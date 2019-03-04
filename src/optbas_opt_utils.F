@@ -3,21 +3,21 @@
 !   Copyright (C) 2000 - 2019  CP2K developers group                                               !
 !--------------------------------------------------------------------------------------------------!
 MODULE optbas_opt_utils
-   USE admm_types,                      ONLY: admm_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_trace,&
-                                              cp_fm_upper_to_full
-   USE cp_fm_diag,                      ONLY: cp_fm_syevd
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE dbcsr_api,                       ONLY: dbcsr_p_type,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE admm_types, ONLY: admm_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_basic_linalg, ONLY: cp_fm_trace, &
+                                 cp_fm_upper_to_full
+   USE cp_fm_diag, ONLY: cp_fm_syevd
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE dbcsr_api, ONLY: dbcsr_p_type, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -45,7 +45,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'evaluate_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, naux, nmo, norb
       REAL(KIND=dp)                                      :: tmp_energy
@@ -69,7 +69,7 @@ CONTAINS
          CALL cp_gemm('N', 'T', naux, naux, norb, 1.0_dp, tmp, QS_inv, 0.0_dp, tmp1)
          CALL cp_gemm('N', 'T', naux, naux, nmo, 1.0_dp, mo_coeff, mo_coeff, 0.0_dp, tmp2)
          CALL cp_fm_trace(tmp1, tmp2, tmp_energy)
-         energy = energy+tmp_energy*(3.0_dp-REAL(SIZE(matrix_ks), dp))
+         energy = energy + tmp_energy*(3.0_dp - REAL(SIZE(matrix_ks), dp))
 
       END DO
 
@@ -119,7 +119,7 @@ CONTAINS
          CALL cp_gemm('N', 'N', nao_aux_fit, nmo, nao_orb, -2.0_dp, admm_env%Q, mo_coeff, &
                       0.0_dp, admm_env%work_aux_nmo(ispin)%matrix)
          CALL cp_fm_trace(mo_coeff_aux_fit, admm_env%work_aux_nmo(ispin)%matrix, trace)
-         fval = fval+trace+2.0_dp*nmo
+         fval = fval + trace + 2.0_dp*nmo
       END DO
 
       ALLOCATE (eigenvalues(nao_aux_fit))

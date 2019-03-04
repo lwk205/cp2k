@@ -10,42 +10,42 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE minbas_methods
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver,&
-                                              cp_fm_power
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_diag,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm_submat,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_create, dbcsr_distribution_type, dbcsr_filter, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_type, &
-        dbcsr_type_no_symmetry
-   USE kinds,                           ONLY: dp
-   USE lapack,                          ONLY: lapack_ssyev
-   USE mao_basis,                       ONLY: mao_generate_basis
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale
+   USE cp_fm_diag, ONLY: choose_eigv_solver, &
+                         cp_fm_power
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_diag, &
+                          cp_fm_release, &
+                          cp_fm_to_fm_submat, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_create, dbcsr_distribution_type, dbcsr_filter, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_type, &
+      dbcsr_type_no_symmetry
+   USE kinds, ONLY: dp
+   USE lapack, ONLY: lapack_ssyev
+   USE mao_basis, ONLY: mao_generate_basis
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -80,7 +80,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: eps_filter
 
       CHARACTER(len=*), PARAMETER :: routineN = 'minbas_calculation', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, i, iab, ispin, nao, natom, &
                                                             ndep, nmao, nmo, nmx, np, np1, nspin, &
@@ -231,7 +231,7 @@ CONTAINS
             IF (unit_nr > 0) THEN
                WRITE (unit_nr, '(T2,A,T51,A,i2,T71,I10)') 'MOs in Occupied Valence Set', 'Spin ', ispin, homo
             END IF
-            nvirt = nmo-homo
+            nvirt = nmo - homo
             NULLIFY (fm_struct_c)
             CALL cp_fm_struct_create(fm_struct_c, nrow_global=nvirt, ncol_global=nvirt, &
                                      para_env=para_env, context=blacs_env)
@@ -239,12 +239,12 @@ CONTAINS
             CALL cp_fm_create(fm4, fm_struct_c)
             ! B(vw) = a(vj)* * a(wj)*
             CALL cp_gemm("N", "T", nvirt, nvirt, nmao, 1.0_dp, fm2, fm2, 0.0_dp, fm3, &
-                         a_first_row=homo+1, b_first_row=homo+1)
+                         a_first_row=homo + 1, b_first_row=homo + 1)
             ALLOCATE (eigval(nvirt))
             CALL choose_eigv_solver(fm3, fm4, eigval)
             ! SVD(B) -> select p largest eigenvalues and vectors
-            np = nmao-homo
-            np1 = nvirt-np+1
+            np = nmao - homo
+            np1 = nvirt - np + 1
             IF (unit_nr > 0) THEN
                WRITE (unit_nr, '(T2,A,T51,A,i2,T71,I10)') 'MOs in Virtual Valence Set', 'Spin ', ispin, np
             END IF
@@ -263,18 +263,18 @@ CONTAINS
             CALL cp_fm_create(fm6, fm_struct_e)
             ! D(j) = SUM_n (a(nj)*)^2 + SUM_vw R(vw) * a(vj)* * a(wj)*
             CALL cp_gemm("N", "N", nvirt, nmao, nvirt, 1.0_dp, fm3, fm2, 0.0_dp, fm5, &
-                         b_first_row=homo+1)
+                         b_first_row=homo + 1)
             CALL cp_gemm("T", "N", nmao, nmao, nvirt, 1.0_dp, fm2, fm5, 0.0_dp, fm6, &
-                         a_first_row=homo+1)
+                         a_first_row=homo + 1)
             CALL cp_fm_get_diag(fm6, dvalv(1:nmao))
             CALL cp_gemm("T", "N", nmao, nmao, homo, 1.0_dp, fm2, fm2, 0.0_dp, fm6)
             CALL cp_fm_get_diag(fm6, dvalo(1:nmao))
             DO i = 1, nmao
-               dval(i) = 1.0_dp/SQRT(dvalo(i)+dvalv(i))
+               dval(i) = 1.0_dp/SQRT(dvalo(i) + dvalv(i))
             END DO
             ! scale intermediate expansion
             CALL cp_fm_to_fm_submat(fm2, fma, homo, nmao, 1, 1, 1, 1)
-            CALL cp_fm_to_fm_submat(fm5, fma, nvirt, nmao, 1, 1, homo+1, 1)
+            CALL cp_fm_to_fm_submat(fm5, fma, nvirt, nmao, 1, 1, homo + 1, 1)
             CALL cp_fm_column_scale(fma, dval)
             ! Orthogonalization
             CALL cp_fm_create(fmwork, fm_struct_e)
@@ -342,7 +342,7 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: sortho
 
       CHARACTER(len=*), PARAMETER :: routineN = 'diag_sqrt_invert', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iatom, info, jatom, lwork, n
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: w, work

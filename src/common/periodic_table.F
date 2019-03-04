@@ -16,8 +16,8 @@
 ! **************************************************************************************************
 MODULE periodic_table
 
-   USE kinds,                           ONLY: dp
-   USE string_utilities,                ONLY: uppercase
+   USE kinds, ONLY: dp
+   USE string_utilities, ONLY: uppercase
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -77,7 +77,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: found
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_ptable_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: symb_ielem, symbol_in
       INTEGER                                            :: ielem, ielem_found

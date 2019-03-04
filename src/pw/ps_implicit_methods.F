@@ -12,51 +12,51 @@
 !> \author Hossein Bani-Hashemian
 ! **************************************************************************************************
 MODULE ps_implicit_methods
-   USE bibliography,                    ONLY: BaniHashemian2016,&
-                                              cite_reference
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE dct,                             ONLY: &
-        dct_type, dct_type_init, neumannX, neumannXY, neumannXYZ, neumannXZ, neumannY, neumannYZ, &
-        neumannZ, pw_expand, pw_shrink
-   USE dielectric_methods,              ONLY: dielectric_create
-   USE dielectric_types,                ONLY: dielectric_type
-   USE dirichlet_bc_methods,            ONLY: dirichlet_boundary_region_setup
-   USE dirichlet_bc_types,              ONLY: dbc_tile_release
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: fourpi,&
-                                              pi
-   USE message_passing,                 ONLY: mp_sum
-   USE ps_implicit_types,               ONLY: MIXED_BC,&
-                                              MIXED_PERIODIC_BC,&
-                                              NEUMANN_BC,&
-                                              PERIODIC_BC,&
-                                              ps_implicit_type
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_derive,&
-                                              pw_integral_ab,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_types,                ONLY: greens_fn_type,&
-                                              pw_poisson_parameter_type,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create,&
-                                              pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_release,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
+   USE bibliography, ONLY: BaniHashemian2016, &
+                           cite_reference
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE dct, ONLY: &
+      dct_type, dct_type_init, neumannX, neumannXY, neumannXYZ, neumannXZ, neumannY, neumannYZ, &
+      neumannZ, pw_expand, pw_shrink
+   USE dielectric_methods, ONLY: dielectric_create
+   USE dielectric_types, ONLY: dielectric_type
+   USE dirichlet_bc_methods, ONLY: dirichlet_boundary_region_setup
+   USE dirichlet_bc_types, ONLY: dbc_tile_release
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE mathconstants, ONLY: fourpi, &
+                            pi
+   USE message_passing, ONLY: mp_sum
+   USE ps_implicit_types, ONLY: MIXED_BC, &
+                                MIXED_PERIODIC_BC, &
+                                NEUMANN_BC, &
+                                PERIODIC_BC, &
+                                ps_implicit_type
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_derive, &
+                         pw_integral_ab, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_types, ONLY: greens_fn_type, &
+                               pw_poisson_parameter_type, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create, &
+                            pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_release, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -98,7 +98,7 @@ CONTAINS
       TYPE(ps_implicit_type), INTENT(INOUT), POINTER     :: ps_implicit_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: boundary_condition, handle, j, &
                                                             n_contacts, neumann_directions
@@ -194,7 +194,7 @@ CONTAINS
       REAL(dp), INTENT(OUT), OPTIONAL                    :: ehartree
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'implicit_poisson_solver_periodic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iter, max_iter, outp_unit, &
                                                             times_called
@@ -260,7 +260,7 @@ CONTAINS
          CALL apply_P_operator(pw_pool, dielectric, QAinvxres, PxQAinvxres)
          CALL pw_copy(PxQAinvxres, res_new)
          CALL pw_scale(res_new, -1.0_dp)
-         CALL pw_axpy(res_old, res_new, 1.0_dp-omega)
+         CALL pw_axpy(res_old, res_new, 1.0_dp - omega)
 
 ! compute the error
          CALL ps_implicit_compute_error_fft(pw_pool, green, res_new, v_old, v_new, QAinvxres, &
@@ -275,12 +275,12 @@ CONTAINS
             IF (outp_unit .GT. 0) WRITE (outp_unit, '(A1,/)')
          END IF
 
-         iter = iter+1
+         iter = iter + 1
          reached_max_iter = iter .GT. max_iter
          reached_tol = pres_error .LE. tol
          IF (pres_error .GT. large_error) &
             CPABORT("Poisson solver did not converge.")
-         ps_implicit_env%times_called = ps_implicit_env%times_called+1
+         ps_implicit_env%times_called = ps_implicit_env%times_called + 1
          IF (reached_max_iter .OR. reached_tol) EXIT
 
 ! v_old = v_new, res_old = res_new
@@ -328,7 +328,7 @@ CONTAINS
       REAL(dp), INTENT(OUT), OPTIONAL                    :: ehartree
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'implicit_poisson_solver_neumann', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iter, max_iter, &
                                                             neumann_directions, outp_unit, &
@@ -421,7 +421,7 @@ CONTAINS
          CALL apply_P_operator(pw_pool_xpndd, dielectric, QAinvxres, PxQAinvxres)
          CALL pw_copy(PxQAinvxres, res_new)
          CALL pw_scale(res_new, -1.0_dp)
-         CALL pw_axpy(res_old, res_new, 1.0_dp-omega)
+         CALL pw_axpy(res_old, res_new, 1.0_dp - omega)
 
 ! compute the error
          CALL ps_implicit_compute_error_dct(pw_pool_xpndd, green, res_new, v_old, v_new_xpndd, QAinvxres, &
@@ -436,12 +436,12 @@ CONTAINS
             IF (outp_unit .GT. 0) WRITE (outp_unit, '(A1,/)')
          END IF
 
-         iter = iter+1
+         iter = iter + 1
          reached_max_iter = iter .GT. max_iter
          reached_tol = pres_error .LE. tol
          IF (pres_error .GT. large_error) &
             CPABORT("Poisson solver did not converge.")
-         ps_implicit_env%times_called = ps_implicit_env%times_called+1
+         ps_implicit_env%times_called = ps_implicit_env%times_called + 1
          IF (reached_max_iter .OR. reached_tol) EXIT
 
 ! v_old = v_new, res_old = res_new
@@ -497,10 +497,10 @@ CONTAINS
       REAL(dp), INTENT(OUT), OPTIONAL                    :: electric_enthalpy
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'implicit_poisson_solver_mixed_periodic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: data_size, handle, iter, j, lb1, lb2, lb3, max_iter, n_contacts, n_tiles_tot, ng, &
-         ngpts_local, nt, nt_tot, outp_unit, times_called, ub1, ub2, ub3
+                 ngpts_local, nt, nt_tot, outp_unit, times_called, ub1, ub2, ub3
       INTEGER(KIND=int_8)                                :: ngpts
       INTEGER, DIMENSION(2, 3)                           :: bounds_local
       INTEGER, DIMENSION(3)                              :: npts_local
@@ -510,7 +510,7 @@ CONTAINS
                                                             gminusAxvbar_avg, nabs_error, omega, &
                                                             pres_error, tol
       REAL(dp), ALLOCATABLE, DIMENSION(:) :: Btxlambda_new, Btxlambda_old, Bxv_bar, Bxv_new, &
-         lambda0, lambda_new, lambda_newNeta, lambda_old, QSxlambda, v_bar1D, v_D, v_new1D, w
+                                             lambda0, lambda_new, lambda_newNeta, lambda_old, QSxlambda, v_bar1D, v_D, v_new1D, w
       REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: B, Bt, QS, Rinv
       REAL(dp), ALLOCATABLE, DIMENSION(:, :, :)          :: Btxlambda_new3D, Btxlambda_old3D
       TYPE(dielectric_type), POINTER                     :: dielectric
@@ -544,7 +544,7 @@ CONTAINS
       n_contacts = SIZE(ps_implicit_env%contacts)
       n_tiles_tot = 0
       DO j = 1, n_contacts
-         n_tiles_tot = n_tiles_tot+ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
+         n_tiles_tot = n_tiles_tot + ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
       END DO
 
       IF (pw_grid%para%blocked) THEN
@@ -561,7 +561,7 @@ CONTAINS
       ALLOCATE (B(n_tiles_tot, data_size))
       ALLOCATE (Bt(data_size, n_tiles_tot))
       ALLOCATE (QS(n_tiles_tot, n_tiles_tot))
-      ALLOCATE (Rinv(n_tiles_tot+1, n_tiles_tot+1))
+      ALLOCATE (Rinv(n_tiles_tot + 1, n_tiles_tot + 1))
 
       B(:, :) = ps_implicit_env%B
       Bt(:, :) = ps_implicit_env%Bt
@@ -578,8 +578,8 @@ CONTAINS
       ALLOCATE (Btxlambda_old(data_size), Btxlambda_new(data_size))
       ALLOCATE (Btxlambda_old3D(lb1:ub1, lb2:ub2, lb3:ub3), Btxlambda_new3D(lb1:ub1, lb2:ub2, lb3:ub3))
       ALLOCATE (QSxlambda(n_tiles_tot))
-      ALLOCATE (w(n_tiles_tot+1))
-      ALLOCATE (lambda_newNeta(n_tiles_tot+1))
+      ALLOCATE (w(n_tiles_tot + 1))
+      ALLOCATE (lambda_newNeta(n_tiles_tot + 1))
       ALLOCATE (v_bar1D(data_size))
       ALLOCATE (Bxv_bar(n_tiles_tot))
 
@@ -632,7 +632,7 @@ CONTAINS
 !        = 1^t * (g - P(\bar{v}))
          CALL apply_P_operator(pw_pool, dielectric, v_new, Axvbar)
          Axvbar_avg = accurate_sum(Axvbar%cr3d)/ngpts
-         gminusAxvbar_avg = g_avg-Axvbar_avg
+         gminusAxvbar_avg = g_avg - Axvbar_avg
          CALL mp_sum(gminusAxvbar_avg, pw_grid%para%group)
 
 ! evaluate Q_S * \lambda + v_D - B * \bar{v}
@@ -642,10 +642,10 @@ CONTAINS
          CALL mp_sum(Bxv_bar, pw_grid%para%group)
 ! solve R [\lambda; \eta] = [Q_S * \lambda + v_D - B * \bar{v}; 1^t * (g - \Delta(\bar{v}) - P(\bar{v}))]
          w = 0.0_dp
-         w(:) = (/QSxlambda+v_D-Bxv_bar, gminusAxvbar_avg/)
-         CALL DGEMV('N', n_tiles_tot+1, n_tiles_tot+1, 1.0_dp, Rinv, n_tiles_tot+1, w, 1, 0.0_dp, lambda_newNeta, 1)
+         w(:) = (/QSxlambda + v_D - Bxv_bar, gminusAxvbar_avg/)
+         CALL DGEMV('N', n_tiles_tot + 1, n_tiles_tot + 1, 1.0_dp, Rinv, n_tiles_tot + 1, w, 1, 0.0_dp, lambda_newNeta, 1)
          lambda_new(:) = lambda_newNeta(1:n_tiles_tot)
-         eta = lambda_newNeta(n_tiles_tot+1)
+         eta = lambda_newNeta(n_tiles_tot + 1)
 
 ! v_new = v_bar + 1 * \eta
          v_new%cr3d = v_new%cr3d+eta/ngpts
@@ -661,7 +661,7 @@ CONTAINS
          CALL pw_zero(res_new)
          CALL apply_P_operator(pw_pool, dielectric, QAinvxres, PxQAinvxres)
          CALL pw_axpy(PxQAinvxres, res_new, -1.0_dp)
-         CALL pw_axpy(res_old, res_new, 1.0_dp-omega)
+         CALL pw_axpy(res_old, res_new, 1.0_dp - omega)
          res_new%cr3d = res_new%cr3d+Btxlambda_old3D-Btxlambda_new3D
 
 ! compute the error
@@ -691,7 +691,7 @@ CONTAINS
                DO ng = 1, n_contacts
                   DO nt = 1, ps_implicit_env%contacts(ng)%dirichlet_bc%n_tiles
                      WRITE (outp_unit, '(T17,I6,5X,I6,3X,E13.4,E13.4)') ng, nt, Bxv_new(nt_tot), lambda_new(nt_tot)
-                     nt_tot = nt_tot+1
+                     nt_tot = nt_tot + 1
                   END DO
                END DO
                WRITE (outp_unit, '(T3,A)') REPEAT('=', 78)
@@ -699,10 +699,10 @@ CONTAINS
          END IF
 
 ! check the convergence
-         iter = iter+1
+         iter = iter + 1
          reached_max_iter = iter .GT. max_iter
          reached_tol = pres_error .LE. tol
-         ps_implicit_env%times_called = ps_implicit_env%times_called+1
+         ps_implicit_env%times_called = ps_implicit_env%times_called + 1
          IF (pres_error .GT. large_error) &
             CPABORT("Poisson solver did not converge.")
          IF (reached_max_iter .OR. reached_tol) EXIT
@@ -757,10 +757,10 @@ CONTAINS
       REAL(dp), INTENT(OUT), OPTIONAL                    :: electric_enthalpy
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'implicit_poisson_solver_mixed', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: data_size, handle, iter, j, lb1, lb2, lb3, max_iter, n_contacts, n_tiles_tot, &
-         neumann_directions, ng, ngpts_local, nt, nt_tot, outp_unit, times_called, ub1, ub2, ub3
+                 neumann_directions, ng, ngpts_local, nt, nt_tot, outp_unit, times_called, ub1, ub2, ub3
       INTEGER(KIND=int_8)                                :: ngpts
       INTEGER, DIMENSION(2, 3)                           :: bounds_local
       INTEGER, DIMENSION(3)                              :: npts_local
@@ -770,7 +770,7 @@ CONTAINS
                                                             gminusAxvbar_avg, nabs_error, omega, &
                                                             pres_error, tol, vol_scfac
       REAL(dp), ALLOCATABLE, DIMENSION(:) :: Btxlambda_new, Btxlambda_old, Bxv_bar, Bxv_new, &
-         lambda0, lambda_new, lambda_newNeta, lambda_old, QSxlambda, v_bar1D, v_D, v_new1D, w
+                                             lambda0, lambda_new, lambda_newNeta, lambda_old, QSxlambda, v_bar1D, v_D, v_new1D, w
       REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: B, Bt, QS, Rinv
       REAL(dp), ALLOCATABLE, DIMENSION(:, :, :)          :: Btxlambda_new3D, Btxlambda_old3D
       TYPE(dct_type), POINTER                            :: dct_env
@@ -818,7 +818,7 @@ CONTAINS
       n_contacts = SIZE(ps_implicit_env%contacts)
       n_tiles_tot = 0
       DO j = 1, n_contacts
-         n_tiles_tot = n_tiles_tot+ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
+         n_tiles_tot = n_tiles_tot + ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
       END DO
 
       IF (dct_pw_grid%para%blocked) THEN
@@ -837,7 +837,7 @@ CONTAINS
       ALLOCATE (B(n_tiles_tot, data_size))
       ALLOCATE (Bt(data_size, n_tiles_tot))
       ALLOCATE (QS(n_tiles_tot, n_tiles_tot))
-      ALLOCATE (Rinv(n_tiles_tot+1, n_tiles_tot+1))
+      ALLOCATE (Rinv(n_tiles_tot + 1, n_tiles_tot + 1))
 
       B(:, :) = ps_implicit_env%B
       Bt(:, :) = ps_implicit_env%Bt
@@ -854,8 +854,8 @@ CONTAINS
       ALLOCATE (Btxlambda_old(data_size), Btxlambda_new(data_size))
       ALLOCATE (Btxlambda_old3D(lb1:ub1, lb2:ub2, lb3:ub3), Btxlambda_new3D(lb1:ub1, lb2:ub2, lb3:ub3))
       ALLOCATE (QSxlambda(n_tiles_tot))
-      ALLOCATE (w(n_tiles_tot+1))
-      ALLOCATE (lambda_newNeta(n_tiles_tot+1))
+      ALLOCATE (w(n_tiles_tot + 1))
+      ALLOCATE (lambda_newNeta(n_tiles_tot + 1))
       ALLOCATE (v_bar1D(data_size))
       ALLOCATE (Bxv_bar(n_tiles_tot))
 
@@ -918,7 +918,7 @@ CONTAINS
 !        = 1^t * (g - P(\bar{v}))
          CALL apply_P_operator(pw_pool_xpndd, dielectric, v_new_xpndd, Axvbar)
          Axvbar_avg = accurate_sum(Axvbar%cr3d)/ngpts
-         gminusAxvbar_avg = g_avg-Axvbar_avg
+         gminusAxvbar_avg = g_avg - Axvbar_avg
          CALL mp_sum(gminusAxvbar_avg, dct_pw_grid%para%group)
 
 ! evaluate Q_S * \lambda + v_D - B * \bar{v}
@@ -928,10 +928,10 @@ CONTAINS
          CALL mp_sum(Bxv_bar, dct_pw_grid%para%group)
 ! solve R [\lambda; \eta] = [Q_S * \lambda + v_D - B * \bar{v}; 1^t * (g - \Delta(\bar{v}) - P(\bar{v}))]
          w = 0.0_dp
-         w(:) = (/QSxlambda+v_D-Bxv_bar, gminusAxvbar_avg/)
-         CALL DGEMV('N', n_tiles_tot+1, n_tiles_tot+1, 1.0_dp, Rinv, n_tiles_tot+1, w, 1, 0.0_dp, lambda_newNeta, 1)
+         w(:) = (/QSxlambda + v_D - Bxv_bar, gminusAxvbar_avg/)
+         CALL DGEMV('N', n_tiles_tot + 1, n_tiles_tot + 1, 1.0_dp, Rinv, n_tiles_tot + 1, w, 1, 0.0_dp, lambda_newNeta, 1)
          lambda_new(:) = lambda_newNeta(1:n_tiles_tot)
-         eta = lambda_newNeta(n_tiles_tot+1)
+         eta = lambda_newNeta(n_tiles_tot + 1)
 
 ! v_new = v_bar + 1 * \eta
          v_new_xpndd%cr3d = v_new_xpndd%cr3d+eta/ngpts
@@ -947,7 +947,7 @@ CONTAINS
          CALL pw_zero(res_new)
          CALL apply_P_operator(pw_pool_xpndd, dielectric, QAinvxres, PxQAinvxres)
          CALL pw_axpy(PxQAinvxres, res_new, -1.0_dp)
-         CALL pw_axpy(res_old, res_new, 1.0_dp-omega)
+         CALL pw_axpy(res_old, res_new, 1.0_dp - omega)
          res_new%cr3d = res_new%cr3d-Btxlambda_new3D+Btxlambda_old3D
 
 ! compute the error
@@ -978,7 +978,7 @@ CONTAINS
                DO ng = 1, n_contacts
                   DO nt = 1, ps_implicit_env%contacts(ng)%dirichlet_bc%n_tiles
                      WRITE (outp_unit, '(T17,I6,5X,I6,3X,E13.4,E13.4)') ng, nt, Bxv_new(nt_tot), lambda_new(nt_tot)
-                     nt_tot = nt_tot+1
+                     nt_tot = nt_tot + 1
                   END DO
                END DO
                WRITE (outp_unit, '(T3,A)') REPEAT('=', 78)
@@ -986,10 +986,10 @@ CONTAINS
          END IF
 
 ! check the convergence
-         iter = iter+1
+         iter = iter + 1
          reached_max_iter = iter .GT. max_iter
          reached_tol = pres_error .LE. tol
-         ps_implicit_env%times_called = ps_implicit_env%times_called+1
+         ps_implicit_env%times_called = ps_implicit_env%times_called + 1
          IF (pres_error .GT. large_error) &
             CPABORT("Poisson solver did not converge.")
          IF (reached_max_iter .OR. reached_tol) EXIT
@@ -1048,7 +1048,7 @@ CONTAINS
       TYPE(pw_pool_type), INTENT(IN), POINTER            :: pw_pool
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_initial_guess_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, n_tiles_tot
 
@@ -1086,10 +1086,10 @@ CONTAINS
       TYPE(ps_implicit_type), INTENT(INOUT), POINTER     :: ps_implicit_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_prepare_blocks', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: data_size, handle, i, indx1, indx2, info, j, k, l, lb1, lb2, lb3, n_contacts, &
-         n_tiles, n_tiles_tot, neumann_directions, ngpts_local, ub1, ub2, ub3, unit_nr
+                 n_tiles, n_tiles_tot, neumann_directions, ngpts_local, ub1, ub2, ub3, unit_nr
       INTEGER(KIND=int_8)                                :: ngpts
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: ipiv
       INTEGER, DIMENSION(2, 3)                           :: bounds, bounds_local
@@ -1155,10 +1155,10 @@ CONTAINS
          DO k = lb3, ub3
             DO j = lb2, ub2
                DO i = lb1, ub1
-                  ps_implicit_env%idx_1dto3d(l) = (i-lb1+1)+ &
-                                                  (j-lb2)*npts_local(1)+ &
-                                                  (k-lb3)*npts_local(1)*npts_local(2)
-                  l = l+1
+                  ps_implicit_env%idx_1dto3d(l) = (i - lb1 + 1) + &
+                                                  (j - lb2)*npts_local(1) + &
+                                                  (k - lb3)*npts_local(1)*npts_local(2)
+                  l = l + 1
                END DO
             END DO
          END DO
@@ -1166,13 +1166,13 @@ CONTAINS
          n_contacts = SIZE(ps_implicit_env%contacts)
          n_tiles_tot = 0
          DO j = 1, n_contacts
-            n_tiles_tot = n_tiles_tot+ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
+            n_tiles_tot = n_tiles_tot + ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
          END DO
 
          ALLOCATE (ps_implicit_env%B(n_tiles_tot, data_size))
          ALLOCATE (ps_implicit_env%Bt(data_size, n_tiles_tot))
          ALLOCATE (ps_implicit_env%QS(n_tiles_tot, n_tiles_tot))
-         ALLOCATE (ps_implicit_env%Rinv(n_tiles_tot+1, n_tiles_tot+1))
+         ALLOCATE (ps_implicit_env%Rinv(n_tiles_tot + 1, n_tiles_tot + 1))
          ALLOCATE (ps_implicit_env%v_D(n_tiles_tot))
          ALLOCATE (ps_implicit_env%osc_frac(n_tiles_tot))
          ALLOCATE (ps_implicit_env%frequency(n_tiles_tot))
@@ -1181,8 +1181,8 @@ CONTAINS
          ALLOCATE (QAinvxBt(data_size, n_tiles_tot))
          ALLOCATE (Bxunit_vec(n_tiles_tot))
          ALLOCATE (test_vec(n_tiles_tot))
-         ALLOCATE (R(n_tiles_tot+1, n_tiles_tot+1))
-         ALLOCATE (work_arr(n_tiles_tot+1), ipiv(n_tiles_tot+1)) ! LAPACK work and ipiv arrays
+         ALLOCATE (R(n_tiles_tot + 1, n_tiles_tot + 1))
+         ALLOCATE (work_arr(n_tiles_tot + 1), ipiv(n_tiles_tot + 1)) ! LAPACK work and ipiv arrays
 
 ! prepare pw_pool for evaluating inverse Laplacian of tile_pw's using DCT
          CALL pw_pool_create(pw_pool_xpndd, pw_grid=dct_pw_grid)
@@ -1191,7 +1191,7 @@ CONTAINS
          indx1 = 1
          DO j = 1, n_contacts
             n_tiles = ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
-            indx2 = indx1+n_tiles-1
+            indx2 = indx1 + n_tiles - 1
             DO i = 1, n_tiles
                tile_pw => ps_implicit_env%contacts(j)%dirichlet_bc%tiles(i)%tile%tile_pw
 
@@ -1202,21 +1202,21 @@ CONTAINS
 
                tile_volume = ps_implicit_env%contacts(j)%dirichlet_bc%tiles(i)%tile%volume
                CALL pw_scale(pw_in, 1.0_dp/(vol_scfac*tile_volume)) ! normalize tile_pw
-               ps_implicit_env%Bt(ps_implicit_env%idx_1dto3d, indx1+i-1) = RESHAPE(pw_in%cr3d, (/data_size/))
+               ps_implicit_env%Bt(ps_implicit_env%idx_1dto3d, indx1 + i - 1) = RESHAPE(pw_in%cr3d, (/data_size/))
 
                CALL pw_pool_create_pw(pw_pool_xpndd, pw_out, use_data=REALDATA3D, in_space=REALSPACE)
                CALL apply_inv_laplace_operator_dct(pw_pool_xpndd, green, pw_in, pw_out)
-               QAinvxBt(ps_implicit_env%idx_1dto3d, indx1+i-1) = RESHAPE(pw_out%cr3d, (/data_size/))
+               QAinvxBt(ps_implicit_env%idx_1dto3d, indx1 + i - 1) = RESHAPE(pw_out%cr3d, (/data_size/))
                ! the electrostatic potential has opposite sign by internal convention
-               ps_implicit_env%v_D(indx1+i-1) = -1.0_dp*ps_implicit_env%contacts(j)%dirichlet_bc%v_D
-               ps_implicit_env%osc_frac(indx1+i-1) = ps_implicit_env%contacts(j)%dirichlet_bc%osc_frac
-               ps_implicit_env%frequency(indx1+i-1) = ps_implicit_env%contacts(j)%dirichlet_bc%frequency
-               ps_implicit_env%phase(indx1+i-1) = ps_implicit_env%contacts(j)%dirichlet_bc%phase
+               ps_implicit_env%v_D(indx1 + i - 1) = -1.0_dp*ps_implicit_env%contacts(j)%dirichlet_bc%v_D
+               ps_implicit_env%osc_frac(indx1 + i - 1) = ps_implicit_env%contacts(j)%dirichlet_bc%osc_frac
+               ps_implicit_env%frequency(indx1 + i - 1) = ps_implicit_env%contacts(j)%dirichlet_bc%frequency
+               ps_implicit_env%phase(indx1 + i - 1) = ps_implicit_env%contacts(j)%dirichlet_bc%phase
 
                CALL pw_pool_give_back_pw(pw_pool_xpndd, pw_in)
                CALL pw_pool_give_back_pw(pw_pool_xpndd, pw_out)
             END DO
-            indx1 = indx2+1
+            indx1 = indx2 + 1
          END DO
          ps_implicit_env%B = TRANSPOSE(ps_implicit_env%Bt)
 
@@ -1234,16 +1234,16 @@ CONTAINS
 ! set up R = [QS B*1; (B*1)^t 0]
          R = 0.0_dp
          R(1:n_tiles_tot, 1:n_tiles_tot) = ps_implicit_env%QS
-         R(1:n_tiles_tot, n_tiles_tot+1) = Bxunit_vec
-         R(n_tiles_tot+1, 1:n_tiles_tot) = Bxunit_vec
+         R(1:n_tiles_tot, n_tiles_tot + 1) = Bxunit_vec
+         R(n_tiles_tot + 1, 1:n_tiles_tot) = Bxunit_vec
 ! evaluate R^(-1)
          ps_implicit_env%Rinv = R
-         CALL DGETRF(n_tiles_tot+1, n_tiles_tot+1, ps_implicit_env%Rinv, n_tiles_tot+1, ipiv, info)
+         CALL DGETRF(n_tiles_tot + 1, n_tiles_tot + 1, ps_implicit_env%Rinv, n_tiles_tot + 1, ipiv, info)
          IF (info .NE. 0) &
             CALL cp_abort(__LOCATION__, &
                           "R is (nearly) singular! Either two Dirichlet constraints are identical or "// &
                           "you need to reduce the number of tiles.")
-         CALL DGETRI(n_tiles_tot+1, ps_implicit_env%Rinv, n_tiles_tot+1, ipiv, work_arr, n_tiles_tot+1, info)
+         CALL DGETRI(n_tiles_tot + 1, ps_implicit_env%Rinv, n_tiles_tot + 1, ipiv, work_arr, n_tiles_tot + 1, info)
          IF (info .NE. 0) &
             CPABORT("Inversion of R failed!")
 
@@ -1284,10 +1284,10 @@ CONTAINS
          DO k = lb3, ub3
             DO j = lb2, ub2
                DO i = lb1, ub1
-                  ps_implicit_env%idx_1dto3d(l) = (i-lb1+1)+ &
-                                                  (j-lb2)*npts_local(1)+ &
-                                                  (k-lb3)*npts_local(1)*npts_local(2)
-                  l = l+1
+                  ps_implicit_env%idx_1dto3d(l) = (i - lb1 + 1) + &
+                                                  (j - lb2)*npts_local(1) + &
+                                                  (k - lb3)*npts_local(1)*npts_local(2)
+                  l = l + 1
                END DO
             END DO
          END DO
@@ -1295,13 +1295,13 @@ CONTAINS
          n_contacts = SIZE(ps_implicit_env%contacts)
          n_tiles_tot = 0
          DO j = 1, n_contacts
-            n_tiles_tot = n_tiles_tot+ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
+            n_tiles_tot = n_tiles_tot + ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
          END DO
 
          ALLOCATE (ps_implicit_env%B(n_tiles_tot, data_size))
          ALLOCATE (ps_implicit_env%Bt(data_size, n_tiles_tot))
          ALLOCATE (ps_implicit_env%QS(n_tiles_tot, n_tiles_tot))
-         ALLOCATE (ps_implicit_env%Rinv(n_tiles_tot+1, n_tiles_tot+1))
+         ALLOCATE (ps_implicit_env%Rinv(n_tiles_tot + 1, n_tiles_tot + 1))
          ALLOCATE (ps_implicit_env%v_D(n_tiles_tot))
          ALLOCATE (ps_implicit_env%osc_frac(n_tiles_tot))
          ALLOCATE (ps_implicit_env%frequency(n_tiles_tot))
@@ -1310,14 +1310,14 @@ CONTAINS
          ALLOCATE (QAinvxBt(data_size, n_tiles_tot))
          ALLOCATE (Bxunit_vec(n_tiles_tot))
          ALLOCATE (test_vec(n_tiles_tot))
-         ALLOCATE (R(n_tiles_tot+1, n_tiles_tot+1))
-         ALLOCATE (work_arr(n_tiles_tot+1), ipiv(n_tiles_tot+1))
+         ALLOCATE (R(n_tiles_tot + 1, n_tiles_tot + 1))
+         ALLOCATE (work_arr(n_tiles_tot + 1), ipiv(n_tiles_tot + 1))
 
 ! set up B, B^t, (\Delta^-1)*B^t
          indx1 = 1
          DO j = 1, n_contacts
             n_tiles = ps_implicit_env%contacts(j)%dirichlet_bc%n_tiles
-            indx2 = indx1+n_tiles-1
+            indx2 = indx1 + n_tiles - 1
             DO i = 1, n_tiles
                tile_pw => ps_implicit_env%contacts(j)%dirichlet_bc%tiles(i)%tile%tile_pw
 
@@ -1326,21 +1326,21 @@ CONTAINS
 
                tile_volume = ps_implicit_env%contacts(j)%dirichlet_bc%tiles(i)%tile%volume
                CALL pw_scale(pw_in, 1.0_dp/tile_volume) ! normalize tile_pw
-               ps_implicit_env%Bt(ps_implicit_env%idx_1dto3d, indx1+i-1) = RESHAPE(pw_in%cr3d, (/data_size/))
+               ps_implicit_env%Bt(ps_implicit_env%idx_1dto3d, indx1 + i - 1) = RESHAPE(pw_in%cr3d, (/data_size/))
 
                CALL pw_pool_create_pw(pw_pool_orig, pw_out, use_data=REALDATA3D, in_space=REALSPACE)
                CALL apply_inv_laplace_operator_fft(pw_pool_orig, green, pw_in, pw_out)
-               QAinvxBt(ps_implicit_env%idx_1dto3d, indx1+i-1) = RESHAPE(pw_out%cr3d, (/data_size/))
+               QAinvxBt(ps_implicit_env%idx_1dto3d, indx1 + i - 1) = RESHAPE(pw_out%cr3d, (/data_size/))
                ! the electrostatic potential has opposite sign by internal convention
-               ps_implicit_env%v_D(indx1+i-1) = -1.0_dp*ps_implicit_env%contacts(j)%dirichlet_bc%v_D
-               ps_implicit_env%osc_frac(indx1+i-1) = ps_implicit_env%contacts(j)%dirichlet_bc%osc_frac
-               ps_implicit_env%frequency(indx1+i-1) = ps_implicit_env%contacts(j)%dirichlet_bc%frequency
-               ps_implicit_env%phase(indx1+i-1) = ps_implicit_env%contacts(j)%dirichlet_bc%phase
+               ps_implicit_env%v_D(indx1 + i - 1) = -1.0_dp*ps_implicit_env%contacts(j)%dirichlet_bc%v_D
+               ps_implicit_env%osc_frac(indx1 + i - 1) = ps_implicit_env%contacts(j)%dirichlet_bc%osc_frac
+               ps_implicit_env%frequency(indx1 + i - 1) = ps_implicit_env%contacts(j)%dirichlet_bc%frequency
+               ps_implicit_env%phase(indx1 + i - 1) = ps_implicit_env%contacts(j)%dirichlet_bc%phase
 
                CALL pw_pool_give_back_pw(pw_pool_orig, pw_in)
                CALL pw_pool_give_back_pw(pw_pool_orig, pw_out)
             END DO
-            indx1 = indx2+1
+            indx1 = indx2 + 1
          END DO
          ps_implicit_env%B = TRANSPOSE(ps_implicit_env%Bt)
 
@@ -1358,16 +1358,16 @@ CONTAINS
 ! set up R = [QS B*1; (B*1)^t 0]
          R = 0.0_dp
          R(1:n_tiles_tot, 1:n_tiles_tot) = ps_implicit_env%QS
-         R(1:n_tiles_tot, n_tiles_tot+1) = Bxunit_vec
-         R(n_tiles_tot+1, 1:n_tiles_tot) = Bxunit_vec
+         R(1:n_tiles_tot, n_tiles_tot + 1) = Bxunit_vec
+         R(n_tiles_tot + 1, 1:n_tiles_tot) = Bxunit_vec
 ! evaluate R^(-1)
          ps_implicit_env%Rinv = R
-         CALL DGETRF(n_tiles_tot+1, n_tiles_tot+1, ps_implicit_env%Rinv, n_tiles_tot+1, ipiv, info)
+         CALL DGETRF(n_tiles_tot + 1, n_tiles_tot + 1, ps_implicit_env%Rinv, n_tiles_tot + 1, ipiv, info)
          IF (info .NE. 0) &
             CALL cp_abort(__LOCATION__, &
                           "R is (nearly) singular! Either two Dirichlet constraints are identical or "// &
                           "you need to reduce the number of tiles.")
-         CALL DGETRI(n_tiles_tot+1, ps_implicit_env%Rinv, n_tiles_tot+1, ipiv, work_arr, n_tiles_tot+1, info)
+         CALL DGETRI(n_tiles_tot + 1, ps_implicit_env%Rinv, n_tiles_tot + 1, ipiv, work_arr, n_tiles_tot + 1, info)
          IF (info .NE. 0) &
             CPABORT("Inversion of R failed!")
 
@@ -1427,7 +1427,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: Pxv
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_P_operator', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
       TYPE(pw_p_type), DIMENSION(3)                      :: dln_eps, dv
@@ -1471,7 +1471,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: pw_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_inv_laplace_operator_fft', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ig, ng
       REAL(dp)                                           :: prefactor
@@ -1521,7 +1521,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: pw_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_inv_laplace_operator_dct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ig, ng
       REAL(dp)                                           :: prefactor
@@ -1569,7 +1569,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: pw_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_laplace_operator_fft', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: g0_index, handle, ig, ng
       LOGICAL                                            :: have_g0
@@ -1592,7 +1592,7 @@ CONTAINS
       CALL pw_transfer(pw_in, pw_in_gs)
 
       IF (have_g0) THEN
-         g0_index = green%influence_fn%pw_grid%first_gne0-1
+         g0_index = green%influence_fn%pw_grid%first_gne0 - 1
          pw_in_gs%cc(g0_index) = 0.0_dp
       END IF
       DO ig = green%influence_fn%pw_grid%first_gne0, ng
@@ -1626,7 +1626,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: pw_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_laplace_operator_dct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: g0_index, handle, ig, ng
       LOGICAL                                            :: have_g0
@@ -1649,7 +1649,7 @@ CONTAINS
       CALL pw_transfer(pw_in, pw_in_gs)
 
       IF (have_g0) THEN
-         g0_index = green%dct_influence_fn%pw_grid%first_gne0-1
+         g0_index = green%dct_influence_fn%pw_grid%first_gne0 - 1
          pw_in_gs%cc(g0_index) = 0.0_dp
       END IF
       DO ig = green%dct_influence_fn%pw_grid%first_gne0, ng
@@ -1684,7 +1684,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: density
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_poisson_operator_fft', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(pw_type), POINTER                             :: Pxv
@@ -1726,7 +1726,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: density
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_poisson_operator_dct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(pw_type), POINTER                             :: Pxv
@@ -1768,7 +1768,7 @@ CONTAINS
       TYPE(pw_type), INTENT(INOUT), POINTER              :: v_eps
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_compute_veps', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
       REAL(dp)                                           :: eightpi
@@ -1790,7 +1790,7 @@ CONTAINS
       CALL derive_fft(v, dv, pw_pool)
 
 ! evaluate |\nabla_r(v)|^2
-      dv2%cr3d = dv(1)%pw%cr3d**2+dv(2)%pw%cr3d**2+dv(3)%pw%cr3d**2
+      dv2%cr3d = dv(1)%pw%cr3d**2 + dv(2)%pw%cr3d**2 + dv(3)%pw%cr3d**2
 
       v_eps%cr3d = -(1.0_dp/eightpi)*(dv2%cr3d*deps_drho%cr3d)
 
@@ -1818,7 +1818,7 @@ CONTAINS
       REAL(dp), INTENT(OUT)                              :: ehartree
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_ehartree_periodic_bc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -1854,7 +1854,7 @@ CONTAINS
       REAL(dp), INTENT(OUT)                              :: ehartree, electric_enthalpy
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_ehartree_mixed_bc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(dp)                                           :: dvol, ehartree_rho, ehartree_rho_cstr
@@ -1877,8 +1877,8 @@ CONTAINS
       ehartree_rho_cstr = 0.5_dp*ehartree_rho_cstr*dvol
       CALL mp_sum(ehartree_rho, pw_grid%para%group)
       CALL mp_sum(ehartree_rho_cstr, pw_grid%para%group)
-      electric_enthalpy = ehartree_rho+ehartree_rho_cstr
-      ehartree = ehartree_rho-ehartree_rho_cstr
+      electric_enthalpy = ehartree_rho + ehartree_rho_cstr
+      ehartree = ehartree_rho - ehartree_rho_cstr
 
       CALL timestop(handle)
 
@@ -1909,7 +1909,7 @@ CONTAINS
       REAL(dp), INTENT(OUT)                              :: pres_error, nabs_error
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_compute_error_fft', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(dp)                                           :: vol
@@ -1961,7 +1961,7 @@ CONTAINS
       REAL(dp), INTENT(OUT)                              :: pres_error, nabs_error
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_compute_error_dct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(dp)                                           :: vol
@@ -2004,7 +2004,7 @@ CONTAINS
       INTEGER, INTENT(OUT)                               :: outp_unit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_output', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: low_print_level = 1
 
       INTEGER                                            :: handle
@@ -2051,7 +2051,7 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: ehartree
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_report_ehartree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: low_print_level = 1
 
       INTEGER                                            :: handle
@@ -2061,7 +2061,7 @@ CONTAINS
       CALL timeset(routineN, handle)
       IF (logger%iter_info%print_level .GT. low_print_level) THEN
          IF (outp_unit .GT. 0) WRITE (outp_unit, '(F19.10,E10.2)') &
-            ehartree, ehartree-ps_implicit_env%ehartree
+            ehartree, ehartree - ps_implicit_env%ehartree
       END IF
       CALL timestop(handle)
 
@@ -2081,14 +2081,14 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iter, max_iter, outp_unit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ps_implicit_print_convergence_msg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=12)                                  :: msg
       INTEGER                                            :: handle, last_iter
 
       CALL timeset(routineN, handle)
 
-      last_iter = iter-1
+      last_iter = iter - 1
       IF (last_iter .EQ. 1) THEN
          msg = " iteration. "
       ELSE
@@ -2176,14 +2176,14 @@ CONTAINS
       lb2 = LBOUND(arr3d, 2); ub2 = UBOUND(arr3d, 2)
       lb3 = LBOUND(arr3d, 3); ub3 = UBOUND(arr3d, 3)
 
-      npts1 = ub1-lb1+1
-      npts2 = ub2-lb2+1
-      npts3 = ub3-lb3+1
+      npts1 = ub1 - lb1 + 1
+      npts2 = ub2 - lb2 + 1
+      npts3 = ub3 - lb3 + 1
 
       DO l = 1, SIZE(idx_1dto3d)
-         k = ((idx_1dto3d(l)-1)/(npts1*npts2))+lb3
-         j = ((idx_1dto3d(l)-1)-(k-lb3)*npts1*npts2)/npts1+lb2
-         i = idx_1dto3d(l)-((j-lb2)*npts1+(k-lb3)*npts1*npts2)+lb1-1
+         k = ((idx_1dto3d(l) - 1)/(npts1*npts2)) + lb3
+         j = ((idx_1dto3d(l) - 1) - (k - lb3)*npts1*npts2)/npts1 + lb2
+         i = idx_1dto3d(l) - ((j - lb2)*npts1 + (k - lb3)*npts1*npts2) + lb1 - 1
          arr3d(i, j, k) = arr1d(l)
       END DO
 
@@ -2215,8 +2215,8 @@ CONTAINS
       ALLOCATE (v_D_new(SIZE(v_D)))
 
       DO i = 1, SIZE(v_D)
-         v_D_new(i) = v_D(i)*(1-osc_frac(i))+ &
-                      v_D(i)*osc_frac(i)*COS(2*pi*time*frequency(i)+phase(i))
+         v_D_new(i) = v_D(i)*(1 - osc_frac(i)) + &
+                      v_D(i)*osc_frac(i)*COS(2*pi*time*frequency(i) + phase(i))
       END DO
 
       CALL timestop(handle)

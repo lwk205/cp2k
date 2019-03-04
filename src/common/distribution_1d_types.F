@@ -21,12 +21,12 @@
 ! **************************************************************************************************
 MODULE distribution_1d_types
 
-   USE cp_array_utils,                  ONLY: cp_1d_i_p_type
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE parallel_rng_types,              ONLY: delete_rng_stream,&
-                                              rng_stream_p_type
+   USE cp_array_utils, ONLY: cp_1d_i_p_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE parallel_rng_types, ONLY: delete_rng_stream, &
+                                 rng_stream_p_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -103,7 +103,7 @@ CONTAINS
       INTEGER, INTENT(in), OPTIONAL                      :: n_lists
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_1d_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ilist, my_n_lists, stat
 
@@ -112,7 +112,7 @@ CONTAINS
       IF (PRESENT(n_lists)) my_n_lists = n_lists
 
       ALLOCATE (distribution_1d)
-      distribution_1d_last_id_nr = distribution_1d_last_id_nr+1
+      distribution_1d_last_id_nr = distribution_1d_last_id_nr + 1
       distribution_1d%id_nr = distribution_1d_last_id_nr
 
       distribution_1d%ref_count = 1
@@ -158,11 +158,11 @@ CONTAINS
       TYPE(distribution_1d_type), POINTER                :: distribution_1d
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_1d_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(distribution_1d))
       CPASSERT(distribution_1d%ref_count > 0)
-      distribution_1d%ref_count = distribution_1d%ref_count+1
+      distribution_1d%ref_count = distribution_1d%ref_count + 1
    END SUBROUTINE distribution_1d_retain
 
 ! **************************************************************************************************
@@ -176,7 +176,7 @@ CONTAINS
       TYPE(distribution_1d_type), POINTER                :: distribution_1d
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_1d_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ilist, iparticle_kind, iparticle_local, &
                                                             nparticle_kind, nparticle_local
@@ -184,7 +184,7 @@ CONTAINS
 
       IF (ASSOCIATED(distribution_1d)) THEN
          CPASSERT(distribution_1d%ref_count > 0)
-         distribution_1d%ref_count = distribution_1d%ref_count-1
+         distribution_1d%ref_count = distribution_1d%ref_count - 1
          IF (distribution_1d%ref_count == 0) THEN
             DEALLOCATE (distribution_1d%n_el)
 

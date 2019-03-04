@@ -11,7 +11,7 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE hfx_contract_block
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -4035,8 +4035,8 @@ CONTAINS
    SUBROUTINE block_default(ma_max, mb_max, mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: ma_max, mb_max, mc_max, md_max
       REAL(KIND=dp) :: kbd(mb_max*md_max), kbc(mb_max*mc_max), kad(ma_max*md_max), &
-         kac(ma_max*mc_max), pbd(mb_max*md_max), pbc(mb_max*mc_max), pad(ma_max*md_max), &
-         pac(ma_max*mc_max), prim(ma_max*mb_max*mc_max*md_max), scale
+                       kac(ma_max*mc_max), pbd(mb_max*md_max), pbc(mb_max*mc_max), pad(ma_max*md_max), &
+                       pac(ma_max*mc_max), prim(ma_max*mb_max*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -4051,18 +4051,18 @@ CONTAINS
             DO mb = 1, mb_max
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*mb_max+mb)
-               p_bc = pbc((mc-1)*mb_max+mb)
+               p_bd = pbd((md - 1)*mb_max + mb)
+               p_bc = pbc((mc - 1)*mb_max + mb)
                DO ma = 1, ma_max
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*ma_max+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*ma_max+ma)
-                  kad((md-1)*ma_max+ma) = kad((md-1)*ma_max+ma)-tmp*p_bc
-                  kac((mc-1)*ma_max+ma) = kac((mc-1)*ma_max+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*ma_max + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*ma_max + ma)
+                  kad((md - 1)*ma_max + ma) = kad((md - 1)*ma_max + ma) - tmp*p_bc
+                  kac((mc - 1)*ma_max + ma) = kac((mc - 1)*ma_max + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*mb_max+mb) = kbd((md-1)*mb_max+mb)-ks_bd
-               kbc((mc-1)*mb_max+mb) = kbc((mc-1)*mb_max+mb)-ks_bc
+               kbd((md - 1)*mb_max + mb) = kbd((md - 1)*mb_max + mb) - ks_bd
+               kbc((mc - 1)*mb_max + mb) = kbc((mc - 1)*mb_max + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4098,18 +4098,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4145,18 +4145,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4192,18 +4192,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4239,18 +4239,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4286,18 +4286,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4333,18 +4333,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4380,18 +4380,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4427,18 +4427,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4475,18 +4475,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4523,18 +4523,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4571,18 +4571,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4618,18 +4618,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4665,18 +4665,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4712,18 +4712,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4759,18 +4759,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4806,18 +4806,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4853,18 +4853,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4900,18 +4900,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4947,18 +4947,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -4980,7 +4980,7 @@ CONTAINS
    SUBROUTINE block_1_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(1*md_max), kac(1*2), pbd(1*md_max), pbc(1*2), &
-         pad(1*md_max), pac(1*2), prim(1*1*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -4995,18 +4995,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5042,18 +5042,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5089,18 +5089,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5136,18 +5136,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5183,18 +5183,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5230,18 +5230,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5277,18 +5277,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5310,7 +5310,7 @@ CONTAINS
    SUBROUTINE block_1_1_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*3), kad(1*md_max), kac(1*3), pbd(1*md_max), pbc(1*3), &
-         pad(1*md_max), pac(1*3), prim(1*1*3*md_max), scale
+                       pad(1*md_max), pac(1*3), prim(1*1*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -5325,18 +5325,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5372,18 +5372,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5419,18 +5419,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5466,18 +5466,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5513,18 +5513,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5546,7 +5546,7 @@ CONTAINS
    SUBROUTINE block_1_1_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*4), kad(1*md_max), kac(1*4), pbd(1*md_max), pbc(1*4), &
-         pad(1*md_max), pac(1*4), prim(1*1*4*md_max), scale
+                       pad(1*md_max), pac(1*4), prim(1*1*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -5561,18 +5561,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5608,18 +5608,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5655,18 +5655,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5702,18 +5702,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5735,7 +5735,7 @@ CONTAINS
    SUBROUTINE block_1_1_5(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*5), kad(1*md_max), kac(1*5), pbd(1*md_max), pbc(1*5), &
-         pad(1*md_max), pac(1*5), prim(1*1*5*md_max), scale
+                       pad(1*md_max), pac(1*5), prim(1*1*5*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -5750,18 +5750,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5797,18 +5797,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5844,18 +5844,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5891,18 +5891,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5924,7 +5924,7 @@ CONTAINS
    SUBROUTINE block_1_1_6(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*6), kad(1*md_max), kac(1*6), pbd(1*md_max), pbc(1*6), &
-         pad(1*md_max), pac(1*6), prim(1*1*6*md_max), scale
+                       pad(1*md_max), pac(1*6), prim(1*1*6*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -5939,18 +5939,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -5986,18 +5986,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6033,18 +6033,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6066,7 +6066,7 @@ CONTAINS
    SUBROUTINE block_1_1_7(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*7), kad(1*md_max), kac(1*7), pbd(1*md_max), pbc(1*7), &
-         pad(1*md_max), pac(1*7), prim(1*1*7*md_max), scale
+                       pad(1*md_max), pac(1*7), prim(1*1*7*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -6081,18 +6081,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6128,18 +6128,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6175,18 +6175,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6208,7 +6208,7 @@ CONTAINS
    SUBROUTINE block_1_1_9(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*9), kad(1*md_max), kac(1*9), pbd(1*md_max), pbc(1*9), &
-         pad(1*md_max), pac(1*9), prim(1*1*9*md_max), scale
+                       pad(1*md_max), pac(1*9), prim(1*1*9*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -6223,18 +6223,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6271,18 +6271,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6304,7 +6304,7 @@ CONTAINS
    SUBROUTINE block_1_1_10(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*10), kad(1*md_max), kac(1*10), pbd(1*md_max), &
-         pbc(1*10), pad(1*md_max), pac(1*10), prim(1*1*10*md_max), scale
+                       pbc(1*10), pad(1*md_max), pac(1*10), prim(1*1*10*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -6319,18 +6319,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6367,18 +6367,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6400,7 +6400,7 @@ CONTAINS
    SUBROUTINE block_1_1_11(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*11), kad(1*md_max), kac(1*11), pbd(1*md_max), &
-         pbc(1*11), pad(1*md_max), pac(1*11), prim(1*1*11*md_max), scale
+                       pbc(1*11), pad(1*md_max), pac(1*11), prim(1*1*11*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -6415,18 +6415,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6463,18 +6463,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6496,7 +6496,7 @@ CONTAINS
    SUBROUTINE block_1_1_15(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*15), kad(1*md_max), kac(1*15), pbd(1*md_max), &
-         pbc(1*15), pad(1*md_max), pac(1*15), prim(1*1*15*md_max), scale
+                       pbc(1*15), pad(1*md_max), pac(1*15), prim(1*1*15*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -6511,18 +6511,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6558,18 +6558,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6605,18 +6605,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6652,18 +6652,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6699,18 +6699,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6746,18 +6746,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6793,18 +6793,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6840,18 +6840,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6887,18 +6887,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6920,7 +6920,7 @@ CONTAINS
    SUBROUTINE block_1_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(1*md_max), kac(1*1), pbd(2*md_max), pbc(2*1), &
-         pad(1*md_max), pac(1*1), prim(1*2*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -6935,18 +6935,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -6982,18 +6982,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7029,18 +7029,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7076,18 +7076,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7123,18 +7123,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7156,7 +7156,7 @@ CONTAINS
    SUBROUTINE block_1_2_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*2), kad(1*md_max), kac(1*2), pbd(2*md_max), pbc(2*2), &
-         pad(1*md_max), pac(1*2), prim(1*2*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*2*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7171,18 +7171,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7218,18 +7218,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7265,18 +7265,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7312,18 +7312,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7345,7 +7345,7 @@ CONTAINS
    SUBROUTINE block_1_2_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*3), kad(1*md_max), kac(1*3), pbd(2*md_max), pbc(2*3), &
-         pad(1*md_max), pac(1*3), prim(1*2*3*md_max), scale
+                       pad(1*md_max), pac(1*3), prim(1*2*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7360,18 +7360,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7407,18 +7407,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7454,18 +7454,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7487,7 +7487,7 @@ CONTAINS
    SUBROUTINE block_1_2_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*4), kad(1*md_max), kac(1*4), pbd(2*md_max), pbc(2*4), &
-         pad(1*md_max), pac(1*4), prim(1*2*4*md_max), scale
+                       pad(1*md_max), pac(1*4), prim(1*2*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7502,18 +7502,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7549,18 +7549,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7582,7 +7582,7 @@ CONTAINS
    SUBROUTINE block_1_2_5(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*5), kad(1*md_max), kac(1*5), pbd(2*md_max), pbc(2*5), &
-         pad(1*md_max), pac(1*5), prim(1*2*5*md_max), scale
+                       pad(1*md_max), pac(1*5), prim(1*2*5*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7597,18 +7597,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7644,18 +7644,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7677,7 +7677,7 @@ CONTAINS
    SUBROUTINE block_1_2_6(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*6), kad(1*md_max), kac(1*6), pbd(2*md_max), pbc(2*6), &
-         pad(1*md_max), pac(1*6), prim(1*2*6*md_max), scale
+                       pad(1*md_max), pac(1*6), prim(1*2*6*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7692,18 +7692,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7739,18 +7739,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7772,7 +7772,7 @@ CONTAINS
    SUBROUTINE block_1_2_7(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*7), kad(1*md_max), kac(1*7), pbd(2*md_max), pbc(2*7), &
-         pad(1*md_max), pac(1*7), prim(1*2*7*md_max), scale
+                       pad(1*md_max), pac(1*7), prim(1*2*7*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7787,18 +7787,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7834,18 +7834,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7867,7 +7867,7 @@ CONTAINS
    SUBROUTINE block_1_2_9(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*9), kad(1*md_max), kac(1*9), pbd(2*md_max), pbc(2*9), &
-         pad(1*md_max), pac(1*9), prim(1*2*9*md_max), scale
+                       pad(1*md_max), pac(1*9), prim(1*2*9*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7882,18 +7882,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7916,7 +7916,7 @@ CONTAINS
    SUBROUTINE block_1_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(1*md_max), kac(1*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -7931,18 +7931,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -7978,18 +7978,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8025,18 +8025,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8072,18 +8072,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8119,18 +8119,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8166,18 +8166,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8213,18 +8213,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8246,7 +8246,7 @@ CONTAINS
    SUBROUTINE block_1_3_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*1), kad(1*md_max), kac(1*1), pbd(3*md_max), pbc(3*1), &
-         pad(1*md_max), pac(1*1), prim(1*3*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*3*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8261,18 +8261,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8308,18 +8308,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8355,18 +8355,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8402,18 +8402,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8435,7 +8435,7 @@ CONTAINS
    SUBROUTINE block_1_3_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*2), kad(1*md_max), kac(1*2), pbd(3*md_max), pbc(3*2), &
-         pad(1*md_max), pac(1*2), prim(1*3*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*3*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8450,18 +8450,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8497,18 +8497,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8544,18 +8544,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8577,7 +8577,7 @@ CONTAINS
    SUBROUTINE block_1_3_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*3), kad(1*md_max), kac(1*3), pbd(3*md_max), pbc(3*3), &
-         pad(1*md_max), pac(1*3), prim(1*3*3*md_max), scale
+                       pad(1*md_max), pac(1*3), prim(1*3*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8592,18 +8592,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8639,18 +8639,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8672,7 +8672,7 @@ CONTAINS
    SUBROUTINE block_1_3_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*4), kad(1*md_max), kac(1*4), pbd(3*md_max), pbc(3*4), &
-         pad(1*md_max), pac(1*4), prim(1*3*4*md_max), scale
+                       pad(1*md_max), pac(1*4), prim(1*3*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8687,18 +8687,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8734,18 +8734,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8767,7 +8767,7 @@ CONTAINS
    SUBROUTINE block_1_3_5(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*5), kad(1*md_max), kac(1*5), pbd(3*md_max), pbc(3*5), &
-         pad(1*md_max), pac(1*5), prim(1*3*5*md_max), scale
+                       pad(1*md_max), pac(1*5), prim(1*3*5*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8782,18 +8782,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8829,18 +8829,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8862,7 +8862,7 @@ CONTAINS
    SUBROUTINE block_1_3_6(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*6), kad(1*md_max), kac(1*6), pbd(3*md_max), pbc(3*6), &
-         pad(1*md_max), pac(1*6), prim(1*3*6*md_max), scale
+                       pad(1*md_max), pac(1*6), prim(1*3*6*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8877,18 +8877,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8911,7 +8911,7 @@ CONTAINS
    SUBROUTINE block_1_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(1*md_max), kac(1*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -8926,18 +8926,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -8973,18 +8973,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9020,18 +9020,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9067,18 +9067,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9114,18 +9114,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9147,7 +9147,7 @@ CONTAINS
    SUBROUTINE block_1_4_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*1), kad(1*md_max), kac(1*1), pbd(4*md_max), pbc(4*1), &
-         pad(1*md_max), pac(1*1), prim(1*4*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*4*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9162,18 +9162,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9209,18 +9209,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9256,18 +9256,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9289,7 +9289,7 @@ CONTAINS
    SUBROUTINE block_1_4_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*2), kad(1*md_max), kac(1*2), pbd(4*md_max), pbc(4*2), &
-         pad(1*md_max), pac(1*2), prim(1*4*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*4*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9304,18 +9304,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9351,18 +9351,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9384,7 +9384,7 @@ CONTAINS
    SUBROUTINE block_1_4_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*3), kad(1*md_max), kac(1*3), pbd(4*md_max), pbc(4*3), &
-         pad(1*md_max), pac(1*3), prim(1*4*3*md_max), scale
+                       pad(1*md_max), pac(1*3), prim(1*4*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9399,18 +9399,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9446,18 +9446,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9479,7 +9479,7 @@ CONTAINS
    SUBROUTINE block_1_4_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*4), kad(1*md_max), kac(1*4), pbd(4*md_max), pbc(4*4), &
-         pad(1*md_max), pac(1*4), prim(1*4*4*md_max), scale
+                       pad(1*md_max), pac(1*4), prim(1*4*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9494,18 +9494,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9528,7 +9528,7 @@ CONTAINS
    SUBROUTINE block_1_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(1*md_max), kac(1*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9543,18 +9543,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9590,18 +9590,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9637,18 +9637,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9684,18 +9684,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9717,7 +9717,7 @@ CONTAINS
    SUBROUTINE block_1_5_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*1), kad(1*md_max), kac(1*1), pbd(5*md_max), pbc(5*1), &
-         pad(1*md_max), pac(1*1), prim(1*5*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*5*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9732,18 +9732,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9779,18 +9779,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9812,7 +9812,7 @@ CONTAINS
    SUBROUTINE block_1_5_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*2), kad(1*md_max), kac(1*2), pbd(5*md_max), pbc(5*2), &
-         pad(1*md_max), pac(1*2), prim(1*5*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*5*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9827,18 +9827,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9874,18 +9874,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9907,7 +9907,7 @@ CONTAINS
    SUBROUTINE block_1_5_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*3), kad(1*md_max), kac(1*3), pbd(5*md_max), pbc(5*3), &
-         pad(1*md_max), pac(1*3), prim(1*5*3*md_max), scale
+                       pad(1*md_max), pac(1*3), prim(1*5*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9922,18 +9922,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -9956,7 +9956,7 @@ CONTAINS
    SUBROUTINE block_1_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(1*md_max), kac(1*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -9971,18 +9971,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10018,18 +10018,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10065,18 +10065,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10112,18 +10112,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10145,7 +10145,7 @@ CONTAINS
    SUBROUTINE block_1_6_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*1), kad(1*md_max), kac(1*1), pbd(6*md_max), pbc(6*1), &
-         pad(1*md_max), pac(1*1), prim(1*6*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*6*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10160,18 +10160,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10207,18 +10207,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10240,7 +10240,7 @@ CONTAINS
    SUBROUTINE block_1_6_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*2), kad(1*md_max), kac(1*2), pbd(6*md_max), pbc(6*2), &
-         pad(1*md_max), pac(1*2), prim(1*6*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*6*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10255,18 +10255,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10302,18 +10302,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10335,7 +10335,7 @@ CONTAINS
    SUBROUTINE block_1_6_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*3), kad(1*md_max), kac(1*3), pbd(6*md_max), pbc(6*3), &
-         pad(1*md_max), pac(1*3), prim(1*6*3*md_max), scale
+                       pad(1*md_max), pac(1*3), prim(1*6*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10350,18 +10350,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10384,7 +10384,7 @@ CONTAINS
    SUBROUTINE block_1_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(1*md_max), kac(1*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10399,18 +10399,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10446,18 +10446,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10493,18 +10493,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10526,7 +10526,7 @@ CONTAINS
    SUBROUTINE block_1_7_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*1), kad(1*md_max), kac(1*1), pbd(7*md_max), pbc(7*1), &
-         pad(1*md_max), pac(1*1), prim(1*7*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*7*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10541,18 +10541,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10588,18 +10588,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10621,7 +10621,7 @@ CONTAINS
    SUBROUTINE block_1_7_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*2), kad(1*md_max), kac(1*2), pbd(7*md_max), pbc(7*2), &
-         pad(1*md_max), pac(1*2), prim(1*7*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*7*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10636,18 +10636,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10670,7 +10670,7 @@ CONTAINS
    SUBROUTINE block_1_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(1*md_max), kac(1*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10685,18 +10685,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10732,18 +10732,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10779,18 +10779,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10812,7 +10812,7 @@ CONTAINS
    SUBROUTINE block_1_9_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*1), kad(1*md_max), kac(1*1), pbd(9*md_max), pbc(9*1), &
-         pad(1*md_max), pac(1*1), prim(1*9*1*md_max), scale
+                       pad(1*md_max), pac(1*1), prim(1*9*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10827,18 +10827,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10874,18 +10874,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10907,7 +10907,7 @@ CONTAINS
    SUBROUTINE block_1_9_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*2), kad(1*md_max), kac(1*2), pbd(9*md_max), pbc(9*2), &
-         pad(1*md_max), pac(1*2), prim(1*9*2*md_max), scale
+                       pad(1*md_max), pac(1*2), prim(1*9*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10922,18 +10922,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -10956,7 +10956,7 @@ CONTAINS
    SUBROUTINE block_1_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(1*md_max), kac(1*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -10971,18 +10971,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11019,18 +11019,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11052,7 +11052,7 @@ CONTAINS
    SUBROUTINE block_1_10_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*1), kad(1*md_max), kac(1*1), pbd(10*md_max), &
-         pbc(10*1), pad(1*md_max), pac(1*1), prim(1*10*1*md_max), scale
+                       pbc(10*1), pad(1*md_max), pac(1*1), prim(1*10*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11067,18 +11067,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11101,8 +11101,8 @@ CONTAINS
    SUBROUTINE block_1_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(1*md_max), kac(1*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11117,18 +11117,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11165,18 +11165,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11198,7 +11198,7 @@ CONTAINS
    SUBROUTINE block_1_11_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*1), kad(1*md_max), kac(1*1), pbd(11*md_max), &
-         pbc(11*1), pad(1*md_max), pac(1*1), prim(1*11*1*md_max), scale
+                       pbc(11*1), pad(1*md_max), pac(1*1), prim(1*11*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11213,18 +11213,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11247,8 +11247,8 @@ CONTAINS
    SUBROUTINE block_1_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(1*md_max), kac(1*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11263,18 +11263,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11311,18 +11311,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11344,7 +11344,7 @@ CONTAINS
    SUBROUTINE block_1_15_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*1), kad(1*md_max), kac(1*1), pbd(15*md_max), &
-         pbc(15*1), pad(1*md_max), pac(1*1), prim(1*15*1*md_max), scale
+                       pbc(15*1), pad(1*md_max), pac(1*1), prim(1*15*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11359,18 +11359,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11393,8 +11393,8 @@ CONTAINS
    SUBROUTINE block_1_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(1*md_max), kac(1*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(1*md_max), pac(1*mc_max), prim(1*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11409,18 +11409,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 1
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*1+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*1+ma)
-                  kad((md-1)*1+ma) = kad((md-1)*1+ma)-tmp*p_bc
-                  kac((mc-1)*1+ma) = kac((mc-1)*1+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*1 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*1 + ma)
+                  kad((md - 1)*1 + ma) = kad((md - 1)*1 + ma) - tmp*p_bc
+                  kac((mc - 1)*1 + ma) = kac((mc - 1)*1 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11456,18 +11456,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11503,18 +11503,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11550,18 +11550,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11597,18 +11597,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11644,18 +11644,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11691,18 +11691,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11738,18 +11738,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11785,18 +11785,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11818,7 +11818,7 @@ CONTAINS
    SUBROUTINE block_2_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(2*md_max), kac(2*1), pbd(1*md_max), pbc(1*1), &
-         pad(2*md_max), pac(2*1), prim(2*1*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -11833,18 +11833,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11880,18 +11880,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11927,18 +11927,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -11974,18 +11974,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12021,18 +12021,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12054,7 +12054,7 @@ CONTAINS
    SUBROUTINE block_2_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(2*md_max), kac(2*2), pbd(1*md_max), pbc(1*2), &
-         pad(2*md_max), pac(2*2), prim(2*1*2*md_max), scale
+                       pad(2*md_max), pac(2*2), prim(2*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12069,18 +12069,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12116,18 +12116,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12163,18 +12163,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12210,18 +12210,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12243,7 +12243,7 @@ CONTAINS
    SUBROUTINE block_2_1_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*3), kad(2*md_max), kac(2*3), pbd(1*md_max), pbc(1*3), &
-         pad(2*md_max), pac(2*3), prim(2*1*3*md_max), scale
+                       pad(2*md_max), pac(2*3), prim(2*1*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12258,18 +12258,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12305,18 +12305,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12352,18 +12352,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12385,7 +12385,7 @@ CONTAINS
    SUBROUTINE block_2_1_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*4), kad(2*md_max), kac(2*4), pbd(1*md_max), pbc(1*4), &
-         pad(2*md_max), pac(2*4), prim(2*1*4*md_max), scale
+                       pad(2*md_max), pac(2*4), prim(2*1*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12400,18 +12400,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12447,18 +12447,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12480,7 +12480,7 @@ CONTAINS
    SUBROUTINE block_2_1_5(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*5), kad(2*md_max), kac(2*5), pbd(1*md_max), pbc(1*5), &
-         pad(2*md_max), pac(2*5), prim(2*1*5*md_max), scale
+                       pad(2*md_max), pac(2*5), prim(2*1*5*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12495,18 +12495,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12542,18 +12542,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12575,7 +12575,7 @@ CONTAINS
    SUBROUTINE block_2_1_6(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*6), kad(2*md_max), kac(2*6), pbd(1*md_max), pbc(1*6), &
-         pad(2*md_max), pac(2*6), prim(2*1*6*md_max), scale
+                       pad(2*md_max), pac(2*6), prim(2*1*6*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12590,18 +12590,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12637,18 +12637,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12670,7 +12670,7 @@ CONTAINS
    SUBROUTINE block_2_1_7(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*7), kad(2*md_max), kac(2*7), pbd(1*md_max), pbc(1*7), &
-         pad(2*md_max), pac(2*7), prim(2*1*7*md_max), scale
+                       pad(2*md_max), pac(2*7), prim(2*1*7*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12685,18 +12685,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12732,18 +12732,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12765,7 +12765,7 @@ CONTAINS
    SUBROUTINE block_2_1_9(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*9), kad(2*md_max), kac(2*9), pbd(1*md_max), pbc(1*9), &
-         pad(2*md_max), pac(2*9), prim(2*1*9*md_max), scale
+                       pad(2*md_max), pac(2*9), prim(2*1*9*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12780,18 +12780,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12814,7 +12814,7 @@ CONTAINS
    SUBROUTINE block_2_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(2*md_max), kac(2*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -12829,18 +12829,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12876,18 +12876,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12923,18 +12923,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -12970,18 +12970,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13017,18 +13017,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13050,7 +13050,7 @@ CONTAINS
    SUBROUTINE block_2_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(2*md_max), kac(2*1), pbd(2*md_max), pbc(2*1), &
-         pad(2*md_max), pac(2*1), prim(2*2*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13065,18 +13065,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13112,18 +13112,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13159,18 +13159,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13192,7 +13192,7 @@ CONTAINS
    SUBROUTINE block_2_2_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*2), kad(2*md_max), kac(2*2), pbd(2*md_max), pbc(2*2), &
-         pad(2*md_max), pac(2*2), prim(2*2*2*md_max), scale
+                       pad(2*md_max), pac(2*2), prim(2*2*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13207,18 +13207,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13254,18 +13254,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13287,7 +13287,7 @@ CONTAINS
    SUBROUTINE block_2_2_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*3), kad(2*md_max), kac(2*3), pbd(2*md_max), pbc(2*3), &
-         pad(2*md_max), pac(2*3), prim(2*2*3*md_max), scale
+                       pad(2*md_max), pac(2*3), prim(2*2*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13302,18 +13302,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13349,18 +13349,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13382,7 +13382,7 @@ CONTAINS
    SUBROUTINE block_2_2_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*4), kad(2*md_max), kac(2*4), pbd(2*md_max), pbc(2*4), &
-         pad(2*md_max), pac(2*4), prim(2*2*4*md_max), scale
+                       pad(2*md_max), pac(2*4), prim(2*2*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13397,18 +13397,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13431,7 +13431,7 @@ CONTAINS
    SUBROUTINE block_2_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(2*md_max), kac(2*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13446,18 +13446,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13493,18 +13493,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13540,18 +13540,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13587,18 +13587,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13620,7 +13620,7 @@ CONTAINS
    SUBROUTINE block_2_3_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*1), kad(2*md_max), kac(2*1), pbd(3*md_max), pbc(3*1), &
-         pad(2*md_max), pac(2*1), prim(2*3*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*3*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13635,18 +13635,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13682,18 +13682,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13715,7 +13715,7 @@ CONTAINS
    SUBROUTINE block_2_3_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*2), kad(2*md_max), kac(2*2), pbd(3*md_max), pbc(3*2), &
-         pad(2*md_max), pac(2*2), prim(2*3*2*md_max), scale
+                       pad(2*md_max), pac(2*2), prim(2*3*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13730,18 +13730,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13777,18 +13777,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13810,7 +13810,7 @@ CONTAINS
    SUBROUTINE block_2_3_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*3), kad(2*md_max), kac(2*3), pbd(3*md_max), pbc(3*3), &
-         pad(2*md_max), pac(2*3), prim(2*3*3*md_max), scale
+                       pad(2*md_max), pac(2*3), prim(2*3*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13825,18 +13825,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13859,7 +13859,7 @@ CONTAINS
    SUBROUTINE block_2_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(2*md_max), kac(2*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -13874,18 +13874,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13921,18 +13921,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -13968,18 +13968,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14001,7 +14001,7 @@ CONTAINS
    SUBROUTINE block_2_4_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*1), kad(2*md_max), kac(2*1), pbd(4*md_max), pbc(4*1), &
-         pad(2*md_max), pac(2*1), prim(2*4*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*4*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14016,18 +14016,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14063,18 +14063,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14096,7 +14096,7 @@ CONTAINS
    SUBROUTINE block_2_4_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*2), kad(2*md_max), kac(2*2), pbd(4*md_max), pbc(4*2), &
-         pad(2*md_max), pac(2*2), prim(2*4*2*md_max), scale
+                       pad(2*md_max), pac(2*2), prim(2*4*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14111,18 +14111,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14145,7 +14145,7 @@ CONTAINS
    SUBROUTINE block_2_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(2*md_max), kac(2*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14160,18 +14160,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14207,18 +14207,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14240,7 +14240,7 @@ CONTAINS
    SUBROUTINE block_2_5_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*1), kad(2*md_max), kac(2*1), pbd(5*md_max), pbc(5*1), &
-         pad(2*md_max), pac(2*1), prim(2*5*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*5*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14255,18 +14255,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14289,7 +14289,7 @@ CONTAINS
    SUBROUTINE block_2_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(2*md_max), kac(2*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14304,18 +14304,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14351,18 +14351,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14384,7 +14384,7 @@ CONTAINS
    SUBROUTINE block_2_6_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*1), kad(2*md_max), kac(2*1), pbd(6*md_max), pbc(6*1), &
-         pad(2*md_max), pac(2*1), prim(2*6*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*6*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14399,18 +14399,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14433,7 +14433,7 @@ CONTAINS
    SUBROUTINE block_2_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(2*md_max), kac(2*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14448,18 +14448,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14495,18 +14495,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14528,7 +14528,7 @@ CONTAINS
    SUBROUTINE block_2_7_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*1), kad(2*md_max), kac(2*1), pbd(7*md_max), pbc(7*1), &
-         pad(2*md_max), pac(2*1), prim(2*7*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*7*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14543,18 +14543,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14577,7 +14577,7 @@ CONTAINS
    SUBROUTINE block_2_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(2*md_max), kac(2*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14592,18 +14592,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14639,18 +14639,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14672,7 +14672,7 @@ CONTAINS
    SUBROUTINE block_2_9_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*1), kad(2*md_max), kac(2*1), pbd(9*md_max), pbc(9*1), &
-         pad(2*md_max), pac(2*1), prim(2*9*1*md_max), scale
+                       pad(2*md_max), pac(2*1), prim(2*9*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14687,18 +14687,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14721,7 +14721,7 @@ CONTAINS
    SUBROUTINE block_2_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(2*md_max), kac(2*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14736,18 +14736,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14770,8 +14770,8 @@ CONTAINS
    SUBROUTINE block_2_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(2*md_max), kac(2*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14786,18 +14786,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14820,8 +14820,8 @@ CONTAINS
    SUBROUTINE block_2_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(2*md_max), kac(2*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14836,18 +14836,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14870,8 +14870,8 @@ CONTAINS
    SUBROUTINE block_2_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(2*md_max), kac(2*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(2*md_max), pac(2*mc_max), prim(2*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -14886,18 +14886,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 2
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*2+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*2+ma)
-                  kad((md-1)*2+ma) = kad((md-1)*2+ma)-tmp*p_bc
-                  kac((mc-1)*2+ma) = kac((mc-1)*2+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*2 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*2 + ma)
+                  kad((md - 1)*2 + ma) = kad((md - 1)*2 + ma) - tmp*p_bc
+                  kac((mc - 1)*2 + ma) = kac((mc - 1)*2 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14933,18 +14933,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -14980,18 +14980,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15027,18 +15027,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15074,18 +15074,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15121,18 +15121,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15168,18 +15168,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15201,7 +15201,7 @@ CONTAINS
    SUBROUTINE block_3_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(3*md_max), kac(3*1), pbd(1*md_max), pbc(1*1), &
-         pad(3*md_max), pac(3*1), prim(3*1*1*md_max), scale
+                       pad(3*md_max), pac(3*1), prim(3*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15216,18 +15216,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15263,18 +15263,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15310,18 +15310,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15357,18 +15357,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15390,7 +15390,7 @@ CONTAINS
    SUBROUTINE block_3_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(3*md_max), kac(3*2), pbd(1*md_max), pbc(1*2), &
-         pad(3*md_max), pac(3*2), prim(3*1*2*md_max), scale
+                       pad(3*md_max), pac(3*2), prim(3*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15405,18 +15405,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15452,18 +15452,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15499,18 +15499,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15532,7 +15532,7 @@ CONTAINS
    SUBROUTINE block_3_1_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*3), kad(3*md_max), kac(3*3), pbd(1*md_max), pbc(1*3), &
-         pad(3*md_max), pac(3*3), prim(3*1*3*md_max), scale
+                       pad(3*md_max), pac(3*3), prim(3*1*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15547,18 +15547,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15594,18 +15594,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15627,7 +15627,7 @@ CONTAINS
    SUBROUTINE block_3_1_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*4), kad(3*md_max), kac(3*4), pbd(1*md_max), pbc(1*4), &
-         pad(3*md_max), pac(3*4), prim(3*1*4*md_max), scale
+                       pad(3*md_max), pac(3*4), prim(3*1*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15642,18 +15642,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15689,18 +15689,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15722,7 +15722,7 @@ CONTAINS
    SUBROUTINE block_3_1_5(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*5), kad(3*md_max), kac(3*5), pbd(1*md_max), pbc(1*5), &
-         pad(3*md_max), pac(3*5), prim(3*1*5*md_max), scale
+                       pad(3*md_max), pac(3*5), prim(3*1*5*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15737,18 +15737,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15784,18 +15784,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15817,7 +15817,7 @@ CONTAINS
    SUBROUTINE block_3_1_6(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*6), kad(3*md_max), kac(3*6), pbd(1*md_max), pbc(1*6), &
-         pad(3*md_max), pac(3*6), prim(3*1*6*md_max), scale
+                       pad(3*md_max), pac(3*6), prim(3*1*6*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15832,18 +15832,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15866,7 +15866,7 @@ CONTAINS
    SUBROUTINE block_3_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(3*md_max), kac(3*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -15881,18 +15881,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15928,18 +15928,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -15975,18 +15975,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16022,18 +16022,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16055,7 +16055,7 @@ CONTAINS
    SUBROUTINE block_3_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(3*md_max), kac(3*1), pbd(2*md_max), pbc(2*1), &
-         pad(3*md_max), pac(3*1), prim(3*2*1*md_max), scale
+                       pad(3*md_max), pac(3*1), prim(3*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16070,18 +16070,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16117,18 +16117,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16150,7 +16150,7 @@ CONTAINS
    SUBROUTINE block_3_2_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*2), kad(3*md_max), kac(3*2), pbd(2*md_max), pbc(2*2), &
-         pad(3*md_max), pac(3*2), prim(3*2*2*md_max), scale
+                       pad(3*md_max), pac(3*2), prim(3*2*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16165,18 +16165,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16212,18 +16212,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16245,7 +16245,7 @@ CONTAINS
    SUBROUTINE block_3_2_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*3), kad(3*md_max), kac(3*3), pbd(2*md_max), pbc(2*3), &
-         pad(3*md_max), pac(3*3), prim(3*2*3*md_max), scale
+                       pad(3*md_max), pac(3*3), prim(3*2*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16260,18 +16260,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16294,7 +16294,7 @@ CONTAINS
    SUBROUTINE block_3_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(3*md_max), kac(3*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16309,18 +16309,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16356,18 +16356,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16403,18 +16403,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16436,7 +16436,7 @@ CONTAINS
    SUBROUTINE block_3_3_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*1), kad(3*md_max), kac(3*1), pbd(3*md_max), pbc(3*1), &
-         pad(3*md_max), pac(3*1), prim(3*3*1*md_max), scale
+                       pad(3*md_max), pac(3*1), prim(3*3*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16451,18 +16451,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16498,18 +16498,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16531,7 +16531,7 @@ CONTAINS
    SUBROUTINE block_3_3_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*2), kad(3*md_max), kac(3*2), pbd(3*md_max), pbc(3*2), &
-         pad(3*md_max), pac(3*2), prim(3*3*2*md_max), scale
+                       pad(3*md_max), pac(3*2), prim(3*3*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16546,18 +16546,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16580,7 +16580,7 @@ CONTAINS
    SUBROUTINE block_3_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(3*md_max), kac(3*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16595,18 +16595,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16642,18 +16642,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16675,7 +16675,7 @@ CONTAINS
    SUBROUTINE block_3_4_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*1), kad(3*md_max), kac(3*1), pbd(4*md_max), pbc(4*1), &
-         pad(3*md_max), pac(3*1), prim(3*4*1*md_max), scale
+                       pad(3*md_max), pac(3*1), prim(3*4*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16690,18 +16690,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16724,7 +16724,7 @@ CONTAINS
    SUBROUTINE block_3_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(3*md_max), kac(3*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16739,18 +16739,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16786,18 +16786,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16819,7 +16819,7 @@ CONTAINS
    SUBROUTINE block_3_5_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*1), kad(3*md_max), kac(3*1), pbd(5*md_max), pbc(5*1), &
-         pad(3*md_max), pac(3*1), prim(3*5*1*md_max), scale
+                       pad(3*md_max), pac(3*1), prim(3*5*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16834,18 +16834,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16868,7 +16868,7 @@ CONTAINS
    SUBROUTINE block_3_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(3*md_max), kac(3*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16883,18 +16883,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16930,18 +16930,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -16963,7 +16963,7 @@ CONTAINS
    SUBROUTINE block_3_6_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*1), kad(3*md_max), kac(3*1), pbd(6*md_max), pbc(6*1), &
-         pad(3*md_max), pac(3*1), prim(3*6*1*md_max), scale
+                       pad(3*md_max), pac(3*1), prim(3*6*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -16978,18 +16978,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17012,7 +17012,7 @@ CONTAINS
    SUBROUTINE block_3_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(3*md_max), kac(3*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17027,18 +17027,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17061,7 +17061,7 @@ CONTAINS
    SUBROUTINE block_3_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(3*md_max), kac(3*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17076,18 +17076,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17110,7 +17110,7 @@ CONTAINS
    SUBROUTINE block_3_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(3*md_max), kac(3*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17125,18 +17125,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17159,8 +17159,8 @@ CONTAINS
    SUBROUTINE block_3_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(3*md_max), kac(3*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17175,18 +17175,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17209,8 +17209,8 @@ CONTAINS
    SUBROUTINE block_3_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(3*md_max), kac(3*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17225,18 +17225,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17259,8 +17259,8 @@ CONTAINS
    SUBROUTINE block_3_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(3*md_max), kac(3*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(3*md_max), pac(3*mc_max), prim(3*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17275,18 +17275,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 3
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*3+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*3+ma)
-                  kad((md-1)*3+ma) = kad((md-1)*3+ma)-tmp*p_bc
-                  kac((mc-1)*3+ma) = kac((mc-1)*3+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*3 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*3 + ma)
+                  kad((md - 1)*3 + ma) = kad((md - 1)*3 + ma) - tmp*p_bc
+                  kac((mc - 1)*3 + ma) = kac((mc - 1)*3 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17322,18 +17322,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17369,18 +17369,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17416,18 +17416,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17463,18 +17463,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17496,7 +17496,7 @@ CONTAINS
    SUBROUTINE block_4_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(4*md_max), kac(4*1), pbd(1*md_max), pbc(1*1), &
-         pad(4*md_max), pac(4*1), prim(4*1*1*md_max), scale
+                       pad(4*md_max), pac(4*1), prim(4*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17511,18 +17511,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17558,18 +17558,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17605,18 +17605,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17638,7 +17638,7 @@ CONTAINS
    SUBROUTINE block_4_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(4*md_max), kac(4*2), pbd(1*md_max), pbc(1*2), &
-         pad(4*md_max), pac(4*2), prim(4*1*2*md_max), scale
+                       pad(4*md_max), pac(4*2), prim(4*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17653,18 +17653,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17700,18 +17700,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17733,7 +17733,7 @@ CONTAINS
    SUBROUTINE block_4_1_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*3), kad(4*md_max), kac(4*3), pbd(1*md_max), pbc(1*3), &
-         pad(4*md_max), pac(4*3), prim(4*1*3*md_max), scale
+                       pad(4*md_max), pac(4*3), prim(4*1*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17748,18 +17748,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17795,18 +17795,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17828,7 +17828,7 @@ CONTAINS
    SUBROUTINE block_4_1_4(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*4), kad(4*md_max), kac(4*4), pbd(1*md_max), pbc(1*4), &
-         pad(4*md_max), pac(4*4), prim(4*1*4*md_max), scale
+                       pad(4*md_max), pac(4*4), prim(4*1*4*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17843,18 +17843,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17877,7 +17877,7 @@ CONTAINS
    SUBROUTINE block_4_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(4*md_max), kac(4*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -17892,18 +17892,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17939,18 +17939,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -17986,18 +17986,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18019,7 +18019,7 @@ CONTAINS
    SUBROUTINE block_4_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(4*md_max), kac(4*1), pbd(2*md_max), pbc(2*1), &
-         pad(4*md_max), pac(4*1), prim(4*2*1*md_max), scale
+                       pad(4*md_max), pac(4*1), prim(4*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18034,18 +18034,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18081,18 +18081,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18114,7 +18114,7 @@ CONTAINS
    SUBROUTINE block_4_2_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*2), kad(4*md_max), kac(4*2), pbd(2*md_max), pbc(2*2), &
-         pad(4*md_max), pac(4*2), prim(4*2*2*md_max), scale
+                       pad(4*md_max), pac(4*2), prim(4*2*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18129,18 +18129,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18163,7 +18163,7 @@ CONTAINS
    SUBROUTINE block_4_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(4*md_max), kac(4*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18178,18 +18178,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18225,18 +18225,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18258,7 +18258,7 @@ CONTAINS
    SUBROUTINE block_4_3_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*1), kad(4*md_max), kac(4*1), pbd(3*md_max), pbc(3*1), &
-         pad(4*md_max), pac(4*1), prim(4*3*1*md_max), scale
+                       pad(4*md_max), pac(4*1), prim(4*3*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18273,18 +18273,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18307,7 +18307,7 @@ CONTAINS
    SUBROUTINE block_4_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(4*md_max), kac(4*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18322,18 +18322,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18369,18 +18369,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18402,7 +18402,7 @@ CONTAINS
    SUBROUTINE block_4_4_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*1), kad(4*md_max), kac(4*1), pbd(4*md_max), pbc(4*1), &
-         pad(4*md_max), pac(4*1), prim(4*4*1*md_max), scale
+                       pad(4*md_max), pac(4*1), prim(4*4*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18417,18 +18417,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18451,7 +18451,7 @@ CONTAINS
    SUBROUTINE block_4_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(4*md_max), kac(4*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18466,18 +18466,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18500,7 +18500,7 @@ CONTAINS
    SUBROUTINE block_4_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(4*md_max), kac(4*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18515,18 +18515,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18549,7 +18549,7 @@ CONTAINS
    SUBROUTINE block_4_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(4*md_max), kac(4*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18564,18 +18564,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18598,7 +18598,7 @@ CONTAINS
    SUBROUTINE block_4_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(4*md_max), kac(4*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18613,18 +18613,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18647,7 +18647,7 @@ CONTAINS
    SUBROUTINE block_4_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(4*md_max), kac(4*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18662,18 +18662,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18696,8 +18696,8 @@ CONTAINS
    SUBROUTINE block_4_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(4*md_max), kac(4*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18712,18 +18712,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18746,8 +18746,8 @@ CONTAINS
    SUBROUTINE block_4_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(4*md_max), kac(4*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18762,18 +18762,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18796,8 +18796,8 @@ CONTAINS
    SUBROUTINE block_4_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(4*md_max), kac(4*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(4*md_max), pac(4*mc_max), prim(4*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -18812,18 +18812,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 4
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*4+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*4+ma)
-                  kad((md-1)*4+ma) = kad((md-1)*4+ma)-tmp*p_bc
-                  kac((mc-1)*4+ma) = kac((mc-1)*4+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*4 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*4 + ma)
+                  kad((md - 1)*4 + ma) = kad((md - 1)*4 + ma) - tmp*p_bc
+                  kac((mc - 1)*4 + ma) = kac((mc - 1)*4 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18859,18 +18859,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18906,18 +18906,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18953,18 +18953,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -18986,7 +18986,7 @@ CONTAINS
    SUBROUTINE block_5_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(5*md_max), kac(5*1), pbd(1*md_max), pbc(1*1), &
-         pad(5*md_max), pac(5*1), prim(5*1*1*md_max), scale
+                       pad(5*md_max), pac(5*1), prim(5*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19001,18 +19001,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19048,18 +19048,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19081,7 +19081,7 @@ CONTAINS
    SUBROUTINE block_5_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(5*md_max), kac(5*2), pbd(1*md_max), pbc(1*2), &
-         pad(5*md_max), pac(5*2), prim(5*1*2*md_max), scale
+                       pad(5*md_max), pac(5*2), prim(5*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19096,18 +19096,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19143,18 +19143,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19176,7 +19176,7 @@ CONTAINS
    SUBROUTINE block_5_1_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*3), kad(5*md_max), kac(5*3), pbd(1*md_max), pbc(1*3), &
-         pad(5*md_max), pac(5*3), prim(5*1*3*md_max), scale
+                       pad(5*md_max), pac(5*3), prim(5*1*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19191,18 +19191,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19225,7 +19225,7 @@ CONTAINS
    SUBROUTINE block_5_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(5*md_max), kac(5*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19240,18 +19240,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19287,18 +19287,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19320,7 +19320,7 @@ CONTAINS
    SUBROUTINE block_5_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(5*md_max), kac(5*1), pbd(2*md_max), pbc(2*1), &
-         pad(5*md_max), pac(5*1), prim(5*2*1*md_max), scale
+                       pad(5*md_max), pac(5*1), prim(5*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19335,18 +19335,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19369,7 +19369,7 @@ CONTAINS
    SUBROUTINE block_5_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(5*md_max), kac(5*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19384,18 +19384,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19431,18 +19431,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19464,7 +19464,7 @@ CONTAINS
    SUBROUTINE block_5_3_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*1), kad(5*md_max), kac(5*1), pbd(3*md_max), pbc(3*1), &
-         pad(5*md_max), pac(5*1), prim(5*3*1*md_max), scale
+                       pad(5*md_max), pac(5*1), prim(5*3*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19479,18 +19479,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19513,7 +19513,7 @@ CONTAINS
    SUBROUTINE block_5_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(5*md_max), kac(5*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19528,18 +19528,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19562,7 +19562,7 @@ CONTAINS
    SUBROUTINE block_5_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(5*md_max), kac(5*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19577,18 +19577,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19611,7 +19611,7 @@ CONTAINS
    SUBROUTINE block_5_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(5*md_max), kac(5*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19626,18 +19626,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19660,7 +19660,7 @@ CONTAINS
    SUBROUTINE block_5_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(5*md_max), kac(5*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19675,18 +19675,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19709,7 +19709,7 @@ CONTAINS
    SUBROUTINE block_5_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(5*md_max), kac(5*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19724,18 +19724,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19758,7 +19758,7 @@ CONTAINS
    SUBROUTINE block_5_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(5*md_max), kac(5*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19773,18 +19773,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19807,8 +19807,8 @@ CONTAINS
    SUBROUTINE block_5_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(5*md_max), kac(5*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19823,18 +19823,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19857,8 +19857,8 @@ CONTAINS
    SUBROUTINE block_5_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(5*md_max), kac(5*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19873,18 +19873,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19907,8 +19907,8 @@ CONTAINS
    SUBROUTINE block_5_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(5*md_max), kac(5*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(5*md_max), pac(5*mc_max), prim(5*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -19923,18 +19923,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 5
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*5+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*5+ma)
-                  kad((md-1)*5+ma) = kad((md-1)*5+ma)-tmp*p_bc
-                  kac((mc-1)*5+ma) = kac((mc-1)*5+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*5 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*5 + ma)
+                  kad((md - 1)*5 + ma) = kad((md - 1)*5 + ma) - tmp*p_bc
+                  kac((mc - 1)*5 + ma) = kac((mc - 1)*5 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -19970,18 +19970,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20017,18 +20017,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20064,18 +20064,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20097,7 +20097,7 @@ CONTAINS
    SUBROUTINE block_6_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(6*md_max), kac(6*1), pbd(1*md_max), pbc(1*1), &
-         pad(6*md_max), pac(6*1), prim(6*1*1*md_max), scale
+                       pad(6*md_max), pac(6*1), prim(6*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20112,18 +20112,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20159,18 +20159,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20192,7 +20192,7 @@ CONTAINS
    SUBROUTINE block_6_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(6*md_max), kac(6*2), pbd(1*md_max), pbc(1*2), &
-         pad(6*md_max), pac(6*2), prim(6*1*2*md_max), scale
+                       pad(6*md_max), pac(6*2), prim(6*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20207,18 +20207,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20254,18 +20254,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20287,7 +20287,7 @@ CONTAINS
    SUBROUTINE block_6_1_3(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*3), kad(6*md_max), kac(6*3), pbd(1*md_max), pbc(1*3), &
-         pad(6*md_max), pac(6*3), prim(6*1*3*md_max), scale
+                       pad(6*md_max), pac(6*3), prim(6*1*3*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20302,18 +20302,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20336,7 +20336,7 @@ CONTAINS
    SUBROUTINE block_6_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(6*md_max), kac(6*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20351,18 +20351,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20398,18 +20398,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20431,7 +20431,7 @@ CONTAINS
    SUBROUTINE block_6_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(6*md_max), kac(6*1), pbd(2*md_max), pbc(2*1), &
-         pad(6*md_max), pac(6*1), prim(6*2*1*md_max), scale
+                       pad(6*md_max), pac(6*1), prim(6*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20446,18 +20446,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20480,7 +20480,7 @@ CONTAINS
    SUBROUTINE block_6_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(6*md_max), kac(6*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20495,18 +20495,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20542,18 +20542,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20575,7 +20575,7 @@ CONTAINS
    SUBROUTINE block_6_3_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*1), kad(6*md_max), kac(6*1), pbd(3*md_max), pbc(3*1), &
-         pad(6*md_max), pac(6*1), prim(6*3*1*md_max), scale
+                       pad(6*md_max), pac(6*1), prim(6*3*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20590,18 +20590,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20624,7 +20624,7 @@ CONTAINS
    SUBROUTINE block_6_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(6*md_max), kac(6*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20639,18 +20639,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20673,7 +20673,7 @@ CONTAINS
    SUBROUTINE block_6_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(6*md_max), kac(6*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20688,18 +20688,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20722,7 +20722,7 @@ CONTAINS
    SUBROUTINE block_6_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(6*md_max), kac(6*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20737,18 +20737,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20771,7 +20771,7 @@ CONTAINS
    SUBROUTINE block_6_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(6*md_max), kac(6*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20786,18 +20786,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20820,7 +20820,7 @@ CONTAINS
    SUBROUTINE block_6_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(6*md_max), kac(6*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20835,18 +20835,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20869,7 +20869,7 @@ CONTAINS
    SUBROUTINE block_6_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(6*md_max), kac(6*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20884,18 +20884,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20918,8 +20918,8 @@ CONTAINS
    SUBROUTINE block_6_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(6*md_max), kac(6*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20934,18 +20934,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -20968,8 +20968,8 @@ CONTAINS
    SUBROUTINE block_6_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(6*md_max), kac(6*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -20984,18 +20984,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21018,8 +21018,8 @@ CONTAINS
    SUBROUTINE block_6_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(6*md_max), kac(6*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(6*md_max), pac(6*mc_max), prim(6*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21034,18 +21034,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 6
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*6+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*6+ma)
-                  kad((md-1)*6+ma) = kad((md-1)*6+ma)-tmp*p_bc
-                  kac((mc-1)*6+ma) = kac((mc-1)*6+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*6 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*6 + ma)
+                  kad((md - 1)*6 + ma) = kad((md - 1)*6 + ma) - tmp*p_bc
+                  kac((mc - 1)*6 + ma) = kac((mc - 1)*6 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21081,18 +21081,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21128,18 +21128,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21161,7 +21161,7 @@ CONTAINS
    SUBROUTINE block_7_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(7*md_max), kac(7*1), pbd(1*md_max), pbc(1*1), &
-         pad(7*md_max), pac(7*1), prim(7*1*1*md_max), scale
+                       pad(7*md_max), pac(7*1), prim(7*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21176,18 +21176,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21223,18 +21223,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21256,7 +21256,7 @@ CONTAINS
    SUBROUTINE block_7_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(7*md_max), kac(7*2), pbd(1*md_max), pbc(1*2), &
-         pad(7*md_max), pac(7*2), prim(7*1*2*md_max), scale
+                       pad(7*md_max), pac(7*2), prim(7*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21271,18 +21271,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21305,7 +21305,7 @@ CONTAINS
    SUBROUTINE block_7_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(7*md_max), kac(7*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21320,18 +21320,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21367,18 +21367,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21400,7 +21400,7 @@ CONTAINS
    SUBROUTINE block_7_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(7*md_max), kac(7*1), pbd(2*md_max), pbc(2*1), &
-         pad(7*md_max), pac(7*1), prim(7*2*1*md_max), scale
+                       pad(7*md_max), pac(7*1), prim(7*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21415,18 +21415,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21449,7 +21449,7 @@ CONTAINS
    SUBROUTINE block_7_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(7*md_max), kac(7*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21464,18 +21464,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21498,7 +21498,7 @@ CONTAINS
    SUBROUTINE block_7_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(7*md_max), kac(7*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21513,18 +21513,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21547,7 +21547,7 @@ CONTAINS
    SUBROUTINE block_7_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(7*md_max), kac(7*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21562,18 +21562,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21596,7 +21596,7 @@ CONTAINS
    SUBROUTINE block_7_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(7*md_max), kac(7*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21611,18 +21611,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21645,7 +21645,7 @@ CONTAINS
    SUBROUTINE block_7_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(7*md_max), kac(7*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21660,18 +21660,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21694,7 +21694,7 @@ CONTAINS
    SUBROUTINE block_7_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(7*md_max), kac(7*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21709,18 +21709,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21743,7 +21743,7 @@ CONTAINS
    SUBROUTINE block_7_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(7*md_max), kac(7*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21758,18 +21758,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21792,8 +21792,8 @@ CONTAINS
    SUBROUTINE block_7_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(7*md_max), kac(7*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21808,18 +21808,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21842,8 +21842,8 @@ CONTAINS
    SUBROUTINE block_7_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(7*md_max), kac(7*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21858,18 +21858,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21892,8 +21892,8 @@ CONTAINS
    SUBROUTINE block_7_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(7*md_max), kac(7*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(7*md_max), pac(7*mc_max), prim(7*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -21908,18 +21908,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 7
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*7+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*7+ma)
-                  kad((md-1)*7+ma) = kad((md-1)*7+ma)-tmp*p_bc
-                  kac((mc-1)*7+ma) = kac((mc-1)*7+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*7 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*7 + ma)
+                  kad((md - 1)*7 + ma) = kad((md - 1)*7 + ma) - tmp*p_bc
+                  kac((mc - 1)*7 + ma) = kac((mc - 1)*7 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -21955,18 +21955,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22002,18 +22002,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22035,7 +22035,7 @@ CONTAINS
    SUBROUTINE block_9_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(9*md_max), kac(9*1), pbd(1*md_max), pbc(1*1), &
-         pad(9*md_max), pac(9*1), prim(9*1*1*md_max), scale
+                       pad(9*md_max), pac(9*1), prim(9*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22050,18 +22050,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22097,18 +22097,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22130,7 +22130,7 @@ CONTAINS
    SUBROUTINE block_9_1_2(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*2), kad(9*md_max), kac(9*2), pbd(1*md_max), pbc(1*2), &
-         pad(9*md_max), pac(9*2), prim(9*1*2*md_max), scale
+                       pad(9*md_max), pac(9*2), prim(9*1*2*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22145,18 +22145,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22179,7 +22179,7 @@ CONTAINS
    SUBROUTINE block_9_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(9*md_max), kac(9*mc_max), pbd(1*md_max), &
-         pbc(1*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*1*mc_max*md_max), scale
+                       pbc(1*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*1*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22194,18 +22194,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22241,18 +22241,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22274,7 +22274,7 @@ CONTAINS
    SUBROUTINE block_9_2_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*1), kad(9*md_max), kac(9*1), pbd(2*md_max), pbc(2*1), &
-         pad(9*md_max), pac(9*1), prim(9*2*1*md_max), scale
+                       pad(9*md_max), pac(9*1), prim(9*2*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22289,18 +22289,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22323,7 +22323,7 @@ CONTAINS
    SUBROUTINE block_9_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(9*md_max), kac(9*mc_max), pbd(2*md_max), &
-         pbc(2*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*2*mc_max*md_max), scale
+                       pbc(2*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*2*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22338,18 +22338,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22372,7 +22372,7 @@ CONTAINS
    SUBROUTINE block_9_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(9*md_max), kac(9*mc_max), pbd(3*md_max), &
-         pbc(3*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*3*mc_max*md_max), scale
+                       pbc(3*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*3*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22387,18 +22387,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22421,7 +22421,7 @@ CONTAINS
    SUBROUTINE block_9_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(9*md_max), kac(9*mc_max), pbd(4*md_max), &
-         pbc(4*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*4*mc_max*md_max), scale
+                       pbc(4*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*4*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22436,18 +22436,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22470,7 +22470,7 @@ CONTAINS
    SUBROUTINE block_9_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(9*md_max), kac(9*mc_max), pbd(5*md_max), &
-         pbc(5*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*5*mc_max*md_max), scale
+                       pbc(5*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*5*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22485,18 +22485,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22519,7 +22519,7 @@ CONTAINS
    SUBROUTINE block_9_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(9*md_max), kac(9*mc_max), pbd(6*md_max), &
-         pbc(6*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*6*mc_max*md_max), scale
+                       pbc(6*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*6*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22534,18 +22534,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22568,7 +22568,7 @@ CONTAINS
    SUBROUTINE block_9_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(9*md_max), kac(9*mc_max), pbd(7*md_max), &
-         pbc(7*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*7*mc_max*md_max), scale
+                       pbc(7*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*7*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22583,18 +22583,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22617,7 +22617,7 @@ CONTAINS
    SUBROUTINE block_9_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(9*md_max), kac(9*mc_max), pbd(9*md_max), &
-         pbc(9*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*9*mc_max*md_max), scale
+                       pbc(9*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*9*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22632,18 +22632,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22666,8 +22666,8 @@ CONTAINS
    SUBROUTINE block_9_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(9*md_max), kac(9*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*10*mc_max*md_max), &
-         scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*10*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22682,18 +22682,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22716,8 +22716,8 @@ CONTAINS
    SUBROUTINE block_9_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(9*md_max), kac(9*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*11*mc_max*md_max), &
-         scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*11*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22732,18 +22732,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22766,8 +22766,8 @@ CONTAINS
    SUBROUTINE block_9_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(9*md_max), kac(9*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*15*mc_max*md_max), &
-         scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(9*md_max), pac(9*mc_max), prim(9*15*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22782,18 +22782,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 9
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*9+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*9+ma)
-                  kad((md-1)*9+ma) = kad((md-1)*9+ma)-tmp*p_bc
-                  kac((mc-1)*9+ma) = kac((mc-1)*9+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*9 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*9 + ma)
+                  kad((md - 1)*9 + ma) = kad((md - 1)*9 + ma) - tmp*p_bc
+                  kac((mc - 1)*9 + ma) = kac((mc - 1)*9 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22830,18 +22830,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22863,7 +22863,7 @@ CONTAINS
    SUBROUTINE block_10_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(10*md_max), kac(10*1), pbd(1*md_max), &
-         pbc(1*1), pad(10*md_max), pac(10*1), prim(10*1*1*md_max), scale
+                       pbc(1*1), pad(10*md_max), pac(10*1), prim(10*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22878,18 +22878,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22912,8 +22912,8 @@ CONTAINS
    SUBROUTINE block_10_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(1*md_max), pbc(1*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*1*mc_max*md_max), &
-         scale
+                       pbd(1*md_max), pbc(1*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*1*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22928,18 +22928,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -22962,8 +22962,8 @@ CONTAINS
    SUBROUTINE block_10_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(2*md_max), pbc(2*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*2*mc_max*md_max), &
-         scale
+                       pbd(2*md_max), pbc(2*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*2*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -22978,18 +22978,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23012,8 +23012,8 @@ CONTAINS
    SUBROUTINE block_10_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(3*md_max), pbc(3*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*3*mc_max*md_max), &
-         scale
+                       pbd(3*md_max), pbc(3*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*3*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23028,18 +23028,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23062,8 +23062,8 @@ CONTAINS
    SUBROUTINE block_10_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(4*md_max), pbc(4*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*4*mc_max*md_max), &
-         scale
+                       pbd(4*md_max), pbc(4*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*4*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23078,18 +23078,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23112,8 +23112,8 @@ CONTAINS
    SUBROUTINE block_10_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(5*md_max), pbc(5*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*5*mc_max*md_max), &
-         scale
+                       pbd(5*md_max), pbc(5*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*5*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23128,18 +23128,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23162,8 +23162,8 @@ CONTAINS
    SUBROUTINE block_10_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(6*md_max), pbc(6*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*6*mc_max*md_max), &
-         scale
+                       pbd(6*md_max), pbc(6*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*6*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23178,18 +23178,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23212,8 +23212,8 @@ CONTAINS
    SUBROUTINE block_10_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(7*md_max), pbc(7*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*7*mc_max*md_max), &
-         scale
+                       pbd(7*md_max), pbc(7*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*7*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23228,18 +23228,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23262,8 +23262,8 @@ CONTAINS
    SUBROUTINE block_10_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(9*md_max), pbc(9*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*9*mc_max*md_max), &
-         scale
+                       pbd(9*md_max), pbc(9*mc_max), pad(10*md_max), pac(10*mc_max), prim(10*9*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23278,18 +23278,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23312,8 +23312,8 @@ CONTAINS
    SUBROUTINE block_10_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(10*md_max), pac(10*mc_max), &
-         prim(10*10*mc_max*md_max), scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(10*md_max), pac(10*mc_max), &
+                       prim(10*10*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23328,18 +23328,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23362,8 +23362,8 @@ CONTAINS
    SUBROUTINE block_10_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(10*md_max), pac(10*mc_max), &
-         prim(10*11*mc_max*md_max), scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(10*md_max), pac(10*mc_max), &
+                       prim(10*11*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23378,18 +23378,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23412,8 +23412,8 @@ CONTAINS
    SUBROUTINE block_10_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(10*md_max), kac(10*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(10*md_max), pac(10*mc_max), &
-         prim(10*15*mc_max*md_max), scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(10*md_max), pac(10*mc_max), &
+                       prim(10*15*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23428,18 +23428,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 10
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*10+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*10+ma)
-                  kad((md-1)*10+ma) = kad((md-1)*10+ma)-tmp*p_bc
-                  kac((mc-1)*10+ma) = kac((mc-1)*10+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*10 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*10 + ma)
+                  kad((md - 1)*10 + ma) = kad((md - 1)*10 + ma) - tmp*p_bc
+                  kac((mc - 1)*10 + ma) = kac((mc - 1)*10 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23476,18 +23476,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23509,7 +23509,7 @@ CONTAINS
    SUBROUTINE block_11_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(11*md_max), kac(11*1), pbd(1*md_max), &
-         pbc(1*1), pad(11*md_max), pac(11*1), prim(11*1*1*md_max), scale
+                       pbc(1*1), pad(11*md_max), pac(11*1), prim(11*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23524,18 +23524,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23558,8 +23558,8 @@ CONTAINS
    SUBROUTINE block_11_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(1*md_max), pbc(1*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*1*mc_max*md_max), &
-         scale
+                       pbd(1*md_max), pbc(1*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*1*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23574,18 +23574,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23608,8 +23608,8 @@ CONTAINS
    SUBROUTINE block_11_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(2*md_max), pbc(2*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*2*mc_max*md_max), &
-         scale
+                       pbd(2*md_max), pbc(2*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*2*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23624,18 +23624,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23658,8 +23658,8 @@ CONTAINS
    SUBROUTINE block_11_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(3*md_max), pbc(3*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*3*mc_max*md_max), &
-         scale
+                       pbd(3*md_max), pbc(3*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*3*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23674,18 +23674,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23708,8 +23708,8 @@ CONTAINS
    SUBROUTINE block_11_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(4*md_max), pbc(4*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*4*mc_max*md_max), &
-         scale
+                       pbd(4*md_max), pbc(4*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*4*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23724,18 +23724,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23758,8 +23758,8 @@ CONTAINS
    SUBROUTINE block_11_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(5*md_max), pbc(5*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*5*mc_max*md_max), &
-         scale
+                       pbd(5*md_max), pbc(5*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*5*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23774,18 +23774,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23808,8 +23808,8 @@ CONTAINS
    SUBROUTINE block_11_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(6*md_max), pbc(6*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*6*mc_max*md_max), &
-         scale
+                       pbd(6*md_max), pbc(6*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*6*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23824,18 +23824,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23858,8 +23858,8 @@ CONTAINS
    SUBROUTINE block_11_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(7*md_max), pbc(7*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*7*mc_max*md_max), &
-         scale
+                       pbd(7*md_max), pbc(7*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*7*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23874,18 +23874,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23908,8 +23908,8 @@ CONTAINS
    SUBROUTINE block_11_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(9*md_max), pbc(9*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*9*mc_max*md_max), &
-         scale
+                       pbd(9*md_max), pbc(9*mc_max), pad(11*md_max), pac(11*mc_max), prim(11*9*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23924,18 +23924,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -23958,8 +23958,8 @@ CONTAINS
    SUBROUTINE block_11_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(11*md_max), pac(11*mc_max), &
-         prim(11*10*mc_max*md_max), scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(11*md_max), pac(11*mc_max), &
+                       prim(11*10*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -23974,18 +23974,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24008,8 +24008,8 @@ CONTAINS
    SUBROUTINE block_11_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(11*md_max), pac(11*mc_max), &
-         prim(11*11*mc_max*md_max), scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(11*md_max), pac(11*mc_max), &
+                       prim(11*11*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24024,18 +24024,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24058,8 +24058,8 @@ CONTAINS
    SUBROUTINE block_11_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(11*md_max), kac(11*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(11*md_max), pac(11*mc_max), &
-         prim(11*15*mc_max*md_max), scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(11*md_max), pac(11*mc_max), &
+                       prim(11*15*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24074,18 +24074,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 11
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*11+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*11+ma)
-                  kad((md-1)*11+ma) = kad((md-1)*11+ma)-tmp*p_bc
-                  kac((mc-1)*11+ma) = kac((mc-1)*11+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*11 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*11 + ma)
+                  kad((md - 1)*11 + ma) = kad((md - 1)*11 + ma) - tmp*p_bc
+                  kac((mc - 1)*11 + ma) = kac((mc - 1)*11 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24122,18 +24122,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24155,7 +24155,7 @@ CONTAINS
    SUBROUTINE block_15_1_1(md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*1), kad(15*md_max), kac(15*1), pbd(1*md_max), &
-         pbc(1*1), pad(15*md_max), pac(15*1), prim(15*1*1*md_max), scale
+                       pbc(1*1), pad(15*md_max), pac(15*1), prim(15*1*1*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24170,18 +24170,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24204,8 +24204,8 @@ CONTAINS
    SUBROUTINE block_15_1(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(1*md_max), kbc(1*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(1*md_max), pbc(1*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*1*mc_max*md_max), &
-         scale
+                       pbd(1*md_max), pbc(1*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*1*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24220,18 +24220,18 @@ CONTAINS
             DO mb = 1, 1
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*1+mb)
-               p_bc = pbc((mc-1)*1+mb)
+               p_bd = pbd((md - 1)*1 + mb)
+               p_bc = pbc((mc - 1)*1 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*1+mb) = kbd((md-1)*1+mb)-ks_bd
-               kbc((mc-1)*1+mb) = kbc((mc-1)*1+mb)-ks_bc
+               kbd((md - 1)*1 + mb) = kbd((md - 1)*1 + mb) - ks_bd
+               kbc((mc - 1)*1 + mb) = kbc((mc - 1)*1 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24254,8 +24254,8 @@ CONTAINS
    SUBROUTINE block_15_2(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(2*md_max), kbc(2*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(2*md_max), pbc(2*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*2*mc_max*md_max), &
-         scale
+                       pbd(2*md_max), pbc(2*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*2*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24270,18 +24270,18 @@ CONTAINS
             DO mb = 1, 2
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*2+mb)
-               p_bc = pbc((mc-1)*2+mb)
+               p_bd = pbd((md - 1)*2 + mb)
+               p_bc = pbc((mc - 1)*2 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*2+mb) = kbd((md-1)*2+mb)-ks_bd
-               kbc((mc-1)*2+mb) = kbc((mc-1)*2+mb)-ks_bc
+               kbd((md - 1)*2 + mb) = kbd((md - 1)*2 + mb) - ks_bd
+               kbc((mc - 1)*2 + mb) = kbc((mc - 1)*2 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24304,8 +24304,8 @@ CONTAINS
    SUBROUTINE block_15_3(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(3*md_max), kbc(3*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(3*md_max), pbc(3*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*3*mc_max*md_max), &
-         scale
+                       pbd(3*md_max), pbc(3*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*3*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24320,18 +24320,18 @@ CONTAINS
             DO mb = 1, 3
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*3+mb)
-               p_bc = pbc((mc-1)*3+mb)
+               p_bd = pbd((md - 1)*3 + mb)
+               p_bc = pbc((mc - 1)*3 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*3+mb) = kbd((md-1)*3+mb)-ks_bd
-               kbc((mc-1)*3+mb) = kbc((mc-1)*3+mb)-ks_bc
+               kbd((md - 1)*3 + mb) = kbd((md - 1)*3 + mb) - ks_bd
+               kbc((mc - 1)*3 + mb) = kbc((mc - 1)*3 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24354,8 +24354,8 @@ CONTAINS
    SUBROUTINE block_15_4(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(4*md_max), kbc(4*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(4*md_max), pbc(4*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*4*mc_max*md_max), &
-         scale
+                       pbd(4*md_max), pbc(4*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*4*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24370,18 +24370,18 @@ CONTAINS
             DO mb = 1, 4
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*4+mb)
-               p_bc = pbc((mc-1)*4+mb)
+               p_bd = pbd((md - 1)*4 + mb)
+               p_bc = pbc((mc - 1)*4 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*4+mb) = kbd((md-1)*4+mb)-ks_bd
-               kbc((mc-1)*4+mb) = kbc((mc-1)*4+mb)-ks_bc
+               kbd((md - 1)*4 + mb) = kbd((md - 1)*4 + mb) - ks_bd
+               kbc((mc - 1)*4 + mb) = kbc((mc - 1)*4 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24404,8 +24404,8 @@ CONTAINS
    SUBROUTINE block_15_5(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(5*md_max), kbc(5*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(5*md_max), pbc(5*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*5*mc_max*md_max), &
-         scale
+                       pbd(5*md_max), pbc(5*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*5*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24420,18 +24420,18 @@ CONTAINS
             DO mb = 1, 5
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*5+mb)
-               p_bc = pbc((mc-1)*5+mb)
+               p_bd = pbd((md - 1)*5 + mb)
+               p_bc = pbc((mc - 1)*5 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*5+mb) = kbd((md-1)*5+mb)-ks_bd
-               kbc((mc-1)*5+mb) = kbc((mc-1)*5+mb)-ks_bc
+               kbd((md - 1)*5 + mb) = kbd((md - 1)*5 + mb) - ks_bd
+               kbc((mc - 1)*5 + mb) = kbc((mc - 1)*5 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24454,8 +24454,8 @@ CONTAINS
    SUBROUTINE block_15_6(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(6*md_max), kbc(6*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(6*md_max), pbc(6*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*6*mc_max*md_max), &
-         scale
+                       pbd(6*md_max), pbc(6*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*6*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24470,18 +24470,18 @@ CONTAINS
             DO mb = 1, 6
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*6+mb)
-               p_bc = pbc((mc-1)*6+mb)
+               p_bd = pbd((md - 1)*6 + mb)
+               p_bc = pbc((mc - 1)*6 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*6+mb) = kbd((md-1)*6+mb)-ks_bd
-               kbc((mc-1)*6+mb) = kbc((mc-1)*6+mb)-ks_bc
+               kbd((md - 1)*6 + mb) = kbd((md - 1)*6 + mb) - ks_bd
+               kbc((mc - 1)*6 + mb) = kbc((mc - 1)*6 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24504,8 +24504,8 @@ CONTAINS
    SUBROUTINE block_15_7(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(7*md_max), kbc(7*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(7*md_max), pbc(7*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*7*mc_max*md_max), &
-         scale
+                       pbd(7*md_max), pbc(7*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*7*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24520,18 +24520,18 @@ CONTAINS
             DO mb = 1, 7
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*7+mb)
-               p_bc = pbc((mc-1)*7+mb)
+               p_bd = pbd((md - 1)*7 + mb)
+               p_bc = pbc((mc - 1)*7 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*7+mb) = kbd((md-1)*7+mb)-ks_bd
-               kbc((mc-1)*7+mb) = kbc((mc-1)*7+mb)-ks_bc
+               kbd((md - 1)*7 + mb) = kbd((md - 1)*7 + mb) - ks_bd
+               kbc((mc - 1)*7 + mb) = kbc((mc - 1)*7 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24554,8 +24554,8 @@ CONTAINS
    SUBROUTINE block_15_9(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(9*md_max), kbc(9*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(9*md_max), pbc(9*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*9*mc_max*md_max), &
-         scale
+                       pbd(9*md_max), pbc(9*mc_max), pad(15*md_max), pac(15*mc_max), prim(15*9*mc_max*md_max), &
+                       scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24570,18 +24570,18 @@ CONTAINS
             DO mb = 1, 9
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*9+mb)
-               p_bc = pbc((mc-1)*9+mb)
+               p_bd = pbd((md - 1)*9 + mb)
+               p_bc = pbc((mc - 1)*9 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*9+mb) = kbd((md-1)*9+mb)-ks_bd
-               kbc((mc-1)*9+mb) = kbc((mc-1)*9+mb)-ks_bc
+               kbd((md - 1)*9 + mb) = kbd((md - 1)*9 + mb) - ks_bd
+               kbc((mc - 1)*9 + mb) = kbc((mc - 1)*9 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24604,8 +24604,8 @@ CONTAINS
    SUBROUTINE block_15_10(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(10*md_max), kbc(10*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(10*md_max), pbc(10*mc_max), pad(15*md_max), pac(15*mc_max), &
-         prim(15*10*mc_max*md_max), scale
+                       pbd(10*md_max), pbc(10*mc_max), pad(15*md_max), pac(15*mc_max), &
+                       prim(15*10*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24620,18 +24620,18 @@ CONTAINS
             DO mb = 1, 10
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*10+mb)
-               p_bc = pbc((mc-1)*10+mb)
+               p_bd = pbd((md - 1)*10 + mb)
+               p_bc = pbc((mc - 1)*10 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*10+mb) = kbd((md-1)*10+mb)-ks_bd
-               kbc((mc-1)*10+mb) = kbc((mc-1)*10+mb)-ks_bc
+               kbd((md - 1)*10 + mb) = kbd((md - 1)*10 + mb) - ks_bd
+               kbc((mc - 1)*10 + mb) = kbc((mc - 1)*10 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24654,8 +24654,8 @@ CONTAINS
    SUBROUTINE block_15_11(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(11*md_max), kbc(11*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(11*md_max), pbc(11*mc_max), pad(15*md_max), pac(15*mc_max), &
-         prim(15*11*mc_max*md_max), scale
+                       pbd(11*md_max), pbc(11*mc_max), pad(15*md_max), pac(15*mc_max), &
+                       prim(15*11*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24670,18 +24670,18 @@ CONTAINS
             DO mb = 1, 11
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*11+mb)
-               p_bc = pbc((mc-1)*11+mb)
+               p_bd = pbd((md - 1)*11 + mb)
+               p_bc = pbc((mc - 1)*11 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*11+mb) = kbd((md-1)*11+mb)-ks_bd
-               kbc((mc-1)*11+mb) = kbc((mc-1)*11+mb)-ks_bc
+               kbd((md - 1)*11 + mb) = kbd((md - 1)*11 + mb) - ks_bd
+               kbc((mc - 1)*11 + mb) = kbc((mc - 1)*11 + mb) - ks_bc
             END DO
          END DO
       END DO
@@ -24704,8 +24704,8 @@ CONTAINS
    SUBROUTINE block_15_15(mc_max, md_max, kbd, kbc, kad, kac, pbd, pbc, pad, pac, prim, scale)
       INTEGER                                            :: mc_max, md_max
       REAL(KIND=dp) :: kbd(15*md_max), kbc(15*mc_max), kad(15*md_max), kac(15*mc_max), &
-         pbd(15*md_max), pbc(15*mc_max), pad(15*md_max), pac(15*mc_max), &
-         prim(15*15*mc_max*md_max), scale
+                       pbd(15*md_max), pbc(15*mc_max), pad(15*md_max), pac(15*mc_max), &
+                       prim(15*15*mc_max*md_max), scale
 
       INTEGER                                            :: ma, mb, mc, md, p_index
       REAL(KIND=dp)                                      :: ks_bc, ks_bd, p_bc, p_bd, tmp
@@ -24720,18 +24720,18 @@ CONTAINS
             DO mb = 1, 15
                ks_bd = 0.0_dp
                ks_bc = 0.0_dp
-               p_bd = pbd((md-1)*15+mb)
-               p_bc = pbc((mc-1)*15+mb)
+               p_bd = pbd((md - 1)*15 + mb)
+               p_bc = pbc((mc - 1)*15 + mb)
                DO ma = 1, 15
-                  p_index = p_index+1
+                  p_index = p_index + 1
                   tmp = scale*prim(p_index)
-                  ks_bc = ks_bc+tmp*pad((md-1)*15+ma)
-                  ks_bd = ks_bd+tmp*pac((mc-1)*15+ma)
-                  kad((md-1)*15+ma) = kad((md-1)*15+ma)-tmp*p_bc
-                  kac((mc-1)*15+ma) = kac((mc-1)*15+ma)-tmp*p_bd
+                  ks_bc = ks_bc + tmp*pad((md - 1)*15 + ma)
+                  ks_bd = ks_bd + tmp*pac((mc - 1)*15 + ma)
+                  kad((md - 1)*15 + ma) = kad((md - 1)*15 + ma) - tmp*p_bc
+                  kac((mc - 1)*15 + ma) = kac((mc - 1)*15 + ma) - tmp*p_bd
                END DO
-               kbd((md-1)*15+mb) = kbd((md-1)*15+mb)-ks_bd
-               kbc((mc-1)*15+mb) = kbc((mc-1)*15+mb)-ks_bc
+               kbd((md - 1)*15 + mb) = kbd((md - 1)*15 + mb) - ks_bd
+               kbc((mc - 1)*15 + mb) = kbc((mc - 1)*15 + mb) - ks_bc
             END DO
          END DO
       END DO

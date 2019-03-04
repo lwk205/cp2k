@@ -22,23 +22,23 @@
 ! **************************************************************************************************
 MODULE qs_loc_types
 
-   USE cell_types,                      ONLY: cell_release,&
-                                              cell_retain,&
-                                              cell_type
-   USE cp_array_utils,                  ONLY: cp_2d_r_p_type
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type
-   USE distribution_1d_types,           ONLY: distribution_1d_release,&
-                                              distribution_1d_retain,&
-                                              distribution_1d_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE particle_types,                  ONLY: particle_type
+   USE cell_types, ONLY: cell_release, &
+                         cell_retain, &
+                         cell_type
+   USE cp_array_utils, ONLY: cp_2d_r_p_type
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_deallocate_matrix, &
+                        dbcsr_p_type
+   USE distribution_1d_types, ONLY: distribution_1d_release, &
+                                    distribution_1d_retain, &
+                                    distribution_1d_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE particle_types, ONLY: particle_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -169,7 +169,7 @@ CONTAINS
       TYPE(qs_loc_env_new_type), POINTER                 :: qs_loc_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_loc_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(qs_loc_env))
 
@@ -203,7 +203,7 @@ CONTAINS
       TYPE(qs_loc_env_new_type), POINTER                 :: qs_loc_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_loc_env_destroy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ii, j
 
@@ -220,7 +220,7 @@ CONTAINS
 
       IF (ASSOCIATED(qs_loc_env%moloc_coeff)) THEN
          DO i = 1, SIZE(qs_loc_env%moloc_coeff, 1)
-            ii = LBOUND(qs_loc_env%moloc_coeff, 1)+i-1
+            ii = LBOUND(qs_loc_env%moloc_coeff, 1) + i - 1
             CALL cp_fm_release(qs_loc_env%moloc_coeff(ii)%matrix)
          END DO
          DEALLOCATE (qs_loc_env%moloc_coeff)
@@ -262,11 +262,11 @@ CONTAINS
       TYPE(qs_loc_env_new_type), POINTER                 :: qs_loc_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_loc_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qs_loc_env)) THEN
          CPASSERT(qs_loc_env%ref_count > 0)
-         qs_loc_env%ref_count = qs_loc_env%ref_count-1
+         qs_loc_env%ref_count = qs_loc_env%ref_count - 1
          IF (qs_loc_env%ref_count == 0) THEN
             CALL qs_loc_env_destroy(qs_loc_env)
          END IF
@@ -287,11 +287,11 @@ CONTAINS
       TYPE(qs_loc_env_new_type), POINTER                 :: qs_loc_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_loc_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(qs_loc_env))
       CPASSERT(qs_loc_env%ref_count > 0)
-      qs_loc_env%ref_count = qs_loc_env%ref_count+1
+      qs_loc_env%ref_count = qs_loc_env%ref_count + 1
    END SUBROUTINE qs_loc_env_retain
 
 ! **************************************************************************************************
@@ -304,7 +304,7 @@ CONTAINS
       TYPE(localized_wfn_control_type), POINTER          :: localized_wfn_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'localized_wfn_control_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(localized_wfn_control))
       ALLOCATE (localized_wfn_control)
@@ -334,11 +334,11 @@ CONTAINS
       TYPE(localized_wfn_control_type), POINTER          :: localized_wfn_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'localized_wfn_control_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(localized_wfn_control)) THEN
          CPASSERT(localized_wfn_control%ref_count > 0)
-         localized_wfn_control%ref_count = localized_wfn_control%ref_count-1
+         localized_wfn_control%ref_count = localized_wfn_control%ref_count - 1
          IF (localized_wfn_control%ref_count == 0) THEN
             IF (ASSOCIATED(localized_wfn_control%loc_states)) THEN
                DEALLOCATE (localized_wfn_control%loc_states)
@@ -365,11 +365,11 @@ CONTAINS
       TYPE(localized_wfn_control_type), POINTER          :: localized_wfn_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'localized_wfn_control_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(localized_wfn_control))
 
-      localized_wfn_control%ref_count = localized_wfn_control%ref_count+1
+      localized_wfn_control%ref_count = localized_wfn_control%ref_count + 1
    END SUBROUTINE localized_wfn_control_retain
 
 !****f* qs_loc_types/get_qs_loc_env [1.0] *

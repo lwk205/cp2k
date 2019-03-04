@@ -9,16 +9,16 @@
 !> \author Joost VandeVondele March 2003
 ! **************************************************************************************************
 MODULE mulliken
-   USE atomic_charges,                  ONLY: print_atomic_charges
-   USE cp_control_types,                ONLY: mulliken_restraint_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
+   USE atomic_charges, ONLY: print_atomic_charges
+   USE cp_control_types, ONLY: mulliken_restraint_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE qs_kind_types, ONLY: qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -73,7 +73,7 @@ CONTAINS
          POINTER                                         :: ks_matrix, w_matrix
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_restraint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, iblock_col, iblock_row, ispin, &
                                                             nblock, nspin
@@ -117,10 +117,10 @@ CONTAINS
                IF (.NOT. (ASSOCIATED(s_block) .AND. ASSOCIATED(ks_block))) THEN
                   CPABORT("Unexpected s / ks structure")
                END IF
-               mult = 0.5_dp*charges_deriv(iblock_row, ispin)+ &
+               mult = 0.5_dp*charges_deriv(iblock_row, ispin) + &
                       0.5_dp*charges_deriv(iblock_col, ispin)
 
-               ks_block = ks_block+mult*s_block
+               ks_block = ks_block + mult*s_block
 
             ENDDO
             CALL dbcsr_iterator_stop(iter)
@@ -142,9 +142,9 @@ CONTAINS
 
                ! minus sign relates to convention for W
                mult = -0.5_dp*charges_deriv(iblock_row, ispin) &
-                      -0.5_dp*charges_deriv(iblock_col, ispin)
+                      - 0.5_dp*charges_deriv(iblock_col, ispin)
 
-               w_block = w_block+mult*p_block
+               w_block = w_block + mult*p_block
 
             END DO
             CALL dbcsr_iterator_stop(iter)
@@ -185,13 +185,13 @@ CONTAINS
       order_p = 0.0_dp
 
       DO I = 1, mulliken_restraint_control%natoms
-         order_p = order_p+charges(mulliken_restraint_control%atoms(I), 1) &
-                   -charges(mulliken_restraint_control%atoms(I), 2) ! spin density on the relevant atoms
+         order_p = order_p + charges(mulliken_restraint_control%atoms(I), 1) &
+                   - charges(mulliken_restraint_control%atoms(I), 2) ! spin density on the relevant atoms
       ENDDO
       ! energy
-      energy = mulliken_restraint_control%strength*(order_p-mulliken_restraint_control%target)**2
+      energy = mulliken_restraint_control%strength*(order_p - mulliken_restraint_control%target)**2
       ! derivative
-      dum = 2*mulliken_restraint_control%strength*(order_p-mulliken_restraint_control%target)
+      dum = 2*mulliken_restraint_control%strength*(order_p - mulliken_restraint_control%target)
       DO I = 1, mulliken_restraint_control%natoms
          charges_deriv(mulliken_restraint_control%atoms(I), 1) = dum
          charges_deriv(mulliken_restraint_control%atoms(I), 2) = -dum
@@ -241,9 +241,9 @@ CONTAINS
             ELSE
                mult = 1.0_dp
             ENDIF
-            charges(iblock_row, ispin) = charges(iblock_row, ispin)+ &
+            charges(iblock_row, ispin) = charges(iblock_row, ispin) + &
                                          mult*SUM(p_block*s_block)
-            charges(iblock_col, ispin) = charges(iblock_col, ispin)+ &
+            charges(iblock_col, ispin) = charges(iblock_col, ispin) + &
                                          mult*SUM(p_block*s_block)
 
          ENDDO
@@ -290,8 +290,8 @@ CONTAINS
          ELSE
             mult = 1.0_dp
          ENDIF
-         charges(iblock_row) = charges(iblock_row)+mult*SUM(p_block*s_block)
-         charges(iblock_col) = charges(iblock_col)+mult*SUM(p_block*s_block)
+         charges(iblock_row) = charges(iblock_row) + mult*SUM(p_block*s_block)
+         charges(iblock_col) = charges(iblock_col) + mult*SUM(p_block*s_block)
       ENDDO
       CALL dbcsr_iterator_stop(iter)
 
@@ -342,13 +342,13 @@ CONTAINS
             ELSE
                mult = 1.0_dp
             ENDIF
-            charges(iblock_row, ispin) = charges(iblock_row, ispin)+mult*SUM(p_block*s_block)
-            charges(iblock_col, ispin) = charges(iblock_col, ispin)+mult*SUM(p_block*s_block)
+            charges(iblock_row, ispin) = charges(iblock_row, ispin) + mult*SUM(p_block*s_block)
+            charges(iblock_col, ispin) = charges(iblock_col, ispin) + mult*SUM(p_block*s_block)
             DO ider = 1, 3
-               CALL dbcsr_get_block_p(matrix=s_matrix(ider+1)%matrix, &
+               CALL dbcsr_get_block_p(matrix=s_matrix(ider + 1)%matrix, &
                                       row=iblock_row, col=iblock_col, BLOCK=ds_block, found=found)
-               dcharges(iblock_row, ider) = dcharges(iblock_row, ider)+mult*SUM(p_block*ds_block)
-               dcharges(iblock_col, ider) = dcharges(iblock_col, ider)+mult*SUM(p_block*ds_block)
+               dcharges(iblock_row, ider) = dcharges(iblock_row, ider) + mult*SUM(p_block*ds_block)
+               dcharges(iblock_col, ider) = dcharges(iblock_col, ider) + mult*SUM(p_block*ds_block)
             END DO
 
          ENDDO
@@ -383,7 +383,7 @@ CONTAINS
       CHARACTER(LEN=*)                                   :: title
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_a', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nblock, nspin
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: charges
@@ -422,7 +422,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: mcharge
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_b', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -451,7 +451,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: mcharge, dmcharge
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -479,7 +479,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:)                        :: mcharge
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_s', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -514,7 +514,7 @@ CONTAINS
       CHARACTER(LEN=*)                                   :: title
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_akp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, nblock, nspin
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: charges, charges_im
@@ -537,7 +537,7 @@ CONTAINS
          s_matrix => s_matrix_kp(1, ic)%matrix
          charges_im = 0.0_dp
          CALL compute_charges(p_matrix, s_matrix, charges_im, para_env)
-         charges(:, :) = charges(:, :)+charges_im(:, :)
+         charges(:, :) = charges(:, :) + charges_im(:, :)
       END DO
 
       CALL print_atomic_charges(particle_set, qs_kind_set, scr, title, electronic_charges=charges)
@@ -562,7 +562,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: mcharge
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_bkp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, natom, nspin
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: mcharge_im
@@ -584,7 +584,7 @@ CONTAINS
             s_matrix => s_matrix_kp(1, ic)%matrix
             IF (ASSOCIATED(p_matrix) .AND. ASSOCIATED(s_matrix)) THEN
                CALL compute_charges(p_matrix, s_matrix, mcharge_im, para_env)
-               mcharge(:, :) = mcharge(:, :)+mcharge_im(:, :)
+               mcharge(:, :) = mcharge(:, :) + mcharge_im(:, :)
             END IF
          END DO
 
@@ -612,7 +612,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: mcharge, dmcharge
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mulliken_charges_ckp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, natom, nder, nspin
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: dmcharge_im, mcharge_im
@@ -635,8 +635,8 @@ CONTAINS
             s_matrix => s_matrix_kp(:, ic)
             IF (ASSOCIATED(p_matrix) .AND. ASSOCIATED(s_matrix)) THEN
                CALL compute_dcharges(p_matrix, s_matrix, mcharge_im, dmcharge_im, para_env)
-               mcharge(:, :) = mcharge(:, :)+mcharge_im(:, :)
-               dmcharge(:, :) = dmcharge(:, :)+dmcharge_im(:, :)
+               mcharge(:, :) = mcharge(:, :) + mcharge_im(:, :)
+               dmcharge(:, :) = dmcharge(:, :) + dmcharge_im(:, :)
             END IF
          END DO
 
@@ -675,7 +675,7 @@ CONTAINS
          IF (.NOT. found) CYCLE
          IF (.NOT. (ASSOCIATED(sp) .AND. ASSOCIATED(ps))) CYCLE
 
-         bond_order(iat, jat) = bond_order(iat, jat)+SUM(ps*sp)
+         bond_order(iat, jat) = bond_order(iat, jat) + SUM(ps*sp)
       ENDDO
       CALL dbcsr_iterator_stop(iter)
 

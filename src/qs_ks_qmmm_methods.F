@@ -7,33 +7,33 @@
 !> \author T.Laino
 ! **************************************************************************************************
 MODULE qs_ks_qmmm_methods
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cube_utils,                      ONLY: cube_info_type,&
-                                              init_cube_info
-   USE d3_poly,                         ONLY: init_d3_poly_module
-   USE input_constants,                 ONLY: do_qmmm_gauss,&
-                                              do_qmmm_swave
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_retain
-   USE pw_methods,                      ONLY: pw_integral_ab
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_p_type
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_ks_qmmm_types,                ONLY: qs_ks_qmmm_env_type,&
-                                              qs_ks_qmmm_release
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cube_utils, ONLY: cube_info_type, &
+                         init_cube_info
+   USE d3_poly, ONLY: init_d3_poly_module
+   USE input_constants, ONLY: do_qmmm_gauss, &
+                              do_qmmm_swave
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_retain
+   USE pw_methods, ONLY: pw_integral_ab
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_p_type
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_ks_qmmm_types, ONLY: qs_ks_qmmm_env_type, &
+                               qs_ks_qmmm_release
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -90,7 +90,7 @@ CONTAINS
       TYPE(qmmm_env_qm_type), POINTER                    :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ks_qmmm_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, igrid
       TYPE(cube_info_type), DIMENSION(:), POINTER        :: cube_info
@@ -113,7 +113,7 @@ CONTAINS
       ks_qmmm_env%pc_ener = 0.0_dp
       ks_qmmm_env%n_evals = 0
       ks_qmmm_env%ref_count = 1
-      last_ks_qmmm_nr = last_ks_qmmm_nr+1
+      last_ks_qmmm_nr = last_ks_qmmm_nr + 1
       ks_qmmm_env%id_nr = last_ks_qmmm_nr
 
       CALL pw_pool_create_pw(auxbas_pw_pool, ks_qmmm_env%v_qmmm_rspace%pw, &
@@ -158,7 +158,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(INOUT)                       :: qmmm_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_calculate_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, output_unit
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -182,13 +182,13 @@ CONTAINS
 
       qmmm_energy = 0.0_dp
       DO ispin = 1, dft_control%nspins
-         qmmm_energy = qmmm_energy+pw_integral_ab(rho(ispin)%pw, v_qmmm%pw)
+         qmmm_energy = qmmm_energy + pw_integral_ab(rho(ispin)%pw, v_qmmm%pw)
       END DO
       IF (dft_control%qs_control%gapw) THEN
          CALL get_qs_env(qs_env=qs_env, &
                          rho0_s_rs=rho0_s_rs)
          CPASSERT(ASSOCIATED(rho0_s_rs))
-         qmmm_energy = qmmm_energy+pw_integral_ab(rho0_s_rs%pw, v_qmmm%pw)
+         qmmm_energy = qmmm_energy + pw_integral_ab(rho0_s_rs%pw, v_qmmm%pw)
       END IF
 
       CALL cp_print_key_finished_output(output_unit, logger, input, &
@@ -212,7 +212,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: scale
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_modify_hartree_pot', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: fac

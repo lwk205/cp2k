@@ -11,10 +11,10 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_para_env
-   USE cp_para_types,                   ONLY: cp_para_cart_type,&
-                                              cp_para_env_type
-   USE message_passing,                 ONLY: mp_comm_free,&
-                                              mp_environ
+   USE cp_para_types, ONLY: cp_para_cart_type, &
+                            cp_para_env_type
+   USE message_passing, ONLY: mp_comm_free, &
+                              mp_environ
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -48,7 +48,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: owns_group
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_para_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(para_env))
       ALLOCATE (para_env)
@@ -79,11 +79,11 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_para_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(para_env))
       CPASSERT(para_env%ref_count > 0)
-      para_env%ref_count = para_env%ref_count+1
+      para_env%ref_count = para_env%ref_count + 1
    END SUBROUTINE cp_para_env_retain
 
 ! **************************************************************************************************
@@ -101,11 +101,11 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_para_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(para_env)) THEN
          CPASSERT(para_env%ref_count > 0)
-         para_env%ref_count = para_env%ref_count-1
+         para_env%ref_count = para_env%ref_count - 1
          IF (para_env%ref_count < 1) THEN
             IF (para_env%owns_group) THEN
                CALL mp_comm_free(para_env%group)
@@ -127,7 +127,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_para_env_update', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(para_env))
       CPASSERT(para_env%ref_count > 0)
@@ -196,11 +196,11 @@ CONTAINS
       TYPE(cp_para_cart_type), POINTER                   :: cart
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_cart_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(cart)) THEN
          CPASSERT(cart%ref_count > 0)
-         cart%ref_count = cart%ref_count-1
+         cart%ref_count = cart%ref_count - 1
          IF (cart%ref_count == 0) THEN
             IF (cart%owns_group) THEN
                CALL mp_comm_free(cart%group)

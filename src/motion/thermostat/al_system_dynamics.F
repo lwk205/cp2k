@@ -8,22 +8,22 @@
 ! **************************************************************************************************
 MODULE al_system_dynamics
 
-   USE al_system_types,                 ONLY: al_system_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE constraint_fxd,                  ONLY: fix_atom_control
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE extended_system_types,           ONLY: map_info_type
-   USE force_env_types,                 ONLY: force_env_type
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: get_molecule,&
-                                              molecule_type
-   USE parallel_rng_types,              ONLY: next_random_number,&
-                                              rng_stream_type
-   USE particle_types,                  ONLY: particle_type
-   USE thermostat_utils,                ONLY: ke_region_particles,&
-                                              vel_rescale_particles
+   USE al_system_types, ONLY: al_system_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE constraint_fxd, ONLY: fix_atom_control
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE extended_system_types, ONLY: map_info_type
+   USE force_env_types, ONLY: force_env_type
+   USE kinds, ONLY: dp
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: get_molecule, &
+                             molecule_type
+   USE parallel_rng_types, ONLY: next_random_number, &
+                                 rng_stream_type
+   USE particle_types, ONLY: particle_type
+   USE thermostat_utils, ONLY: ke_region_particles, &
+                               vel_rescale_particles
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -184,7 +184,7 @@ CONTAINS
       CHARACTER(len=*), PARAMETER :: routineN = 'al_OU_step', routineP = moduleN//':'//routineN
 
       INTEGER :: first_atom, i, ii, ikind, imap, imol, imol_local, ipart, iparticle_kind, &
-         iparticle_local, last_atom, nmol_local, nparticle, nparticle_kind, nparticle_local
+                 iparticle_local, last_atom, nmol_local, nparticle, nparticle_kind, nparticle_local
       LOGICAL                                            :: check, present_vel
       REAL(KIND=dp)                                      :: mass
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: w(:, :)
@@ -200,7 +200,7 @@ CONTAINS
          ! drag on velocities
          IF (al%tau_langevin > 0.0_dp) THEN
             map_info%v_scale(imap) = EXP(-step*al%dt/al%tau_langevin)
-            map_info%s_kin(imap) = SQRT((al%nvt(i)%nkt/al%nvt(i)%degrees_of_freedom)*(1.0_dp-map_info%v_scale(imap)**2))
+            map_info%s_kin(imap) = SQRT((al%nvt(i)%nkt/al%nvt(i)%degrees_of_freedom)*(1.0_dp - map_info%v_scale(imap)**2))
          ELSE
             map_info%v_scale(imap) = 1.0_dp
             map_info%s_kin(imap) = 0.0_dp
@@ -239,14 +239,14 @@ CONTAINS
             molecule => molecule_set(imol)
             CALL get_molecule(molecule, first_atom=first_atom, last_atom=last_atom)
             DO ipart = first_atom, last_atom
-               ii = ii+1
+               ii = ii + 1
                atomic_kind => particle_set(ipart)%atomic_kind
                CALL get_atomic_kind(atomic_kind=atomic_kind, mass=mass)
                IF (present_vel) THEN
-                  vel(:, ipart) = vel(:, ipart)*map_info%v_scale(ii)+ &
+                  vel(:, ipart) = vel(:, ipart)*map_info%v_scale(ii) + &
                                   map_info%s_kin(ii)/SQRT(mass)*w(:, ipart)
                ELSE
-                  particle_set(ipart)%v(:) = particle_set(ipart)%v(:)*map_info%v_scale(ii)+ &
+                  particle_set(ipart)%v(:) = particle_set(ipart)%v(:)*map_info%v_scale(ii) + &
                                              map_info%s_kin(ii)/SQRT(mass)*w(:, ipart)
                ENDIF
             END DO
@@ -270,7 +270,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: set_half_step_vel_factors
 
       CHARACTER(len=*), PARAMETER :: routineN = 'al_NH_quarter_step', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, imap
       REAL(KIND=dp)                                      :: decay, delta_K
@@ -280,8 +280,8 @@ CONTAINS
       DO i = 1, al%loc_num_al
          IF (al%nvt(i)%mass > 0.0_dp) THEN
             imap = map_info%map_index(i)
-            delta_K = 0.5_dp*(map_info%s_kin(imap)-al%nvt(i)%nkt)
-            al%nvt(i)%chi = al%nvt(i)%chi+0.5_dp*al%dt*delta_K/al%nvt(i)%mass
+            delta_K = 0.5_dp*(map_info%s_kin(imap) - al%nvt(i)%nkt)
+            al%nvt(i)%chi = al%nvt(i)%chi + 0.5_dp*al%dt*delta_K/al%nvt(i)%mass
             IF (set_half_step_vel_factors) THEN
                decay = EXP(-0.5_dp*al%dt*al%nvt(i)%chi)
                map_info%v_scale(imap) = decay

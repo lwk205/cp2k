@@ -8,37 +8,37 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_param
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_complete_redistribute, dbcsr_copy, dbcsr_create, dbcsr_frobenius_norm, &
-        dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_type
-   USE dm_ls_scf_types,                 ONLY: ls_mstruct_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_max
-   USE pao_input,                       ONLY: pao_exp_param,&
-                                              pao_fock_param,&
-                                              pao_gth_param,&
-                                              pao_rotinv_param
-   USE pao_param_exp,                   ONLY: pao_calc_U_exp,&
-                                              pao_param_count_exp,&
-                                              pao_param_finalize_exp,&
-                                              pao_param_init_exp,&
-                                              pao_param_initguess_exp
-   USE pao_param_gth,                   ONLY: pao_calc_U_gth,&
-                                              pao_param_count_gth,&
-                                              pao_param_finalize_gth,&
-                                              pao_param_init_gth,&
-                                              pao_param_initguess_gth
-   USE pao_param_linpot,                ONLY: pao_calc_U_linpot,&
-                                              pao_param_count_linpot,&
-                                              pao_param_finalize_linpot,&
-                                              pao_param_init_linpot,&
-                                              pao_param_initguess_linpot
-   USE pao_types,                       ONLY: pao_env_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE dbcsr_api, ONLY: &
+      dbcsr_complete_redistribute, dbcsr_copy, dbcsr_create, dbcsr_frobenius_norm, &
+      dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_type
+   USE dm_ls_scf_types, ONLY: ls_mstruct_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_max
+   USE pao_input, ONLY: pao_exp_param, &
+                        pao_fock_param, &
+                        pao_gth_param, &
+                        pao_rotinv_param
+   USE pao_param_exp, ONLY: pao_calc_U_exp, &
+                            pao_param_count_exp, &
+                            pao_param_finalize_exp, &
+                            pao_param_init_exp, &
+                            pao_param_initguess_exp
+   USE pao_param_gth, ONLY: pao_calc_U_gth, &
+                            pao_param_count_gth, &
+                            pao_param_finalize_gth, &
+                            pao_param_init_gth, &
+                            pao_param_initguess_gth
+   USE pao_param_linpot, ONLY: pao_calc_U_linpot, &
+                               pao_param_count_linpot, &
+                               pao_param_finalize_linpot, &
+                               pao_param_init_linpot, &
+                               pao_param_initguess_linpot
+   USE pao_types, ONLY: pao_env_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -154,7 +154,7 @@ CONTAINS
       TYPE(pao_env_type), POINTER                        :: pao
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_param_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -189,7 +189,7 @@ CONTAINS
       INTEGER, INTENT(OUT)                               :: nparams
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_param_count', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -220,7 +220,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_param_initial_guess', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(dp)                                           :: norm
@@ -301,7 +301,7 @@ CONTAINS
       TYPE(pao_env_type), POINTER                        :: pao
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_assert_unitary', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: acol, arow, group, handle, i, iatom, M, N
       INTEGER, DIMENSION(:), POINTER                     :: blk_sizes_pao, blk_sizes_pri
@@ -330,7 +330,7 @@ CONTAINS
          tmp1 = block_test(:, 1:M)
          tmp2 = MATMUL(TRANSPOSE(tmp1), tmp1)
          DO i = 1, M
-            tmp2(i, i) = tmp2(i, i)-1.0_dp
+            tmp2(i, i) = tmp2(i, i) - 1.0_dp
          ENDDO
 
 !$OMP ATOMIC

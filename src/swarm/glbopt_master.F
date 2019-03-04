@@ -8,49 +8,49 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE glbopt_master
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              deallocate_atomic_kind_set
-   USE colvar_types,                    ONLY: colvar_p_release,&
-                                              colvar_p_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE exclusion_types,                 ONLY: exclusion_release,&
-                                              exclusion_type
-   USE glbopt_mincrawl,                 ONLY: mincrawl_finalize,&
-                                              mincrawl_init,&
-                                              mincrawl_steer,&
-                                              mincrawl_type
-   USE glbopt_minhop,                   ONLY: minhop_finalize,&
-                                              minhop_init,&
-                                              minhop_steer,&
-                                              minhop_type
-   USE input_constants,                 ONLY: dump_xmol,&
-                                              glbopt_do_mincrawl,&
-                                              glbopt_do_minhop
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_release,&
-                                              section_vals_retain,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              int_8
-   USE molecule_kind_types,             ONLY: deallocate_molecule_kind_set,&
-                                              molecule_kind_type
-   USE molecule_types,                  ONLY: deallocate_global_constraint,&
-                                              deallocate_molecule_set,&
-                                              global_constraint_type,&
-                                              molecule_type
-   USE particle_methods,                ONLY: write_particle_coordinates
-   USE particle_types,                  ONLY: deallocate_particle_set,&
-                                              particle_type
-   USE swarm_message,                   ONLY: swarm_message_get,&
-                                              swarm_message_type
-   USE topology,                        ONLY: topology_control
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                deallocate_atomic_kind_set
+   USE colvar_types, ONLY: colvar_p_release, &
+                           colvar_p_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE exclusion_types, ONLY: exclusion_release, &
+                              exclusion_type
+   USE glbopt_mincrawl, ONLY: mincrawl_finalize, &
+                              mincrawl_init, &
+                              mincrawl_steer, &
+                              mincrawl_type
+   USE glbopt_minhop, ONLY: minhop_finalize, &
+                            minhop_init, &
+                            minhop_steer, &
+                            minhop_type
+   USE input_constants, ONLY: dump_xmol, &
+                              glbopt_do_mincrawl, &
+                              glbopt_do_minhop
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_release, &
+                                  section_vals_retain, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    int_8
+   USE molecule_kind_types, ONLY: deallocate_molecule_kind_set, &
+                                  molecule_kind_type
+   USE molecule_types, ONLY: deallocate_global_constraint, &
+                             deallocate_molecule_set, &
+                             global_constraint_type, &
+                             molecule_type
+   USE particle_methods, ONLY: write_particle_coordinates
+   USE particle_types, ONLY: deallocate_particle_set, &
+                             particle_type
+   USE swarm_message, ONLY: swarm_message_get, &
+                            swarm_message_type
+   USE topology, ONLY: topology_control
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -98,7 +98,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n_walkers, iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'glbopt_master_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_logger_type), POINTER                      :: logger
 
@@ -197,7 +197,7 @@ CONTAINS
       LOGICAL, INTENT(INOUT)                             :: should_stop
 
       CHARACTER(len=*), PARAMETER :: routineN = 'glbopt_master_steer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CALL progress_report(this, report)
 
@@ -231,7 +231,7 @@ CONTAINS
       INTEGER                                            :: gopt_steps, md_steps, report_worker_id
       REAL(KIND=dp)                                      :: report_Epot
 
-      this%i_iteration = this%i_iteration+1
+      this%i_iteration = this%i_iteration + 1
 
       CALL swarm_message_get(report, "worker_id", report_worker_id)
       CALL swarm_message_get(report, "status", status)
@@ -240,9 +240,9 @@ CONTAINS
          CALL swarm_message_get(report, "Epot", report_Epot)
          CALL swarm_message_get(report, "md_steps", md_steps)
          CALL swarm_message_get(report, "gopt_steps", gopt_steps)
-         this%total_md_steps = this%total_md_steps+md_steps
-         this%total_gopt_steps = this%total_gopt_steps+gopt_steps
-         this%count_reports = this%count_reports+1
+         this%total_md_steps = this%total_md_steps + md_steps
+         this%total_gopt_steps = this%total_gopt_steps + gopt_steps
+         this%count_reports = this%count_reports + 1
 
          IF (report_Epot < this%E_lowest) THEN
             this%E_lowest = report_Epot
@@ -313,7 +313,7 @@ CONTAINS
       TYPE(glbopt_master_type), INTENT(INOUT)            :: this
 
       CHARACTER(len=*), PARAMETER :: routineN = 'glbopt_master_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_logger_type), POINTER                      :: logger
 

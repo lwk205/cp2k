@@ -10,37 +10,37 @@
 
 MODULE rt_make_propagators
 
-   USE cp_control_types,                ONLY: rtp_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_to_fm
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_create,&
-                                              dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type,&
-                                              dbcsr_scale,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: do_etrs,&
-                                              do_pade,&
-                                              do_taylor
-   USE kinds,                           ONLY: dp
-   USE ls_matrix_exp,                   ONLY: bch_expansion_complex_propagator,&
-                                              bch_expansion_imaginary_propagator,&
-                                              cp_complex_dbcsr_gemm_3,&
-                                              taylor_full_complex_dbcsr,&
-                                              taylor_only_imaginary_dbcsr
-   USE matrix_exp,                      ONLY: arnoldi,&
-                                              exp_pade_full_complex,&
-                                              exp_pade_only_imaginary,&
-                                              taylor_full_complex,&
-                                              taylor_only_imaginary
-   USE rt_propagation_types,            ONLY: get_rtp,&
-                                              rt_prop_type
+   USE cp_control_types, ONLY: rtp_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_to_fm
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_create, &
+                        dbcsr_deallocate_matrix, &
+                        dbcsr_p_type, &
+                        dbcsr_scale, &
+                        dbcsr_type
+   USE input_constants, ONLY: do_etrs, &
+                              do_pade, &
+                              do_taylor
+   USE kinds, ONLY: dp
+   USE ls_matrix_exp, ONLY: bch_expansion_complex_propagator, &
+                            bch_expansion_imaginary_propagator, &
+                            cp_complex_dbcsr_gemm_3, &
+                            taylor_full_complex_dbcsr, &
+                            taylor_only_imaginary_dbcsr
+   USE matrix_exp, ONLY: arnoldi, &
+                         exp_pade_full_complex, &
+                         exp_pade_only_imaginary, &
+                         taylor_full_complex, &
+                         taylor_only_imaginary
+   USE rt_propagation_types, ONLY: get_rtp, &
+                                   rt_prop_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -87,7 +87,7 @@ CONTAINS
       CALL compute_exponential(exp_H_new, propagator_matrix, rtp_control, rtp)
 
       DO i = 1, SIZE(mos_new)/2
-         re = 2*i-1
+         re = 2*i - 1
          im = 2*i
 
          CALL cp_fm_get_info(mos_new(re)%matrix, ncol_global=nmo)
@@ -136,7 +136,7 @@ CONTAINS
       TYPE(rtp_control_type), POINTER                    :: rtp_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'propagate_exp_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: handle, i, im, re
@@ -160,7 +160,7 @@ CONTAINS
       CALL dbcsr_create(tmp_im, template=propagator_matrix(1)%matrix, matrix_type="N")
 
       DO i = 1, SIZE(exp_H_new)/2
-         re = 2*i-1
+         re = 2*i - 1
          im = 2*i
          !Save some work by computing the first half of the propagation only once in case of ETRS
          !For EM this matrix has to be the initial matrix, thus a copy is enough
@@ -200,7 +200,7 @@ CONTAINS
       TYPE(rtp_control_type), POINTER                    :: rtp_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'propagate_arnoldi', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, im, ispin, nspin, re
       REAL(dp)                                           :: eps_arnoldi, t
@@ -234,7 +234,7 @@ CONTAINS
       END DO
 
       DO ispin = 1, nspin
-         re = ispin*2-1
+         re = ispin*2 - 1
          im = ispin*2
          IF (rtp_control%fixed_ions .AND. .NOT. rtp%do_hfx) THEN
             CALL arnoldi(mos_old(re:im), mos_new(re:im), &
@@ -284,7 +284,7 @@ CONTAINS
                    rho_next=rho_next)
 
       DO ispin = 1, SIZE(propagator_matrix)/2
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
 
          IF (rtp%iter == 1) THEN
@@ -342,7 +342,7 @@ CONTAINS
       TYPE(rt_prop_type), POINTER                        :: rtp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'compute_exponential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, im, ispin, re
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: propagator_fm, propagator_matrix_fm
@@ -363,7 +363,7 @@ CONTAINS
       END DO
 
       DO ispin = 1, SIZE(propagator)/2
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
 
          SELECT CASE (rtp_control%mat_exp)
@@ -411,14 +411,14 @@ CONTAINS
       TYPE(rt_prop_type), POINTER                        :: rtp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'compute_exponential_sparse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, im, ispin, re
 
       CALL timeset(routineN, handle)
 
       DO ispin = 1, SIZE(propagator)/2
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
          IF (rtp_control%fixed_ions .AND. .NOT. rtp%do_hfx) THEN
             CALL taylor_only_imaginary_dbcsr(propagator(re:im), propagator_matrix(im)%matrix, &

@@ -14,7 +14,7 @@
 ! **************************************************************************************************
 
 MODULE fft_plan
-   USE fft_kinds,                       ONLY: integer8_kind
+   USE fft_kinds, ONLY: integer8_kind
 
    IMPLICIT NONE
    PRIVATE

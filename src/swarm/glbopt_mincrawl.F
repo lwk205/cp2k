@@ -8,34 +8,34 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE glbopt_mincrawl
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE glbopt_history,                  ONLY: history_add,&
-                                              history_finalize,&
-                                              history_fingerprint,&
-                                              history_fingerprint_type,&
-                                              history_init,&
-                                              history_lookup,&
-                                              history_type
-   USE input_constants,                 ONLY: dump_xmol
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE parallel_rng_types,              ONLY: create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_random_number,&
-                                              rng_stream_type
-   USE particle_methods,                ONLY: write_particle_coordinates
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: kelvin
-   USE swarm_message,                   ONLY: swarm_message_add,&
-                                              swarm_message_get,&
-                                              swarm_message_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE glbopt_history, ONLY: history_add, &
+                             history_finalize, &
+                             history_fingerprint, &
+                             history_fingerprint_type, &
+                             history_init, &
+                             history_lookup, &
+                             history_type
+   USE input_constants, ONLY: dump_xmol
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE parallel_rng_types, ONLY: create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_random_number, &
+                                 rng_stream_type
+   USE particle_methods, ONLY: write_particle_coordinates
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: kelvin
+   USE swarm_message, ONLY: swarm_message_add, &
+                            swarm_message_get, &
+                            swarm_message_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -151,7 +151,7 @@ CONTAINS
       ALLOCATE (this%tempdist_init(this%tempstep_max))
       this%tempdist_init = 0.0
       DO i = 1, this%tempstep_max
-         this%tempdist_init(i) = 1.0/(1.0+EXP((this%tempstep_init-i)/this%tempdist_init_width))
+         this%tempdist_init(i) = 1.0/(1.0 + EXP((this%tempstep_init - i)/this%tempdist_init_width))
       ENDDO
 
       CALL create_rng_stream(this%rng_stream, name="mincrawl")
@@ -196,8 +196,8 @@ CONTAINS
          RETURN
       ENDIF
 
-      best_minima%n_active = best_minima%n_active+1
-      best_minima%n_sampled = best_minima%n_sampled+1
+      best_minima%n_active = best_minima%n_active + 1
+      best_minima%n_sampled = best_minima%n_sampled + 1
       this%workers(wid)%start_minima => best_minima
       this%workers(wid)%tempstep = choose_tempstep(this, best_minima)
 
@@ -275,8 +275,8 @@ CONTAINS
 
       DO
          r = next_random_number(this%rng_stream)
-         step = INT(r*SIZE(minima%tempdist))+1
-         a = 1.0-2.0*ABS(minima%tempdist(step)-0.5)
+         step = INT(r*SIZE(minima%tempdist)) + 1
+         a = 1.0 - 2.0*ABS(minima%tempdist(step) - 0.5)
          r = next_random_number(this%rng_stream)
          IF (r < a) EXIT
       END DO
@@ -347,7 +347,7 @@ CONTAINS
       TYPE(swarm_message_type)                           :: report
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mincrawl_register_minima', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: new_mid, tempstep, wid
       LOGICAL                                            :: minima_known
@@ -371,7 +371,7 @@ CONTAINS
       CALL history_lookup(this%history, report_fp, minima_known)
 
       IF (ASSOCIATED(start_minima)) THEN
-         start_minima%n_active = start_minima%n_active-1
+         start_minima%n_active = start_minima%n_active - 1
          IF (start_minima%n_active < 0) CPABORT("negative n_active")
 
          ! update tempdist and escape_hist
@@ -386,12 +386,12 @@ CONTAINS
       ENDIF
 
       IF (.NOT. minima_known) THEN
-         this%n_minima = this%n_minima+1
+         this%n_minima = this%n_minima + 1
          IF (this%n_minima > SIZE(this%minimas)) THEN
             ALLOCATE (minimas_tmp(SIZE(this%minimas)))
             minimas_tmp(:) = this%minimas
             DEALLOCATE (this%minimas)
-            ALLOCATE (this%minimas(SIZE(minimas_tmp)+1000))
+            ALLOCATE (this%minimas(SIZE(minimas_tmp) + 1000))
             this%minimas(:SIZE(minimas_tmp)) = minimas_tmp
             DEALLOCATE (minimas_tmp)
          ENDIF
@@ -450,8 +450,8 @@ CONTAINS
       INTEGER                                            :: i
 
       DO i = 1, SIZE(tempdist)
-         tempdist(i) = tempdist(i)+this%tempdist_update_height &
-                       *REAL(direction, KIND=dp)*EXP(-((center-i)/this%tempdist_update_width)**2)
+         tempdist(i) = tempdist(i) + this%tempdist_update_height &
+                       *REAL(direction, KIND=dp)*EXP(-((center - i)/this%tempdist_update_width)**2)
          tempdist(i) = MAX(0.0_dp, MIN(1.0_dp, tempdist(i)))
       ENDDO
    END SUBROUTINE update_tempdist

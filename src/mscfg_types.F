@@ -10,14 +10,14 @@
 !> \author Rustam Z Khaliullin
 ! **************************************************************************************************
 MODULE mscfg_types
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_complete_redistribute, dbcsr_create, dbcsr_distribution_get, &
-        dbcsr_distribution_new, dbcsr_distribution_release, dbcsr_distribution_type, &
-        dbcsr_finalize, dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_nfullcols_total, &
-        dbcsr_nfullrows_total, dbcsr_release, dbcsr_reserve_block2d, dbcsr_set, dbcsr_type, &
-        dbcsr_type_no_symmetry, dbcsr_work_create
-   USE kinds,                           ONLY: dp
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_complete_redistribute, dbcsr_create, dbcsr_distribution_get, &
+      dbcsr_distribution_new, dbcsr_distribution_release, dbcsr_distribution_type, &
+      dbcsr_finalize, dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_nfullcols_total, &
+      dbcsr_nfullrows_total, dbcsr_release, dbcsr_reserve_block2d, dbcsr_set, dbcsr_type, &
+      dbcsr_type_no_symmetry, dbcsr_work_create
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -67,7 +67,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nfrags
 
       CHARACTER(len=*), PARAMETER :: routineN = 'molecular_scf_guess_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 ! check if the number of fragments is already set
 !IF (env%nfrags.ne.0) THEN
@@ -97,7 +97,7 @@ CONTAINS
       TYPE(molecular_scf_guess_env_type)                 :: env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'molecular_scf_guess_env_destroy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ifrag, jfrag
 
@@ -132,7 +132,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iset
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_matrix_from_submatrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ifrag
       INTEGER, DIMENSION(2)                              :: matrix_size, offset, submatrix_size
@@ -166,8 +166,8 @@ CONTAINS
 
          CALL dbcsr_add(matrix_out, matrix_temp, 1.0_dp, 1.0_dp)
 
-         offset(1) = offset(1)+submatrix_size(1)
-         offset(2) = offset(2)+submatrix_size(2)
+         offset(1) = offset(1) + submatrix_size(1)
+         offset(2) = offset(2) + submatrix_size(2)
 
       ENDDO
 
@@ -203,15 +203,15 @@ CONTAINS
       INTEGER, DIMENSION(2), INTENT(IN)                  :: offset, submatrix_size, matrix_size
 
       CHARACTER(len=*), PARAMETER :: routineN = 'copy_submatrix_into_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: add_blocks_after, dimen, iblock_col, &
                                                             iblock_row, iblock_size, nblocks, &
                                                             nblocks_new, start_index, trailing_size
       INTEGER, DIMENSION(2)                              :: add_blocks_before
       INTEGER, DIMENSION(:), POINTER :: blk_distr, blk_sizes, block_sizes_new, cluster_distr, &
-         cluster_distr_new, col_cluster_new, col_distr_new, col_sizes_new, distr_new_array, &
-         row_cluster_new, row_distr_new, row_sizes_new
+                                        cluster_distr_new, col_cluster_new, col_distr_new, col_sizes_new, distr_new_array, &
+                                        row_cluster_new, row_distr_new, row_sizes_new
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_p, p_new_block
       TYPE(dbcsr_distribution_type)                      :: dist_new, dist_qs
       TYPE(dbcsr_iterator_type)                          :: iter
@@ -226,13 +226,13 @@ CONTAINS
          add_blocks_before(dimen) = 0
          add_blocks_after = 0
          start_index = 1
-         trailing_size = matrix_size(dimen)-offset(dimen)-submatrix_size(dimen)
+         trailing_size = matrix_size(dimen) - offset(dimen) - submatrix_size(dimen)
          IF (offset(dimen) .GT. 0) THEN
-            add_blocks_before(dimen) = add_blocks_before(dimen)+1
+            add_blocks_before(dimen) = add_blocks_before(dimen) + 1
             start_index = 2
          ENDIF
          IF (trailing_size .GT. 0) THEN
-            add_blocks_after = add_blocks_after+1
+            add_blocks_after = add_blocks_after + 1
          ENDIF
 
          NULLIFY (cluster_distr_new)
@@ -246,7 +246,7 @@ CONTAINS
          ENDIF
          nblocks = SIZE(blk_sizes) ! number of blocks in the small matrix
 
-         nblocks_new = nblocks+add_blocks_before(dimen)+add_blocks_after
+         nblocks_new = nblocks + add_blocks_before(dimen) + add_blocks_after
          ALLOCATE (block_sizes_new(nblocks_new))
          ALLOCATE (distr_new_array(nblocks_new))
          IF (ASSOCIATED(cluster_distr)) THEN
@@ -259,10 +259,10 @@ CONTAINS
                cluster_distr_new(1) = 0
             END IF
          ENDIF
-         block_sizes_new(start_index:nblocks+start_index-1) = blk_sizes(1:nblocks)
-         distr_new_array(start_index:nblocks+start_index-1) = blk_distr(1:nblocks)
+         block_sizes_new(start_index:nblocks + start_index - 1) = blk_sizes(1:nblocks)
+         distr_new_array(start_index:nblocks + start_index - 1) = blk_distr(1:nblocks)
          IF (ASSOCIATED(cluster_distr)) THEN
-            cluster_distr_new(start_index:nblocks+start_index-1) = cluster_distr(1:nblocks)
+            cluster_distr_new(start_index:nblocks + start_index - 1) = cluster_distr(1:nblocks)
          END IF
          IF (add_blocks_after .GT. 0) THEN
             block_sizes_new(nblocks_new) = trailing_size
@@ -316,8 +316,8 @@ CONTAINS
          ! to work
          NULLIFY (p_new_block)
          CALL dbcsr_reserve_block2d(matrix_new, &
-                                    iblock_row+add_blocks_before(1), &
-                                    iblock_col+add_blocks_before(2), &
+                                    iblock_row + add_blocks_before(1), &
+                                    iblock_col + add_blocks_before(2), &
                                     p_new_block)
 
          CPASSERT(ASSOCIATED(p_new_block))

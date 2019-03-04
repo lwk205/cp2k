@@ -10,40 +10,40 @@
 ! **************************************************************************************************
 MODULE pint_io
 
-   USE cell_types,                      ONLY: cell_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE f77_interface,                   ONLY: f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE force_env_types,                 ONLY: force_env_get
-   USE input_constants,                 ONLY: dump_atomic,&
-                                              dump_dcd,&
-                                              dump_dcd_aligned_cell,&
-                                              dump_xmol
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: write_particle_coordinates
-   USE pint_public,                     ONLY: pint_com_pos
-   USE pint_transformations,            ONLY: pint_u2x
-   USE pint_types,                      ONLY: e_conserved_id,&
-                                              e_kin_thermo_id,&
-                                              e_kin_virial_id,&
-                                              e_potential_id,&
-                                              pint_env_type
+   USE cell_types, ONLY: cell_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE f77_interface, ONLY: f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE force_env_types, ONLY: force_env_get
+   USE input_constants, ONLY: dump_atomic, &
+                              dump_dcd, &
+                              dump_dcd_aligned_cell, &
+                              dump_xmol
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: write_particle_coordinates
+   USE pint_public, ONLY: pint_com_pos
+   USE pint_transformations, ONLY: pint_u2x
+   USE pint_types, ONLY: e_conserved_id, &
+                         e_kin_thermo_id, &
+                         e_kin_virial_id, &
+                         e_potential_id, &
+                         pint_env_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -75,7 +75,7 @@ CONTAINS
       CHARACTER(len=*), INTENT(IN)                       :: line
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_line', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: my_label
       INTEGER                                            :: unit_nr
@@ -106,7 +106,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_centroids', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: n_ids = 2, pos_id = 1, vel_id = 2
 
       CHARACTER(len=default_string_length)               :: ext, form, my_middle_name, unit_str
@@ -194,13 +194,13 @@ CONTAINS
          idim = 0
          DO iat = 1, pint_env%ndim/3
             DO idir = 1, 3
-               idim = idim+1
+               idim = idim + 1
                ss = 0.0_dp
                vv = 0.0_dp
 !          ss2=0.0_dp
                DO ib = 1, pint_env%p
-                  ss = ss+pint_env%x(ib, idim)
-                  vv = vv+pint_env%v(ib, idim)
+                  ss = ss + pint_env%x(ib, idim)
+                  vv = vv + pint_env%v(ib, idim)
 !            ss2=ss2+pint_env%x(ib,idim)**2
                END DO
                particles%els(iat)%r(idir) = ss/nb
@@ -261,7 +261,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_trajectory', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: n_ids = 2, pos_id = 1, vel_id = 2
 
       CHARACTER(len=default_string_length)               :: ext, form, ib_str, my_middle_name, &
@@ -350,7 +350,7 @@ CONTAINS
             idim = 0
             DO iat = 1, pint_env%ndim/3
                DO idir = 1, 3
-                  idim = idim+1
+                  idim = idim + 1
                   particles%els(iat)%r(idir) = pint_env%x(ib, idim)
                   particles%els(iat)%v(idir) = pint_env%v(ib, idim)
                END DO
@@ -488,7 +488,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_ener', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ndof, unit_nr
       LOGICAL                                            :: file_is_new
@@ -537,7 +537,7 @@ CONTAINS
 
             ndof = pint_env%p
             IF (pint_env%first_propagated_mode .EQ. 2) THEN
-               ndof = ndof-1
+               ndof = ndof - 1
             END IF
             temp = cp_unit_from_cp2k(2.0_dp*pint_env%e_kin_beads/ &
                                      REAL(ndof, dp)/REAL(pint_env%ndim, dp), &
@@ -571,7 +571,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_action', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: unit_nr
       LOGICAL                                            :: file_is_new
@@ -645,7 +645,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_step_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: msgstr, stmp, time_unit
       INTEGER                                            :: unit_nr
@@ -707,7 +707,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_write_rgyr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: unit_str
       INTEGER                                            :: ia, ib, ic, idim, unit_nr
@@ -741,10 +741,10 @@ CONTAINS
       idim = 0
       DO ia = 1, pint_env%ndim/3
          DO ic = 1, 3
-            idim = idim+1
+            idim = idim + 1
             ss = 0.0_dp
             DO ib = 1, pint_env%p
-               ss = ss+pint_env%x(ib, idim)
+               ss = ss + pint_env%x(ib, idim)
             END DO
             pint_env%rtmp_ndim(idim) = ss/nb
          END DO
@@ -755,9 +755,9 @@ CONTAINS
       DO ia = 1, pint_env%ndim/3
          ss = 0.0_dp
          DO ic = 1, 3
-            idim = idim+1
+            idim = idim + 1
             DO ib = 1, pint_env%p
-               ss = ss+(pint_env%x(ib, idim)-pint_env%rtmp_ndim(idim))**2
+               ss = ss + (pint_env%x(ib, idim) - pint_env%rtmp_ndim(idim))**2
             END DO
          END DO
          pint_env%rtmp_natom(ia) = SQRT(ss/nb)*unit_conv

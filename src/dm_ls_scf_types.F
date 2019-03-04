@@ -11,21 +11,21 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE dm_ls_scf_types
-   USE cp_para_env,                     ONLY: cp_para_env_release
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_release,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: ls_cluster_atomic,&
-                                              ls_cluster_molecular
-   USE input_section_types,             ONLY: section_vals_release,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE pao_types,                       ONLY: pao_env_type,&
-                                              pao_finalize
-   USE pexsi_types,                     ONLY: lib_pexsi_env,&
-                                              lib_pexsi_finalize
-   USE qs_density_mixing_types,         ONLY: mixing_storage_release,&
-                                              mixing_storage_type
+   USE cp_para_env, ONLY: cp_para_env_release
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_release, &
+                        dbcsr_type
+   USE input_constants, ONLY: ls_cluster_atomic, &
+                              ls_cluster_molecular
+   USE input_section_types, ONLY: section_vals_release, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE pao_types, ONLY: pao_env_type, &
+                        pao_finalize
+   USE pexsi_types, ONLY: lib_pexsi_env, &
+                          lib_pexsi_finalize
+   USE qs_density_mixing_types, ONLY: mixing_storage_release, &
+                                      mixing_storage_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE

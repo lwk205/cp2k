@@ -12,30 +12,30 @@
 ! **************************************************************************************************
 
 MODULE fist_pol_scf
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE ewald_environment_types,         ONLY: ewald_env_get,&
-                                              ewald_environment_type
-   USE ewald_pw_types,                  ONLY: ewald_pw_type
-   USE ewalds_multipole,                ONLY: ewald_multipole_evaluate
-   USE fist_energy_types,               ONLY: fist_energy_type
-   USE fist_nonbond_env_types,          ONLY: fist_nonbond_env_type
-   USE input_constants,                 ONLY: do_fist_pol_cg,&
-                                              do_fist_pol_sc
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE multipole_types,                 ONLY: multipole_type
-   USE particle_types,                  ONLY: particle_type
-   USE pw_poisson_types,                ONLY: do_ewald_ewald,&
-                                              do_ewald_pme,&
-                                              do_ewald_spme
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE ewald_environment_types, ONLY: ewald_env_get, &
+                                      ewald_environment_type
+   USE ewald_pw_types, ONLY: ewald_pw_type
+   USE ewalds_multipole, ONLY: ewald_multipole_evaluate
+   USE fist_energy_types, ONLY: fist_energy_type
+   USE fist_nonbond_env_types, ONLY: fist_nonbond_env_type
+   USE input_constants, ONLY: do_fist_pol_cg, &
+                              do_fist_pol_sc
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE multipole_types, ONLY: multipole_type
+   USE particle_types, ONLY: particle_type
+   USE pw_poisson_types, ONLY: do_ewald_ewald, &
+                               do_ewald_pme, &
+                               do_ewald_spme
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -91,7 +91,7 @@ CONTAINS
       INTEGER                                            :: do_ipol
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fist_pol_evaluate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       SELECT CASE (do_ipol)
       CASE (do_fist_pol_sc)
@@ -156,7 +156,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: mm_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fist_pol_evaluate_sc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ewald_type, handle, i, iatom, ii, ikind, &
                                                             iter, iw, iw2, j, max_ipol_iter, &
@@ -208,8 +208,8 @@ CONTAINS
             ! ignore atoms with dipole and quadrupole polarizability zero
             IF (apol == 0 .AND. cpol == 0) CYCLE
             ! increment counter correctly
-            IF (apol /= 0) ntot = ntot+natom_of_kind
-            IF (cpol /= 0) ntot = ntot+natom_of_kind
+            IF (apol /= 0) ntot = ntot + natom_of_kind
+            IF (cpol /= 0) ntot = ntot + natom_of_kind
 
             DO iatom = 1, natom_of_kind
                ii = atom_list(iatom)
@@ -217,19 +217,19 @@ CONTAINS
                   DO i = 1, 3
                      ! the rmsd of the derivatives of the energy towards the
                      ! components of the atomic dipole moments
-                     rmsd = rmsd+(multipoles%dipoles(i, ii)/apol-efield1(i, ii))**2
+                     rmsd = rmsd + (multipoles%dipoles(i, ii)/apol - efield1(i, ii))**2
                   END DO
                END IF
                IF (cpol /= 0) THEN
-                  rmsd = rmsd+(multipoles%quadrupoles(1, 1, ii)/cpol-efield2(1, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(2, 1, ii)/cpol-efield2(2, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(3, 1, ii)/cpol-efield2(3, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(1, 2, ii)/cpol-efield2(4, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(2, 2, ii)/cpol-efield2(5, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(3, 2, ii)/cpol-efield2(6, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(1, 3, ii)/cpol-efield2(7, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(2, 3, ii)/cpol-efield2(8, ii))**2
-                  rmsd = rmsd+(multipoles%quadrupoles(3, 3, ii)/cpol-efield2(9, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(1, 1, ii)/cpol - efield2(1, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(2, 1, ii)/cpol - efield2(2, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(3, 1, ii)/cpol - efield2(3, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(1, 2, ii)/cpol - efield2(4, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(2, 2, ii)/cpol - efield2(5, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(3, 2, ii)/cpol - efield2(6, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(1, 3, ii)/cpol - efield2(7, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(2, 3, ii)/cpol - efield2(8, ii))**2
+                  rmsd = rmsd + (multipoles%quadrupoles(3, 3, ii)/cpol - efield2(9, ii))**2
                END IF
 ! compute dipole
                multipoles%dipoles(:, ii) = apol*efield1(:, ii)
@@ -247,7 +247,7 @@ CONTAINS
                END IF
                ! Compute the new induction term while we are here
                IF (apol /= 0) THEN
-                  thermo%e_induction = thermo%e_induction+ &
+                  thermo%e_induction = thermo%e_induction + &
                                        DOT_PRODUCT(multipoles%dipoles(:, ii), &
                                                    multipoles%dipoles(:, ii))/apol/2.0_dp
                END IF
@@ -255,11 +255,11 @@ CONTAINS
                   tmp_trace = 0._dp
                   DO i = 1, 3
                      DO j = 1, 3
-                        tmp_trace = tmp_trace+ &
+                        tmp_trace = tmp_trace + &
                                     multipoles%quadrupoles(i, j, ii)*multipoles%quadrupoles(i, j, ii)
                      END DO
                   END DO
-                  thermo%e_induction = thermo%e_induction+tmp_trace/cpol/6.0_dp
+                  thermo%e_induction = thermo%e_induction + tmp_trace/cpol/6.0_dp
                END IF
             END DO
          END DO
@@ -267,7 +267,7 @@ CONTAINS
          IF (iw > 0) THEN
             ! print the energy that is minimized (this is electrostatic + induction)
             WRITE (iw, FMT='(T5,"POL_SCF|",5X,I5,5X,E12.6,T61,F20.10)') iter, &
-               rmsd, vg_coulomb+pot_nonbond_local+thermo%e_induction
+               rmsd, vg_coulomb + pot_nonbond_local + thermo%e_induction
          END IF
          IF (rmsd <= eps_pol) THEN
             IF (iw > 0) WRITE (iw, FMT='(T5,"POL_SCF|",1X,"Self-consistent Polarization achieved.")')
@@ -288,13 +288,13 @@ CONTAINS
                           atomic_kind_set=atomic_kind_set, mm_section=mm_section, &
                           forces_local=fg_coulomb, forces_glob=f_nonbond, &
                           pv_local=pv_g, pv_glob=pv_nonbond)
-      pot_nonbond = pot_nonbond+pot_nonbond_local
+      pot_nonbond = pot_nonbond + pot_nonbond_local
       CALL mp_sum(pot_nonbond_local, logger%para_env%group)
 
       IF (iw > 0) THEN
          ! print the energy that is minimized (this is electrostatic + induction)
          WRITE (iw, FMT='(T5,"POL_SCF|",5X,"Final",T61,F20.10,/)') &
-            vg_coulomb+pot_nonbond_local+thermo%e_induction
+            vg_coulomb + pot_nonbond_local + thermo%e_induction
       END IF
 
       ! Deallocate working arrays
@@ -369,7 +369,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: mm_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fist_pol_evaluate_cg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ewald_type, handle, i, iatom, ii, ikind, &
                                                             iter, iw, iw2, max_ipol_iter, &
@@ -434,12 +434,12 @@ CONTAINS
          CALL get_atomic_kind(atomic_kind, apol=apol, natom=natom_of_kind, atom_list=atom_list)
          ! ignore atoms with polarizability zero
          IF (apol == 0) CYCLE
-         ntot = ntot+natom_of_kind
+         ntot = ntot + natom_of_kind
          DO iatom = 1, natom_of_kind
             ii = atom_list(iatom)
             DO i = 1, 3
                ! residual = b - A x
-               residual(i, ii) = efield1(i, ii)-multipoles%dipoles(i, ii)/apol
+               residual(i, ii) = efield1(i, ii) - multipoles%dipoles(i, ii)/apol
             END DO
          END DO
       END DO
@@ -474,10 +474,10 @@ CONTAINS
                ii = atom_list(iatom)
                DO i = 1, 3
                   ! residual = b - A x
-                  rmsd = rmsd+residual(i, ii)**2
+                  rmsd = rmsd + residual(i, ii)**2
                   IF (debug_this_module) THEN
-                     denom = denom+(residual(i, ii)-(efield1(i, ii)- &
-                                                     multipoles%dipoles(i, ii)/apol))**2
+                     denom = denom + (residual(i, ii) - (efield1(i, ii) - &
+                                                         multipoles%dipoles(i, ii)/apol))**2
                   END IF
                END DO
             END DO
@@ -502,7 +502,7 @@ CONTAINS
                              atomic_kind_set=atomic_kind_set, mm_section=mm_section, &
                              efield1=conjugate_applied)
          multipoles%dipoles = tmp_dipoles ! restore backup
-         conjugate_applied(:, :) = efield1_ext-conjugate_applied
+         conjugate_applied(:, :) = efield1_ext - conjugate_applied
 
          ! Finish conjugate_applied and compute alpha from the conjugate gradient algorithm.
          alpha = 0.0_dp
@@ -515,10 +515,10 @@ CONTAINS
             DO iatom = 1, natom_of_kind
                ii = atom_list(iatom)
                DO i = 1, 3
-                  conjugate_applied(i, ii) = conjugate_applied(i, ii)+conjugate(i, ii)/apol
+                  conjugate_applied(i, ii) = conjugate_applied(i, ii) + conjugate(i, ii)/apol
                END DO
-               alpha = alpha+DOT_PRODUCT(residual(:, ii), residual(:, ii))
-               denom = denom+DOT_PRODUCT(conjugate(:, ii), conjugate_applied(:, ii))
+               alpha = alpha + DOT_PRODUCT(residual(:, ii), residual(:, ii))
+               denom = denom + DOT_PRODUCT(conjugate(:, ii), conjugate_applied(:, ii))
             END DO
          END DO
          alpha = alpha/denom
@@ -532,11 +532,11 @@ CONTAINS
             IF (apol == 0) CYCLE
             DO iatom = 1, natom_of_kind
                ii = atom_list(iatom)
-               denom = denom+DOT_PRODUCT(residual(:, ii), residual(:, ii))
+               denom = denom + DOT_PRODUCT(residual(:, ii), residual(:, ii))
                DO i = 1, 3
-                  residual(i, ii) = residual(i, ii)-alpha*conjugate_applied(i, ii)
+                  residual(i, ii) = residual(i, ii) - alpha*conjugate_applied(i, ii)
                END DO
-               beta = beta+DOT_PRODUCT(residual(:, ii), residual(:, ii))
+               beta = beta + DOT_PRODUCT(residual(:, ii), residual(:, ii))
             END DO
          END DO
          beta = beta/denom
@@ -552,9 +552,9 @@ CONTAINS
             DO iatom = 1, natom_of_kind
                ii = atom_list(iatom)
                DO i = 1, 3
-                  multipoles%dipoles(i, ii) = multipoles%dipoles(i, ii)+alpha*conjugate(i, ii)
-                  conjugate(i, ii) = residual(i, ii)+beta*conjugate(i, ii)
-                  thermo%e_induction = thermo%e_induction+multipoles%dipoles(i, ii)**2/apol/2.0_dp
+                  multipoles%dipoles(i, ii) = multipoles%dipoles(i, ii) + alpha*conjugate(i, ii)
+                  conjugate(i, ii) = residual(i, ii) + beta*conjugate(i, ii)
+                  thermo%e_induction = thermo%e_induction + multipoles%dipoles(i, ii)**2/apol/2.0_dp
                END DO
             END DO
          END DO
@@ -593,7 +593,7 @@ CONTAINS
                ii = atom_list(iatom)
                DO i = 1, 3
                   ! residual = b - A x
-                  rmsd = rmsd+(efield1(i, ii)-multipoles%dipoles(i, ii)/apol)**2
+                  rmsd = rmsd + (efield1(i, ii) - multipoles%dipoles(i, ii)/apol)**2
                END DO
             END DO
          END DO
@@ -613,12 +613,12 @@ CONTAINS
                              forces_local=fg_coulomb, forces_glob=f_nonbond, &
                              pv_local=pv_g, pv_glob=pv_nonbond)
       ENDIF
-      pot_nonbond = pot_nonbond+pot_nonbond_local
+      pot_nonbond = pot_nonbond + pot_nonbond_local
       CALL mp_sum(pot_nonbond_local, logger%para_env%group)
 
       IF (iw > 0) THEN
          WRITE (iw, FMT='(T5,"POL_SCF|",5X,"Final",T61,F20.10,/)') &
-            vg_coulomb+pot_nonbond_local+thermo%e_induction
+            vg_coulomb + pot_nonbond_local + thermo%e_induction
       END IF
 
       ! Deallocate working arrays

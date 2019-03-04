@@ -12,40 +12,40 @@
 ! **************************************************************************************************
 MODULE extended_system_init
 
-   USE cell_types,                      ONLY: cell_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE extended_system_mapping,         ONLY: nhc_to_barostat_mapping,&
-                                              nhc_to_particle_mapping,&
-                                              nhc_to_particle_mapping_fast,&
-                                              nhc_to_particle_mapping_slow,&
-                                              nhc_to_shell_mapping
-   USE extended_system_types,           ONLY: debug_isotropic_limit,&
-                                              lnhc_parameters_type,&
-                                              map_info_type,&
-                                              npt_info_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: do_thermo_only_master,&
-                                              npe_f_ensemble,&
-                                              npe_i_ensemble,&
-                                              nph_uniaxial_damped_ensemble,&
-                                              nph_uniaxial_ensemble,&
-                                              npt_f_ensemble,&
-                                              npt_i_ensemble
-   USE input_cp2k_binary_restarts,      ONLY: read_binary_thermostats_nose
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_remove_values,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: global_constraint_type,&
-                                              molecule_type
-   USE parallel_rng_types,              ONLY: next_random_number
-   USE simpar_types,                    ONLY: simpar_type
-   USE thermostat_types,                ONLY: thermostat_info_type
-   USE thermostat_utils,                ONLY: get_nhc_energies
+   USE cell_types, ONLY: cell_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE extended_system_mapping, ONLY: nhc_to_barostat_mapping, &
+                                      nhc_to_particle_mapping, &
+                                      nhc_to_particle_mapping_fast, &
+                                      nhc_to_particle_mapping_slow, &
+                                      nhc_to_shell_mapping
+   USE extended_system_types, ONLY: debug_isotropic_limit, &
+                                    lnhc_parameters_type, &
+                                    map_info_type, &
+                                    npt_info_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: do_thermo_only_master, &
+                              npe_f_ensemble, &
+                              npe_i_ensemble, &
+                              nph_uniaxial_damped_ensemble, &
+                              nph_uniaxial_ensemble, &
+                              npt_f_ensemble, &
+                              npt_i_ensemble
+   USE input_cp2k_binary_restarts, ONLY: read_binary_thermostats_nose
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_remove_values, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: global_constraint_type, &
+                             molecule_type
+   USE parallel_rng_types, ONLY: next_random_number
+   USE simpar_types, ONLY: simpar_type
+   USE thermostat_types, ONLY: thermostat_info_type
+   USE thermostat_utils, ONLY: get_nhc_energies
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -135,7 +135,7 @@ CONTAINS
             ind = 0
             DO i = 1, SIZE(npt_info, 1)
                DO j = 1, SIZE(npt_info, 2)
-                  ind = ind+1
+                  ind = ind + 1
                   npt_info(i, j)%v = buffer(ind)
                END DO
             END DO
@@ -143,7 +143,7 @@ CONTAINS
             ind = 0
             DO i = 1, SIZE(npt_info, 1)
                DO j = 1, SIZE(npt_info, 2)
-                  ind = ind+1
+                  ind = ind + 1
                   npt_info(i, j)%mass = buffer(ind)
                END DO
             END DO
@@ -179,7 +179,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: save_mem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_nhc_baro', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: restart
@@ -249,7 +249,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: save_mem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_nhc_slow', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: restart
@@ -316,7 +316,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: save_mem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_nhc_fast', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: restart
@@ -385,7 +385,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: binary_restart_file_name
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_nhc_part', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: restart
@@ -455,7 +455,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: binary_restart_file_name
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_nhc_shell', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: restart
@@ -504,7 +504,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: dt
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_yoshida_coef', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp), DIMENSION(nhc%nyosh)                :: yosh_wt
 
@@ -514,20 +514,20 @@ CONTAINS
       CASE (1)
          yosh_wt(1) = 1.0_dp
       CASE (3)
-         yosh_wt(1) = 1.0_dp/(2.0_dp-(2.0_dp)**(1.0_dp/3.0_dp))
-         yosh_wt(2) = 1.0_dp-2.0_dp*yosh_wt(1)
+         yosh_wt(1) = 1.0_dp/(2.0_dp - (2.0_dp)**(1.0_dp/3.0_dp))
+         yosh_wt(2) = 1.0_dp - 2.0_dp*yosh_wt(1)
          yosh_wt(3) = yosh_wt(1)
       CASE (5)
-         yosh_wt(1) = 1.0_dp/(4.0_dp-(4.0_dp)**(1.0_dp/3.0_dp))
+         yosh_wt(1) = 1.0_dp/(4.0_dp - (4.0_dp)**(1.0_dp/3.0_dp))
          yosh_wt(2) = yosh_wt(1)
          yosh_wt(4) = yosh_wt(1)
          yosh_wt(5) = yosh_wt(1)
-         yosh_wt(3) = 1.0_dp-4.0_dp*yosh_wt(1)
+         yosh_wt(3) = 1.0_dp - 4.0_dp*yosh_wt(1)
       CASE (7)
          yosh_wt(1) = .78451361047756_dp
          yosh_wt(2) = .235573213359357_dp
          yosh_wt(3) = -1.17767998417887_dp
-         yosh_wt(4) = 1.0_dp-2.0_dp*(yosh_wt(1)+yosh_wt(2)+yosh_wt(3))
+         yosh_wt(4) = 1.0_dp - 2.0_dp*(yosh_wt(1) + yosh_wt(2) + yosh_wt(3))
          yosh_wt(5) = yosh_wt(3)
          yosh_wt(6) = yosh_wt(2)
          yosh_wt(7) = yosh_wt(1)
@@ -536,8 +536,8 @@ CONTAINS
          yosh_wt(2) = 0.554910818409783619692725006662999_dp
          yosh_wt(3) = 0.124659619941888644216504240951585_dp
          yosh_wt(4) = -0.843182063596933505315033808282941_dp
-         yosh_wt(5) = 1.0_dp-2.0_dp*(yosh_wt(1)+yosh_wt(2)+ &
-                                     yosh_wt(3)+yosh_wt(4))
+         yosh_wt(5) = 1.0_dp - 2.0_dp*(yosh_wt(1) + yosh_wt(2) + &
+                                       yosh_wt(3) + yosh_wt(4))
          yosh_wt(6) = yosh_wt(4)
          yosh_wt(7) = yosh_wt(3)
          yosh_wt(8) = yosh_wt(2)
@@ -550,8 +550,8 @@ CONTAINS
          yosh_wt(5) = -0.144485223686048e1_dp
          yosh_wt(6) = 0.253693336566229_dp
          yosh_wt(7) = 0.914844246229740_dp
-         yosh_wt(8) = 1.0_dp-2.0_dp*(yosh_wt(1)+yosh_wt(2)+ &
-                                     yosh_wt(3)+yosh_wt(4)+yosh_wt(5)+yosh_wt(6)+yosh_wt(7))
+         yosh_wt(8) = 1.0_dp - 2.0_dp*(yosh_wt(1) + yosh_wt(2) + &
+                                       yosh_wt(3) + yosh_wt(4) + yosh_wt(5) + yosh_wt(6) + yosh_wt(7))
          yosh_wt(9) = yosh_wt(7)
          yosh_wt(10) = yosh_wt(6)
          yosh_wt(11) = yosh_wt(5)
@@ -645,36 +645,36 @@ CONTAINS
             CALL section_vals_val_get(nose_section, "COORD%_DEFAULT_KEYWORD_", r_vals=buffer)
             DO i = 1, SIZE(nhc%nvt, 2)
                ind = map_info%index(i)
-               ind = (ind-1)*nhc%nhc_len
+               ind = (ind - 1)*nhc%nhc_len
                DO j = 1, SIZE(nhc%nvt, 1)
-                  ind = ind+1
+                  ind = ind + 1
                   nhc%nvt(j, i)%eta = buffer(ind)
                END DO
             END DO
             CALL section_vals_val_get(nose_section, "VELOCITY%_DEFAULT_KEYWORD_", r_vals=buffer)
             DO i = 1, SIZE(nhc%nvt, 2)
                ind = map_info%index(i)
-               ind = (ind-1)*nhc%nhc_len
+               ind = (ind - 1)*nhc%nhc_len
                DO j = 1, SIZE(nhc%nvt, 1)
-                  ind = ind+1
+                  ind = ind + 1
                   nhc%nvt(j, i)%v = buffer(ind)
                END DO
             END DO
             CALL section_vals_val_get(nose_section, "MASS%_DEFAULT_KEYWORD_", r_vals=buffer)
             DO i = 1, SIZE(nhc%nvt, 2)
                ind = map_info%index(i)
-               ind = (ind-1)*nhc%nhc_len
+               ind = (ind - 1)*nhc%nhc_len
                DO j = 1, SIZE(nhc%nvt, 1)
-                  ind = ind+1
+                  ind = ind + 1
                   nhc%nvt(j, i)%mass = buffer(ind)
                END DO
             END DO
             CALL section_vals_val_get(nose_section, "FORCE%_DEFAULT_KEYWORD_", r_vals=buffer)
             DO i = 1, SIZE(nhc%nvt, 2)
                ind = map_info%index(i)
-               ind = (ind-1)*nhc%nhc_len
+               ind = (ind - 1)*nhc%nhc_len
                DO j = 1, SIZE(nhc%nvt, 1)
-                  ind = ind+1
+                  ind = ind + 1
                   nhc%nvt(j, i)%f = buffer(ind)
                END DO
             END DO
@@ -718,7 +718,7 @@ CONTAINS
       TYPE(global_environment_type), POINTER             :: globenv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_nhc_variables', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, icount, j, number, tot_rn
       REAL(KIND=dp)                                      :: akin, dum, temp
@@ -757,9 +757,9 @@ CONTAINS
          akin = 0.0_dp
          DO i = 1, nhc%loc_num_nhc
             DO j = 1, nhc%nhc_len
-               akin = akin+0.5_dp*(nhc%nvt(j, i)%mass* &
-                                   nhc%nvt(j, i)%v* &
-                                   nhc%nvt(j, i)%v)
+               akin = akin + 0.5_dp*(nhc%nvt(j, i)%mass* &
+                                     nhc%nvt(j, i)%v* &
+                                     nhc%nvt(j, i)%v)
             END DO
          END DO
          number = nhc%loc_num_nhc
@@ -777,8 +777,8 @@ CONTAINS
          ! initializing all of the forces on the thermostats
          DO i = 1, nhc%loc_num_nhc
             DO j = 2, nhc%nhc_len
-               nhc%nvt(j, i)%f = nhc%nvt(j-1, i)%mass*nhc%nvt(j-1, i)%v* &
-                                 nhc%nvt(j-1, i)%v-nhc%nvt(j, i)%nkt
+               nhc%nvt(j, i)%f = nhc%nvt(j - 1, i)%mass*nhc%nvt(j - 1, i)%v* &
+                                 nhc%nvt(j - 1, i)%v - nhc%nvt(j, i)%nkt
                IF (nhc%nvt(j, i)%mass > 0.0_dp) THEN
                   nhc%nvt(j, i)%f = nhc%nvt(j, i)%f/nhc%nvt(j, i)%mass
                END IF
@@ -792,9 +792,9 @@ CONTAINS
          ! Map deterministically determined random number to nhc % v
          DO i = 1, nhc%loc_num_nhc
             icount = map_info%index(i)
-            icount = (icount-1)*nhc%nhc_len
+            icount = (icount - 1)*nhc%nhc_len
             DO j = 1, nhc%nhc_len
-               icount = icount+1
+               icount = icount + 1
                nhc%nvt(j, i)%v = array_of_rn(icount)
                ! WRITE ( *, * ) 'VEL', para_env%mepos, i,j, nhc%nvt(j,i)%v
                nhc%nvt(j, i)%eta = 0.0_dp
@@ -817,8 +817,8 @@ CONTAINS
          ! initializing all of the forces on the thermostats
          DO i = 1, nhc%loc_num_nhc
             DO j = 2, nhc%nhc_len
-               nhc%nvt(j, i)%f = nhc%nvt(j-1, i)%mass*nhc%nvt(j-1, i)%v* &
-                                 nhc%nvt(j-1, i)%v-nhc%nvt(j, i)%nkt
+               nhc%nvt(j, i)%f = nhc%nvt(j - 1, i)%mass*nhc%nvt(j - 1, i)%v* &
+                                 nhc%nvt(j - 1, i)%v - nhc%nvt(j, i)%nkt
                IF (nhc%nvt(j, i)%mass > 0.0_dp) THEN
                   nhc%nvt(j, i)%f = nhc%nvt(j, i)%f/nhc%nvt(j, i)%mass
                END IF
@@ -855,7 +855,7 @@ CONTAINS
       TYPE(global_environment_type), POINTER             :: globenv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_barostat_variables', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, number
       REAL(KIND=dp)                                      :: akin, temp, v
@@ -871,15 +871,15 @@ CONTAINS
       npt(:, :)%f = 0.0_dp
       SELECT CASE (ensemble)
       CASE (npt_i_ensemble)
-         npt(:, :)%mass = REAL(nfree+3, KIND=dp)*temp_ext*tau_cell**2
+         npt(:, :)%mass = REAL(nfree + 3, KIND=dp)*temp_ext*tau_cell**2
       CASE (npt_f_ensemble)
-         npt(:, :)%mass = REAL(nfree+3, KIND=dp)*temp_ext*tau_cell**2/3.0_dp
+         npt(:, :)%mass = REAL(nfree + 3, KIND=dp)*temp_ext*tau_cell**2/3.0_dp
       CASE (nph_uniaxial_ensemble, nph_uniaxial_damped_ensemble)
          npt(:, :)%mass = cmass
       CASE (npe_f_ensemble)
-         npt(:, :)%mass = REAL(nfree+3, KIND=dp)*temp_ext*tau_cell**2/3.0_dp
+         npt(:, :)%mass = REAL(nfree + 3, KIND=dp)*temp_ext*tau_cell**2/3.0_dp
       CASE (npe_i_ensemble)
-         npt(:, :)%mass = REAL(nfree+3, KIND=dp)*temp_ext*tau_cell**2
+         npt(:, :)%mass = REAL(nfree + 3, KIND=dp)*temp_ext*tau_cell**2
       END SELECT
       ! initializing velocities
       DO i = 1, SIZE(npt, 1)
@@ -895,7 +895,7 @@ CONTAINS
       akin = 0.0_dp
       DO i = 1, SIZE(npt, 1)
          DO j = 1, SIZE(npt, 2)
-            akin = akin+0.5_dp*(npt(j, i)%mass*npt(j, i)%v*npt(j, i)%v)
+            akin = akin + 0.5_dp*(npt(j, i)%mass*npt(j, i)%v*npt(j, i)%v)
          END DO
       END DO
 
@@ -939,7 +939,7 @@ CONTAINS
       TYPE(lnhc_parameters_type), POINTER                :: nhc
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_nhc_forces', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j
 
@@ -949,8 +949,8 @@ CONTAINS
       ! assign the forces
       DO i = 1, SIZE(nhc%nvt, 2)
          DO j = 2, SIZE(nhc%nvt, 1)
-            nhc%nvt(j, i)%f = nhc%nvt(j-1, i)%mass* &
-                              nhc%nvt(j-1, i)%v**2- &
+            nhc%nvt(j, i)%f = nhc%nvt(j - 1, i)%mass* &
+                              nhc%nvt(j - 1, i)%v**2 - &
                               nhc%nvt(j, i)%nkt
             IF (nhc%nvt(j, i)%mass > 0.0_dp) THEN
                nhc%nvt(j, i)%f = nhc%nvt(j, i)%f/nhc%nvt(j, i)%mass

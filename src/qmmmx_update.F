@@ -10,23 +10,23 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE qmmmx_update
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_restart_force_eval,        ONLY: update_force_eval
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_release,&
-                                              section_vals_type
-   USE qmmm_create,                     ONLY: qmmm_env_create
-   USE qmmm_types,                      ONLY: qmmm_env_get
-   USE qmmmx_types,                     ONLY: qmmmx_env_release,&
-                                              qmmmx_env_type
-   USE qmmmx_util,                      ONLY: setup_force_mixing_qmmm_sections,&
-                                              update_force_mixing_labels
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_restart_force_eval, ONLY: update_force_eval
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_release, &
+                                  section_vals_type
+   USE qmmm_create, ONLY: qmmm_env_create
+   USE qmmm_types, ONLY: qmmm_env_get
+   USE qmmmx_types, ONLY: qmmmx_env_release, &
+                          qmmmx_env_type
+   USE qmmmx_util, ONLY: setup_force_mixing_qmmm_sections, &
+                         update_force_mixing_labels
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -49,7 +49,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: root_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmmx_update_force_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: force_mixing_active, labels_changed
       TYPE(atomic_kind_list_type), POINTER               :: atomic_kinds, new_atomic_kinds
@@ -139,11 +139,11 @@ CONTAINS
       TYPE(distribution_1d_type), POINTER                :: to_local_particles
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'copy_wiener_process', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: from_iparticle_kind, from_iparticle_local(1), from_nparticle_kind, &
-         from_nparticle_local, handle, to_iparticle_global, to_iparticle_kind, to_iparticle_local, &
-         to_nparticle_kind, to_nparticle_local, tot_from_nparticle_local, tot_to_nparticle_local
+                 from_nparticle_local, handle, to_iparticle_global, to_iparticle_kind, to_iparticle_local, &
+                 to_nparticle_kind, to_nparticle_local, tot_from_nparticle_local, tot_to_nparticle_local
       LOGICAL                                            :: found_it
 
       CALL timeset(routineN, handle)
@@ -159,11 +159,11 @@ CONTAINS
       ! make sure total number of particles hasn't changed, even if particle kinds have
       tot_from_nparticle_local = 0
       DO from_iparticle_kind = 1, from_nparticle_kind
-         tot_from_nparticle_local = tot_from_nparticle_local+from_local_particles%n_el(from_iparticle_kind)
+         tot_from_nparticle_local = tot_from_nparticle_local + from_local_particles%n_el(from_iparticle_kind)
       END DO
       tot_to_nparticle_local = 0
       DO to_iparticle_kind = 1, to_nparticle_kind
-         tot_to_nparticle_local = tot_to_nparticle_local+to_local_particles%n_el(to_iparticle_kind)
+         tot_to_nparticle_local = tot_to_nparticle_local + to_local_particles%n_el(to_iparticle_kind)
       END DO
       CPASSERT(tot_from_nparticle_local == tot_to_nparticle_local)
 
@@ -181,10 +181,10 @@ CONTAINS
             ! find the matching kind/index where this particle was before
             DO from_iparticle_kind = 1, from_nparticle_kind
                from_nparticle_local = from_local_particles%n_el(from_iparticle_kind)
-               IF (MINVAL(ABS(from_local_particles%list(from_iparticle_kind)%array(1:from_nparticle_local)- &
+               IF (MINVAL(ABS(from_local_particles%list(from_iparticle_kind)%array(1:from_nparticle_local) - &
                               to_iparticle_global)) == 0) THEN
                   from_iparticle_local = &
-                     MINLOC(ABS(from_local_particles%list(from_iparticle_kind)%array(1:from_nparticle_local)- &
+                     MINLOC(ABS(from_local_particles%list(from_iparticle_kind)%array(1:from_nparticle_local) - &
                                 to_iparticle_global))
                   to_local_particles%local_particle_set(to_iparticle_kind)%rng(to_iparticle_local)%stream = &
                      from_local_particles%local_particle_set(from_iparticle_kind)%rng(from_iparticle_local(1))%stream

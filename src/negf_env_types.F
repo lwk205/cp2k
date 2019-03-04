@@ -7,73 +7,73 @@
 !> \brief Environment for NEGF based quantum transport calculations
 ! **************************************************************************************************
 MODULE negf_env_types
-   USE cell_types,                      ONLY: cell_type,&
-                                              real_to_scaled
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_deallocate_matrix,&
-                                              dbcsr_init_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_p_type,&
-                                              force_env_type,&
-                                              use_qs_force
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE kpoint_types,                    ONLY: get_kpoint_env,&
-                                              get_kpoint_info,&
-                                              kpoint_env_p_type,&
-                                              kpoint_type
-   USE message_passing,                 ONLY: mp_sum
-   USE negf_atom_map,                   ONLY: negf_atom_map_type,&
-                                              negf_map_atomic_indices
-   USE negf_control_types,              ONLY: negf_control_contact_type,&
-                                              negf_control_type
-   USE negf_matrix_utils,               ONLY: invert_cell_to_index,&
-                                              negf_copy_contact_matrix,&
-                                              negf_copy_sym_dbcsr_to_fm_submat,&
-                                              negf_reference_contact_matrix,&
-                                              number_of_atomic_orbitals
-   USE negf_subgroup_types,             ONLY: negf_subgroup_env_type
-   USE negf_vectors,                    ONLY: contact_direction_vector,&
-                                              projection_on_direction_vector
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_density_mixing_types,         ONLY: mixing_storage_create,&
-                                              mixing_storage_release,&
-                                              mixing_storage_type
-   USE qs_energy,                       ONLY: qs_energies
-   USE qs_energy_init,                  ONLY: qs_energies_init
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
+   USE cell_types, ONLY: cell_type, &
+                         real_to_scaled
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_deallocate_matrix, &
+                        dbcsr_init_p, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_p_type, &
+                              force_env_type, &
+                              use_qs_force
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE kpoint_types, ONLY: get_kpoint_env, &
+                           get_kpoint_info, &
+                           kpoint_env_p_type, &
+                           kpoint_type
+   USE message_passing, ONLY: mp_sum
+   USE negf_atom_map, ONLY: negf_atom_map_type, &
+                            negf_map_atomic_indices
+   USE negf_control_types, ONLY: negf_control_contact_type, &
+                                 negf_control_type
+   USE negf_matrix_utils, ONLY: invert_cell_to_index, &
+                                negf_copy_contact_matrix, &
+                                negf_copy_sym_dbcsr_to_fm_submat, &
+                                negf_reference_contact_matrix, &
+                                number_of_atomic_orbitals
+   USE negf_subgroup_types, ONLY: negf_subgroup_env_type
+   USE negf_vectors, ONLY: contact_direction_vector, &
+                           projection_on_direction_vector
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_density_mixing_types, ONLY: mixing_storage_create, &
+                                      mixing_storage_release, &
+                                      mixing_storage_type
+   USE qs_energy, ONLY: qs_energies
+   USE qs_energy_init, ONLY: qs_energies_init
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -167,7 +167,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: log_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: contact_str, force_env_str, &
                                                             n_force_env_str
@@ -310,7 +310,7 @@ CONTAINS
       TYPE(qs_subsys_type), POINTER                      :: subsys_device, subsys_contact
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'negf_env_contact_init_maps', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, natoms
 
@@ -377,7 +377,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_s_device
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'negf_env_contact_init_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iatom, ispin, nao, natoms, &
                                                             nimages, nspins
@@ -535,7 +535,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'negf_env_device_init_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icontact, ispin, nao_c, nao_s, &
                                                             ncontacts, nspins
@@ -683,7 +683,7 @@ CONTAINS
          INTENT(in)                                      :: contact_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_env_init_v_hartree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(kind=dp), PARAMETER :: threshold = 16.0_dp*EPSILON(0.0_dp)
 
       INTEGER                                            :: dx, dy, dz, handle, icontact, ix, iy, &
@@ -698,7 +698,7 @@ CONTAINS
       CPASSERT(SIZE(contact_control) == ncontacts)
       CPASSERT(ncontacts == 2)
 
-      dirvector_bias = contact_env(2)%origin_bias-contact_env(1)%origin_bias
+      dirvector_bias = contact_env(2)%origin_bias - contact_env(1)%origin_bias
       v1 = contact_control(1)%v_external
       v2 = contact_control(2)%v_external
 
@@ -716,17 +716,17 @@ CONTAINS
       dvol = v_hartree%pw_grid%dvol
 
       DO iz = lz, uz
-         point_indices(3) = REAL(iz+dz, kind=dp)
+         point_indices(3) = REAL(iz + dz, kind=dp)
          DO iy = ly, uy
-            point_indices(2) = REAL(iy+dy, kind=dp)
+            point_indices(2) = REAL(iy + dy, kind=dp)
 
             DO ix = lx, ux
-               point_indices(1) = REAL(ix+dx, kind=dp)
+               point_indices(1) = REAL(ix + dx, kind=dp)
                point_coord(:) = MATMUL(v_hartree%pw_grid%dh, point_indices)
 
-               vector = point_coord-contact_env(1)%origin_bias
+               vector = point_coord - contact_env(1)%origin_bias
                proj = projection_on_direction_vector(vector, dirvector_bias)
-               IF (proj+threshold >= 0.0_dp .AND. proj-threshold <= 1.0_dp) THEN
+               IF (proj + threshold >= 0.0_dp .AND. proj - threshold <= 1.0_dp) THEN
                   ! scattering region
                   ! proj == 0   we are at the first contact boundary
                   ! proj == 1   we are at the second contact boundary
@@ -735,14 +735,14 @@ CONTAINS
                   ELSE IF (proj > 1.0_dp) THEN
                      proj = 1.0_dp
                   END IF
-                  pot = v1+(v2-v1)*proj
+                  pot = v1 + (v2 - v1)*proj
                ELSE
                   pot = 0.0_dp
                   DO icontact = 1, ncontacts
-                     vector = point_coord-contact_env(icontact)%origin_bias
+                     vector = point_coord - contact_env(icontact)%origin_bias
                      proj = projection_on_direction_vector(vector, contact_env(icontact)%direction_vector_bias)
 
-                     IF (proj+threshold >= 0.0_dp .AND. proj-threshold <= 1.0_dp) THEN
+                     IF (proj + threshold >= 0.0_dp .AND. proj - threshold <= 1.0_dp) THEN
                         pot = contact_control(icontact)%v_external
                         EXIT
                      END IF
@@ -773,7 +773,7 @@ CONTAINS
       INTEGER                                            :: direction_axis
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'contact_direction_axis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, naxes
       REAL(kind=dp), DIMENSION(3)                        :: scaled
@@ -791,7 +791,7 @@ CONTAINS
             ELSE
                direction_axis = -i
             END IF
-            naxes = naxes+1
+            naxes = naxes + 1
          END IF
       END DO
 
@@ -811,7 +811,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'negf_homo_energy_estimate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: gamma_point = 1
 
       INTEGER                                            :: handle, homo, ikpgr, ikpoint, imo, &
@@ -836,7 +836,7 @@ CONTAINS
 
          ! looking for a processor that holds the gamma point
          IF (para_env_kp%mepos == 0 .AND. kp_range(1) <= gamma_point .AND. kp_range(2) >= gamma_point) THEN
-            kplocal = kp_range(2)-kp_range(1)+1
+            kplocal = kp_range(2) - kp_range(1) + 1
 
             DO ikpgr = 1, kplocal
                CALL get_kpoint_env(kp_env(ikpgr)%kpoint_env, nkpoint=ikpoint, mos=mos_kp)
@@ -907,7 +907,7 @@ CONTAINS
       TYPE(qs_subsys_type), POINTER                      :: subsys_device
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'list_atoms_in_bulk_primary_unit_cell', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_min, dir_axis_min, &
                                                             direction_axis_abs, handle, iatom, &
@@ -927,7 +927,7 @@ CONTAINS
       proj_min = 1.0_dp
       atom_min = 1
       DO iatom = 1, natoms_bulk
-         vector = particle_set(atomlist_bulk(iatom))%r-origin
+         vector = particle_set(atomlist_bulk(iatom))%r - origin
          proj = projection_on_direction_vector(vector, direction_vector)
 
          IF (proj < proj_min) THEN
@@ -941,7 +941,7 @@ CONTAINS
       natoms_cell0 = 0
       DO iatom = 1, natoms_bulk
          IF (atom_map(iatom)%cell(direction_axis_abs) == dir_axis_min) &
-            natoms_cell0 = natoms_cell0+1
+            natoms_cell0 = natoms_cell0 + 1
       END DO
 
       ALLOCATE (atomlist_cell0(natoms_cell0))
@@ -950,7 +950,7 @@ CONTAINS
       natoms_cell0 = 0
       DO iatom = 1, natoms_bulk
          IF (atom_map(iatom)%cell(direction_axis_abs) == dir_axis_min) THEN
-            natoms_cell0 = natoms_cell0+1
+            natoms_cell0 = natoms_cell0 + 1
             atomlist_cell0(natoms_cell0) = atomlist_bulk(iatom)
             atom_map_cell0(natoms_cell0) = atom_map(iatom)
          END IF
@@ -988,7 +988,7 @@ CONTAINS
       TYPE(qs_subsys_type), POINTER                      :: subsys_device
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'list_atoms_in_bulk_secondary_unit_cell', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_min, dir_axis_min, &
                                                             direction_axis_abs, handle, iatom, &
@@ -1009,7 +1009,7 @@ CONTAINS
       proj_min = 1.0_dp
       atom_min = 1
       DO iatom = 1, natoms_bulk
-         vector = particle_set(atomlist_bulk(iatom))%r-origin
+         vector = particle_set(atomlist_bulk(iatom))%r - origin
          proj = projection_on_direction_vector(vector, direction_vector)
 
          IF (proj < proj_min) THEN
@@ -1022,8 +1022,8 @@ CONTAINS
 
       natoms_cell1 = 0
       DO iatom = 1, natoms_bulk
-         IF (atom_map(iatom)%cell(direction_axis_abs) == dir_axis_min+offset) &
-            natoms_cell1 = natoms_cell1+1
+         IF (atom_map(iatom)%cell(direction_axis_abs) == dir_axis_min + offset) &
+            natoms_cell1 = natoms_cell1 + 1
       END DO
 
       ALLOCATE (atomlist_cell1(natoms_cell1))
@@ -1031,8 +1031,8 @@ CONTAINS
 
       natoms_cell1 = 0
       DO iatom = 1, natoms_bulk
-         IF (atom_map(iatom)%cell(direction_axis_abs) == dir_axis_min+offset) THEN
-            natoms_cell1 = natoms_cell1+1
+         IF (atom_map(iatom)%cell(direction_axis_abs) == dir_axis_min + offset) THEN
+            natoms_cell1 = natoms_cell1 + 1
             atomlist_cell1(natoms_cell1) = atomlist_bulk(iatom)
             atom_map_cell1(natoms_cell1) = atom_map(iatom)
             atom_map_cell1(natoms_cell1)%cell(direction_axis_abs) = dir_axis_min
@@ -1052,7 +1052,7 @@ CONTAINS
       TYPE(negf_env_type), INTENT(inout)                 :: negf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icontact, ispin, nspins
 
@@ -1118,7 +1118,7 @@ CONTAINS
       TYPE(negf_env_contact_type), INTENT(inout)         :: contact_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_env_contact_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
 

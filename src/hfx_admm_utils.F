@@ -12,73 +12,73 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE hfx_admm_utils
-   USE admm_dm_types,                   ONLY: admm_dm_create,&
-                                              admm_dm_type
-   USE admm_methods,                    ONLY: scale_dm
-   USE admm_types,                      ONLY: admm_env_create,&
-                                              admm_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type
-   USE hfx_derivatives,                 ONLY: derivatives_four_center
-   USE hfx_energy_potential,            ONLY: integrate_four_center
-   USE input_constants,                 ONLY: &
-        do_admm_aux_exch_func_bee, do_admm_aux_exch_func_default, do_admm_aux_exch_func_none, &
-        do_admm_aux_exch_func_opt, do_admm_aux_exch_func_pbex, do_hfx_potential_coulomb, &
-        do_hfx_potential_short, do_hfx_potential_truncated, xc_funct_no_shortcut
-   USE input_section_types,             ONLY: section_vals_duplicate,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_get_subs_vals2,&
-                                              section_vals_remove_values,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: dp
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_create,&
-                                              pw_p_type,&
-                                              pw_release
-   USE qs_collocate_density,            ONLY: calculate_wavefunction
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE rt_propagation_types,            ONLY: rt_prop_type
-   USE virial_types,                    ONLY: virial_type
-   USE xc_adiabatic_utils,              ONLY: rescale_xc_potential
+   USE admm_dm_types, ONLY: admm_dm_create, &
+                            admm_dm_type
+   USE admm_methods, ONLY: scale_dm
+   USE admm_types, ONLY: admm_env_create, &
+                         admm_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type
+   USE hfx_derivatives, ONLY: derivatives_four_center
+   USE hfx_energy_potential, ONLY: integrate_four_center
+   USE input_constants, ONLY: &
+      do_admm_aux_exch_func_bee, do_admm_aux_exch_func_default, do_admm_aux_exch_func_none, &
+      do_admm_aux_exch_func_opt, do_admm_aux_exch_func_pbex, do_hfx_potential_coulomb, &
+      do_hfx_potential_short, do_hfx_potential_truncated, xc_funct_no_shortcut
+   USE input_section_types, ONLY: section_vals_duplicate, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_get_subs_vals2, &
+                                  section_vals_remove_values, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: dp
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_create, &
+                       pw_p_type, &
+                       pw_release
+   USE qs_collocate_density, ONLY: calculate_wavefunction
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_types, ONLY: qs_ks_env_type, &
+                          set_ks_env
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE rt_propagation_types, ONLY: rt_prop_type
+   USE virial_types, ONLY: virial_type
+   USE xc_adiabatic_utils, ONLY: rescale_xc_potential
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -319,7 +319,7 @@ CONTAINS
             CALL integrate_four_center(qs_env, matrix_ks_orb, eh1, rho_ao_orb, hfx_sections, &
                                        para_env, s_mstruct_changed, irep, distribute_fock_matrix, &
                                        ispin=ispin)
-            ehfx = ehfx+eh1
+            ehfx = ehfx + eh1
          END DO
 
          IF (calculate_forces .AND. .NOT. do_adiabatic_rescaling) THEN
@@ -368,7 +368,7 @@ CONTAINS
                CALL integrate_four_center(qs_env, matrix_ks_orb, eh1, rho_ao_orb, hfx_sections, &
                                           para_env, .FALSE., irep, distribute_fock_matrix, &
                                           ispin=ispin)
-               ehfxrt = ehfxrt+eh1
+               ehfxrt = ehfxrt + eh1
             END DO
 
             IF (calculate_forces .AND. .NOT. do_adiabatic_rescaling) THEN
@@ -377,7 +377,7 @@ CONTAINS
             END IF
 
             !! If required, the calculation of the forces will be done later with adiabatic rescaling
-            IF (do_adiabatic_rescaling) hf_energy(irep) = ehfx+ehfxrt
+            IF (do_adiabatic_rescaling) hf_energy(irep) = ehfx + ehfxrt
          END IF
 
          CALL pw_env_get(pw_env, auxbas_pw_pool=auxbas_pw_pool, &
@@ -387,7 +387,7 @@ CONTAINS
       END DO
 
       ! *** Set the total HFX energy
-      energy%ex = ehfx+ehfxrt
+      energy%ex = ehfx + ehfxrt
 
       ! *** Add Core-Hamiltonian-Matrix ***
       DO ispin = 1, nspins
@@ -397,7 +397,7 @@ CONTAINS
          END DO
       END DO
       IF (use_virial .AND. calculate_forces) THEN
-         virial%pv_virial = virial%pv_virial-virial%pv_fock_4c
+         virial%pv_virial = virial%pv_virial - virial%pv_fock_4c
          virial%pv_calculate = .FALSE.
       ENDIF
 
@@ -508,9 +508,9 @@ CONTAINS
 
             DO iorb_block = 1, norb, blocksize
 
-               DO iorb = iorb_block, MIN(iorb_block+blocksize-1, norb)
+               DO iorb = iorb_block, MIN(iorb_block + blocksize - 1, norb)
 
-                  iloc = iorb-iorb_block+1
+                  iloc = iorb - iorb_block + 1
                   CALL calculate_wavefunction(mo_coeff, iorb, rho_i(iloc), rho_g, &
                                               atomic_kind_set, qs_kind_set, cell, dft_control, particle_set, &
                                               pw_env)
@@ -519,19 +519,19 @@ CONTAINS
 
                DO jorb_block = iorb_block, norb, blocksize
 
-                  DO jorb = jorb_block, MIN(jorb_block+blocksize-1, norb)
+                  DO jorb = jorb_block, MIN(jorb_block + blocksize - 1, norb)
 
-                     jloc = jorb-jorb_block+1
+                     jloc = jorb - jorb_block + 1
                      CALL calculate_wavefunction(mo_coeff, jorb, rho_j(jloc), rho_g, &
                                                  atomic_kind_set, qs_kind_set, cell, dft_control, particle_set, &
                                                  pw_env)
 
                   ENDDO
 
-                  DO iorb = iorb_block, MIN(iorb_block+blocksize-1, norb)
-                     iloc = iorb-iorb_block+1
-                     DO jorb = jorb_block, MIN(jorb_block+blocksize-1, norb)
-                        jloc = jorb-jorb_block+1
+                  DO iorb = iorb_block, MIN(iorb_block + blocksize - 1, norb)
+                     iloc = iorb - iorb_block + 1
+                     DO jorb = jorb_block, MIN(jorb_block + blocksize - 1, norb)
+                        jloc = jorb - jorb_block + 1
                         IF (jorb < iorb) CYCLE
 
                         ! compute the pair density
@@ -546,7 +546,7 @@ CONTAINS
                         IF (SIZE(mo_array) == 1) scaling = scaling*2.0_dp
                         IF (iorb /= jorb) scaling = scaling*2.0_dp
 
-                        exchange_energy = exchange_energy-scaling*pair_energy
+                        exchange_energy = exchange_energy - scaling*pair_energy
 
                      ENDDO
                   ENDDO
@@ -613,7 +613,7 @@ CONTAINS
       TYPE(admm_type), POINTER                           :: admm_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_admm_xc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=20)                                  :: name_x_func
       INTEGER                                            :: hfx_potential_type, ifun, nfun
@@ -641,10 +641,10 @@ CONTAINS
       ifun = 0
       nfun = 0
       DO
-         ifun = ifun+1
+         ifun = ifun + 1
          xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
          IF (.NOT. ASSOCIATED(xc_fun)) EXIT
-         nfun = nfun+1
+         nfun = nfun + 1
       END DO
 
       ifun = 0
@@ -714,7 +714,7 @@ CONTAINS
             ifun = 0
             funct_found = .FALSE.
             DO
-               ifun = ifun+1
+               ifun = ifun + 1
                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
                IF (xc_fun%section%name == "PBE") THEN
@@ -731,7 +731,7 @@ CONTAINS
             ELSE
                CALL section_vals_val_get(xc_fun_section, "PBE%SCALE_X", &
                                          r_val=scale_x)
-               scale_x = scale_x+hfx_fraction
+               scale_x = scale_x + hfx_fraction
                CALL section_vals_val_set(xc_fun_section, "PBE%SCALE_X", &
                                          r_val=scale_x)
             END IF
@@ -740,7 +740,7 @@ CONTAINS
             ifun = 0
             funct_found = .FALSE.
             DO
-               ifun = ifun+1
+               ifun = ifun + 1
                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
                IF (xc_fun%section%name == "XWPBE") THEN
@@ -759,7 +759,7 @@ CONTAINS
             ELSE
                CALL section_vals_val_get(xc_fun_section, "XWPBE%SCALE_X", &
                                          r_val=scale_x)
-               scale_x = scale_x+hfx_fraction
+               scale_x = scale_x + hfx_fraction
                CALL section_vals_val_set(xc_fun_section, "XWPBE%SCALE_X", &
                                          r_val=scale_x)
             END IF
@@ -768,7 +768,7 @@ CONTAINS
             ifun = 0
             funct_found = .FALSE.
             DO
-               ifun = ifun+1
+               ifun = ifun + 1
                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
                IF (xc_fun%section%name == "PBE_HOLE_T_C_LR") THEN
@@ -786,7 +786,7 @@ CONTAINS
             ELSE
                CALL section_vals_val_get(xc_fun_section, "PBE_HOLE_T_C_LR%SCALE_X", &
                                          r_val=scale_x)
-               scale_x = scale_x-hfx_fraction
+               scale_x = scale_x - hfx_fraction
                CALL section_vals_val_set(xc_fun_section, "PBE_HOLE_T_C_LR%SCALE_X", &
                                          r_val=scale_x)
                CALL section_vals_val_set(xc_fun_section, "PBE_HOLE_T_C_LR%CUTOFF_RADIUS", &
@@ -795,7 +795,7 @@ CONTAINS
             ifun = 0
             funct_found = .FALSE.
             DO
-               ifun = ifun+1
+               ifun = ifun + 1
                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
                IF (xc_fun%section%name == "XWPBE") THEN
@@ -813,7 +813,7 @@ CONTAINS
             ELSE
                CALL section_vals_val_get(xc_fun_section, "XWPBE%SCALE_X0", &
                                          r_val=scale_x)
-               scale_x = scale_x+hfx_fraction
+               scale_x = scale_x + hfx_fraction
                CALL section_vals_val_set(xc_fun_section, "XWPBE%SCALE_X0", &
                                          r_val=scale_x)
             END IF
@@ -862,7 +862,7 @@ CONTAINS
          ifun = 0
          funct_found = .FALSE.
          DO
-            ifun = ifun+1
+            ifun = ifun + 1
             xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
             IF (.NOT. ASSOCIATED(xc_fun)) EXIT
             IF (xc_fun%section%name == TRIM(name_x_func)) THEN
@@ -891,7 +891,7 @@ CONTAINS
          ELSE
             CALL section_vals_val_get(xc_fun_section, TRIM(name_x_func)//"%SCALE_X", &
                                       r_val=scale_x)
-            scale_x = scale_x+hfx_fraction
+            scale_x = scale_x + hfx_fraction
             CALL section_vals_val_set(xc_fun_section, TRIM(name_x_func)//"%SCALE_X", &
                                       r_val=scale_x)
             IF (admm_env%aux_exch_func == do_admm_aux_exch_func_opt) THEN
@@ -907,7 +907,7 @@ CONTAINS
          ifun = 0
          funct_found = .FALSE.
          DO
-            ifun = ifun+1
+            ifun = ifun + 1
             xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
             IF (.NOT. ASSOCIATED(xc_fun)) EXIT
 
@@ -931,7 +931,7 @@ CONTAINS
          ifun = 0
          funct_found = .FALSE.
          DO
-            ifun = ifun+1
+            ifun = ifun + 1
             xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
             IF (.NOT. ASSOCIATED(xc_fun)) EXIT
             scale_x = -1000.0_dp
@@ -966,7 +966,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddft_hfx_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, irep, ispin, mspin, n_rep_hf, &
                                                             nspins
@@ -1017,7 +1017,7 @@ CONTAINS
             DO ispin = 1, mspin
                CALL integrate_four_center(qs_env, matrix_ks_kp, eh1, rho_ao_kp, hfx_sections, para_env, &
                                           s_mstruct_changed, irep, distribute_fock_matrix, ispin=ispin)
-               ehfx = ehfx+eh1
+               ehfx = ehfx + eh1
             END DO
          END DO
          energy%ex = ehfx

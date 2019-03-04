@@ -22,15 +22,15 @@
 ! **************************************************************************************************
 
 MODULE tmc_cancelation
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE tmc_dot_tree,                    ONLY: create_dot_color
-   USE tmc_tree_types,                  ONLY: &
-        add_to_list, elem_list_type, status_accepted, status_accepted_result, &
-        status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
-        status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
-        status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
-        status_deleted_result, status_rejected, status_rejected_result, tree_type
-   USE tmc_types,                       ONLY: tmc_env_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE tmc_dot_tree, ONLY: create_dot_color
+   USE tmc_tree_types, ONLY: &
+      add_to_list, elem_list_type, status_accepted, status_accepted_result, &
+      status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
+      status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
+      status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
+      status_deleted_result, status_rejected, status_rejected_result, tree_type
+   USE tmc_types, ONLY: tmc_env_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -54,7 +54,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'add_to_canceling_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: need_to_cancel
@@ -74,14 +74,14 @@ CONTAINS
          CASE (status_calculate_energy)
             elem%stat = status_cancel_ener
             need_to_cancel = .TRUE.
-            tmc_env%m_env%count_cancel_ener = tmc_env%m_env%count_cancel_ener+1
+            tmc_env%m_env%count_cancel_ener = tmc_env%m_env%count_cancel_ener + 1
          CASE (status_calc_approx_ener) !TODO maybe elem status for approx ener cancel
             !elem%stat = status_cancel_ener
             !need_to_cancel = .TRUE.
          CASE (status_calculate_NMC_steps, status_calculate_MD)
             elem%stat = status_cancel_nmc
             need_to_cancel = .TRUE.
-            tmc_env%m_env%count_cancel_NMC = tmc_env%m_env%count_cancel_NMC+1
+            tmc_env%m_env%count_cancel_NMC = tmc_env%m_env%count_cancel_NMC + 1
          CASE (status_accepted, status_accepted_result, status_rejected, &
                status_rejected_result, status_calculated, status_created, &
                status_cancel_nmc, status_cancel_ener, status_canceled_nmc, &
@@ -118,7 +118,7 @@ CONTAINS
       TYPE(elem_list_type), POINTER                      :: cancel_list
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'free_cancelation_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(elem_list_type), POINTER                      :: tmp_element
 

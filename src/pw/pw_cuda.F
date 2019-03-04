@@ -18,22 +18,22 @@
 !> \author Benjamin G. Levine
 ! **************************************************************************************************
 MODULE pw_cuda
-   USE ISO_C_BINDING,                   ONLY: C_DOUBLE,&
-                                              C_INT,&
-                                              C_LOC,&
-                                              C_PTR
-   USE fast,                            ONLY: zero_c
-   USE fft_tools,                       ONLY: &
-        cube_transpose_1, cube_transpose_2, fft_scratch_sizes, fft_scratch_type, get_fft_scratch, &
-        release_fft_scratch, x_to_yz, xz_to_yz, yz_to_x, yz_to_xz
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_comm_compare,&
-                                              mp_environ,&
-                                              mp_rank_compare
-   USE pw_grid_types,                   ONLY: FULLSPACE
-   USE pw_types,                        ONLY: REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_type
+   USE ISO_C_BINDING, ONLY: C_DOUBLE, &
+                            C_INT, &
+                            C_LOC, &
+                            C_PTR
+   USE fast, ONLY: zero_c
+   USE fft_tools, ONLY: &
+      cube_transpose_1, cube_transpose_2, fft_scratch_sizes, fft_scratch_type, get_fft_scratch, &
+      release_fft_scratch, x_to_yz, xz_to_yz, yz_to_x, yz_to_xz
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_comm_compare, &
+                              mp_environ, &
+                              mp_rank_compare
+   USE pw_grid_types, ONLY: FULLSPACE
+   USE pw_types, ONLY: REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -450,17 +450,17 @@ CONTAINS
          lg = SIZE(grays, 1)
          mg = SIZE(grays, 2)
          mmax = MAX(mg, 1)
-         lmax = MAX(lg, (ngpts/mmax+1))
+         lmax = MAX(lg, (ngpts/mmax + 1))
 
-         ALLOCATE (p2p(0:numtask-1))
+         ALLOCATE (p2p(0:numtask - 1))
 
          CALL mp_rank_compare(gs_group, rs_group, p2p)
 
          rp = p2p(g_pos)
-         mx2 = bo(2, 1, rp, 2)-bo(1, 1, rp, 2)+1
-         mz2 = bo(2, 3, rp, 2)-bo(1, 3, rp, 2)+1
-         n1 = MAXVAL(bo(2, 1, :, 1)-bo(1, 1, :, 1)+1)
-         n2 = MAXVAL(bo(2, 2, :, 1)-bo(1, 2, :, 1)+1)
+         mx2 = bo(2, 1, rp, 2) - bo(1, 1, rp, 2) + 1
+         mz2 = bo(2, 3, rp, 2) - bo(1, 3, rp, 2) + 1
+         n1 = MAXVAL(bo(2, 1, :, 1) - bo(1, 1, :, 1) + 1)
+         n2 = MAXVAL(bo(2, 2, :, 1) - bo(1, 2, :, 1) + 1)
          nmax = MAX((2*n2)/numtask, 2)*mx2*mz2
          nmax = MAX(nmax, n1*MAXVAL(nyzray))
 
@@ -469,17 +469,17 @@ CONTAINS
          fft_scratch_size%nz = nloc(3)
          fft_scratch_size%lmax = lmax
          fft_scratch_size%mmax = mmax
-         fft_scratch_size%mx1 = bo(2, 1, rp, 1)-bo(1, 1, rp, 1)+1
+         fft_scratch_size%mx1 = bo(2, 1, rp, 1) - bo(1, 1, rp, 1) + 1
          fft_scratch_size%mx2 = mx2
-         fft_scratch_size%my1 = bo(2, 2, rp, 1)-bo(1, 2, rp, 1)+1
+         fft_scratch_size%my1 = bo(2, 2, rp, 1) - bo(1, 2, rp, 1) + 1
          fft_scratch_size%mz2 = mz2
          fft_scratch_size%lg = lg
          fft_scratch_size%mg = mg
          fft_scratch_size%nbx = MAXVAL(bo(2, 1, :, 2))
          fft_scratch_size%nbz = MAXVAL(bo(2, 3, :, 2))
-         fft_scratch_size%mcz1 = MAXVAL(bo(2, 3, :, 1)-bo(1, 3, :, 1)+1)
-         fft_scratch_size%mcx2 = MAXVAL(bo(2, 1, :, 2)-bo(1, 1, :, 2)+1)
-         fft_scratch_size%mcz2 = MAXVAL(bo(2, 3, :, 2)-bo(1, 3, :, 2)+1)
+         fft_scratch_size%mcz1 = MAXVAL(bo(2, 3, :, 1) - bo(1, 3, :, 1) + 1)
+         fft_scratch_size%mcx2 = MAXVAL(bo(2, 1, :, 2) - bo(1, 1, :, 2) + 1)
+         fft_scratch_size%mcz2 = MAXVAL(bo(2, 3, :, 2) - bo(1, 3, :, 2) + 1)
          fft_scratch_size%nmax = nmax
          fft_scratch_size%nmray = MAXVAL(nyzray)
          fft_scratch_size%nyzray = nyzray(g_pos)
@@ -639,17 +639,17 @@ CONTAINS
          lg = SIZE(grays, 1)
          mg = SIZE(grays, 2)
          mmax = MAX(mg, 1)
-         lmax = MAX(lg, (ngpts/mmax+1))
+         lmax = MAX(lg, (ngpts/mmax + 1))
 
-         ALLOCATE (p2p(0:numtask-1))
+         ALLOCATE (p2p(0:numtask - 1))
 
          CALL mp_rank_compare(gs_group, rs_group, p2p)
 
          rp = p2p(g_pos)
-         mx2 = bo(2, 1, rp, 2)-bo(1, 1, rp, 2)+1
-         mz2 = bo(2, 3, rp, 2)-bo(1, 3, rp, 2)+1
-         n1 = MAXVAL(bo(2, 1, :, 1)-bo(1, 1, :, 1)+1)
-         n2 = MAXVAL(bo(2, 2, :, 1)-bo(1, 2, :, 1)+1)
+         mx2 = bo(2, 1, rp, 2) - bo(1, 1, rp, 2) + 1
+         mz2 = bo(2, 3, rp, 2) - bo(1, 3, rp, 2) + 1
+         n1 = MAXVAL(bo(2, 1, :, 1) - bo(1, 1, :, 1) + 1)
+         n2 = MAXVAL(bo(2, 2, :, 1) - bo(1, 2, :, 1) + 1)
          nmax = MAX((2*n2)/numtask, 2)*mx2*mz2
          nmax = MAX(nmax, n1*MAXVAL(nyzray))
 
@@ -658,17 +658,17 @@ CONTAINS
          fft_scratch_size%nz = nloc(3)
          fft_scratch_size%lmax = lmax
          fft_scratch_size%mmax = mmax
-         fft_scratch_size%mx1 = bo(2, 1, rp, 1)-bo(1, 1, rp, 1)+1
+         fft_scratch_size%mx1 = bo(2, 1, rp, 1) - bo(1, 1, rp, 1) + 1
          fft_scratch_size%mx2 = mx2
-         fft_scratch_size%my1 = bo(2, 2, rp, 1)-bo(1, 2, rp, 1)+1
+         fft_scratch_size%my1 = bo(2, 2, rp, 1) - bo(1, 2, rp, 1) + 1
          fft_scratch_size%mz2 = mz2
          fft_scratch_size%lg = lg
          fft_scratch_size%mg = mg
          fft_scratch_size%nbx = MAXVAL(bo(2, 1, :, 2))
          fft_scratch_size%nbz = MAXVAL(bo(2, 3, :, 2))
-         fft_scratch_size%mcz1 = MAXVAL(bo(2, 3, :, 1)-bo(1, 3, :, 1)+1)
-         fft_scratch_size%mcx2 = MAXVAL(bo(2, 1, :, 2)-bo(1, 1, :, 2)+1)
-         fft_scratch_size%mcz2 = MAXVAL(bo(2, 3, :, 2)-bo(1, 3, :, 2)+1)
+         fft_scratch_size%mcz1 = MAXVAL(bo(2, 3, :, 1) - bo(1, 3, :, 1) + 1)
+         fft_scratch_size%mcx2 = MAXVAL(bo(2, 1, :, 2) - bo(1, 1, :, 2) + 1)
+         fft_scratch_size%mcz2 = MAXVAL(bo(2, 3, :, 2) - bo(1, 3, :, 2) + 1)
          fft_scratch_size%nmax = nmax
          fft_scratch_size%nmray = MAXVAL(nyzray)
          fft_scratch_size%nyzray = nyzray(g_pos)

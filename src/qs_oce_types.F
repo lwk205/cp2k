@@ -5,10 +5,10 @@
 ! **************************************************************************************************
 MODULE qs_oce_types
 
-   USE block_p_types,                   ONLY: block_p_type
-   USE kinds,                           ONLY: dp
-   USE sap_kind_types,                  ONLY: release_sap_int,&
-                                              sap_int_type
+   USE block_p_types, ONLY: block_p_type
+   USE kinds, ONLY: dp
+   USE sap_kind_types, ONLY: release_sap_int, &
+                             sap_int_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -58,7 +58,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_oce_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -100,7 +100,7 @@ CONTAINS
       TYPE(oce_matrix_type), POINTER                     :: oce_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_oce_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (.NOT. ASSOCIATED(oce_set)) RETURN
 

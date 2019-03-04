@@ -10,36 +10,36 @@
 !>         reorganization of the original routines/modules
 ! **************************************************************************************************
 MODULE simpar_methods
-   USE bibliography,                    ONLY: Evans1983,&
-                                              Kuhne2007,&
-                                              Minary2003,&
-                                              Ricci2003,&
-                                              cite_reference
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_generate_filename,&
-                                              cp_print_key_unit_nr
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE input_constants,                 ONLY: &
-        isokin_ensemble, langevin_ensemble, npe_f_ensemble, npe_i_ensemble, &
-        nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, npt_f_ensemble, npt_i_ensemble, &
-        nvt_ensemble, reftraj_ensemble
-   USE input_cp2k_md,                   ONLY: create_md_section
-   USE input_enumeration_types,         ONLY: enum_i2c,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_get,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_get_keyword,&
-                                              section_release,&
-                                              section_type,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE simpar_types,                    ONLY: simpar_type
+   USE bibliography, ONLY: Evans1983, &
+                           Kuhne2007, &
+                           Minary2003, &
+                           Ricci2003, &
+                           cite_reference
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_generate_filename, &
+                                 cp_print_key_unit_nr
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE input_constants, ONLY: &
+      isokin_ensemble, langevin_ensemble, npe_f_ensemble, npe_i_ensemble, &
+      nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, npt_f_ensemble, npt_i_ensemble, &
+      nvt_ensemble, reftraj_ensemble
+   USE input_cp2k_md, ONLY: create_md_section
+   USE input_enumeration_types, ONLY: enum_i2c, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_get, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_get_keyword, &
+                                  section_release, &
+                                  section_type, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE simpar_types, ONLY: simpar_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -62,7 +62,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: motion_section, md_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_md_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       INTEGER                                            :: iprint, iw
@@ -85,7 +85,7 @@ CONTAINS
          CALL cite_reference(Ricci2003)
          IF (simpar%noisy_gamma > 0.0_dp) CALL cite_reference(Kuhne2007)
          ! Normalization factor using a normal Gaussian random number distribution
-         simpar%var_w = 2.0_dp*simpar%temp_ext*simpar%dt*(simpar%gamma+simpar%noisy_gamma)
+         simpar%var_w = 2.0_dp*simpar%temp_ext*simpar%dt*(simpar%gamma + simpar%noisy_gamma)
          IF (iw > 0) THEN
             tmp_r1 = cp_unit_from_cp2k(simpar%gamma, "fs^-1")
             tmp_r2 = cp_unit_from_cp2k(simpar%noisy_gamma, "fs^-1")

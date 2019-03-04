@@ -8,8 +8,8 @@
 ! **************************************************************************************************
 MODULE damping_dipole_types
 
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
+   USE kinds, ONLY: default_string_length, &
+                    dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -67,7 +67,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkinds
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'damping_p_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -88,7 +88,7 @@ CONTAINS
       TYPE(damping_p_type), POINTER                      :: damping
 
       CHARACTER(len=*), PARAMETER :: routineN = 'damping_p_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(damping)) THEN
          IF (ASSOCIATED(damping%damp)) THEN

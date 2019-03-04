@@ -63,7 +63,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_rho_cflags_setall', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       cflags%rho = value
       cflags%rho_spin = value
@@ -91,7 +91,7 @@ CONTAINS
       LOGICAL                                            :: equal
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_rho_cflags_equal', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       equal = ((cflags1%rho .EQV. cflags2%rho) .AND. &
                (cflags1%rho_spin .EQV. cflags2%rho_spin) .AND. &

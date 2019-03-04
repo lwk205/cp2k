@@ -37,22 +37,22 @@
 !>      @version 12.2001
 ! **************************************************************************************************
 MODULE cp_log_handling
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_iter_types,                   ONLY: cp_iteration_info_create,&
-                                              cp_iteration_info_release,&
-                                              cp_iteration_info_retain,&
-                                              cp_iteration_info_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE machine,                         ONLY: default_output_unit,&
-                                              m_getpid,&
-                                              m_hostnm
-   USE message_passing,                 ONLY: mp_comm_free
-   USE string_utilities,                ONLY: compress
-   USE timings,                         ONLY: print_stack
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_iter_types, ONLY: cp_iteration_info_create, &
+                            cp_iteration_info_release, &
+                            cp_iteration_info_retain, &
+                            cp_iteration_info_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE machine, ONLY: default_output_unit, &
+                      m_getpid, &
+                      m_hostnm
+   USE message_passing, ONLY: mp_comm_free
+   USE string_utilities, ONLY: compress
+   USE timings, ONLY: print_stack
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -174,7 +174,7 @@ CONTAINS
       INTEGER                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_default_logger_stack_size', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       res = stack_pointer
    END FUNCTION cp_default_logger_stack_size
@@ -192,14 +192,14 @@ CONTAINS
       TYPE(cp_logger_type), POINTER                      :: logger
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_add_default_logger', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
-      IF (stack_pointer+1 > max_stack_pointer) THEN
+      IF (stack_pointer + 1 > max_stack_pointer) THEN
          CALL cp_abort(__LOCATION__, routineP// &
                        "too many default loggers, increase max_stack_pointer in "//moduleN)
       ENDIF
 
-      stack_pointer = stack_pointer+1
+      stack_pointer = stack_pointer + 1
       NULLIFY (default_logger_stack(stack_pointer)%cp_default_logger)
 
       default_logger_stack(stack_pointer)%cp_default_logger => logger
@@ -214,14 +214,14 @@ CONTAINS
 !> \author Joost VandeVondele
 ! **************************************************************************************************
    SUBROUTINE cp_rm_default_logger()
-      IF (stack_pointer-1 < 0) THEN
+      IF (stack_pointer - 1 < 0) THEN
          CALL cp_abort(__LOCATION__, moduleN//":cp_rm_default_logger"// &
                        "can not destroy default logger "//moduleN)
       ENDIF
 
       CALL cp_logger_release(default_logger_stack(stack_pointer)%cp_default_logger)
       NULLIFY (default_logger_stack(stack_pointer)%cp_default_logger)
-      stack_pointer = stack_pointer-1
+      stack_pointer = stack_pointer - 1
 
    END SUBROUTINE cp_rm_default_logger
 
@@ -298,7 +298,7 @@ CONTAINS
       TYPE(cp_logger_type), OPTIONAL, POINTER            :: template_logger
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: stat
 
@@ -309,7 +309,7 @@ CONTAINS
       NULLIFY (logger%para_env)
       NULLIFY (logger%iter_info)
       logger%ref_count = 1
-      last_logger_id_nr = last_logger_id_nr+1
+      last_logger_id_nr = last_logger_id_nr + 1
       logger%id_nr = last_logger_id_nr
 
       IF (PRESENT(template_logger)) THEN
@@ -353,7 +353,7 @@ CONTAINS
          CPABORT(routineP//" para env not associated")
       IF (logger%para_env%ref_count < 1) &
          CPABORT(routineP//" para_env%ref_count<1")
-      logger%para_env%ref_count = logger%para_env%ref_count+1
+      logger%para_env%ref_count = logger%para_env%ref_count + 1
 
       IF (PRESENT(print_level)) logger%print_level = print_level
 
@@ -415,13 +415,13 @@ CONTAINS
       TYPE(cp_logger_type), POINTER                      :: logger
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (.NOT. ASSOCIATED(logger)) &
          CPABORT(routineP//" logger not associated")
       IF (logger%ref_count < 1) &
          CPABORT(routineP//" logger%ref_count<1")
-      logger%ref_count = logger%ref_count+1
+      logger%ref_count = logger%ref_count + 1
    END SUBROUTINE cp_logger_retain
 
 ! **************************************************************************************************
@@ -435,12 +435,12 @@ CONTAINS
       TYPE(cp_logger_type), POINTER                      :: logger
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(logger)) THEN
          IF (logger%ref_count < 1) &
             CPABORT(routineP//" logger%ref_count<1")
-         logger%ref_count = logger%ref_count-1
+         logger%ref_count = logger%ref_count - 1
          IF (logger%ref_count == 0) THEN
             IF (logger%close_global_unit_on_dealloc .AND. &
                 logger%default_global_unit_nr >= 0) THEN
@@ -482,7 +482,7 @@ CONTAINS
       LOGICAL                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_would_log', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_logger_type), POINTER                      :: lggr
 
@@ -557,7 +557,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: level
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_set_log_level', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (.NOT. ASSOCIATED(logger)) &
          CPABORT(routineP//" logger not associated")
@@ -583,7 +583,7 @@ CONTAINS
       INTEGER                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_get_default_unit_nr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: filename, host_name
       INTEGER                                            :: iostat, pid
@@ -686,13 +686,13 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'my_cp_para_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(para_env)) THEN
          IF (para_env%ref_count < 1) THEN
             CPABORT(routineP//" para_env%ref_count<1")
          END IF
-         para_env%ref_count = para_env%ref_count-1
+         para_env%ref_count = para_env%ref_count - 1
          IF (para_env%ref_count < 1) THEN
             IF (para_env%owns_group) THEN
                CALL mp_comm_free(para_env%group)
@@ -728,7 +728,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: local
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_logger_generate_filename', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: loc
       TYPE(cp_logger_type), POINTER                      :: lggr

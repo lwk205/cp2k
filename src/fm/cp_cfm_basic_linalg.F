@@ -12,17 +12,17 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE cp_cfm_basic_linalg
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_cfm_types,                    ONLY: cp_cfm_get_info,&
-                                              cp_cfm_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_equivalent
-   USE cp_fm_types,                     ONLY: cp_fm_type
-   USE kahan_sum,                       ONLY: accurate_dot_product
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: z_one,&
-                                              z_zero
-   USE message_passing,                 ONLY: mp_prod,&
-                                              mp_sum
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_cfm_types, ONLY: cp_cfm_get_info, &
+                           cp_cfm_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_equivalent
+   USE cp_fm_types, ONLY: cp_fm_type
+   USE kahan_sum, ONLY: accurate_dot_product
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: z_one, &
+                            z_zero
+   USE message_passing, ONLY: mp_prod, &
+                              mp_sum
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -68,7 +68,7 @@ CONTAINS
       TYPE(cp_cfm_type), POINTER                         :: matrix_a, matrix_b, matrix_c
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_cfm_schur_product', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       COMPLEX(kind=dp), DIMENSION(:, :), POINTER         :: a, b, c
       INTEGER                                            :: handle, icol_local, irow_local, mypcol, &
@@ -107,7 +107,7 @@ CONTAINS
       TYPE(cp_cfm_type), POINTER                         :: matrix_a, matrix_b, matrix_c
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_cfm_schur_product_cc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       COMPLEX(kind=dp), DIMENSION(:, :), POINTER         :: a, b, c
       INTEGER                                            :: handle, icol_local, irow_local, mypcol, &
@@ -159,7 +159,7 @@ CONTAINS
       TYPE(cp_cfm_type), OPTIONAL, POINTER               :: matrix_b
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_cfm_scale_and_add', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       COMPLEX(kind=dp)                                   :: my_beta
       COMPLEX(kind=dp), DIMENSION(:, :), POINTER         :: a, b
@@ -227,14 +227,14 @@ CONTAINS
                   !a(:, :) = a(:, :)+b(:, :)
                   DO icol_local = 1, ncol_local
                      DO irow_local = 1, nrow_local
-                        a(irow_local, icol_local) = a(irow_local, icol_local)+b(irow_local, icol_local)
+                        a(irow_local, icol_local) = a(irow_local, icol_local) + b(irow_local, icol_local)
                      END DO
                   END DO
                ELSE
                   !a(:, :) = a(:, :)+my_beta*b(:, :)
                   DO icol_local = 1, ncol_local
                      DO irow_local = 1, nrow_local
-                        a(irow_local, icol_local) = a(irow_local, icol_local)+my_beta*b(irow_local, icol_local)
+                        a(irow_local, icol_local) = a(irow_local, icol_local) + my_beta*b(irow_local, icol_local)
                      END DO
                   END DO
                END IF
@@ -242,7 +242,7 @@ CONTAINS
                !a(:, :) = alpha*a(:, :)+my_beta*b(:, :)
                DO icol_local = 1, ncol_local
                   DO irow_local = 1, nrow_local
-                     a(irow_local, icol_local) = alpha*a(irow_local, icol_local)+my_beta*b(irow_local, icol_local)
+                     a(irow_local, icol_local) = alpha*a(irow_local, icol_local) + my_beta*b(irow_local, icol_local)
                   END DO
                END DO
             END IF
@@ -275,7 +275,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: matrix_b
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_cfm_scale_and_add_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       COMPLEX(kind=dp), DIMENSION(:, :), POINTER         :: a
       INTEGER                                            :: handle, icol_local, irow_local, mypcol, &
@@ -337,14 +337,14 @@ CONTAINS
                   !a(:, :) = a(:, :)+b(:, :)
                   DO icol_local = 1, ncol_local
                      DO irow_local = 1, nrow_local
-                        a(irow_local, icol_local) = a(irow_local, icol_local)+b(irow_local, icol_local)
+                        a(irow_local, icol_local) = a(irow_local, icol_local) + b(irow_local, icol_local)
                      END DO
                   END DO
                ELSE
                   !a(:, :) = a(:, :)+beta*b(:, :)
                   DO icol_local = 1, ncol_local
                      DO irow_local = 1, nrow_local
-                        a(irow_local, icol_local) = a(irow_local, icol_local)+beta*b(irow_local, icol_local)
+                        a(irow_local, icol_local) = a(irow_local, icol_local) + beta*b(irow_local, icol_local)
                      END DO
                   END DO
                END IF
@@ -352,7 +352,7 @@ CONTAINS
                !a(:, :) = alpha*a(:, :)+beta*b(:, :)
                DO icol_local = 1, ncol_local
                   DO irow_local = 1, nrow_local
-                     a(irow_local, icol_local) = alpha*a(irow_local, icol_local)+beta*b(irow_local, icol_local)
+                     a(irow_local, icol_local) = alpha*a(irow_local, icol_local) + beta*b(irow_local, icol_local)
                   END DO
                END DO
             END IF
@@ -412,7 +412,7 @@ CONTAINS
 
       counter = 0
       DO irow = 1, nrow_local
-         IF (ipivot(irow) .NE. row_indices(irow)) counter = counter+1
+         IF (ipivot(irow) .NE. row_indices(irow)) counter = counter + 1
       END DO
 
       IF (MOD(counter, 2) == 0) THEN
@@ -426,13 +426,13 @@ CONTAINS
       icol = 1
       DO WHILE (irow <= nrow_local .AND. icol <= ncol_local)
          IF (row_indices(irow) < col_indices(icol)) THEN
-            irow = irow+1
+            irow = irow + 1
          ELSE IF (row_indices(irow) > col_indices(icol)) THEN
-            icol = icol+1
+            icol = icol + 1
          ELSE ! diagonal element
             determinant = determinant*a(irow, icol)
-            irow = irow+1
-            icol = icol+1
+            irow = irow + 1
+            icol = icol + 1
          END IF
       END DO
       CALL mp_prod(determinant, matrix_a%matrix_struct%para_env%group)
@@ -442,7 +442,7 @@ CONTAINS
       counter = 0
       determinant = z_one
       DO irow = 1, nrow_global
-         IF (ipivot(irow) .NE. irow) counter = counter+1
+         IF (ipivot(irow) .NE. irow) counter = counter + 1
          determinant = determinant*a(irow, irow)
       ENDDO
       IF (MOD(counter, 2) == 1) determinant = -1.0_dp*determinant
@@ -707,7 +707,7 @@ CONTAINS
 
          counter = 0
          DO irow = 1, nrow_local
-            IF (ipivot(irow) .NE. row_indices(irow)) counter = counter+1
+            IF (ipivot(irow) .NE. row_indices(irow)) counter = counter + 1
          END DO
 
          IF (MOD(counter, 2) == 0) THEN
@@ -721,13 +721,13 @@ CONTAINS
          icol = 1
          DO WHILE (irow <= nrow_local .AND. icol <= ncol_local)
             IF (row_indices(irow) < col_indices(icol)) THEN
-               irow = irow+1
+               irow = irow + 1
             ELSE IF (row_indices(irow) > col_indices(icol)) THEN
-               icol = icol+1
+               icol = icol + 1
             ELSE ! diagonal element
                determinant = determinant*a(irow, icol)
-               irow = irow+1
-               icol = icol+1
+               irow = irow + 1
+               icol = icol + 1
             END IF
          END DO
          CALL mp_prod(determinant, matrix_a%matrix_struct%para_env%group)
@@ -743,7 +743,7 @@ CONTAINS
          counter = 0
          determinant = z_one
          DO irow = 1, nrow_global
-            IF (ipivot(irow) .NE. irow) counter = counter+1
+            IF (ipivot(irow) .NE. irow) counter = counter + 1
             determinant = determinant*a(irow, irow)
          ENDDO
          IF (MOD(counter, 2) == 1) determinant = -1.0_dp*determinant
@@ -1043,7 +1043,7 @@ CONTAINS
       COMPLEX(kind=dp), INTENT(in), OPTIONAL             :: alpha
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_cfm_triangular_multiply', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER                                          :: side_char, transa, unit_diag, uplo
       COMPLEX(kind=dp)                                   :: al

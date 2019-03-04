@@ -5,67 +5,67 @@
 ! **************************************************************************************************
 MODULE qs_rho0_ggrid
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cube_utils,                      ONLY: cube_info_type
-   USE input_constants,                 ONLY: tddfpt_singlet
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: dfac,&
-                                              fourpi
-   USE memory_utilities,                ONLY: reallocate
-   USE message_passing,                 ONLY: mp_sum
-   USE orbital_pointers,                ONLY: indco,&
-                                              nco,&
-                                              ncoset,&
-                                              nso,&
-                                              nsoset
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cube_utils, ONLY: cube_info_type
+   USE input_constants, ONLY: tddfpt_singlet
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE mathconstants, ONLY: dfac, &
+                            fourpi
+   USE memory_utilities, ONLY: reallocate
+   USE message_passing, ONLY: mp_sum
+   USE orbital_pointers, ONLY: indco, &
+                               nco, &
+                               ncoset, &
+                               nso, &
+                               nsoset
    USE orbital_transformation_matrices, ONLY: orbtramat
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_integrate_function,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_release
-   USE qs_collocate_density,            ONLY: collocate_pgf_product_rspace
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_harmonics_atom,               ONLY: get_none0_cg_list,&
-                                              harmonics_atom_type
-   USE qs_integrate_potential,          ONLY: integrate_pgf_product_rspace
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_p_env_types,                  ONLY: qs_p_env_type
-   USE qs_rho0_types,                   ONLY: get_rho0_mpole,&
-                                              rho0_mpole_type
-   USE qs_rho_atom_types,               ONLY: get_rho_atom,&
-                                              rho_atom_coeff,&
-                                              rho_atom_type
-   USE realspace_grid_types,            ONLY: &
-        pw2rs, realspace_grid_desc_p_type, realspace_grid_desc_type, realspace_grid_p_type, &
-        realspace_grid_type, rs2pw, rs_grid_create, rs_grid_release, rs_grid_retain, rs_grid_zero, &
-        rs_pw_transfer
-   USE util,                            ONLY: get_limit
-   USE virial_types,                    ONLY: virial_type
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_integrate_function, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_release
+   USE qs_collocate_density, ONLY: collocate_pgf_product_rspace
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_harmonics_atom, ONLY: get_none0_cg_list, &
+                                harmonics_atom_type
+   USE qs_integrate_potential, ONLY: integrate_pgf_product_rspace
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_p_env_types, ONLY: qs_p_env_type
+   USE qs_rho0_types, ONLY: get_rho0_mpole, &
+                            rho0_mpole_type
+   USE qs_rho_atom_types, ONLY: get_rho_atom, &
+                                rho_atom_coeff, &
+                                rho_atom_type
+   USE realspace_grid_types, ONLY: &
+      pw2rs, realspace_grid_desc_p_type, realspace_grid_desc_type, realspace_grid_p_type, &
+      realspace_grid_type, rs2pw, rs_grid_create, rs_grid_release, rs_grid_retain, rs_grid_zero, &
+      rs_pw_transfer
+   USE util, ONLY: get_limit
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -95,7 +95,7 @@ CONTAINS
       REAL(dp), INTENT(OUT)                              :: tot_rs_int
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'put_rho0_on_grid', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: auxbas_grid, handle, iat, iatom, igrid, &
                                                             ikind, ithread, j, l0_ikind, lmax0, &
@@ -204,11 +204,11 @@ CONTAINS
             IF (rs_grid%desc%parallel .AND. .NOT. rs_grid%desc%distributed) THEN
                ! replicated realspace grid, split the atoms up between procs
                IF (MODULO(nat, rs_grid%desc%group_size) == rs_grid%desc%my_pos) THEN
-                  npme = npme+1
+                  npme = npme + 1
                   cores(npme) = iat
                ENDIF
             ELSE
-               npme = npme+1
+               npme = npme + 1
                cores(npme) = iat
             ENDIF
 
@@ -290,7 +290,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: tddft
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rho0_s_grid_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: my_tddft
       TYPE(pw_env_type), POINTER                         :: new_pw_env
@@ -360,12 +360,12 @@ CONTAINS
       TYPE(qs_p_env_type), OPTIONAL, POINTER             :: p_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'integrate_vhg0_rspace', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: auxbas_grid, bo(2), handle, i, iat, iatom, ic, icg, ico, ig1, ig2, igrid, ii, &
-         ikind, ipgf1, ipgf2, is, iset1, iset2, iso, iso1, iso2, ispin, j, l0_ikind, llmax, lmax0, &
-         lshell, lx, ly, lz, m1, m2, max_iso_not0_local, max_s_harm, maxl, maxso, mepos, n1, n2, &
-         nat, nch_ik, nch_max, ncurr, nset, nsotot, nspins, num_pe
+                 ikind, ipgf1, ipgf2, is, iset1, iset2, iso, iso1, iso2, ispin, j, l0_ikind, llmax, lmax0, &
+                 lshell, lx, ly, lz, m1, m2, max_iso_not0_local, max_s_harm, maxl, maxso, mepos, n1, n2, &
+                 nat, nch_ik, nch_max, ncurr, nset, nsotot, nspins, num_pe
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: cg_n_list
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: cg_list
       INTEGER, DIMENSION(:), POINTER                     :: atom_list, lmax, lmin, npgf
@@ -562,7 +562,7 @@ CONTAINS
 
          num_pe = para_env%num_pe
          mepos = para_env%mepos
-         DO j = 0, num_pe-1
+         DO j = 0, num_pe - 1
             bo = get_limit(nat, num_pe, j)
             IF (.NOT. grid_distributed .AND. j /= mepos) CYCLE
 
@@ -596,37 +596,37 @@ CONTAINS
                ! Convert from cartesian to spherical
                DO lshell = 0, l0_ikind
                   DO is = 1, nso(lshell)
-                     iso = is+nsoset(lshell-1)
+                     iso = is + nsoset(lshell - 1)
                      hab_sph(iso) = 0.0_dp
                      hdab_sph(1:3, iso) = 0.0_dp
                      a_hdab_sph(1:3, 1:3, iso) = 0.0_dp
                      DO ic = 1, nco(lshell)
-                        ico = ic+ncoset(lshell-1)
+                        ico = ic + ncoset(lshell - 1)
                         lx = indco(1, ico)
                         ly = indco(2, ico)
                         lz = indco(3, ico)
 
-                        hab_sph(iso) = hab_sph(iso)+ &
+                        hab_sph(iso) = hab_sph(iso) + &
                                        orbtramat(lshell)%c2s(is, ic)*hab(ico, 1)* &
                                        norm_l(lshell)/ &
-                                       SQRT(c4pi*dfac(2*lx-1)*dfac(2*ly-1)*dfac(2*lz-1)/ &
-                                            dfac(2*lshell+1))
+                                       SQRT(c4pi*dfac(2*lx - 1)*dfac(2*ly - 1)*dfac(2*lz - 1)/ &
+                                            dfac(2*lshell + 1))
 
                         IF (calculate_forces) THEN
-                           hdab_sph(1:3, iso) = hdab_sph(1:3, iso)+ &
+                           hdab_sph(1:3, iso) = hdab_sph(1:3, iso) + &
                                                 orbtramat(lshell)%c2s(is, ic)*hdab(1:3, ico, 1)* &
                                                 norm_l(lshell)/ &
-                                                SQRT(c4pi*dfac(2*lx-1)*dfac(2*ly-1)*dfac(2*lz-1)/ &
-                                                     dfac(2*lshell+1))
+                                                SQRT(c4pi*dfac(2*lx - 1)*dfac(2*ly - 1)*dfac(2*lz - 1)/ &
+                                                     dfac(2*lshell + 1))
                         END IF
                         IF (use_virial) THEN
                            DO ii = 1, 3
                            DO i = 1, 3
-                              a_hdab_sph(i, ii, iso) = a_hdab_sph(i, ii, iso)+ &
+                              a_hdab_sph(i, ii, iso) = a_hdab_sph(i, ii, iso) + &
                                                        orbtramat(lshell)%c2s(is, ic)*a_hdab(i, ii, ico, 1)* &
                                                        norm_l(lshell)/ &
-                                                       SQRT(c4pi*dfac(2*lx-1)*dfac(2*ly-1)*dfac(2*lz-1)/ &
-                                                            dfac(2*lshell+1))
+                                                       SQRT(c4pi*dfac(2*lx - 1)*dfac(2*ly - 1)*dfac(2*lz - 1)/ &
+                                                            dfac(2*lshell + 1))
                            END DO
                            END DO
                         END IF
@@ -652,19 +652,19 @@ CONTAINS
                                  iso1 = cg_list(1, icg, iso)
                                  iso2 = cg_list(2, icg, iso)
 
-                                 ig1 = iso1+n1*(ipgf1-1)+m1
-                                 ig2 = iso2+n2*(ipgf2-1)+m2
+                                 ig1 = iso1 + n1*(ipgf1 - 1) + m1
+                                 ig2 = iso2 + n2*(ipgf2 - 1) + m2
 
-                                 intloc(ig1, ig2) = intloc(ig1, ig2)+Qlm_gg(ig1, ig2, iso)*hab_sph(iso)
+                                 intloc(ig1, ig2) = intloc(ig1, ig2) + Qlm_gg(ig1, ig2, iso)*hab_sph(iso)
 
                               END DO ! icg
                            END DO ! iso
 
                         END DO ! ipgf2
                      END DO ! ipgf1
-                     m2 = m2+maxso
+                     m2 = m2 + maxso
                   END DO ! iset2
-                  m1 = m1+maxso
+                  m1 = m1 + maxso
                END DO ! iset1
 
                IF (grid_distributed) THEN
@@ -676,26 +676,26 @@ CONTAINS
                   rho_atom => rho_atom_set(iatom)
                   CALL get_rho_atom(rho_atom=rho_atom, ga_Vlocal_gb_h=int_local_h, ga_Vlocal_gb_s=int_local_s)
                   DO ispin = 1, nspins
-                     int_local_h(ispin)%r_coef = int_local_h(ispin)%r_coef+intloc
-                     int_local_s(ispin)%r_coef = int_local_s(ispin)%r_coef+intloc
+                     int_local_h(ispin)%r_coef = int_local_h(ispin)%r_coef + intloc
+                     int_local_s(ispin)%r_coef = int_local_s(ispin)%r_coef + intloc
                   END DO
                END IF
 
                IF (calculate_forces) THEN
                   force_tmp(1:3) = 0.0_dp
                   DO iso = 1, nsoset(l0_ikind)
-                     force_tmp(1) = force_tmp(1)+Qlm(iso)*hdab_sph(1, iso)
-                     force_tmp(2) = force_tmp(2)+Qlm(iso)*hdab_sph(2, iso)
-                     force_tmp(3) = force_tmp(3)+Qlm(iso)*hdab_sph(3, iso)
+                     force_tmp(1) = force_tmp(1) + Qlm(iso)*hdab_sph(1, iso)
+                     force_tmp(2) = force_tmp(2) + Qlm(iso)*hdab_sph(2, iso)
+                     force_tmp(3) = force_tmp(3) + Qlm(iso)*hdab_sph(3, iso)
                   END DO
-                  force(ikind)%g0s_Vh_elec(1:3, iat) = force(ikind)%g0s_Vh_elec(1:3, iat)+force_tmp(1:3)
+                  force(ikind)%g0s_Vh_elec(1:3, iat) = force(ikind)%g0s_Vh_elec(1:3, iat) + force_tmp(1:3)
                END IF
                IF (use_virial) THEN
                   my_virial_a = 0.0_dp
                   DO iso = 1, nsoset(l0_ikind)
                      DO ii = 1, 3
                      DO i = 1, 3
-                        virial%pv_virial(i, ii) = virial%pv_virial(i, ii)+Qlm(iso)*a_hdab_sph(i, ii, iso)
+                        virial%pv_virial(i, ii) = virial%pv_virial(i, ii) + Qlm(iso)*a_hdab_sph(i, ii, iso)
                      END DO
                      END DO
                   END DO

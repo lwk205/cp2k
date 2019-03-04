@@ -10,21 +10,21 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE qs_p_env_types
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE cp_fm_types,                     ONLY: cp_fm_p_type
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE hartree_local_types,             ONLY: hartree_local_release,&
-                                              hartree_local_type
-   USE kinds,                           ONLY: dp
-   USE preconditioner_types,            ONLY: destroy_preconditioner,&
-                                              preconditioner_type
-   USE qs_kpp1_env_types,               ONLY: kpp1_release,&
-                                              qs_kpp1_env_type
-   USE qs_local_rho_types,              ONLY: local_rho_set_release,&
-                                              local_rho_type
-   USE qs_rho_types,                    ONLY: qs_rho_release,&
-                                              qs_rho_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE cp_fm_types, ONLY: cp_fm_p_type
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE hartree_local_types, ONLY: hartree_local_release, &
+                                  hartree_local_type
+   USE kinds, ONLY: dp
+   USE preconditioner_types, ONLY: destroy_preconditioner, &
+                                   preconditioner_type
+   USE qs_kpp1_env_types, ONLY: kpp1_release, &
+                                qs_kpp1_env_type
+   USE qs_local_rho_types, ONLY: local_rho_set_release, &
+                                 local_rho_type
+   USE qs_rho_types, ONLY: qs_rho_release, &
+                           qs_rho_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -116,7 +116,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(p_env))
       CPASSERT(p_env%ref_count > 0)
-      p_env%ref_count = p_env%ref_count+1
+      p_env%ref_count = p_env%ref_count + 1
    END SUBROUTINE p_env_retain
 
 ! **************************************************************************************************
@@ -136,7 +136,7 @@ CONTAINS
 
       IF (ASSOCIATED(p_env)) THEN
          CPASSERT(p_env%ref_count > 0)
-         p_env%ref_count = p_env%ref_count-1
+         p_env%ref_count = p_env%ref_count - 1
          IF (p_env%ref_count < 1) THEN
             CALL kpp1_release(p_env%kpp1_env)
             CALL cp_fm_vect_dealloc(p_env%S_psi0)

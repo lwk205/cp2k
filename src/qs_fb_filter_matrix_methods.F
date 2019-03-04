@@ -5,54 +5,54 @@
 
 MODULE qs_fb_filter_matrix_methods
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_distribution_type,&
-                                              dbcsr_finalize,&
-                                              dbcsr_get_info,&
-                                              dbcsr_get_stored_coordinates,&
-                                              dbcsr_put_block,&
-                                              dbcsr_type,&
-                                              dbcsr_type_no_symmetry
-   USE fermi_utils,                     ONLY: Fermi,&
-                                              FermiFixed
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              int_8
-   USE message_passing,                 ONLY: mp_alltoall
-   USE particle_types,                  ONLY: particle_type
-   USE qs_fb_atomic_halo_types,         ONLY: fb_atomic_halo_create,&
-                                              fb_atomic_halo_get,&
-                                              fb_atomic_halo_list_get,&
-                                              fb_atomic_halo_list_obj,&
-                                              fb_atomic_halo_nullify,&
-                                              fb_atomic_halo_obj,&
-                                              fb_atomic_halo_release,&
-                                              fb_atomic_halo_set
-   USE qs_fb_atomic_matrix_methods,     ONLY: fb_atmatrix_calc_size,&
-                                              fb_atmatrix_construct,&
-                                              fb_atmatrix_construct_2,&
-                                              fb_atmatrix_generate_com_pairs_2
-   USE qs_fb_com_tasks_types,           ONLY: &
-        TASK_COST, TASK_DEST, TASK_N_RECORDS, TASK_PAIR, TASK_SRC, &
-        fb_com_atom_pairs_calc_buffer_sizes, fb_com_atom_pairs_create, fb_com_atom_pairs_decode, &
-        fb_com_atom_pairs_distribute_blks, fb_com_atom_pairs_gather_blks, fb_com_atom_pairs_get, &
-        fb_com_atom_pairs_has_data, fb_com_atom_pairs_init, fb_com_atom_pairs_nullify, &
-        fb_com_atom_pairs_obj, fb_com_atom_pairs_release, fb_com_tasks_build_atom_pairs, &
-        fb_com_tasks_create, fb_com_tasks_encode_pair, fb_com_tasks_nullify, fb_com_tasks_obj, &
-        fb_com_tasks_release, fb_com_tasks_set, fb_com_tasks_transpose_dest_src
-   USE qs_fb_matrix_data_types,         ONLY: fb_matrix_data_add,&
-                                              fb_matrix_data_create,&
-                                              fb_matrix_data_has_data,&
-                                              fb_matrix_data_nullify,&
-                                              fb_matrix_data_obj,&
-                                              fb_matrix_data_release
-   USE qs_fb_trial_fns_types,           ONLY: fb_trial_fns_get,&
-                                              fb_trial_fns_obj
-   USE string_utilities,                ONLY: compress,&
-                                              uppercase
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_distribution_type, &
+                        dbcsr_finalize, &
+                        dbcsr_get_info, &
+                        dbcsr_get_stored_coordinates, &
+                        dbcsr_put_block, &
+                        dbcsr_type, &
+                        dbcsr_type_no_symmetry
+   USE fermi_utils, ONLY: Fermi, &
+                          FermiFixed
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    int_8
+   USE message_passing, ONLY: mp_alltoall
+   USE particle_types, ONLY: particle_type
+   USE qs_fb_atomic_halo_types, ONLY: fb_atomic_halo_create, &
+                                      fb_atomic_halo_get, &
+                                      fb_atomic_halo_list_get, &
+                                      fb_atomic_halo_list_obj, &
+                                      fb_atomic_halo_nullify, &
+                                      fb_atomic_halo_obj, &
+                                      fb_atomic_halo_release, &
+                                      fb_atomic_halo_set
+   USE qs_fb_atomic_matrix_methods, ONLY: fb_atmatrix_calc_size, &
+                                          fb_atmatrix_construct, &
+                                          fb_atmatrix_construct_2, &
+                                          fb_atmatrix_generate_com_pairs_2
+   USE qs_fb_com_tasks_types, ONLY: &
+      TASK_COST, TASK_DEST, TASK_N_RECORDS, TASK_PAIR, TASK_SRC, &
+      fb_com_atom_pairs_calc_buffer_sizes, fb_com_atom_pairs_create, fb_com_atom_pairs_decode, &
+      fb_com_atom_pairs_distribute_blks, fb_com_atom_pairs_gather_blks, fb_com_atom_pairs_get, &
+      fb_com_atom_pairs_has_data, fb_com_atom_pairs_init, fb_com_atom_pairs_nullify, &
+      fb_com_atom_pairs_obj, fb_com_atom_pairs_release, fb_com_tasks_build_atom_pairs, &
+      fb_com_tasks_create, fb_com_tasks_encode_pair, fb_com_tasks_nullify, fb_com_tasks_obj, &
+      fb_com_tasks_release, fb_com_tasks_set, fb_com_tasks_transpose_dest_src
+   USE qs_fb_matrix_data_types, ONLY: fb_matrix_data_add, &
+                                      fb_matrix_data_create, &
+                                      fb_matrix_data_has_data, &
+                                      fb_matrix_data_nullify, &
+                                      fb_matrix_data_obj, &
+                                      fb_matrix_data_release
+   USE qs_fb_trial_fns_types, ONLY: fb_trial_fns_get, &
+                                    fb_trial_fns_obj
+   USE string_utilities, ONLY: compress, &
+                               uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -111,7 +111,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: tolerance
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_build', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=32)                                  :: symmetry_string
       CHARACTER(LEN=default_string_length)               :: name_string
@@ -272,7 +272,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: tolerance
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_build_2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: name_string
       INTEGER                                            :: handle, iblkcol, ihalo, ikind, &
@@ -388,7 +388,7 @@ CONTAINS
       DO ihalo = 1, nhalos
          CALL fb_atomic_halo_get(atomic_halo=halos(ihalo), &
                                  natoms=natoms_in_halo)
-         nmax = nmax+natoms_in_halo
+         nmax = nmax + natoms_in_halo
       END DO
       CALL fb_matrix_data_create(filter_mat_data, &
                                  nmax, &
@@ -479,16 +479,16 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: tolerance
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_add_blkcol', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, handle_mpi, iatom_global, iatom_in_halo, ind, ipair, ipe, itrial, &
-         jatom_global, jatom_in_halo, jkind, natoms_global, natoms_in_halo, ncols_atmatrix, &
-         ncols_blk, nrows_atmatrix, nrows_blk, numprocs, pe, recv_encode, send_encode, stat
+                 jatom_global, jatom_in_halo, jkind, natoms_global, natoms_in_halo, ncols_atmatrix, &
+                 ncols_blk, nrows_atmatrix, nrows_blk, numprocs, pe, recv_encode, send_encode, stat
       INTEGER(KIND=int_8), DIMENSION(:), POINTER         :: pairs_recv, pairs_send
       INTEGER, ALLOCATABLE, DIMENSION(:) :: atomic_H_blk_col_start, atomic_H_blk_row_start, &
-         atomic_S_blk_col_start, atomic_S_blk_row_start, col_block_size_data, ind_in_halo, &
-         recv_disps, recv_pair_count, recv_pair_disps, recv_sizes, send_disps, send_pair_count, &
-         send_pair_disps, send_sizes
+                                            atomic_S_blk_col_start, atomic_S_blk_row_start, col_block_size_data, ind_in_halo, &
+                                            recv_disps, recv_pair_count, recv_pair_disps, recv_sizes, send_disps, send_pair_count, &
+                                            send_pair_disps, send_sizes
       INTEGER, DIMENSION(:), POINTER                     :: halo_atoms, ntfns, row_block_size_data
       INTEGER, DIMENSION(:, :), POINTER                  :: tfns
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: recv_buf, send_buf
@@ -584,8 +584,8 @@ CONTAINS
                               halo_atoms=halo_atoms)
 
       ! construct atomic matrix for H for atomic_halo
-      ALLOCATE (atomic_H_blk_row_start(natoms_in_halo+1), &
-                atomic_H_blk_col_start(natoms_in_halo+1), &
+      ALLOCATE (atomic_H_blk_row_start(natoms_in_halo + 1), &
+                atomic_H_blk_col_start(natoms_in_halo + 1), &
                 STAT=stat)
       CPASSERT(stat == 0)
       CALL fb_atmatrix_calc_size(H_mat, &
@@ -604,8 +604,8 @@ CONTAINS
                                  atomic_H_blk_col_start)
 
       ! construct atomic matrix for S for atomic_halo
-      ALLOCATE (atomic_S_blk_row_start(natoms_in_halo+1), &
-                atomic_S_blk_col_start(natoms_in_halo+1), &
+      ALLOCATE (atomic_S_blk_row_start(natoms_in_halo + 1), &
+                atomic_S_blk_col_start(natoms_in_halo + 1), &
                 STAT=stat)
       CPASSERT(stat == 0)
       CALL fb_atmatrix_calc_size(S_mat, &
@@ -653,7 +653,7 @@ CONTAINS
       DO ipe = 1, numprocs
          send_sizes(ipe) = 0
          DO ipair = 1, send_pair_count(ipe)
-            CALL fb_com_atom_pairs_decode(pairs_send(send_pair_disps(ipe)+ipair), &
+            CALL fb_com_atom_pairs_decode(pairs_send(send_pair_disps(ipe) + ipair), &
                                           pe, iatom_global, jatom_global, &
                                           send_encode)
             iatom_in_halo = ind_in_halo(iatom_global)
@@ -668,28 +668,28 @@ CONTAINS
 
             ! do it column-wise one trial function at a time
             DO itrial = 1, ntfns(jkind)
-               ind = send_disps(ipe)+send_sizes(ipe)+(itrial-1)*nrows_blk
+               ind = send_disps(ipe) + send_sizes(ipe) + (itrial - 1)*nrows_blk
                CALL dgemv("N", &
                           nrows_blk, &
                           ncols_atmatrix, &
                           1.0_dp, &
                           atomic_filter_mat( &
                           atomic_H_blk_row_start(iatom_in_halo): &
-                          atomic_H_blk_row_start(iatom_in_halo+1)-1, &
+                          atomic_H_blk_row_start(iatom_in_halo + 1) - 1, &
                           1:ncols_atmatrix &
                           ), &
                           nrows_blk, &
                           atomic_S( &
                           1:nrows_atmatrix, &
-                          atomic_S_blk_col_start(jatom_in_halo)+ &
-                          tfns(itrial, jkind)-1 &
+                          atomic_S_blk_col_start(jatom_in_halo) + &
+                          tfns(itrial, jkind) - 1 &
                           ), &
                           1, &
                           0.0_dp, &
-                          send_buf(ind+1:ind+nrows_blk), &
+                          send_buf(ind + 1:ind + nrows_blk), &
                           1)
             END DO ! itrial
-            send_sizes(ipe) = send_sizes(ipe)+nrows_blk*ncols_blk
+            send_sizes(ipe) = send_sizes(ipe) + nrows_blk*ncols_blk
          END DO ! ipair
       END DO ! ipe
 
@@ -726,16 +726,16 @@ CONTAINS
       DO ipe = 1, numprocs
          recv_sizes(ipe) = 0
          DO ipair = 1, recv_pair_count(ipe)
-            CALL fb_com_atom_pairs_decode(pairs_recv(recv_pair_disps(ipe)+ipair), &
+            CALL fb_com_atom_pairs_decode(pairs_recv(recv_pair_disps(ipe) + ipair), &
                                           pe, iatom_global, jatom_global, &
                                           recv_encode)
             nrows_blk = row_block_size_data(iatom_global)
             ncols_blk = col_block_size_data(jatom_global)
-            ind = recv_disps(ipe)+recv_sizes(ipe)
+            ind = recv_disps(ipe) + recv_sizes(ipe)
             CALL dbcsr_put_block(filter_mat, &
                                  iatom_global, jatom_global, &
-                                 recv_buf((ind+1):(ind+nrows_blk*ncols_blk)))
-            recv_sizes(ipe) = recv_sizes(ipe)+nrows_blk*ncols_blk
+                                 recv_buf((ind + 1):(ind + nrows_blk*ncols_blk)))
+            recv_sizes(ipe) = recv_sizes(ipe) + nrows_blk*ncols_blk
          END DO ! ipair
       END DO ! ipe
 
@@ -796,13 +796,13 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: tolerance
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_add_blkcol_2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, iatom_global, iatom_in_halo, itrial, jatom_global, jatom_in_halo, jkind, &
-         natoms_global, natoms_in_halo, ncols_atmatrix, ncols_blk, ncols_blk_max, nrows_atmatrix, &
-         nrows_blk, nrows_blk_max, stat
+                 natoms_global, natoms_in_halo, ncols_atmatrix, ncols_blk, ncols_blk_max, nrows_atmatrix, &
+                 nrows_blk, nrows_blk_max, stat
       INTEGER, ALLOCATABLE, DIMENSION(:) :: atomic_H_blk_col_start, atomic_H_blk_row_start, &
-         atomic_S_blk_col_start, atomic_S_blk_row_start, col_block_size_data
+                                            atomic_S_blk_col_start, atomic_S_blk_row_start, col_block_size_data
       INTEGER, DIMENSION(:), POINTER                     :: halo_atoms, ntfns, row_block_size_data
       INTEGER, DIMENSION(:, :), POINTER                  :: tfns
       LOGICAL                                            :: check_ok
@@ -843,8 +843,8 @@ CONTAINS
                               halo_atoms=halo_atoms)
 
       ! construct atomic matrix for H for atomic_halo
-      ALLOCATE (atomic_H_blk_row_start(natoms_in_halo+1), &
-                atomic_H_blk_col_start(natoms_in_halo+1), &
+      ALLOCATE (atomic_H_blk_row_start(natoms_in_halo + 1), &
+                atomic_H_blk_col_start(natoms_in_halo + 1), &
                 STAT=stat)
       CPASSERT(stat == 0)
       CALL fb_atmatrix_calc_size(H_mat, &
@@ -861,8 +861,8 @@ CONTAINS
                                    atomic_H_blk_col_start)
 
       ! construct atomic matrix for S for atomic_halo
-      ALLOCATE (atomic_S_blk_row_start(natoms_in_halo+1), &
-                atomic_S_blk_col_start(natoms_in_halo+1), &
+      ALLOCATE (atomic_S_blk_row_start(natoms_in_halo + 1), &
+                atomic_S_blk_col_start(natoms_in_halo + 1), &
                 STAT=stat)
       CPASSERT(stat == 0)
       CALL fb_atmatrix_calc_size(S_mat, &
@@ -920,14 +920,14 @@ CONTAINS
                        1.0_dp, &
                        atomic_filter_mat( &
                        atomic_H_blk_row_start(iatom_in_halo): &
-                       atomic_H_blk_row_start(iatom_in_halo+1)-1, &
+                       atomic_H_blk_row_start(iatom_in_halo + 1) - 1, &
                        1:ncols_atmatrix &
                        ), &
                        nrows_blk, &
                        atomic_S( &
                        1:nrows_atmatrix, &
-                       atomic_S_blk_col_start(jatom_in_halo)+ &
-                       tfns(itrial, jkind)-1 &
+                       atomic_S_blk_col_start(jatom_in_halo) + &
+                       tfns(itrial, jkind) - 1 &
                        ), &
                        1, &
                        0.0_dp, &
@@ -980,7 +980,7 @@ CONTAINS
       TYPE(fb_com_atom_pairs_obj), INTENT(INOUT)         :: atom_pairs_send, atom_pairs_recv
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_generate_com_pairs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dest, handle, iatom_global, &
                                                             iatom_in_halo, itask, jatom_global, &
@@ -1060,7 +1060,7 @@ CONTAINS
                                        nblkrows_total)
          ! calculation of cost not implemented at the moment
          tasks_send(TASK_COST, itask) = 0
-         itask = itask+1
+         itask = itask + 1
       END DO ! iatom_in_halo
 
       CALL fb_com_tasks_create(com_tasks_recv)
@@ -1119,10 +1119,10 @@ CONTAINS
       TYPE(fb_com_atom_pairs_obj), INTENT(INOUT)         :: atom_pairs_send, atom_pairs_recv
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_generate_com_pairs_2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: dest, handle, iatom_global, iatom_in_halo, iatom_stored, ihalo, itask, &
-         jatom_global, jatom_stored, natoms_in_halo, nblkrows_total, nhalos, ntasks_send, src
+                 jatom_global, jatom_stored, natoms_in_halo, nblkrows_total, nhalos, ntasks_send, src
       INTEGER(KIND=int_8), DIMENSION(:, :), POINTER      :: tasks_send
       INTEGER, DIMENSION(:), POINTER                     :: halo_atoms
       LOGICAL                                            :: transpose
@@ -1165,7 +1165,7 @@ CONTAINS
       DO ihalo = 1, nhalos
          CALL fb_atomic_halo_get(atomic_halo=halos(ihalo), &
                                  natoms=natoms_in_halo)
-         ntasks_send = ntasks_send+natoms_in_halo
+         ntasks_send = ntasks_send + natoms_in_halo
       END DO ! ihalo
 
       ! allocate send tasks
@@ -1206,12 +1206,12 @@ CONTAINS
                                           nblkrows_total)
             ! calculation of cost not implemented at the moment
             tasks_send(TASK_COST, itask) = 0
-            itask = itask+1
+            itask = itask + 1
          END DO ! iatom_in_halo
       END DO ! ihalo
 
       ! get the actual number of tasks
-      ntasks_send = itask-1
+      ntasks_send = itask - 1
 
       CALL fb_com_tasks_create(com_tasks_send)
       CALL fb_com_tasks_set(com_tasks=com_tasks_send, &
@@ -1268,7 +1268,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: tolerance
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fb_fltrmat_build_atomic_fltrmat', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, handle_dgemm, handle_dsygv, ii, &
                                                             info, jj, mat_dim, work_array_size
@@ -1420,7 +1420,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: T, mu
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_fltrmat_fermi_dirac_mu', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: kTS, ne
 
@@ -1445,7 +1445,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: T, ne, maxocc
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_fltrmat_fermi_dirac_ne', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: kTS, mu
 

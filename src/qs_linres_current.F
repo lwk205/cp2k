@@ -13,115 +13,115 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE qs_linres_current
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_array_utils,                  ONLY: cp_2d_i_p_type,&
-                                              cp_2d_r_p_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_scale_and_add,&
-                                              cp_fm_trace
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE cube_utils,                      ONLY: cube_info_type
-   USE dbcsr_api,                       ONLY: &
-        convert_offsets_to_sizes, dbcsr_add_block_node, dbcsr_copy, dbcsr_create, &
-        dbcsr_deallocate_matrix, dbcsr_distribution_type, dbcsr_finalize, dbcsr_get_block_p, &
-        dbcsr_p_type, dbcsr_set, dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry
-   USE gaussian_gridlevels,             ONLY: gridlevel_info_type
-   USE input_constants,                 ONLY: current_gauge_atom
-   USE input_section_types,             ONLY: section_get_ivals,&
-                                              section_get_lval,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: twopi
-   USE memory_utilities,                ONLY: reallocate
-   USE orbital_pointers,                ONLY: ncoset
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_integrate_function,&
-                                              pw_scale,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: collocate_pgf_product_rspace
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_linres_atom_current,          ONLY: calculate_jrho_atom,&
-                                              calculate_jrho_atom_coeff,&
-                                              calculate_jrho_atom_rad
-   USE qs_linres_op,                    ONLY: fac_vecp,&
-                                              fm_scale_by_pbc_AC,&
-                                              ind_m2,&
-                                              set_vecp,&
-                                              set_vecp_rev
-   USE qs_linres_types,                 ONLY: current_env_type,&
-                                              get_current_env,&
-                                              realspaces_grid_p_type
-   USE qs_matrix_pools,                 ONLY: qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_modify_pab_block,             ONLY: FUNC_AB,&
-                                              FUNC_ADBmDAB,&
-                                              FUNC_ARDBmDARB
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_operators_ao,                 ONLY: build_lin_mom_matrix,&
-                                              rRc_xyz_der_ao
-   USE qs_rho_types,                    ONLY: qs_rho_get
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE realspace_grid_types,            ONLY: &
-        realspace_grid_desc_p_type, realspace_grid_desc_type, realspace_grid_p_type, &
-        realspace_grid_type, rs_grid_create, rs_grid_mult_and_add, rs_grid_release, &
-        rs_grid_retain, rs_grid_zero
-   USE rs_pw_interface,                 ONLY: density_rs2pw
-   USE task_list_methods,               ONLY: distribute_tasks,&
-                                              int2pair,&
-                                              rs_distribute_matrix,&
-                                              task_list_inner_loop
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_array_utils, ONLY: cp_2d_i_p_type, &
+                             cp_2d_r_p_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_scale_and_add, &
+                                 cp_fm_trace
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE cube_utils, ONLY: cube_info_type
+   USE dbcsr_api, ONLY: &
+      convert_offsets_to_sizes, dbcsr_add_block_node, dbcsr_copy, dbcsr_create, &
+      dbcsr_deallocate_matrix, dbcsr_distribution_type, dbcsr_finalize, dbcsr_get_block_p, &
+      dbcsr_p_type, dbcsr_set, dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry
+   USE gaussian_gridlevels, ONLY: gridlevel_info_type
+   USE input_constants, ONLY: current_gauge_atom
+   USE input_section_types, ONLY: section_get_ivals, &
+                                  section_get_lval, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: default_path_length, &
+                    dp, &
+                    int_8
+   USE mathconstants, ONLY: twopi
+   USE memory_utilities, ONLY: reallocate
+   USE orbital_pointers, ONLY: ncoset
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_integrate_function, &
+                         pw_scale, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: collocate_pgf_product_rspace
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_linres_atom_current, ONLY: calculate_jrho_atom, &
+                                     calculate_jrho_atom_coeff, &
+                                     calculate_jrho_atom_rad
+   USE qs_linres_op, ONLY: fac_vecp, &
+                           fm_scale_by_pbc_AC, &
+                           ind_m2, &
+                           set_vecp, &
+                           set_vecp_rev
+   USE qs_linres_types, ONLY: current_env_type, &
+                              get_current_env, &
+                              realspaces_grid_p_type
+   USE qs_matrix_pools, ONLY: qs_matrix_pools_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_modify_pab_block, ONLY: FUNC_AB, &
+                                  FUNC_ADBmDAB, &
+                                  FUNC_ARDBmDARB
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_operators_ao, ONLY: build_lin_mom_matrix, &
+                              rRc_xyz_der_ao
+   USE qs_rho_types, ONLY: qs_rho_get
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE realspace_grid_types, ONLY: &
+      realspace_grid_desc_p_type, realspace_grid_desc_type, realspace_grid_p_type, &
+      realspace_grid_type, rs_grid_create, rs_grid_mult_and_add, rs_grid_release, &
+      rs_grid_retain, rs_grid_zero
+   USE rs_pw_interface, ONLY: density_rs2pw
+   USE task_list_methods, ONLY: distribute_tasks, &
+                                int2pair, &
+                                rs_distribute_matrix, &
+                                task_list_inner_loop
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -176,7 +176,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iB
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_build_current', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: ext, filename, my_pos
       INTEGER                                            :: handle, idir, iiB, iiiB, ispin, istate, &
@@ -354,7 +354,7 @@ CONTAINS
             !
             ! Copy the vector in the full matrix psi1
             !nstate_loc = center_list(ispin)%array(1,icenter+1)-center_list(ispin)%array(1,icenter)
-            DO j = center_list(ispin)%array(1, istate), center_list(ispin)%array(1, istate+1)-1
+            DO j = center_list(ispin)%array(1, istate), center_list(ispin)%array(1, istate + 1) - 1
                jstate = center_list(ispin)%array(2, j)
                CALL cp_fm_to_fm(psi1_p(ispin, iiB)%matrix, psi_a_iB, 1, jstate, jstate)
                CALL cp_fm_to_fm(psi1_p(ispin, iiiB)%matrix, psi_buf, 1, jstate, jstate)
@@ -424,7 +424,7 @@ CONTAINS
 
             IF (output_unit > 0) THEN
                WRITE (output_unit, '(T2,2(A,E24.16))') 'Integrated j_'&
-                    &//ACHAR(idir+119)//ACHAR(iB+119)//'(r): G-space=', &
+                    &//ACHAR(idir + 119)//ACHAR(iB + 119)//'(r): G-space=', &
                      jrho_tot_G(idir, iB), ' R-space=', jrho_tot_R(idir, iB)
             ENDIF
             !
@@ -490,7 +490,7 @@ CONTAINS
             filename = "jresp"
             mpi_io = .TRUE.
             WRITE (ext, '(a2,I1,a2,I1,a5)') "iB", iB, "_d", idir, ".cube"
-            WRITE (ext, '(a2,a1,a2,a1,a5)') "iB", ACHAR(iB+119), "_d", ACHAR(idir+119), ".cube"
+            WRITE (ext, '(a2,a1,a2,a1,a5)') "iB", ACHAR(iB + 119), "_d", ACHAR(idir + 119), ".cube"
             unit_nr = cp_print_key_unit_nr(logger, current_section, "PRINT%CURRENT_CUBES", &
                                            extension=TRIM(ext), middle_name=TRIM(filename), &
                                            log_filename=.FALSE., file_position=my_pos, &
@@ -581,21 +581,21 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: soft_valid, retain_rsgrid
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_jrho_resp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: max_tasks = 2000
 
       INTEGER :: bcol, brow, cindex, curr_tasks, handle, i, iatom, iatom_old, idir2, igrid_level, &
-         iiB, iiiB, ikind, ikind_old, ipgf, iset, iset_old, itask, ithread, jatom, jatom_old, &
-         jkind, jkind_old, jpgf, jset, jset_old, lmax_global, maxco, maxpgf, maxset, maxsgf, &
-         maxsgf_set, na1, na2, natom, nb1, nb2, ncoa, ncob, nimages, nkind, nseta, nsetb, ntasks, &
-         nthread, sgfa, sgfb
+                 iiB, iiiB, ikind, ikind_old, ipgf, iset, iset_old, itask, ithread, jatom, jatom_old, &
+                 jkind, jkind_old, jpgf, jset, jset_old, lmax_global, maxco, maxpgf, maxset, maxsgf, &
+                 maxsgf_set, na1, na2, natom, nb1, nb2, ncoa, ncob, nimages, nkind, nseta, nsetb, ntasks, &
+                 nthread, sgfa, sgfb
       INTEGER(kind=int_8), DIMENSION(:), POINTER         :: atom_pair_recv, atom_pair_send
       INTEGER(kind=int_8), DIMENSION(:, :), POINTER      :: tasks
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, mylmax, &
                                                             npgfa, npgfb, nsgfa, nsgfb
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgfa, first_sgfb
       LOGICAL :: atom_pair_changed, den_found, den_found_a, distributed_rs_grids, do_igaim, &
-         map_consistent, my_retain_rsgrid, my_soft
+                 map_consistent, my_retain_rsgrid, my_soft
       REAL(dp), DIMENSION(:, :, :), POINTER              :: my_current, my_gauge, my_rho
       REAL(KIND=dp)                                      :: eps_rho_rspace, kind_radius_a, &
                                                             kind_radius_b, Lxo2, Lyo2, Lzo2, rab2, &
@@ -603,8 +603,8 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(3)                        :: ra, rab, rb
       REAL(KIND=dp), DIMENSION(:), POINTER               :: set_radius_a, set_radius_b
       REAL(KIND=dp), DIMENSION(:, :), POINTER :: dist_ab, jp_block_a, jp_block_b, jp_block_c, &
-         jp_block_d, jpab_a, jpab_b, jpab_c, jpab_d, jpblock_a, jpblock_b, jpblock_c, jpblock_d, &
-         rpgfa, rpgfb, sphi_a, sphi_b, work, zeta, zetb
+                                           jp_block_d, jpab_a, jpab_b, jpab_c, jpab_d, jpblock_a, jpblock_b, jpblock_c, jpblock_d, &
+                                                 rpgfa, rpgfb, sphi_a, sphi_b, work, zeta, zetb
       REAL(KIND=dp), DIMENSION(:, :, :), POINTER         :: jpabt_a, jpabt_b, jpabt_c, jpabt_d, workt
       TYPE(cell_type), POINTER                           :: cell
       TYPE(cp_para_env_type), POINTER                    :: para_env
@@ -712,11 +712,11 @@ CONTAINS
 
       nkind = SIZE(qs_kind_set)
 
-      CALL reallocate(jpabt_a, 1, maxco, 1, maxco, 0, nthread-1)
-      CALL reallocate(jpabt_b, 1, maxco, 1, maxco, 0, nthread-1)
-      CALL reallocate(jpabt_c, 1, maxco, 1, maxco, 0, nthread-1)
-      CALL reallocate(jpabt_d, 1, maxco, 1, maxco, 0, nthread-1)
-      CALL reallocate(workt, 1, maxco, 1, maxsgf_set, 0, nthread-1)
+      CALL reallocate(jpabt_a, 1, maxco, 1, maxco, 0, nthread - 1)
+      CALL reallocate(jpabt_b, 1, maxco, 1, maxco, 0, nthread - 1)
+      CALL reallocate(jpabt_c, 1, maxco, 1, maxco, 0, nthread - 1)
+      CALL reallocate(jpabt_d, 1, maxco, 1, maxco, 0, nthread - 1)
+      CALL reallocate(workt, 1, maxco, 1, maxsgf_set, 0, nthread - 1)
       CALL reallocate(tasks, 1, 6, 1, max_tasks)
       CALL reallocate(dist_ab, 1, 3, 1, max_tasks)
 
@@ -754,7 +754,7 @@ CONTAINS
 
       ! ga_gb_function can be one of FUNC_AB, FUNC_ADBmDAB or FUNC_ARDBm_DARB
       ! take worst case and add 2 to lmax_global
-      lmax_global = lmax_global+2
+      lmax_global = lmax_global + 2
 
       !   *** Initialize working density matrix ***
 
@@ -1108,13 +1108,13 @@ CONTAINS
          ENDIF
 
          rab(:) = dist_ab(:, itask)
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
-         rb(:) = ra(:)+rab(:)
-         zetp = zeta(ipgf, iset)+zetb(jpgf, jset)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
+         rb(:) = ra(:) + rab(:)
+         zetp = zeta(ipgf, iset) + zetb(jpgf, jset)
 
-         na1 = (ipgf-1)*ncoset(la_max(iset))+1
+         na1 = (ipgf - 1)*ncoset(la_max(iset)) + 1
          na2 = ipgf*ncoset(la_max(iset))
-         nb1 = (jpgf-1)*ncoset(lb_max(jset))+1
+         nb1 = (jpgf - 1)*ncoset(lb_max(jset)) + 1
          nb2 = jpgf*ncoset(lb_max(jset))
 
          ! Four calls to the general collocate density, to multply the correct function
@@ -1126,7 +1126,7 @@ CONTAINS
          scale = 1.0_dp
          CALL collocate_pgf_product_rspace(la_max(iset), zeta(ipgf, iset), &
                                            la_min(iset), lb_max(jset), zetb(jpgf, jset), lb_min(jset), &
-                                           ra, rab, rab2, scale, jpab_a, na1-1, nb1-1, &
+                                           ra, rab, rab2, scale, jpab_a, na1 - 1, nb1 - 1, &
                                            rs_current(igrid_level)%rs_grid, cell, cube_info(igrid_level), &
                                            eps_rho_rspace, &
                                            ga_gb_function=FUNC_ADBmDAB, &
@@ -1138,7 +1138,7 @@ CONTAINS
             IF (scale2 .NE. 0.0_dp) THEN
                CALL collocate_pgf_product_rspace(la_max(iset), zeta(ipgf, iset), &
                                                  la_min(iset), lb_max(jset), zetb(jpgf, jset), lb_min(jset), &
-                                                 ra, rab, rab2, scale2, jpab_d, na1-1, nb1-1, &
+                                                 ra, rab, rab2, scale2, jpab_d, na1 - 1, nb1 - 1, &
                                                  rs_rho(igrid_level)%rs_grid, cell, cube_info(igrid_level), &
                                                  eps_rho_rspace, &
                                                  ga_gb_function=FUNC_AB, &
@@ -1150,7 +1150,7 @@ CONTAINS
             scale = 1.0_dp
             CALL collocate_pgf_product_rspace(la_max(iset), zeta(ipgf, iset), &
                                               la_min(iset), lb_max(jset), zetb(jpgf, jset), lb_min(jset), &
-                                              ra, rab, rab2, scale, jpab_b, na1-1, nb1-1, &
+                                              ra, rab, rab2, scale, jpab_b, na1 - 1, nb1 - 1, &
                                               rs_current(igrid_level)%rs_grid, cell, cube_info(igrid_level), &
                                               eps_rho_rspace, &
                                               ga_gb_function=FUNC_ADBmDAB, &
@@ -1164,7 +1164,7 @@ CONTAINS
             scale = -1.0_dp
             CALL collocate_pgf_product_rspace(la_max(iset), zeta(ipgf, iset), &
                                               la_min(iset), lb_max(jset), zetb(jpgf, jset), lb_min(jset), &
-                                              ra, rab, rab2, scale, jpab_c, na1-1, nb1-1, &
+                                              ra, rab, rab2, scale, jpab_c, na1 - 1, nb1 - 1, &
                                               rs_current(igrid_level)%rs_grid, cell, cube_info(igrid_level), &
                                               eps_rho_rspace, &
                                               ga_gb_function=FUNC_ADBmDAB, &
@@ -1179,7 +1179,7 @@ CONTAINS
             scale = 1.0_dp
             CALL collocate_pgf_product_rspace(la_max(iset), zeta(ipgf, iset), &
                                               la_min(iset), lb_max(jset), zetb(jpgf, jset), lb_min(jset), &
-                                              ra, rab, rab2, scale, jpab_b, na1-1, nb1-1, &
+                                              ra, rab, rab2, scale, jpab_b, na1 - 1, nb1 - 1, &
                                               rs_current(igrid_level)%rs_grid, cell, cube_info(igrid_level), &
                                               eps_rho_rspace, &
                                               ga_gb_function=FUNC_ARDBmDARB, &
@@ -1191,7 +1191,7 @@ CONTAINS
             scale = -1.0_dp
             CALL collocate_pgf_product_rspace(la_max(iset), zeta(ipgf, iset), &
                                               la_min(iset), lb_max(jset), zetb(jpgf, jset), lb_min(jset), &
-                                              ra, rab, rab2, scale, jpab_c, na1-1, nb1-1, &
+                                              ra, rab, rab2, scale, jpab_c, na1 - 1, nb1 - 1, &
                                               rs_current(igrid_level)%rs_grid, cell, cube_info(igrid_level), &
                                               eps_rho_rspace, &
                                               ga_gb_function=FUNC_ARDBmDARB, &
@@ -1329,16 +1329,16 @@ CONTAINS
 !> \param qs_env ...
 ! **************************************************************************************************
       SUBROUTINE box_atoms(qs_env)
-      TYPE(qs_environment_type), POINTER                 :: qs_env
+         TYPE(qs_environment_type), POINTER                 :: qs_env
 
-      REAL(kind=dp), PARAMETER                           :: box_size_guess = 5.0_dp
+         REAL(kind=dp), PARAMETER                           :: box_size_guess = 5.0_dp
 
-      INTEGER                                            :: i, iatom, ibox, ii, jbox, kbox, natms
-      REAL(dp)                                           :: offset(3)
-      REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: ratom
-      TYPE(cell_type), POINTER                           :: cell
-      TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
-      TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
+         INTEGER                                            :: i, iatom, ibox, ii, jbox, kbox, natms
+         REAL(dp)                                           :: offset(3)
+         REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: ratom
+         TYPE(cell_type), POINTER                           :: cell
+         TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
+         TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
          CALL get_qs_env(qs_env=qs_env, &
                          qs_kind_set=qs_kind_set, &
@@ -1357,7 +1357,7 @@ CONTAINS
          dbox(2) = cell%hmat(2, 2)/REAL(nbox(2), dp)
          dbox(3) = cell%hmat(3, 3)/REAL(nbox(3), dp)
          !write(*,*) 'dbox',dbox
-         ALLOCATE (box_ptr(0:nbox(1), 0:nbox(2)-1, 0:nbox(3)-1), box_data(3, natms))
+         ALLOCATE (box_ptr(0:nbox(1), 0:nbox(2) - 1, 0:nbox(3) - 1), box_data(3, natms))
          box_data(:, :) = HUGE(0.0_dp)
          box_ptr(:, :, :) = HUGE(0)
          !
@@ -1365,36 +1365,36 @@ CONTAINS
          offset(2) = cell%hmat(2, 2)*0.5_dp
          offset(3) = cell%hmat(3, 3)*0.5_dp
          DO iatom = 1, natms
-            ratom(:, iatom) = pbc(particle_set(iatom)%r(:), cell)+offset(:)
+            ratom(:, iatom) = pbc(particle_set(iatom)%r(:), cell) + offset(:)
          ENDDO
          !
          i = 1
-         DO kbox = 0, nbox(3)-1
-         DO jbox = 0, nbox(2)-1
+         DO kbox = 0, nbox(3) - 1
+         DO jbox = 0, nbox(2) - 1
             box_ptr(0, jbox, kbox) = i
-            DO ibox = 0, nbox(1)-1
+            DO ibox = 0, nbox(1) - 1
                ii = 0
                DO iatom = 1, natms
                   IF (INT(ratom(1, iatom)/dbox(1)) .EQ. ibox .AND. &
                       INT(ratom(2, iatom)/dbox(2)) .EQ. jbox .AND. &
                       INT(ratom(3, iatom)/dbox(3)) .EQ. kbox) THEN
-                     box_data(:, i) = ratom(:, iatom)-offset(:)
-                     i = i+1
-                     ii = ii+1
+                     box_data(:, i) = ratom(:, iatom) - offset(:)
+                     i = i + 1
+                     ii = ii + 1
                   ENDIF
                ENDDO
-               box_ptr(ibox+1, jbox, kbox) = box_ptr(ibox, jbox, kbox)+ii
+               box_ptr(ibox + 1, jbox, kbox) = box_ptr(ibox, jbox, kbox) + ii
             ENDDO
          ENDDO
          ENDDO
          !
          IF (.FALSE.) THEN
-            DO kbox = 0, nbox(3)-1
-            DO jbox = 0, nbox(2)-1
-            DO ibox = 0, nbox(1)-1
+            DO kbox = 0, nbox(3) - 1
+            DO jbox = 0, nbox(2) - 1
+            DO ibox = 0, nbox(1) - 1
                WRITE (*, *) 'box=', ibox, jbox, kbox
-               WRITE (*, *) 'nbr atom=', box_ptr(ibox+1, jbox, kbox)-box_ptr(ibox, jbox, kbox)
-               DO iatom = box_ptr(ibox, jbox, kbox), box_ptr(ibox+1, jbox, kbox)-1
+               WRITE (*, *) 'nbr atom=', box_ptr(ibox + 1, jbox, kbox) - box_ptr(ibox, jbox, kbox)
+               DO iatom = box_ptr(ibox, jbox, kbox), box_ptr(ibox + 1, jbox, kbox) - 1
                   WRITE (*, *) 'iatom=', iatom
                   WRITE (*, '(A,3E14.6)') 'coor=', box_data(:, iatom)
                ENDDO
@@ -1415,24 +1415,24 @@ CONTAINS
 ! **************************************************************************************************
       SUBROUTINE collocate_gauge(current_env, qs_env, rs_grid_x, rs_grid_y, rs_grid_z)
          !
-      TYPE(current_env_type)                             :: current_env
-      TYPE(qs_environment_type), POINTER                 :: qs_env
-      TYPE(realspace_grid_type), POINTER                 :: rs_grid_x, rs_grid_y, rs_grid_z
+         TYPE(current_env_type)                             :: current_env
+         TYPE(qs_environment_type), POINTER                 :: qs_env
+         TYPE(realspace_grid_type), POINTER                 :: rs_grid_x, rs_grid_y, rs_grid_z
 
-      INTEGER                                            :: i, iatom, ibeg, ibox, iend, imax, imin, &
-                                                            j, jatom, jbox, jmax, jmin, k, kbox, &
-                                                            kmax, kmin, lb(3), lb_local(3), natms, &
-                                                            natms_local, ng(3)
-      REAL(KIND=dp)                                      :: ab, buf_tmp, dist, dr(3), &
-                                                            gauge_atom_radius, offset(3), pa, pb, &
-                                                            point(3), pra(3), r(3), res(3), summe, &
-                                                            tmp, x, y, z
-      REAL(kind=dp), ALLOCATABLE, DIMENSION(:)           :: buf, nrm_atms_pnt
-      REAL(kind=dp), ALLOCATABLE, DIMENSION(:, :)        :: atms_pnt, ratom
-      REAL(kind=dp), DIMENSION(:, :, :), POINTER         :: grid_x, grid_y, grid_z
-      TYPE(cell_type), POINTER                           :: cell
-      TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
-      TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
+         INTEGER                                            :: i, iatom, ibeg, ibox, iend, imax, imin, &
+                                                               j, jatom, jbox, jmax, jmin, k, kbox, &
+                                                               kmax, kmin, lb(3), lb_local(3), natms, &
+                                                               natms_local, ng(3)
+         REAL(KIND=dp)                                      :: ab, buf_tmp, dist, dr(3), &
+                                                               gauge_atom_radius, offset(3), pa, pb, &
+                                                               point(3), pra(3), r(3), res(3), summe, &
+                                                               tmp, x, y, z
+         REAL(kind=dp), ALLOCATABLE, DIMENSION(:)           :: buf, nrm_atms_pnt
+         REAL(kind=dp), ALLOCATABLE, DIMENSION(:, :)        :: atms_pnt, ratom
+         REAL(kind=dp), DIMENSION(:, :, :), POINTER         :: grid_x, grid_y, grid_z
+         TYPE(cell_type), POINTER                           :: cell
+         TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
+         TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
 !
 
@@ -1464,51 +1464,51 @@ CONTAINS
             DO j = 1, ng(2)
                DO i = 1, ng(1)
                   !
-                  point(3) = REAL(k-1+lb_local(3)-lb(3), dp)*dr(3)
-                  point(2) = REAL(j-1+lb_local(2)-lb(2), dp)*dr(2)
-                  point(1) = REAL(i-1+lb_local(1)-lb(1), dp)*dr(1)
+                  point(3) = REAL(k - 1 + lb_local(3) - lb(3), dp)*dr(3)
+                  point(2) = REAL(j - 1 + lb_local(2) - lb(2), dp)*dr(2)
+                  point(1) = REAL(i - 1 + lb_local(1) - lb(1), dp)*dr(1)
                   point = pbc(point, cell)
                   !
                   ! run over the overlaping boxes
                   natms_local = 0
-                  kmin = INT((point(3)+offset(3)-gauge_atom_radius)/dbox(3))
-                  kmax = INT((point(3)+offset(3)+gauge_atom_radius)/dbox(3))
-                  IF (kmax-kmin+1 .GT. nbox(3)) THEN
+                  kmin = INT((point(3) + offset(3) - gauge_atom_radius)/dbox(3))
+                  kmax = INT((point(3) + offset(3) + gauge_atom_radius)/dbox(3))
+                  IF (kmax - kmin + 1 .GT. nbox(3)) THEN
                      kmin = 0
-                     kmax = nbox(3)-1
+                     kmax = nbox(3) - 1
                   ENDIF
                   DO kbox = kmin, kmax
-                     jmin = INT((point(2)+offset(2)-gauge_atom_radius)/dbox(2))
-                     jmax = INT((point(2)+offset(2)+gauge_atom_radius)/dbox(2))
-                     IF (jmax-jmin+1 .GT. nbox(2)) THEN
+                     jmin = INT((point(2) + offset(2) - gauge_atom_radius)/dbox(2))
+                     jmax = INT((point(2) + offset(2) + gauge_atom_radius)/dbox(2))
+                     IF (jmax - jmin + 1 .GT. nbox(2)) THEN
                         jmin = 0
-                        jmax = nbox(2)-1
+                        jmax = nbox(2) - 1
                      ENDIF
                      DO jbox = jmin, jmax
-                        imin = INT((point(1)+offset(1)-gauge_atom_radius)/dbox(1))
-                        imax = INT((point(1)+offset(1)+gauge_atom_radius)/dbox(1))
-                        IF (imax-imin+1 .GT. nbox(1)) THEN
+                        imin = INT((point(1) + offset(1) - gauge_atom_radius)/dbox(1))
+                        imax = INT((point(1) + offset(1) + gauge_atom_radius)/dbox(1))
+                        IF (imax - imin + 1 .GT. nbox(1)) THEN
                            imin = 0
-                           imax = nbox(1)-1
+                           imax = nbox(1) - 1
                         ENDIF
                         DO ibox = imin, imax
                            ibeg = box_ptr(MODULO(ibox, nbox(1)), MODULO(jbox, nbox(2)), MODULO(kbox, nbox(3)))
-                           iend = box_ptr(MODULO(ibox, nbox(1))+1, MODULO(jbox, nbox(2)), MODULO(kbox, nbox(3)))-1
+                           iend = box_ptr(MODULO(ibox, nbox(1)) + 1, MODULO(jbox, nbox(2)), MODULO(kbox, nbox(3))) - 1
                            DO iatom = ibeg, iend
-                              r(:) = pbc(box_data(:, iatom)-point(:), cell)+point(:)
-                              dist = (r(1)-point(1))**2+(r(2)-point(2))**2+(r(3)-point(3))**2
+                              r(:) = pbc(box_data(:, iatom) - point(:), cell) + point(:)
+                              dist = (r(1) - point(1))**2 + (r(2) - point(2))**2 + (r(3) - point(3))**2
                               IF (dist .LT. gauge_atom_radius**2) THEN
-                                 natms_local = natms_local+1
+                                 natms_local = natms_local + 1
                                  ratom(:, natms_local) = r(:)
                                  !
                                  ! compute the distance atoms-point
-                                 x = point(1)-r(1)
-                                 y = point(2)-r(2)
-                                 z = point(3)-r(3)
+                                 x = point(1) - r(1)
+                                 y = point(2) - r(2)
+                                 z = point(3) - r(3)
                                  atms_pnt(1, natms_local) = x
                                  atms_pnt(2, natms_local) = y
                                  atms_pnt(3, natms_local) = z
-                                 nrm_atms_pnt(natms_local) = SQRT(x*x+y*y+z*z)
+                                 nrm_atms_pnt(natms_local) = SQRT(x*x + y*y + z*z)
                               ENDIF
                            ENDDO
                         ENDDO
@@ -1527,16 +1527,16 @@ CONTAINS
                         DO jatom = 1, natms_local
                            IF (iatom .EQ. jatom) CYCLE
                            pb = nrm_atms_pnt(jatom)
-                           x = pra(1)-atms_pnt(1, jatom)
-                           y = pra(2)-atms_pnt(2, jatom)
-                           z = pra(3)-atms_pnt(3, jatom)
-                           ab = SQRT(x*x+y*y+z*z)
+                           x = pra(1) - atms_pnt(1, jatom)
+                           y = pra(2) - atms_pnt(2, jatom)
+                           z = pra(3) - atms_pnt(3, jatom)
+                           ab = SQRT(x*x + y*y + z*z)
                            !
-                           tmp = (pa-pb)/ab
-                           tmp = 0.5_dp*(3.0_dp-tmp*tmp)*tmp
-                           tmp = 0.5_dp*(3.0_dp-tmp*tmp)*tmp
-                           tmp = 0.5_dp*(3.0_dp-tmp*tmp)*tmp
-                           buf_tmp = buf_tmp*0.5_dp*(1.0_dp-tmp)
+                           tmp = (pa - pb)/ab
+                           tmp = 0.5_dp*(3.0_dp - tmp*tmp)*tmp
+                           tmp = 0.5_dp*(3.0_dp - tmp*tmp)*tmp
+                           tmp = 0.5_dp*(3.0_dp - tmp*tmp)*tmp
+                           buf_tmp = buf_tmp*0.5_dp*(1.0_dp - tmp)
                         ENDDO
                         buf(iatom) = buf_tmp
                      ENDDO
@@ -1545,17 +1545,17 @@ CONTAINS
                      res(3) = 0.0_dp
                      summe = 0.0_dp
                      DO iatom = 1, natms_local
-                        res(1) = res(1)+ratom(1, iatom)*buf(iatom)
-                        res(2) = res(2)+ratom(2, iatom)*buf(iatom)
-                        res(3) = res(3)+ratom(3, iatom)*buf(iatom)
-                        summe = summe+buf(iatom)
+                        res(1) = res(1) + ratom(1, iatom)*buf(iatom)
+                        res(2) = res(2) + ratom(2, iatom)*buf(iatom)
+                        res(3) = res(3) + ratom(3, iatom)*buf(iatom)
+                        summe = summe + buf(iatom)
                      ENDDO
                      res(1) = res(1)/summe
                      res(2) = res(2)/summe
                      res(3) = res(3)/summe
-                     grid_x(i, j, k) = point(1)-res(1)
-                     grid_y(i, j, k) = point(2)-res(2)
-                     grid_z(i, j, k) = point(3)-res(3)
+                     grid_x(i, j, k) = point(1) - res(1)
+                     grid_y(i, j, k) = point(2) - res(2)
+                     grid_z(i, j, k) = point(3) - res(3)
                   ELSE
                      grid_x(i, j, k) = 0.0_dp
                      grid_y(i, j, k) = 0.0_dp
@@ -1576,24 +1576,24 @@ CONTAINS
 !> \param box ...
 ! **************************************************************************************************
       SUBROUTINE box_atoms_new(current_env, qs_env, box)
-      TYPE(current_env_type)                             :: current_env
-      TYPE(qs_environment_type), POINTER                 :: qs_env
-      TYPE(box_type), DIMENSION(:, :, :), POINTER        :: box
+         TYPE(current_env_type)                             :: current_env
+         TYPE(qs_environment_type), POINTER                 :: qs_env
+         TYPE(box_type), DIMENSION(:, :, :), POINTER        :: box
 
-      CHARACTER(LEN=*), PARAMETER :: routineN = 'box_atoms_new', routineP = moduleN//':'//routineN
+         CHARACTER(LEN=*), PARAMETER :: routineN = 'box_atoms_new', routineP = moduleN//':'//routineN
 
-      INTEGER                                            :: handle, i, iatom, ibeg, ibox, iend, &
-                                                            ifind, ii, imax, imin, j, jatom, jbox, &
-                                                            jmax, jmin, k, kbox, kmax, kmin, &
-                                                            natms, natms_local
-      REAL(dp)                                           :: gauge_atom_radius, offset(3), scale
-      REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: ratom
-      REAL(dp), DIMENSION(:, :), POINTER                 :: r_ptr
-      REAL(kind=dp)                                      :: box_center(3), box_center_wrap(3), &
-                                                            box_size_guess, r(3)
-      TYPE(cell_type), POINTER                           :: cell
-      TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
-      TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
+         INTEGER                                            :: handle, i, iatom, ibeg, ibox, iend, &
+                                                               ifind, ii, imax, imin, j, jatom, jbox, &
+                                                               jmax, jmin, k, kbox, kmax, kmin, &
+                                                               natms, natms_local
+         REAL(dp)                                           :: gauge_atom_radius, offset(3), scale
+         REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: ratom
+         REAL(dp), DIMENSION(:, :), POINTER                 :: r_ptr
+         REAL(kind=dp)                                      :: box_center(3), box_center_wrap(3), &
+                                                               box_size_guess, r(3)
+         TYPE(cell_type), POINTER                           :: cell
+         TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
+         TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
          CALL timeset(routineN, handle)
 
@@ -1620,7 +1620,7 @@ CONTAINS
          dbox(1) = cell%hmat(1, 1)/REAL(nbox(1), dp)
          dbox(2) = cell%hmat(2, 2)/REAL(nbox(2), dp)
          dbox(3) = cell%hmat(3, 3)/REAL(nbox(3), dp)
-         ALLOCATE (box_ptr(0:nbox(1), 0:nbox(2)-1, 0:nbox(3)-1), box_data(3, natms))
+         ALLOCATE (box_ptr(0:nbox(1), 0:nbox(2) - 1, 0:nbox(3) - 1), box_data(3, natms))
          box_data(:, :) = HUGE(0.0_dp)
          box_ptr(:, :, :) = HUGE(0)
          !
@@ -1632,33 +1632,33 @@ CONTAINS
          ENDDO
          !
          i = 1
-         DO kbox = 0, nbox(3)-1
-         DO jbox = 0, nbox(2)-1
+         DO kbox = 0, nbox(3) - 1
+         DO jbox = 0, nbox(2) - 1
             box_ptr(0, jbox, kbox) = i
-            DO ibox = 0, nbox(1)-1
+            DO ibox = 0, nbox(1) - 1
                ii = 0
                DO iatom = 1, natms
                   IF (MODULO(FLOOR(ratom(1, iatom)/dbox(1)), nbox(1)) .EQ. ibox .AND. &
                       MODULO(FLOOR(ratom(2, iatom)/dbox(2)), nbox(2)) .EQ. jbox .AND. &
                       MODULO(FLOOR(ratom(3, iatom)/dbox(3)), nbox(3)) .EQ. kbox) THEN
                      box_data(:, i) = ratom(:, iatom)
-                     i = i+1
-                     ii = ii+1
+                     i = i + 1
+                     ii = ii + 1
                   ENDIF
                ENDDO
-               box_ptr(ibox+1, jbox, kbox) = box_ptr(ibox, jbox, kbox)+ii
+               box_ptr(ibox + 1, jbox, kbox) = box_ptr(ibox, jbox, kbox) + ii
             ENDDO
          ENDDO
          ENDDO
          !
          IF (.FALSE.) THEN
-            DO kbox = 0, nbox(3)-1
-            DO jbox = 0, nbox(2)-1
-            DO ibox = 0, nbox(1)-1
-               IF (box_ptr(ibox+1, jbox, kbox)-box_ptr(ibox, jbox, kbox) .GT. 0) THEN
+            DO kbox = 0, nbox(3) - 1
+            DO jbox = 0, nbox(2) - 1
+            DO ibox = 0, nbox(1) - 1
+               IF (box_ptr(ibox + 1, jbox, kbox) - box_ptr(ibox, jbox, kbox) .GT. 0) THEN
                   WRITE (*, *) 'box=', ibox, jbox, kbox
-                  WRITE (*, *) 'nbr atom=', box_ptr(ibox+1, jbox, kbox)-box_ptr(ibox, jbox, kbox)
-                  DO iatom = box_ptr(ibox, jbox, kbox), box_ptr(ibox+1, jbox, kbox)-1
+                  WRITE (*, *) 'nbr atom=', box_ptr(ibox + 1, jbox, kbox) - box_ptr(ibox, jbox, kbox)
+                  DO iatom = box_ptr(ibox, jbox, kbox), box_ptr(ibox + 1, jbox, kbox) - 1
                      WRITE (*, '(A,I3,3E14.6)') 'coor=', iatom, box_data(:, iatom)
                   ENDDO
                ENDIF
@@ -1668,49 +1668,49 @@ CONTAINS
          ENDIF
          !
          NULLIFY (box)
-         ALLOCATE (box(0:nbox(1)-1, 0:nbox(2)-1, 0:nbox(3)-1))
+         ALLOCATE (box(0:nbox(1) - 1, 0:nbox(2) - 1, 0:nbox(3) - 1))
          !
          ! build the list
-         DO k = 0, nbox(3)-1
-         DO j = 0, nbox(2)-1
-         DO i = 0, nbox(1)-1
+         DO k = 0, nbox(3) - 1
+         DO j = 0, nbox(2) - 1
+         DO i = 0, nbox(1) - 1
             !
-            box_center(1) = (REAL(i, dp)+0.5_dp)*dbox(1)
-            box_center(2) = (REAL(j, dp)+0.5_dp)*dbox(2)
-            box_center(3) = (REAL(k, dp)+0.5_dp)*dbox(3)
+            box_center(1) = (REAL(i, dp) + 0.5_dp)*dbox(1)
+            box_center(2) = (REAL(j, dp) + 0.5_dp)*dbox(2)
+            box_center(3) = (REAL(k, dp) + 0.5_dp)*dbox(3)
             box_center_wrap = pbc(box_center, cell)
             !
             ! find the atoms that are in the overlaping boxes
             natms_local = 0
-            kmin = FLOOR((box_center(3)-gauge_atom_radius)/dbox(3))
-            kmax = FLOOR((box_center(3)+gauge_atom_radius)/dbox(3))
-            IF (kmax-kmin+1 .GT. nbox(3)) THEN
+            kmin = FLOOR((box_center(3) - gauge_atom_radius)/dbox(3))
+            kmax = FLOOR((box_center(3) + gauge_atom_radius)/dbox(3))
+            IF (kmax - kmin + 1 .GT. nbox(3)) THEN
                kmin = 0
-               kmax = nbox(3)-1
+               kmax = nbox(3) - 1
             ENDIF
             DO kbox = kmin, kmax
-               jmin = FLOOR((box_center(2)-gauge_atom_radius)/dbox(2))
-               jmax = FLOOR((box_center(2)+gauge_atom_radius)/dbox(2))
-               IF (jmax-jmin+1 .GT. nbox(2)) THEN
+               jmin = FLOOR((box_center(2) - gauge_atom_radius)/dbox(2))
+               jmax = FLOOR((box_center(2) + gauge_atom_radius)/dbox(2))
+               IF (jmax - jmin + 1 .GT. nbox(2)) THEN
                   jmin = 0
-                  jmax = nbox(2)-1
+                  jmax = nbox(2) - 1
                ENDIF
                DO jbox = jmin, jmax
-                  imin = FLOOR((box_center(1)-gauge_atom_radius)/dbox(1))
-                  imax = FLOOR((box_center(1)+gauge_atom_radius)/dbox(1))
-                  IF (imax-imin+1 .GT. nbox(1)) THEN
+                  imin = FLOOR((box_center(1) - gauge_atom_radius)/dbox(1))
+                  imax = FLOOR((box_center(1) + gauge_atom_radius)/dbox(1))
+                  IF (imax - imin + 1 .GT. nbox(1)) THEN
                      imin = 0
-                     imax = nbox(1)-1
+                     imax = nbox(1) - 1
                   ENDIF
                   DO ibox = imin, imax
                      ibeg = box_ptr(MODULO(ibox, nbox(1)), MODULO(jbox, nbox(2)), MODULO(kbox, nbox(3)))
-                     iend = box_ptr(MODULO(ibox, nbox(1))+1, MODULO(jbox, nbox(2)), MODULO(kbox, nbox(3)))-1
+                     iend = box_ptr(MODULO(ibox, nbox(1)) + 1, MODULO(jbox, nbox(2)), MODULO(kbox, nbox(3))) - 1
                      DO iatom = ibeg, iend
-                        r = pbc(box_center_wrap(:)-box_data(:, iatom), cell)
-                        IF (ABS(r(1)) .LE. (scale+0.5_dp)*dbox(1) .AND. &
-                            ABS(r(2)) .LE. (scale+0.5_dp)*dbox(2) .AND. &
-                            ABS(r(3)) .LE. (scale+0.5_dp)*dbox(3)) THEN
-                           natms_local = natms_local+1
+                        r = pbc(box_center_wrap(:) - box_data(:, iatom), cell)
+                        IF (ABS(r(1)) .LE. (scale + 0.5_dp)*dbox(1) .AND. &
+                            ABS(r(2)) .LE. (scale + 0.5_dp)*dbox(2) .AND. &
+                            ABS(r(3)) .LE. (scale + 0.5_dp)*dbox(3)) THEN
+                           natms_local = natms_local + 1
                            ratom(:, natms_local) = box_data(:, iatom)
                         ENDIF
                      ENDDO
@@ -1731,28 +1731,28 @@ CONTAINS
          ENDDO
 
          IF (.FALSE.) THEN
-            DO k = 0, nbox(3)-1
-            DO j = 0, nbox(2)-1
-            DO i = 0, nbox(1)-1
+            DO k = 0, nbox(3) - 1
+            DO j = 0, nbox(2) - 1
+            DO i = 0, nbox(1) - 1
                IF (box(i, j, k)%n .GT. 0) THEN
                   WRITE (*, *)
                   WRITE (*, *) 'box=', i, j, k
-                  box_center(1) = (REAL(i, dp)+0.5_dp)*dbox(1)
-                  box_center(2) = (REAL(j, dp)+0.5_dp)*dbox(2)
-                  box_center(3) = (REAL(k, dp)+0.5_dp)*dbox(3)
+                  box_center(1) = (REAL(i, dp) + 0.5_dp)*dbox(1)
+                  box_center(2) = (REAL(j, dp) + 0.5_dp)*dbox(2)
+                  box_center(3) = (REAL(k, dp) + 0.5_dp)*dbox(3)
                   box_center = pbc(box_center, cell)
                   WRITE (*, '(A,3E14.6)') 'box_center=', box_center
                   WRITE (*, *) 'nbr atom=', box(i, j, k)%n
                   r_ptr => box(i, j, k)%r
                   DO iatom = 1, box(i, j, k)%n
                      WRITE (*, '(A,I3,3E14.6)') 'coor=', iatom, r_ptr(:, iatom)
-                     r(:) = pbc(box_center(:)-r_ptr(:, iatom), cell)
-                     IF (ABS(r(1)) .GT. (scale+0.5_dp)*dbox(1) .OR. &
-                         ABS(r(2)) .GT. (scale+0.5_dp)*dbox(2) .OR. &
-                         ABS(r(3)) .GT. (scale+0.5_dp)*dbox(3)) THEN
+                     r(:) = pbc(box_center(:) - r_ptr(:, iatom), cell)
+                     IF (ABS(r(1)) .GT. (scale + 0.5_dp)*dbox(1) .OR. &
+                         ABS(r(2)) .GT. (scale + 0.5_dp)*dbox(2) .OR. &
+                         ABS(r(3)) .GT. (scale + 0.5_dp)*dbox(3)) THEN
                         WRITE (*, *) 'error too many atoms'
                         WRITE (*, *) 'dist=', ABS(r(:))
-                        WRITE (*, *) 'large_dist=', (scale+0.5_dp)*dbox
+                        WRITE (*, *) 'large_dist=', (scale + 0.5_dp)*dbox
                         CPABORT("")
                      ENDIF
                   ENDDO
@@ -1763,19 +1763,19 @@ CONTAINS
          ENDIF
 
          IF (.TRUE.) THEN
-            DO k = 0, nbox(3)-1
-            DO j = 0, nbox(2)-1
-            DO i = 0, nbox(1)-1
-               box_center(1) = (REAL(i, dp)+0.5_dp)*dbox(1)
-               box_center(2) = (REAL(j, dp)+0.5_dp)*dbox(2)
-               box_center(3) = (REAL(k, dp)+0.5_dp)*dbox(3)
+            DO k = 0, nbox(3) - 1
+            DO j = 0, nbox(2) - 1
+            DO i = 0, nbox(1) - 1
+               box_center(1) = (REAL(i, dp) + 0.5_dp)*dbox(1)
+               box_center(2) = (REAL(j, dp) + 0.5_dp)*dbox(2)
+               box_center(3) = (REAL(k, dp) + 0.5_dp)*dbox(3)
                box_center = pbc(box_center, cell)
                r_ptr => box(i, j, k)%r
                DO iatom = 1, natms
-                  r(:) = pbc(box_center(:)-ratom(:, iatom), cell)
+                  r(:) = pbc(box_center(:) - ratom(:, iatom), cell)
                   ifind = 0
                   DO jatom = 1, box(i, j, k)%n
-                     IF (SUM(ABS(ratom(:, iatom)-r_ptr(:, jatom))) .LT. 1E-10_dp) ifind = 1
+                     IF (SUM(ABS(ratom(:, iatom) - r_ptr(:, jatom))) .LT. 1E-10_dp) ifind = 1
                   ENDDO
 
                   IF (ifind .EQ. 0) THEN
@@ -1812,28 +1812,28 @@ CONTAINS
 ! **************************************************************************************************
       SUBROUTINE collocate_gauge_new(current_env, qs_env, rs_grid_x, rs_grid_y, rs_grid_z, box)
          !
-      TYPE(current_env_type)                             :: current_env
-      TYPE(qs_environment_type), POINTER                 :: qs_env
-      TYPE(realspace_grid_type), POINTER                 :: rs_grid_x, rs_grid_y, rs_grid_z
-      TYPE(box_type), DIMENSION(:, :, :), POINTER        :: box
+         TYPE(current_env_type)                             :: current_env
+         TYPE(qs_environment_type), POINTER                 :: qs_env
+         TYPE(realspace_grid_type), POINTER                 :: rs_grid_x, rs_grid_y, rs_grid_z
+         TYPE(box_type), DIMENSION(:, :, :), POINTER        :: box
 
-      CHARACTER(LEN=*), PARAMETER :: routineN = 'collocate_gauge_new', &
-         routineP = moduleN//':'//routineN
+         CHARACTER(LEN=*), PARAMETER :: routineN = 'collocate_gauge_new', &
+                                        routineP = moduleN//':'//routineN
 
-      INTEGER :: delta_lb(3), handle, i, iatom, ib, ibe, ibox, ibs, ie, is, j, jatom, jb, jbe, &
-         jbox, jbs, je, js, k, kb, kbe, kbox, kbs, ke, ks, lb(3), lb_local(3), natms, &
-         natms_local0, natms_local1, ng(3)
-      REAL(dp), DIMENSION(:, :), POINTER                 :: r_ptr
-      REAL(KIND=dp)                                      :: ab, box_center(3), buf_tmp, dist, dr(3), &
-                                                            gauge_atom_radius, offset(3), pa, pb, &
-                                                            point(3), pra(3), r(3), res(3), summe, &
-                                                            tmp, x, y, z
-      REAL(kind=dp), ALLOCATABLE, DIMENSION(:)           :: buf, nrm_atms_pnt
-      REAL(kind=dp), ALLOCATABLE, DIMENSION(:, :)        :: atms_pnt, ratom
-      REAL(kind=dp), DIMENSION(:, :, :), POINTER         :: grid_x, grid_y, grid_z
-      TYPE(cell_type), POINTER                           :: cell
-      TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
-      TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
+         INTEGER :: delta_lb(3), handle, i, iatom, ib, ibe, ibox, ibs, ie, is, j, jatom, jb, jbe, &
+                    jbox, jbs, je, js, k, kb, kbe, kbox, kbs, ke, ks, lb(3), lb_local(3), natms, &
+                    natms_local0, natms_local1, ng(3)
+         REAL(dp), DIMENSION(:, :), POINTER                 :: r_ptr
+         REAL(KIND=dp)                                      :: ab, box_center(3), buf_tmp, dist, dr(3), &
+                                                               gauge_atom_radius, offset(3), pa, pb, &
+                                                               point(3), pra(3), r(3), res(3), summe, &
+                                                               tmp, x, y, z
+         REAL(kind=dp), ALLOCATABLE, DIMENSION(:)           :: buf, nrm_atms_pnt
+         REAL(kind=dp), ALLOCATABLE, DIMENSION(:, :)        :: atms_pnt, ratom
+         REAL(kind=dp), DIMENSION(:, :, :), POINTER         :: grid_x, grid_y, grid_z
+         TYPE(cell_type), POINTER                           :: cell
+         TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
+         TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
          CALL timeset(routineN, handle)
 
@@ -1856,7 +1856,7 @@ CONTAINS
          grid_y => rs_grid_y%r(:, :, :)
          grid_z => rs_grid_z%r(:, :, :)
          ng(:) = UBOUND(grid_x)
-         delta_lb(:) = lb_local(:)-lb(:)
+         delta_lb(:) = lb_local(:) - lb(:)
          offset(1) = cell%hmat(1, 1)*0.5_dp
          offset(2) = cell%hmat(2, 2)*0.5_dp
          offset(3) = cell%hmat(3, 3)*0.5_dp
@@ -1864,11 +1864,11 @@ CONTAINS
          !
          ! find the boxes that match the grid
          ibs = FLOOR(REAL(delta_lb(1), dp)*dr(1)/dbox(1))
-         ibe = FLOOR(REAL(ng(1)-1+delta_lb(1), dp)*dr(1)/dbox(1))
+         ibe = FLOOR(REAL(ng(1) - 1 + delta_lb(1), dp)*dr(1)/dbox(1))
          jbs = FLOOR(REAL(delta_lb(2), dp)*dr(2)/dbox(2))
-         jbe = FLOOR(REAL(ng(2)-1+delta_lb(2), dp)*dr(2)/dbox(2))
+         jbe = FLOOR(REAL(ng(2) - 1 + delta_lb(2), dp)*dr(2)/dbox(2))
          kbs = FLOOR(REAL(delta_lb(3), dp)*dr(3)/dbox(3))
-         kbe = FLOOR(REAL(ng(3)-1+delta_lb(3), dp)*dr(3)/dbox(3))
+         kbe = FLOOR(REAL(ng(3) - 1 + delta_lb(3), dp)*dr(3)/dbox(3))
          !
          ! go over the box-list
          DO kb = kbs, kbe
@@ -1878,36 +1878,36 @@ CONTAINS
             jbox = MODULO(jb, nbox(2))
             kbox = MODULO(kb, nbox(3))
             !
-            is = MAX(CEILING(REAL(ib, dp)*dbox(1)/dr(1)), delta_lb(1))-delta_lb(1)+1
-            ie = MIN(FLOOR(REAL(ib+1, dp)*dbox(1)/dr(1)), ng(1)-1+delta_lb(1))-delta_lb(1)+1
-            js = MAX(CEILING(REAL(jb, dp)*dbox(2)/dr(2)), delta_lb(2))-delta_lb(2)+1
-            je = MIN(FLOOR(REAL(jb+1, dp)*dbox(2)/dr(2)), ng(2)-1+delta_lb(2))-delta_lb(2)+1
-            ks = MAX(CEILING(REAL(kb, dp)*dbox(3)/dr(3)), delta_lb(3))-delta_lb(3)+1
-            ke = MIN(FLOOR(REAL(kb+1, dp)*dbox(3)/dr(3)), ng(3)-1+delta_lb(3))-delta_lb(3)+1
+            is = MAX(CEILING(REAL(ib, dp)*dbox(1)/dr(1)), delta_lb(1)) - delta_lb(1) + 1
+            ie = MIN(FLOOR(REAL(ib + 1, dp)*dbox(1)/dr(1)), ng(1) - 1 + delta_lb(1)) - delta_lb(1) + 1
+            js = MAX(CEILING(REAL(jb, dp)*dbox(2)/dr(2)), delta_lb(2)) - delta_lb(2) + 1
+            je = MIN(FLOOR(REAL(jb + 1, dp)*dbox(2)/dr(2)), ng(2) - 1 + delta_lb(2)) - delta_lb(2) + 1
+            ks = MAX(CEILING(REAL(kb, dp)*dbox(3)/dr(3)), delta_lb(3)) - delta_lb(3) + 1
+            ke = MIN(FLOOR(REAL(kb + 1, dp)*dbox(3)/dr(3)), ng(3) - 1 + delta_lb(3)) - delta_lb(3) + 1
             !
             ! sanity checks
             IF (.TRUE.) THEN
-               IF (REAL(ks-1+delta_lb(3), dp)*dr(3) .LT. REAL(kb, dp)*dbox(3) .OR. &
-                   REAL(ke-1+delta_lb(3), dp)*dr(3) .GT. REAL(kb+1, dp)*dbox(3)) THEN
-                  WRITE (*, *) 'box_k', REAL(kb, dp)*dbox(3), REAL(kb+1, dp)*dbox(3)
-                  WRITE (*, *) 'point_k', REAL(ks-1+delta_lb(3), dp)*dr(3), REAL(ke-1+delta_lb(3), dp)*dr(3)
+               IF (REAL(ks - 1 + delta_lb(3), dp)*dr(3) .LT. REAL(kb, dp)*dbox(3) .OR. &
+                   REAL(ke - 1 + delta_lb(3), dp)*dr(3) .GT. REAL(kb + 1, dp)*dbox(3)) THEN
+                  WRITE (*, *) 'box_k', REAL(kb, dp)*dbox(3), REAL(kb + 1, dp)*dbox(3)
+                  WRITE (*, *) 'point_k', REAL(ks - 1 + delta_lb(3), dp)*dr(3), REAL(ke - 1 + delta_lb(3), dp)*dr(3)
                   WRITE (*, *) 'ibox', ibox, 'jbox', jbox, 'kbox', kbox
                   WRITE (*, *) 'is,ie', is, ie, ' js,je', js, je, ' ks,ke', ks, ke
                   WRITE (*, *) 'ibs,ibe', ibs, ibe, ' jbs,jbe', jbs, jbe, ' kbs,kbe', kbs, kbe
                   CPABORT("we stop_k")
                ENDIF
-               IF (REAL(js-1+delta_lb(2), dp)*dr(2) .LT. REAL(jb, dp)*dbox(2) .OR. &
-                   REAL(je-1+delta_lb(2), dp)*dr(2) .GT. REAL(jb+1, dp)*dbox(2)) THEN
-                  WRITE (*, *) 'box_j', REAL(jb, dp)*dbox(2), REAL(jb+1, dp)*dbox(2)
-                  WRITE (*, *) 'point_j', REAL(js-1+delta_lb(2), dp)*dr(2), REAL(je-1+delta_lb(2), dp)*dr(2)
+               IF (REAL(js - 1 + delta_lb(2), dp)*dr(2) .LT. REAL(jb, dp)*dbox(2) .OR. &
+                   REAL(je - 1 + delta_lb(2), dp)*dr(2) .GT. REAL(jb + 1, dp)*dbox(2)) THEN
+                  WRITE (*, *) 'box_j', REAL(jb, dp)*dbox(2), REAL(jb + 1, dp)*dbox(2)
+                  WRITE (*, *) 'point_j', REAL(js - 1 + delta_lb(2), dp)*dr(2), REAL(je - 1 + delta_lb(2), dp)*dr(2)
                   WRITE (*, *) 'is,ie', is, ie, ' js,je', js, je, ' ks,ke', ks, ke
                   WRITE (*, *) 'ibs,ibe', ibs, ibe, ' jbs,jbe', jbs, jbe, ' kbs,kbe', kbs, kbe
                   CPABORT("we stop_j")
                ENDIF
-               IF (REAL(is-1+delta_lb(1), dp)*dr(1) .LT. REAL(ib, dp)*dbox(1) .OR. &
-                   REAL(ie-1+delta_lb(1), dp)*dr(1) .GT. REAL(ib+1, dp)*dbox(1)) THEN
-                  WRITE (*, *) 'box_i', REAL(ib, dp)*dbox(1), REAL(ib+1, dp)*dbox(1)
-                  WRITE (*, *) 'point_i', REAL(is-1+delta_lb(1), dp)*dr(1), REAL(ie-1+delta_lb(1), dp)*dr(1)
+               IF (REAL(is - 1 + delta_lb(1), dp)*dr(1) .LT. REAL(ib, dp)*dbox(1) .OR. &
+                   REAL(ie - 1 + delta_lb(1), dp)*dr(1) .GT. REAL(ib + 1, dp)*dbox(1)) THEN
+                  WRITE (*, *) 'box_i', REAL(ib, dp)*dbox(1), REAL(ib + 1, dp)*dbox(1)
+                  WRITE (*, *) 'point_i', REAL(is - 1 + delta_lb(1), dp)*dr(1), REAL(ie - 1 + delta_lb(1), dp)*dr(1)
                   WRITE (*, *) 'is,ie', is, ie, ' js,je', js, je, ' ks,ke', ks, ke
                   WRITE (*, *) 'ibs,ibe', ibs, ibe, ' jbs,jbe', jbs, jbe, ' kbs,kbe', kbs, kbe
                   CPABORT("we stop_i")
@@ -1915,9 +1915,9 @@ CONTAINS
             ENDIF
             !
             ! the center of the box
-            box_center(1) = (REAL(ibox, dp)+0.5_dp)*dbox(1)
-            box_center(2) = (REAL(jbox, dp)+0.5_dp)*dbox(2)
-            box_center(3) = (REAL(kbox, dp)+0.5_dp)*dbox(3)
+            box_center(1) = (REAL(ibox, dp) + 0.5_dp)*dbox(1)
+            box_center(2) = (REAL(jbox, dp) + 0.5_dp)*dbox(2)
+            box_center(3) = (REAL(kbox, dp) + 0.5_dp)*dbox(3)
             !
             ! find the atoms that are in the overlaping boxes
             natms_local0 = box(ibox, jbox, kbox)%n
@@ -1930,28 +1930,28 @@ CONTAINS
                DO k = ks, ke
                DO j = js, je
                DO i = is, ie
-                  point(1) = REAL(i-1+delta_lb(1), dp)*dr(1)
-                  point(2) = REAL(j-1+delta_lb(2), dp)*dr(2)
-                  point(3) = REAL(k-1+delta_lb(3), dp)*dr(3)
+                  point(1) = REAL(i - 1 + delta_lb(1), dp)*dr(1)
+                  point(2) = REAL(j - 1 + delta_lb(2), dp)*dr(2)
+                  point(3) = REAL(k - 1 + delta_lb(3), dp)*dr(3)
                   point = pbc(point, cell)
                   !
                   ! compute atom-point distances
                   natms_local1 = 0
                   DO iatom = 1, natms_local0
-                     r(:) = pbc(r_ptr(:, iatom)-point(:), cell)+point(:) !needed?
-                     dist = (r(1)-point(1))**2+(r(2)-point(2))**2+(r(3)-point(3))**2
+                     r(:) = pbc(r_ptr(:, iatom) - point(:), cell) + point(:) !needed?
+                     dist = (r(1) - point(1))**2 + (r(2) - point(2))**2 + (r(3) - point(3))**2
                      IF (dist .LT. gauge_atom_radius**2) THEN
-                        natms_local1 = natms_local1+1
+                        natms_local1 = natms_local1 + 1
                         ratom(:, natms_local1) = r(:)
                         !
                         ! compute the distance atoms-point
-                        x = point(1)-r(1)
-                        y = point(2)-r(2)
-                        z = point(3)-r(3)
+                        x = point(1) - r(1)
+                        y = point(2) - r(2)
+                        z = point(3) - r(3)
                         atms_pnt(1, natms_local1) = x
                         atms_pnt(2, natms_local1) = y
                         atms_pnt(3, natms_local1) = z
-                        nrm_atms_pnt(natms_local1) = SQRT(x*x+y*y+z*z)
+                        nrm_atms_pnt(natms_local1) = SQRT(x*x + y*y + z*z)
                      ENDIF
                   ENDDO
                   !
@@ -1968,16 +1968,16 @@ CONTAINS
                         DO jatom = 1, natms_local1
                            IF (iatom .EQ. jatom) CYCLE
                            pb = nrm_atms_pnt(jatom)
-                           x = pra(1)-atms_pnt(1, jatom)
-                           y = pra(2)-atms_pnt(2, jatom)
-                           z = pra(3)-atms_pnt(3, jatom)
-                           ab = SQRT(x*x+y*y+z*z)
+                           x = pra(1) - atms_pnt(1, jatom)
+                           y = pra(2) - atms_pnt(2, jatom)
+                           z = pra(3) - atms_pnt(3, jatom)
+                           ab = SQRT(x*x + y*y + z*z)
                            !
-                           tmp = (pa-pb)/ab
-                           tmp = 0.5_dp*(3.0_dp-tmp*tmp)*tmp
-                           tmp = 0.5_dp*(3.0_dp-tmp*tmp)*tmp
-                           tmp = 0.5_dp*(3.0_dp-tmp*tmp)*tmp
-                           buf_tmp = buf_tmp*0.5_dp*(1.0_dp-tmp)
+                           tmp = (pa - pb)/ab
+                           tmp = 0.5_dp*(3.0_dp - tmp*tmp)*tmp
+                           tmp = 0.5_dp*(3.0_dp - tmp*tmp)*tmp
+                           tmp = 0.5_dp*(3.0_dp - tmp*tmp)*tmp
+                           buf_tmp = buf_tmp*0.5_dp*(1.0_dp - tmp)
                         ENDDO
                         buf(iatom) = buf_tmp
                      ENDDO
@@ -1986,17 +1986,17 @@ CONTAINS
                      res(3) = 0.0_dp
                      summe = 0.0_dp
                      DO iatom = 1, natms_local1
-                        res(1) = res(1)+ratom(1, iatom)*buf(iatom)
-                        res(2) = res(2)+ratom(2, iatom)*buf(iatom)
-                        res(3) = res(3)+ratom(3, iatom)*buf(iatom)
-                        summe = summe+buf(iatom)
+                        res(1) = res(1) + ratom(1, iatom)*buf(iatom)
+                        res(2) = res(2) + ratom(2, iatom)*buf(iatom)
+                        res(3) = res(3) + ratom(3, iatom)*buf(iatom)
+                        summe = summe + buf(iatom)
                      ENDDO
                      res(1) = res(1)/summe
                      res(2) = res(2)/summe
                      res(3) = res(3)/summe
-                     grid_x(i, j, k) = point(1)-res(1)
-                     grid_y(i, j, k) = point(2)-res(2)
-                     grid_z(i, j, k) = point(3)-res(3)
+                     grid_x(i, j, k) = point(1) - res(1)
+                     grid_y(i, j, k) = point(2) - res(2)
+                     grid_z(i, j, k) = point(3) - res(3)
                   ELSE
                      grid_x(i, j, k) = 0.0_dp
                      grid_y(i, j, k) = 0.0_dp
@@ -2036,9 +2036,9 @@ CONTAINS
 !> \param box ...
 ! **************************************************************************************************
       SUBROUTINE deallocate_box(box)
-      TYPE(box_type), DIMENSION(:, :, :), POINTER        :: box
+         TYPE(box_type), DIMENSION(:, :, :), POINTER        :: box
 
-      INTEGER                                            :: i, j, k
+         INTEGER                                            :: i, j, k
 
          IF (ASSOCIATED(box)) THEN
             DO k = LBOUND(box, 3), UBOUND(box, 3)
@@ -2090,10 +2090,10 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iB
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_build_chi_many_centers', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, icenter, idir, idir2, ii, iiB, iii, iiiB, ispin, istate, j, jstate, &
-         max_states, nao, natom, nbr_center(2), nmo, nspins, nstate_loc, nstates(2), output_unit
+                 max_states, nao, natom, nbr_center(2), nmo, nspins, nstate_loc, nstates(2), output_unit
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: first_sgf, last_sgf
       INTEGER, DIMENSION(:), POINTER                     :: row_blk_sizes
       LOGICAL                                            :: chi_pbc, gapw
@@ -2163,8 +2163,8 @@ CONTAINS
       max_states = 0
       DO ispin = 1, nspins
          DO icenter = 1, nbr_center(ispin)
-            max_states = MAX(max_states, center_list(ispin)%array(1, icenter+1)&
-                 &                     -center_list(ispin)%array(1, icenter))
+            max_states = MAX(max_states, center_list(ispin)%array(1, icenter + 1)&
+                 &                     - center_list(ispin)%array(1, icenter))
          ENDDO
       ENDDO
       !
@@ -2302,9 +2302,9 @@ CONTAINS
             CALL cp_fm_set_all(psi_D, 0.0_dp)
             CALL cp_fm_set_all(psi_p1, 0.0_dp)
             CALL cp_fm_set_all(psi_p2, 0.0_dp)
-            nstate_loc = center_list(ispin)%array(1, icenter+1)-center_list(ispin)%array(1, icenter)
+            nstate_loc = center_list(ispin)%array(1, icenter + 1) - center_list(ispin)%array(1, icenter)
             jstate = 1
-            DO j = center_list(ispin)%array(1, icenter), center_list(ispin)%array(1, icenter+1)-1
+            DO j = center_list(ispin)%array(1, icenter), center_list(ispin)%array(1, icenter + 1) - 1
                istate = center_list(ispin)%array(2, j)
                !
                ! block the states that belong to this center
@@ -2317,7 +2317,7 @@ CONTAINS
                CALL cp_fm_to_fm(psi1_p(ispin, iiB)%matrix, psi_p1, 1, istate, jstate)
                CALL cp_fm_to_fm(psi1_p(ispin, iiiB)%matrix, psi_p2, 1, istate, jstate)
                !
-               jstate = jstate+1
+               jstate = jstate + 1
             ENDDO ! istate
             !
             ! scale the ordered mos
@@ -2370,22 +2370,22 @@ CONTAINS
                ! the factor 2 should be already included in the matrix elements
                contrib = 0.0_dp
                CALL cp_fm_trace(psi0, rr_rxp(ii, iii)%matrix, contrib)
-               chi_tmp = chi_tmp+2.0_dp*contrib
+               chi_tmp = chi_tmp + 2.0_dp*contrib
                !
                contrib = 0.0_dp
                CALL cp_fm_trace(psi0, rr_rxp(iii, ii)%matrix, contrib)
-               chi_tmp = chi_tmp-2.0_dp*contrib
+               chi_tmp = chi_tmp - 2.0_dp*contrib
                !
                ! correction: dk_ii*2[C0| d_iii(C1(rxp-D))] - dk_iii*2[C0| d_ii(C1(rxp-D))]
                ! factor 2 not included in the matrix elements
                contrib = 0.0_dp
                CALL cp_fm_trace(psi0, p_rxp(iii)%matrix, contrib)
-               IF (.NOT. chi_pbc) chi_tmp = chi_tmp+2.0_dp*dk(ii)*contrib
-               int_current_tmp = int_current_tmp+2.0_dp*contrib
+               IF (.NOT. chi_pbc) chi_tmp = chi_tmp + 2.0_dp*dk(ii)*contrib
+               int_current_tmp = int_current_tmp + 2.0_dp*contrib
                !
                contrib2 = 0.0_dp
                CALL cp_fm_trace(psi0, p_rxp(ii)%matrix, contrib2)
-               IF (.NOT. chi_pbc) chi_tmp = chi_tmp-2.0_dp*dk(iii)*contrib2
+               IF (.NOT. chi_pbc) chi_tmp = chi_tmp - 2.0_dp*dk(iii)*contrib2
                !
                ! term: -2[C0| (r-dk)_ii  (r-dk)_iiB | d_iii(C1(piiiB))] \
                !       +2[C0| (r-dk)_iii (r-dk)_iiB | d_ii(C1(piiiB))]
@@ -2393,21 +2393,21 @@ CONTAINS
                contrib = 0.0_dp
                idir2 = ind_m2(ii, iiB)
                CALL cp_fm_trace(psi0, rr_p2(idir2, iii)%matrix, contrib)
-               chi_tmp = chi_tmp-2.0_dp*contrib
+               chi_tmp = chi_tmp - 2.0_dp*contrib
                contrib2 = 0.0_dp
                IF (iiB == iii) THEN
                   CALL cp_fm_trace(psi0, r_p2(ii)%matrix, contrib2)
-                  chi_tmp = chi_tmp-contrib2
+                  chi_tmp = chi_tmp - contrib2
                ENDIF
                !
                contrib = 0.0_dp
                idir2 = ind_m2(iii, iiB)
                CALL cp_fm_trace(psi0, rr_p2(idir2, ii)%matrix, contrib)
-               chi_tmp = chi_tmp+2.0_dp*contrib
+               chi_tmp = chi_tmp + 2.0_dp*contrib
                contrib2 = 0.0_dp
                IF (iiB == ii) THEN
                   CALL cp_fm_trace(psi0, r_p2(iii)%matrix, contrib2)
-                  chi_tmp = chi_tmp+contrib2
+                  chi_tmp = chi_tmp + contrib2
                ENDIF
                !
                ! correction: -dk_ii * 2[C0|(r-dk)_iiB | d_iii(C1(piiiB))] \
@@ -2416,12 +2416,12 @@ CONTAINS
                ! no additional correction terms because of the orthogonality between C0 and C1
                contrib = 0.0_dp
                CALL cp_fm_trace(psi0, rr_p2(iiB, iii)%matrix, contrib)
-               IF (.NOT. chi_pbc) chi_tmp = chi_tmp-2.0_dp*dk(ii)*contrib
-               int_current_tmp = int_current_tmp-2.0_dp*contrib
+               IF (.NOT. chi_pbc) chi_tmp = chi_tmp - 2.0_dp*dk(ii)*contrib
+               int_current_tmp = int_current_tmp - 2.0_dp*contrib
                !
                contrib2 = 0.0_dp
                CALL cp_fm_trace(psi0, rr_p2(iiB, ii)%matrix, contrib2)
-               IF (.NOT. chi_pbc) chi_tmp = chi_tmp+2.0_dp*dk(iii)*contrib2
+               IF (.NOT. chi_pbc) chi_tmp = chi_tmp + 2.0_dp*dk(iii)*contrib2
                !
                ! term: +2[C0| (r-dk)_ii  (r-dk)_iiiB | d_iii(C1(piiB))] \
                !       -2[C0| (r-dk)_iii (r-dk)_iiiB | d_ii(C1(piiB))]
@@ -2429,21 +2429,21 @@ CONTAINS
                contrib = 0.0_dp
                idir2 = ind_m2(ii, iiiB)
                CALL cp_fm_trace(psi0, rr_p1(idir2, iii)%matrix, contrib)
-               chi_tmp = chi_tmp+2.0_dp*contrib
+               chi_tmp = chi_tmp + 2.0_dp*contrib
                contrib2 = 0.0_dp
                IF (iiiB == iii) THEN
                   CALL cp_fm_trace(psi0, r_p1(ii)%matrix, contrib2)
-                  chi_tmp = chi_tmp+contrib2
+                  chi_tmp = chi_tmp + contrib2
                ENDIF
                !
                contrib = 0.0_dp
                idir2 = ind_m2(iii, iiiB)
                CALL cp_fm_trace(psi0, rr_p1(idir2, ii)%matrix, contrib)
-               chi_tmp = chi_tmp-2.0_dp*contrib
+               chi_tmp = chi_tmp - 2.0_dp*contrib
                contrib2 = 0.0_dp
                IF (iiiB == ii) THEN
                   CALL cp_fm_trace(psi0, r_p1(iii)%matrix, contrib2)
-                  chi_tmp = chi_tmp-contrib2
+                  chi_tmp = chi_tmp - contrib2
                ENDIF
                !
                ! correction: +dk_ii * 2[C0|(r-dk)_iiiB | d_iii(C1(piiB))] +\
@@ -2451,22 +2451,22 @@ CONTAINS
                ! the factor 2 should be already included in the matrix elements
                contrib = 0.0_dp
                CALL cp_fm_trace(psi0, rr_p1(iiiB, iii)%matrix, contrib)
-               IF (.NOT. chi_pbc) chi_tmp = chi_tmp+2.0_dp*dk(ii)*contrib
-               int_current_tmp = int_current_tmp+2.0_dp*contrib
+               IF (.NOT. chi_pbc) chi_tmp = chi_tmp + 2.0_dp*dk(ii)*contrib
+               int_current_tmp = int_current_tmp + 2.0_dp*contrib
                !
                contrib2 = 0.0_dp
                CALL cp_fm_trace(psi0, rr_p1(iiiB, ii)%matrix, contrib2)
-               IF (.NOT. chi_pbc) chi_tmp = chi_tmp-2.0_dp*dk(iii)*contrib2
+               IF (.NOT. chi_pbc) chi_tmp = chi_tmp - 2.0_dp*dk(iii)*contrib2
                !
                ! accumulate
-               chi(idir) = chi(idir)+maxocc*chi_tmp
-               int_current(iii) = int_current(iii)+int_current_tmp
+               chi(idir) = chi(idir) + maxocc*chi_tmp
+               int_current(iii) = int_current(iii) + int_current_tmp
             ENDDO ! idir
 
          ENDDO ! icenter
          !
          DO idir = 1, 3
-            current_env%chi_tensor(idir, iB, ispin) = current_env%chi_tensor(idir, iB, ispin)+ &
+            current_env%chi_tensor(idir, iB, ispin) = current_env%chi_tensor(idir, iB, ispin) + &
                                                       chi(idir)
             IF (output_unit > 0) THEN
                !WRITE(output_unit,'(A,E12.6)') ' chi_'//ACHAR(119+idir)//ACHAR(119+iB)//&
@@ -2517,10 +2517,10 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iB
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_build_chi_one_center', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, idir, idir2, iiB, iiiB, ispin, jdir, jjdir, kdir, max_states, nao, natom, &
-         nbr_center(2), nmo, nspins, nstates(2), output_unit
+                 nbr_center(2), nmo, nspins, nstates(2), output_unit
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: first_sgf, last_sgf
       INTEGER, DIMENSION(:), POINTER                     :: row_blk_sizes
       LOGICAL                                            :: chi_pbc, gapw
@@ -2700,7 +2700,7 @@ CONTAINS
                   DO kdir = 1, 3
                      IF (Levi_Civita(kdir, jdir, idir) .EQ. 0.0_dp) CYCLE
                      CALL cp_fm_trace(buf, psi1_rxp(ispin, iB)%matrix, contrib)
-                     chi(kdir) = chi(kdir)-Levi_Civita(kdir, jdir, idir)*2.0_dp*dk(jdir)*contrib
+                     chi(kdir) = chi(kdir) - Levi_Civita(kdir, jdir, idir)*2.0_dp*dk(jdir)*contrib
                   ENDDO
                ENDDO
             ENDIF
@@ -2720,7 +2720,7 @@ CONTAINS
                DO kdir = 1, 3
                   IF (Levi_Civita(kdir, jdir, idir) .EQ. 0.0_dp) CYCLE
                   CALL cp_fm_trace(buf, psi1_rxp(ispin, iB)%matrix, contrib)
-                  chi(kdir) = chi(kdir)-Levi_Civita(kdir, jdir, idir)*2.0_dp*contrib
+                  chi(kdir) = chi(kdir) - Levi_Civita(kdir, jdir, idir)*2.0_dp*contrib
                ENDDO
                !
                IF (.NOT. chi_pbc) THEN
@@ -2729,7 +2729,7 @@ CONTAINS
                         DO kdir = 1, 3
                            IF (Levi_Civita(kdir, jjdir, idir) .EQ. 0.0_dp) CYCLE
                            CALL cp_fm_trace(buf, psi1_p(ispin, iiiB)%matrix, contrib)
-                           chi(kdir) = chi(kdir)+Levi_Civita(kdir, jjdir, idir)*2.0_dp*dk(jjdir)*contrib
+                           chi(kdir) = chi(kdir) + Levi_Civita(kdir, jjdir, idir)*2.0_dp*dk(jjdir)*contrib
                         ENDDO
                      ENDDO
                   ENDIF
@@ -2739,7 +2739,7 @@ CONTAINS
                         DO kdir = 1, 3
                            IF (Levi_Civita(kdir, jjdir, idir) .EQ. 0.0_dp) CYCLE
                            CALL cp_fm_trace(buf, psi1_p(ispin, iiB)%matrix, contrib)
-                           chi(kdir) = chi(kdir)-Levi_Civita(kdir, jjdir, idir)*2.0_dp*dk(jjdir)*contrib
+                           chi(kdir) = chi(kdir) - Levi_Civita(kdir, jjdir, idir)*2.0_dp*dk(jjdir)*contrib
                         ENDDO
                      ENDDO
                   ENDIF
@@ -2760,7 +2760,7 @@ CONTAINS
                DO kdir = 1, 3
                   IF (Levi_Civita(kdir, jdir, idir) .EQ. 0.0_dp) CYCLE
                   CALL cp_fm_trace(buf, psi1_p(ispin, iiiB)%matrix, contrib)
-                  chi(kdir) = chi(kdir)+Levi_Civita(kdir, jdir, idir)*2.0_dp*contrib
+                  chi(kdir) = chi(kdir) + Levi_Civita(kdir, jdir, idir)*2.0_dp*contrib
                ENDDO
                !
                CALL cp_dbcsr_sm_fm_multiply(op_mom_der_ao(ind_m2(jdir, iiiB), idir)%matrix, mo_coeff, &
@@ -2768,7 +2768,7 @@ CONTAINS
                DO kdir = 1, 3
                   IF (Levi_Civita(kdir, jdir, idir) .EQ. 0.0_dp) CYCLE
                   CALL cp_fm_trace(buf, psi1_p(ispin, iiB)%matrix, contrib)
-                  chi(kdir) = chi(kdir)-Levi_Civita(kdir, jdir, idir)*2.0_dp*contrib
+                  chi(kdir) = chi(kdir) - Levi_Civita(kdir, jdir, idir)*2.0_dp*contrib
                ENDDO
             ENDDO
             !
@@ -2786,7 +2786,7 @@ CONTAINS
                   IF (Levi_Civita(kdir, idir, jdir) .EQ. 0.0_dp) CYCLE
                   IF (iiB == jdir) THEN
                      CALL cp_fm_trace(buf, psi1_p(ispin, iiiB)%matrix, contrib)
-                     chi(kdir) = chi(kdir)+Levi_Civita(kdir, idir, jdir)*contrib
+                     chi(kdir) = chi(kdir) + Levi_Civita(kdir, idir, jdir)*contrib
                   ENDIF
                ENDDO
             ENDDO
@@ -2796,7 +2796,7 @@ CONTAINS
                   IF (Levi_Civita(kdir, idir, jdir) .EQ. 0.0_dp) CYCLE
                   IF (iiiB == jdir) THEN
                      CALL cp_fm_trace(buf, psi1_p(ispin, iiB)%matrix, contrib)
-                     chi(kdir) = chi(kdir)-Levi_Civita(kdir, idir, jdir)*contrib
+                     chi(kdir) = chi(kdir) - Levi_Civita(kdir, idir, jdir)*contrib
                   ENDIF
                   !
                ENDDO
@@ -2808,7 +2808,7 @@ CONTAINS
          ENDDO ! idir
          !
          DO idir = 1, 3
-            current_env%chi_tensor(idir, iB, ispin) = current_env%chi_tensor(idir, iB, ispin)+ &
+            current_env%chi_tensor(idir, iB, ispin) = current_env%chi_tensor(idir, iB, ispin) + &
                                                       maxocc*chi(idir)
             IF (output_unit > 0) THEN
                !WRITE(output_unit,'(A,E12.6)') ' chi_'//ACHAR(119+idir)//ACHAR(119+iB)//&

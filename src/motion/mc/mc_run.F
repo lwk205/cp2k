@@ -36,40 +36,40 @@
 !> \author MJM-Oct-15-03
 ! **************************************************************************************************
 MODULE mc_run
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE force_env_types,                 ONLY: force_env_p_type,&
-                                              force_env_release,&
-                                              force_env_retain,&
-                                              force_env_type,&
-                                              use_fist_force
-   USE global_types,                    ONLY: global_environment_type
-   USE input_section_types,             ONLY: section_type,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE mc_control,                      ONLY: mc_create_force_env,&
-                                              read_mc_restart
-   USE mc_ensembles,                    ONLY: mc_compute_virial,&
-                                              mc_run_ensemble
-   USE mc_environment_types,            ONLY: get_mc_env,&
-                                              mc_env_create,&
-                                              mc_env_release,&
-                                              mc_environment_p_type,&
-                                              set_mc_env
-   USE mc_types,                        ONLY: &
-        find_mc_rcut, get_mc_molecule_info, get_mc_par, mc_determine_molecule_info, &
-        mc_input_file_create, mc_input_file_destroy, mc_input_file_type, &
-        mc_input_parameters_check, mc_molecule_info_destroy, mc_molecule_info_type, &
-        mc_sim_par_create, mc_sim_par_destroy, mc_simulation_parameters_p_type, read_mc_section, &
-        set_mc_par
-   USE parallel_rng_types,              ONLY: UNIFORM,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              rng_stream_type
-   USE physcon,                         ONLY: angstrom
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE force_env_types, ONLY: force_env_p_type, &
+                              force_env_release, &
+                              force_env_retain, &
+                              force_env_type, &
+                              use_fist_force
+   USE global_types, ONLY: global_environment_type
+   USE input_section_types, ONLY: section_type, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE mc_control, ONLY: mc_create_force_env, &
+                         read_mc_restart
+   USE mc_ensembles, ONLY: mc_compute_virial, &
+                           mc_run_ensemble
+   USE mc_environment_types, ONLY: get_mc_env, &
+                                   mc_env_create, &
+                                   mc_env_release, &
+                                   mc_environment_p_type, &
+                                   set_mc_env
+   USE mc_types, ONLY: &
+      find_mc_rcut, get_mc_molecule_info, get_mc_par, mc_determine_molecule_info, &
+      mc_input_file_create, mc_input_file_destroy, mc_input_file_type, &
+      mc_input_parameters_check, mc_molecule_info_destroy, mc_molecule_info_type, &
+      mc_sim_par_create, mc_sim_par_destroy, mc_simulation_parameters_p_type, read_mc_section, &
+      set_mc_par
+   USE parallel_rng_types, ONLY: UNIFORM, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 rng_stream_type
+   USE physcon, ONLY: angstrom
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE

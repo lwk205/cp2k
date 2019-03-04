@@ -9,10 +9,10 @@
 ! **************************************************************************************************
 MODULE et_coupling_types
 
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE kinds,                           ONLY: dp
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -54,7 +54,7 @@ CONTAINS
       TYPE(et_coupling_type), POINTER                    :: et_coupling
 
       CHARACTER(len=*), PARAMETER :: routineN = 'et_coupling_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (et_coupling)
 
@@ -80,7 +80,7 @@ CONTAINS
          POINTER                                         :: rest_mat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_et_coupling_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(et_mo_coeff)) et_mo_coeff => et_coupling%et_mo_coeff
       IF (PRESENT(rest_mat)) rest_mat => et_coupling%rest_mat
@@ -101,7 +101,7 @@ CONTAINS
          POINTER                                         :: rest_mat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_et_coupling_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(et_mo_coeff)) et_coupling%et_mo_coeff = et_mo_coeff
       IF (PRESENT(rest_mat)) et_coupling%rest_mat => rest_mat
@@ -116,7 +116,7 @@ CONTAINS
       TYPE(et_coupling_type), POINTER                    :: et_coupling
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'et_coupling_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

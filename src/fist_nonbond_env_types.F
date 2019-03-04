@@ -9,17 +9,17 @@
 !> \author HAF
 ! **************************************************************************************************
 MODULE fist_nonbond_env_types
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_release,&
-                                              cell_type
-   USE fist_neighbor_list_types,        ONLY: fist_neighbor_deallocate,&
-                                              fist_neighbor_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE pair_potential_types,            ONLY: pair_potential_pp_release,&
-                                              pair_potential_pp_type,&
-                                              siepmann_type,&
-                                              tersoff_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_release, &
+                         cell_type
+   USE fist_neighbor_list_types, ONLY: fist_neighbor_deallocate, &
+                                       fist_neighbor_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE pair_potential_types, ONLY: pair_potential_pp_release, &
+                                   pair_potential_pp_type, &
+                                   siepmann_type, &
+                                   tersoff_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -272,7 +272,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: shift_cutoff
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fist_nonbond_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (fist_nonbond_env)
       NULLIFY (fist_nonbond_env%potparm14)
@@ -320,7 +320,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: shift_cutoff
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_fist_nonbond_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: idim, jdim, natom_types
       LOGICAL                                            :: check, use_potparm, use_potparm14
@@ -352,7 +352,7 @@ CONTAINS
       fist_nonbond_env%long_range_correction = 0
       fist_nonbond_env%ref_count = 1
       fist_nonbond_env%id_nr = last_fist_nonbond_env_id_nr
-      last_fist_nonbond_env_id_nr = last_fist_nonbond_env_id_nr+1
+      last_fist_nonbond_env_id_nr = last_fist_nonbond_env_id_nr + 1
       IF (do_nonbonded) THEN
          natom_types = 1
          ! Determine size of kind arrays
@@ -384,7 +384,7 @@ CONTAINS
                   ! Warning: rlist_rcut should only be used by the neighbor list
                   ! algorithm. It is not the cutoff for the evaluation of the
                   ! interactions because rlist_rcut includes the Verlet skin.
-                  rcut = MAX(rcut, ewald_rcut)+verlet_skin
+                  rcut = MAX(rcut, ewald_rcut) + verlet_skin
                   fist_nonbond_env%rlist_cut(idim, jdim) = rcut
                   fist_nonbond_env%rlist_cut(jdim, idim) = rcut
                   rlow = rlow*(1.06_dp)**2 ! 1.06_dp in order to have 1/2 Emax_spline
@@ -438,11 +438,11 @@ CONTAINS
       TYPE(fist_nonbond_env_type), POINTER               :: fist_nonbond_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fist_nonbond_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(fist_nonbond_env))
       CPASSERT(fist_nonbond_env%ref_count > 0)
-      fist_nonbond_env%ref_count = fist_nonbond_env%ref_count+1
+      fist_nonbond_env%ref_count = fist_nonbond_env%ref_count + 1
    END SUBROUTINE fist_nonbond_env_retain
 
 ! **************************************************************************************************
@@ -456,11 +456,11 @@ CONTAINS
       TYPE(fist_nonbond_env_type), POINTER               :: fist_nonbond_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fist_nonbond_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(fist_nonbond_env)) THEN
          CPASSERT(fist_nonbond_env%ref_count > 0)
-         fist_nonbond_env%ref_count = fist_nonbond_env%ref_count-1
+         fist_nonbond_env%ref_count = fist_nonbond_env%ref_count - 1
          IF (fist_nonbond_env%ref_count < 1) THEN
             IF (ASSOCIATED(fist_nonbond_env%nonbonded)) THEN
                CALL fist_neighbor_deallocate(fist_nonbond_env%nonbonded)

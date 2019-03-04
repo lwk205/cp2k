@@ -5,23 +5,23 @@
 
 ! **************************************************************************************************
 MODULE farming_methods
-   USE cp_files,                        ONLY: get_unit_number
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_generate_filename,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE farming_types,                   ONLY: farming_env_type,&
-                                              init_job_type,&
-                                              job_finished,&
-                                              job_pending,&
-                                              job_running
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE message_passing,                 ONLY: mp_bcast
+   USE cp_files, ONLY: get_unit_number
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_generate_filename, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE farming_types, ONLY: farming_env_type, &
+                            init_job_type, &
+                            job_finished, &
+                            job_pending, &
+                            job_running
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE message_passing, ONLY: mp_bcast
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -58,12 +58,12 @@ CONTAINS
          IF (current < start) THEN
             current = start
          ELSE
-            current = current+1
+            current = current + 1
          ENDIF
          IF (current > END) THEN
             todo = do_nothing
          ELSE
-            todo = MODULO(current-1, farming_env%njobs)+1
+            todo = MODULO(current - 1, farming_env%njobs) + 1
          ENDIF
       ELSE
          ! find a pending job
@@ -120,7 +120,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'farming_parse_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=3)                                   :: text
       INTEGER                                            :: i, iunit, n_rep_val, num_slaves, &
@@ -149,7 +149,7 @@ CONTAINS
       IF (n_rep_val > 0) THEN
          CALL section_vals_val_get(farming_section, "GROUP_PARTITION", &
                                    i_vals=i_vals)
-         ALLOCATE (farming_env%group_partition(0:SIZE(i_vals)-1))
+         ALLOCATE (farming_env%group_partition(0:SIZE(i_vals) - 1))
          farming_env%group_partition(:) = i_vals
          farming_env%ngroup_wish_set = .TRUE.
          farming_env%ngroup_wish = SIZE(i_vals)
@@ -245,7 +245,7 @@ CONTAINS
          WRITE (output_unit, FMT="(T2,A)") "FARMING| Master-slave setup not support for serial runs"
       ENDIF
       IF (farming_env%master_slave) THEN
-         num_slaves = para_env%num_pe-1
+         num_slaves = para_env%num_pe - 1
       ELSE
          num_slaves = para_env%num_pe
       ENDIF
@@ -256,7 +256,7 @@ CONTAINS
             WRITE (output_unit, FMT="(T2,A,T71,I10)") "FARMING| Ngroup wish:", farming_env%ngroup_wish
             IF (ASSOCIATED(farming_env%group_partition)) THEN
                WRITE (output_unit, FMT="(T2,A)", ADVANCE="NO") "FARMING| User partition:"
-               DO i = 0, SIZE(farming_env%group_partition)-1
+               DO i = 0, SIZE(farming_env%group_partition) - 1
                   IF (MODULO(i, 4) == 0) WRITE (output_unit, *)
                   WRITE (output_unit, FMT='(I4)', ADVANCE="NO") farming_env%group_partition(i)
                END DO

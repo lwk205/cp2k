@@ -16,66 +16,66 @@
 !> \author Teodoro Laino 08.2006
 ! **************************************************************************************************
 MODULE vibrational_analysis
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_set_element,&
-                                              cp_fm_type,&
-                                              cp_fm_write_unformatted
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_result_methods,               ONLY: get_results
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE f77_interface,                   ONLY: f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE header,                          ONLY: vib_header
-   USE input_constants,                 ONLY: do_rep_blocked
-   USE input_section_types,             ONLY: section_type,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: pi
-   USE mathlib,                         ONLY: diamat_all
-   USE mode_selective,                  ONLY: ms_vb_anal
-   USE molden_utils,                    ONLY: write_vibrations_molden
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: fixd_constraint_type,&
-                                              get_molecule_kind,&
-                                              molecule_kind_type
-   USE motion_utils,                    ONLY: rot_ana,&
-                                              thrs_motion
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: write_particle_matrix
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: &
-        a_bohr, boltzmann, e_mass, h_bar, hertz, kelvin, kjmol, massunit, n_avogadro, pascal, &
-        vibfac, wavenumbers
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE replica_methods,                 ONLY: rep_env_calc_e_f,&
-                                              rep_env_create
-   USE replica_types,                   ONLY: rep_env_release,&
-                                              replica_env_type
-   USE util,                            ONLY: sort
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_set_element, &
+                          cp_fm_type, &
+                          cp_fm_write_unformatted
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_result_methods, ONLY: get_results
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE f77_interface, ONLY: f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE header, ONLY: vib_header
+   USE input_constants, ONLY: do_rep_blocked
+   USE input_section_types, ONLY: section_type, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: pi
+   USE mathlib, ONLY: diamat_all
+   USE mode_selective, ONLY: ms_vb_anal
+   USE molden_utils, ONLY: write_vibrations_molden
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_type
+   USE molecule_kind_types, ONLY: fixd_constraint_type, &
+                                  get_molecule_kind, &
+                                  molecule_kind_type
+   USE motion_utils, ONLY: rot_ana, &
+                           thrs_motion
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: write_particle_matrix
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: &
+      a_bohr, boltzmann, e_mass, h_bar, hertz, kelvin, kjmol, massunit, n_avogadro, pascal, &
+      vibfac, wavenumbers
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE replica_methods, ONLY: rep_env_calc_e_f, &
+                              rep_env_create
+   USE replica_types, ONLY: rep_env_release, &
+                            replica_env_type
+   USE util, ONLY: sort
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -106,8 +106,8 @@ CONTAINS
 
       CHARACTER(LEN=default_string_length)               :: description
       INTEGER :: handle, i, icoord, icoordm, icoordp, ierr, imap, ip1, ip2, iparticle1, &
-         iparticle2, iseq, iw, j, k, natoms, ncoord, nrep, nres, nRotTrM, nvib, output_unit, &
-         output_unit_eig, prep, proc_dist_type
+                 iparticle2, iseq, iw, j, k, natoms, ncoord, nrep, nres, nRotTrM, nvib, output_unit, &
+                 output_unit_eig, prep, proc_dist_type
       INTEGER, DIMENSION(:), POINTER                     :: Clist, Mlist
       LOGICAL                                            :: calc_intens, calc_thchdata, &
                                                             do_mode_tracking, keep_rotations, &
@@ -205,15 +205,15 @@ CONTAINS
             Clist = 0
             DO i = 1, natoms
                imap = Mlist(i)
-               Clist((i-1)*3+1) = (imap-1)*3+1
-               Clist((i-1)*3+2) = (imap-1)*3+2
-               Clist((i-1)*3+3) = (imap-1)*3+3
+               Clist((i - 1)*3 + 1) = (imap - 1)*3 + 1
+               Clist((i - 1)*3 + 2) = (imap - 1)*3 + 2
+               Clist((i - 1)*3 + 3) = (imap - 1)*3 + 3
                mass(i) = particles(imap)%atomic_kind%mass
                CPASSERT(mass(i) > 0.0_dp)
                mass(i) = SQRT(mass(i))
-               pos0((i-1)*3+1) = particles(imap)%r(1)
-               pos0((i-1)*3+2) = particles(imap)%r(2)
-               pos0((i-1)*3+3) = particles(imap)%r(3)
+               pos0((i - 1)*3 + 1) = particles(imap)%r(1)
+               pos0((i - 1)*3 + 2) = particles(imap)%r(2)
+               pos0((i - 1)*3 + 3) = particles(imap)%r(3)
             END DO
             !
             ! Determine the principal axes of inertia.
@@ -235,120 +235,120 @@ CONTAINS
             Hessian = HUGE(0.0_dp)
             IF (output_unit > 0) WRITE (output_unit, '(/,T2,A)') "VIB| Vibrational Analysis Info"
             DO icoordp = 1, ncoord, nrep
-               icoord = icoordp-1
+               icoord = icoordp - 1
                DO j = 1, nrep
                   DO i = 1, ncoord
                      imap = Clist(i)
                      rep_env%r(imap, j) = pos0(i)
                   END DO
-                  IF (icoord+j <= ncoord) THEN
-                     imap = Clist(icoord+j)
-                     rep_env%r(imap, j) = rep_env%r(imap, j)+Dx
+                  IF (icoord + j <= ncoord) THEN
+                     imap = Clist(icoord + j)
+                     rep_env%r(imap, j) = rep_env%r(imap, j) + Dx
                   END IF
                END DO
                CALL rep_env_calc_e_f(rep_env, calc_f=.TRUE.)
 
                DO j = 1, nrep
                   IF (calc_intens) THEN
-                     IF (icoord+j <= ncoord) THEN
+                     IF (icoord + j <= ncoord) THEN
                         CALL get_results(results=rep_env%results(j)%results, &
                                          description=description, &
                                          n_rep=nres)
                         CALL get_results(results=rep_env%results(j)%results, &
                                          description=description, &
-                                         values=tmp_dip(icoord+j, :, 1), &
+                                         values=tmp_dip(icoord + j, :, 1), &
                                          nval=nres)
                      END IF
                   END IF
-                  IF (icoord+j <= ncoord) THEN
+                  IF (icoord + j <= ncoord) THEN
                      DO i = 1, ncoord
                         imap = Clist(i)
-                        Hessian(i, icoord+j) = rep_env%f(imap, j)
+                        Hessian(i, icoord + j) = rep_env%f(imap, j)
                      END DO
-                     imap = Clist(icoord+j)
+                     imap = Clist(icoord + j)
                      ! Dump Info
                      IF (output_unit > 0) THEN
                         iparticle1 = imap/3
-                        IF (MOD(imap, 3) /= 0) iparticle1 = iparticle1+1
+                        IF (MOD(imap, 3) /= 0) iparticle1 = iparticle1 + 1
                         WRITE (output_unit, '(T2,A,I5,A,I5,3A)') &
                            "VIB| REPLICA Nr.", j, "- Energy and Forces for particle:", &
-                           iparticle1, "  coordinate: ", lab(imap-(iparticle1-1)*3), &
-                           " + D"//TRIM(lab(imap-(iparticle1-1)*3))
+                           iparticle1, "  coordinate: ", lab(imap - (iparticle1 - 1)*3), &
+                           " + D"//TRIM(lab(imap - (iparticle1 - 1)*3))
                         !
                         WRITE (output_unit, '(T2,A,T42,A,9X,F15.9)') &
-                           "VIB|", " Total Energy: ", rep_env%f(rep_env%ndim+1, j)
+                           "VIB|", " Total Energy: ", rep_env%f(rep_env%ndim + 1, j)
                         WRITE (output_unit, '(T2,"VIB|",T10,"ATOM",T33,3(9X,A,7X))') lab(1), lab(2), lab(3)
                         DO i = 1, natoms
                            imap = Mlist(i)
                            WRITE (output_unit, '(T2,"VIB|",T12,A,T30,3(2X,F15.9))') &
                               particles(imap)%atomic_kind%name, &
-                              rep_env%f((imap-1)*3+1:(imap-1)*3+3, j)
+                              rep_env%f((imap - 1)*3 + 1:(imap - 1)*3 + 3, j)
                         END DO
                      END IF
                   END IF
                END DO
             END DO
             DO icoordm = 1, ncoord, nrep
-               icoord = icoordm-1
+               icoord = icoordm - 1
                DO j = 1, nrep
                   DO i = 1, ncoord
                      imap = Clist(i)
                      rep_env%r(imap, j) = pos0(i)
                   END DO
-                  IF (icoord+j <= ncoord) THEN
-                     imap = Clist(icoord+j)
-                     rep_env%r(imap, j) = rep_env%r(imap, j)-Dx
+                  IF (icoord + j <= ncoord) THEN
+                     imap = Clist(icoord + j)
+                     rep_env%r(imap, j) = rep_env%r(imap, j) - Dx
                   END IF
                END DO
                CALL rep_env_calc_e_f(rep_env, calc_f=.TRUE.)
 
                DO j = 1, nrep
                   IF (calc_intens) THEN
-                     IF (icoord+j <= ncoord) THEN
-                        k = (icoord+j+2)/3
+                     IF (icoord + j <= ncoord) THEN
+                        k = (icoord + j + 2)/3
                         CALL get_results(results=rep_env%results(j)%results, &
                                          description=description, &
                                          n_rep=nres)
                         CALL get_results(results=rep_env%results(j)%results, &
                                          description=description, &
-                                         values=tmp_dip(icoord+j, :, 2), &
+                                         values=tmp_dip(icoord + j, :, 2), &
                                          nval=nres)
-                        tmp_dip(icoord+j, :, 1) = (tmp_dip(icoord+j, :, 1)-tmp_dip(icoord+j, :, 2))/(2.0_dp*Dx*mass(k))
+                        tmp_dip(icoord + j, :, 1) = (tmp_dip(icoord + j, :, 1) - tmp_dip(icoord + j, :, 2))/(2.0_dp*Dx*mass(k))
                      END IF
                   END IF
-                  IF (icoord+j <= ncoord) THEN
-                     imap = Clist(icoord+j)
+                  IF (icoord + j <= ncoord) THEN
+                     imap = Clist(icoord + j)
                      iparticle1 = imap/3
-                     IF (MOD(imap, 3) /= 0) iparticle1 = iparticle1+1
-                     ip1 = (icoord+j)/3
-                     IF (MOD(icoord+j, 3) /= 0) ip1 = ip1+1
+                     IF (MOD(imap, 3) /= 0) iparticle1 = iparticle1 + 1
+                     ip1 = (icoord + j)/3
+                     IF (MOD(icoord + j, 3) /= 0) ip1 = ip1 + 1
                      ! Dump Info
                      IF (output_unit > 0) THEN
                         WRITE (output_unit, '(T2,A,I5,A,I5,3A)') &
                            "VIB| REPLICA Nr.", j, "- Energy and Forces for particle:", &
-                           iparticle1, "  coordinate: ", lab(imap-(iparticle1-1)*3), &
-                           " - D"//TRIM(lab(imap-(iparticle1-1)*3))
+                           iparticle1, "  coordinate: ", lab(imap - (iparticle1 - 1)*3), &
+                           " - D"//TRIM(lab(imap - (iparticle1 - 1)*3))
                         !
                         WRITE (output_unit, '(T2,A,T42,A,9X,F15.9)') &
-                           "VIB|", " Total Energy: ", rep_env%f(rep_env%ndim+1, j)
+                           "VIB|", " Total Energy: ", rep_env%f(rep_env%ndim + 1, j)
                         WRITE (output_unit, '(T2,"VIB|",T10,"ATOM",T33,3(9X,A,7X))') lab(1), lab(2), lab(3)
                         DO i = 1, natoms
                            imap = Mlist(i)
                            WRITE (output_unit, '(T2,"VIB|",T12,A,T30,3(2X,F15.9))') &
                               particles(imap)%atomic_kind%name, &
-                              rep_env%f((imap-1)*3+1:(imap-1)*3+3, j)
+                              rep_env%f((imap - 1)*3 + 1:(imap - 1)*3 + 3, j)
                         END DO
                      END IF
                      DO iseq = 1, ncoord
                         imap = Clist(iseq)
                         iparticle2 = imap/3
-                        IF (MOD(imap, 3) /= 0) iparticle2 = iparticle2+1
+                        IF (MOD(imap, 3) /= 0) iparticle2 = iparticle2 + 1
                         ip2 = iseq/3
-                        IF (MOD(iseq, 3) /= 0) ip2 = ip2+1
-                        tmp = Hessian(iseq, icoord+j)-rep_env%f(imap, j)
+                        IF (MOD(iseq, 3) /= 0) ip2 = ip2 + 1
+                        tmp = Hessian(iseq, icoord + j) - rep_env%f(imap, j)
                         tmp = -tmp/(2.0_dp*Dx*mass(ip1)*mass(ip2))*1E6_dp
                         ! Mass weighted Hessian
-                        Hessian(iseq, icoord+j) = tmp
+                        Hessian(iseq, icoord + j) = tmp
 
                      END DO
                   END IF
@@ -358,7 +358,7 @@ CONTAINS
             ! restore original particle positions for output
             DO i = 1, natoms
                imap = Mlist(i)
-               particles(imap)%r(1:3) = pos0((i-1)*3+1:(i-1)*3+3)
+               particles(imap)%r(1:3) = pos0((i - 1)*3 + 1:(i - 1)*3 + 3)
             ENDDO
             DO j = 1, nrep
                DO i = 1, ncoord
@@ -368,19 +368,19 @@ CONTAINS
             ENDDO
             CALL rep_env_calc_e_f(rep_env, calc_f=.TRUE.)
             j = 1
-            minimum_energy = rep_env%f(rep_env%ndim+1, j)
+            minimum_energy = rep_env%f(rep_env%ndim + 1, j)
             IF (output_unit > 0) THEN
                WRITE (output_unit, '(T2,A)') &
                   "VIB| ", " Minimum Structure - Energy and Forces:"
                !
                WRITE (output_unit, '(T2,A,T42,A,9X,F15.9)') &
-                  "VIB|", " Total Energy: ", rep_env%f(rep_env%ndim+1, j)
+                  "VIB|", " Total Energy: ", rep_env%f(rep_env%ndim + 1, j)
                WRITE (output_unit, '(T2,"VIB|",T10,"ATOM",T33,3(9X,A,7X))') lab(1), lab(2), lab(3)
                DO i = 1, natoms
                   imap = Mlist(i)
                   WRITE (output_unit, '(T2,"VIB|",T12,A,T30,3(2X,F15.9))') &
                      particles(imap)%atomic_kind%name, &
-                     rep_env%f((imap-1)*3+1:(imap-1)*3+3, j)
+                     rep_env%f((imap - 1)*3 + 1:(imap - 1)*3 + 3, j)
                END DO
             END IF
 
@@ -400,7 +400,7 @@ CONTAINS
                   Hessian(j, i) = Hessian(i, j)
                END DO
             END DO
-            nvib = ncoord-nRotTrM
+            nvib = ncoord - nRotTrM
             ALLOCATE (H_eigval1(ncoord))
             ALLOCATE (H_eigval2(SIZE(D, 2)))
             ALLOCATE (Hint1(ncoord, ncoord))
@@ -443,7 +443,7 @@ CONTAINS
                Hessian = 0.0_dp
                DO i = 1, natoms
                   DO j = 1, 3
-                     Hessian((i-1)*3+j, (i-1)*3+j) = 1.0_dp/mass(i)
+                     Hessian((i - 1)*3 + j, (i - 1)*3 + j) = 1.0_dp/mass(i)
                   END DO
                END DO
                ! Cartesian displacements of the normal modes
@@ -460,7 +460,7 @@ CONTAINS
                   IF (calc_intens) THEN
                      D_deriv = 0._dp
                      DO j = 1, nvib
-                        D_deriv(:) = D_deriv(:)+dip_deriv(:, j)*Hint2(j, i)
+                        D_deriv(:) = D_deriv(:) + dip_deriv(:, j)*Hint2(j, i)
                      END DO
                      intensities(i) = SQRT(DOT_PRODUCT(D_deriv, D_deriv))
                   END IF
@@ -520,7 +520,7 @@ CONTAINS
       INTEGER, DIMENSION(:), POINTER                     :: Ilist
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_moving_atoms', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ii, ikind, j, ndim, &
                                                             nfixed_atoms, nfixed_atoms_total, nkind
@@ -548,9 +548,9 @@ CONTAINS
       DO ikind = 1, nkind
          molecule_kind => molecule_kind_set(ikind)
          CALL get_molecule_kind(molecule_kind, nfixd=nfixed_atoms)
-         nfixed_atoms_total = nfixed_atoms_total+nfixed_atoms
+         nfixed_atoms_total = nfixed_atoms_total + nfixed_atoms
       END DO
-      ndim = SIZE(particle_set)-nfixed_atoms_total
+      ndim = SIZE(particle_set) - nfixed_atoms_total
       CPASSERT(ndim >= 0)
       ALLOCATE (Ilist(ndim))
 
@@ -564,7 +564,7 @@ CONTAINS
             IF (ASSOCIATED(fixd_list)) THEN
                DO ii = 1, SIZE(fixd_list)
                   IF (.NOT. fixd_list(ii)%restraint%active) THEN
-                     nfixed_atoms_total = nfixed_atoms_total+1
+                     nfixed_atoms_total = nfixed_atoms_total + 1
                      ifixd_list(nfixed_atoms_total) = fixd_list(ii)%fixd
                   END IF
                END DO
@@ -576,11 +576,11 @@ CONTAINS
          j = 1
          Loop_count: DO i = 1, SIZE(particle_set)
             DO WHILE (i > ifixd_list(j))
-               j = j+1
+               j = j + 1
                IF (j > nfixed_atoms_total) EXIT Loop_count
             END DO
             IF (i /= ifixd_list(j)) THEN
-               ndim = ndim+1
+               ndim = ndim + 1
                Ilist(ndim) = i
             END IF
          END DO Loop_count
@@ -591,7 +591,7 @@ CONTAINS
          ndim = 0
       END IF
       DO j = i, SIZE(particle_set)
-         ndim = ndim+1
+         ndim = ndim + 1
          Ilist(ndim) = j
       END DO
       CALL timestop(handle)
@@ -628,7 +628,7 @@ CONTAINS
       WRITE (UNIT=iw, FMT="(T2,'VIB|')")
       DO jatom = 1, nvib, 3
          from = jatom
-         to = MIN(from+2, nvib)
+         to = MIN(from + 2, nvib)
          WRITE (UNIT=iw, FMT="(T2,'VIB|',13X,3(8X,I5,8X))") &
             (icol, icol=from, to)
          WRITE (UNIT=iw, FMT="(T2,'VIB|Frequency (cm^-1)',3(1X,F12.6,8X))") &
@@ -644,12 +644,12 @@ CONTAINS
          WRITE (UNIT=iw, FMT="(T2,' ATOM',2X,'EL',7X,3(4X,'  X  ',1X,'  Y  ',1X,'  Z  '))")
          DO iatom = 1, natom, 3
             katom = iatom/3
-            IF (MOD(iatom, 3) /= 0) katom = katom+1
+            IF (MOD(iatom, 3) /= 0) katom = katom + 1
             CALL get_atomic_kind(atomic_kind=particles(Mlist(katom))%atomic_kind, &
                                  element_symbol=element_symbol)
             WRITE (UNIT=iw, FMT="(T2,I5,2X,A2,7X,3(4X,2(F5.2,1X),F5.2))") &
                Mlist(katom), element_symbol, &
-               ((D(iatom+j, icol), j=0, 2), icol=from, to)
+               ((D(iatom + j, icol), j=0, 2), icol=from, to)
          END DO
          WRITE (UNIT=iw, FMT="(/)")
       END DO
@@ -685,13 +685,13 @@ CONTAINS
       my_full = .TRUE.
       IF (PRESENT(full)) my_full = full
       ! Generate the missing vectors of the orthogonal basis set
-      nvib = 3*natoms-dof
+      nvib = 3*natoms - dof
       ALLOCATE (work(3*natoms))
       ALLOCATE (D(3*natoms, 3*natoms))
       ! Check First orthogonality in the first element of the basis set
       DO i = 1, dof
          D(:, i) = mat(:, i)
-         DO j = i+1, dof
+         DO j = i + 1, dof
             norm = DOT_PRODUCT(mat(:, i), mat(:, j))
             CPASSERT(ABS(norm) < thrs_motion)
          END DO
@@ -700,30 +700,30 @@ CONTAINS
       iseq = 0
       ifound = 0
       DO WHILE (ifound /= nvib)
-         iseq = iseq+1
+         iseq = iseq + 1
          CPASSERT(iseq <= 3*natoms)
          work = 0.0_dp
          work(iseq) = 1.0_dp
          ! Gram Schmidt orthogonalization
-         DO i = 1, dof+ifound
+         DO i = 1, dof + ifound
             norm = DOT_PRODUCT(work, D(:, i))
-            work(:) = work-norm*D(:, i)
+            work(:) = work - norm*D(:, i)
          END DO
          ! Check norm of the new generated vector
          norm = SQRT(DOT_PRODUCT(work, work))
          IF (norm >= 10E4_dp*thrs_motion) THEN
             ! Accept new vector
-            ifound = ifound+1
-            D(:, dof+ifound) = work/norm
+            ifound = ifound + 1
+            D(:, dof + ifound) = work/norm
          END IF
       END DO
-      CPASSERT(dof+ifound == 3*natoms)
+      CPASSERT(dof + ifound == 3*natoms)
       IF (my_full) THEN
          ALLOCATE (Dout(3*natoms, 3*natoms))
          Dout = D
       ELSE
          ALLOCATE (Dout(3*natoms, nvib))
-         Dout = D(:, dof+1:)
+         Dout = D(:, dof + 1:)
       END IF
       DEALLOCATE (work)
       DEALLOCATE (D)
@@ -757,14 +757,14 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: totene, temp, pressure
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_thch_values', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, natoms, sym_num
       REAL(KIND=dp) :: el_entropy, entropy, exp_min_one, fact, fact2, freq_arg, freq_arg2, &
-         freqsum, Gibbs, heat_capacity, inertia_kg(3), mass_tot, one_min_exp, partition_function, &
-         rot_cv, rot_energy, rot_entropy, rot_part_func, rotvibtra, tran_cv, tran_energy, &
-         tran_enthalpy, tran_entropy, tran_part_func, vib_cv, vib_energy, vib_entropy, &
-         vib_part_func, zpe
+                       freqsum, Gibbs, heat_capacity, inertia_kg(3), mass_tot, one_min_exp, partition_function, &
+                       rot_cv, rot_energy, rot_entropy, rot_part_func, rotvibtra, tran_cv, tran_energy, &
+                       tran_enthalpy, tran_entropy, tran_part_func, vib_cv, vib_energy, vib_entropy, &
+                       vib_part_func, zpe
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: mass_kg
 
 !    temp = 273.150_dp ! in Kelvin
@@ -772,7 +772,7 @@ CONTAINS
 
       freqsum = 0.0_dp
       DO i = 1, nvib
-         freqsum = freqsum+freqs(i)
+         freqsum = freqsum + freqs(i)
       ENDDO
 
 !   ZPE
@@ -792,7 +792,7 @@ CONTAINS
       IF (inertia_kg(1)*inertia_kg(2)*inertia_kg(3) > 1.0_dp) THEN
          rot_part_func = fact*fact*fact*inertia_kg(1)*inertia_kg(2)*inertia_kg(3)*pi
          rot_part_func = SQRT(rot_part_func)
-         rot_entropy = n_avogadro*boltzmann*(LOG(rot_part_func)+1.5_dp)
+         rot_entropy = n_avogadro*boltzmann*(LOG(rot_part_func) + 1.5_dp)
          rot_energy = 1.5_dp*n_avogadro*boltzmann*temp
          rot_cv = 1.5_dp*n_avogadro*boltzmann
       ELSE
@@ -804,14 +804,14 @@ CONTAINS
          ELSE
             rot_part_func = fact*inertia_kg(3)
          END IF
-         rot_entropy = n_avogadro*boltzmann*(LOG(rot_part_func)+1.0_dp)
+         rot_entropy = n_avogadro*boltzmann*(LOG(rot_part_func) + 1.0_dp)
          rot_energy = n_avogadro*boltzmann*temp
          rot_cv = n_avogadro*boltzmann
       END IF
 
 !   TRANSLATIONAL: Partition function and Entropy
       tran_part_func = (boltzmann*temp)**2.5_dp/(pressure*(h_bar*2.0_dp*pi)**3.0_dp)*(2.0_dp*pi*mass_tot)**1.5_dp
-      tran_entropy = n_avogadro*boltzmann*(LOG(tran_part_func)+2.5_dp)
+      tran_entropy = n_avogadro*boltzmann*(LOG(tran_part_func) + 2.5_dp)
       tran_energy = 1.5_dp*n_avogadro*boltzmann*temp
       tran_enthalpy = 2.5_dp*n_avogadro*boltzmann*temp
       tran_cv = 2.5_dp*n_avogadro*boltzmann
@@ -826,18 +826,18 @@ CONTAINS
       DO i = 1, nvib
          freq_arg = fact*freqs(i)
          freq_arg2 = fact2*freqs(i)
-         exp_min_one = EXP(freq_arg)-1.0_dp
-         one_min_exp = 1.0_dp-EXP(-freq_arg)
+         exp_min_one = EXP(freq_arg) - 1.0_dp
+         one_min_exp = 1.0_dp - EXP(-freq_arg)
 !dbg
 !  write(*,*) 'freq ', i, freqs(i), exp_min_one , one_min_exp
 !      vib_part_func = vib_part_func*(1.0_dp/(1.0_dp - exp(-fact*freqs(i))))
          vib_part_func = vib_part_func*(1.0_dp/one_min_exp)
 !      vib_energy = vib_energy + fact2*freqs(i)*0.5_dp+fact2*freqs(i)/(exp(fact*freqs(i))-1.0_dp)
-         vib_energy = vib_energy+freq_arg2*0.5_dp+freq_arg2/exp_min_one
+         vib_energy = vib_energy + freq_arg2*0.5_dp + freq_arg2/exp_min_one
 !      vib_entropy = vib_entropy +fact*freqs(i)/(exp(fact*freqs(i))-1.0_dp)-log(1.0_dp - exp(-fact*freqs(i)))
-         vib_entropy = vib_entropy+freq_arg/exp_min_one-LOG(one_min_exp)
+         vib_entropy = vib_entropy + freq_arg/exp_min_one - LOG(one_min_exp)
 !      vib_cv = vib_cv + fact*fact*freqs(i)*freqs(i)*exp(fact*freqs(i))/(exp(fact*freqs(i))-1.0_dp)/(exp(fact*freqs(i))-1.0_dp)
-         vib_cv = vib_cv+freq_arg*freq_arg*EXP(freq_arg)/exp_min_one/exp_min_one
+         vib_cv = vib_cv + freq_arg*freq_arg*EXP(freq_arg)/exp_min_one/exp_min_one
       ENDDO
       vib_energy = vib_energy*n_avogadro ! it contains already ZPE
       vib_entropy = vib_entropy*(n_avogadro*boltzmann)
@@ -850,17 +850,17 @@ CONTAINS
 !dbg
 !    write(*,*) 'entropy ', el_entropy,rot_entropy,tran_entropy,vib_entropy
 
-      entropy = el_entropy+rot_entropy+tran_entropy+vib_entropy
+      entropy = el_entropy + rot_entropy + tran_entropy + vib_entropy
 !dbg
 !    write(*,*) 'energy ', rot_energy , tran_enthalpy , vib_energy, totene*kjmol*1000.0_dp
 
-      rotvibtra = rot_energy+tran_enthalpy+vib_energy
+      rotvibtra = rot_energy + tran_enthalpy + vib_energy
 !dbg
 !    write(*,*) 'cv ', rot_cv, tran_cv, vib_cv
-      heat_capacity = vib_cv+tran_cv+rot_cv
+      heat_capacity = vib_cv + tran_cv + rot_cv
 
 !   Free energy in J/mol: internal energy + PV - TS
-      Gibbs = vib_energy+rot_energy+tran_enthalpy-temp*entropy
+      Gibbs = vib_energy + rot_energy + tran_enthalpy - temp*entropy
 
       DEALLOCATE (mass_kg)
 
@@ -900,7 +900,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), INTENT(IN)         :: eigenvectors
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_eigs_unformatted', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, jj
 
@@ -938,7 +938,7 @@ CONTAINS
       TYPE(cp_logger_type), POINTER                      :: logger
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_va_hessian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, hesunit, i, j, ndf
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env

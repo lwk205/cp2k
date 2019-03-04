@@ -4,30 +4,30 @@
 !--------------------------------------------------------------------------------------------------!
 ! **************************************************************************************************
 MODULE topology_xyz
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_methods,               ONLY: parser_get_next_line,&
-                                              parser_get_object,&
-                                              read_integer_object
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              max_line_length
-   USE memory_utilities,                ONLY: reallocate
-   USE periodic_table,                  ONLY: nelem,&
-                                              ptable
-   USE string_table,                    ONLY: id2str,&
-                                              s2s,&
-                                              str2id
-   USE topology_types,                  ONLY: atom_info_type,&
-                                              topology_parameters_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_methods, ONLY: parser_get_next_line, &
+                                parser_get_object, &
+                                read_integer_object
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    max_line_length
+   USE memory_utilities, ONLY: reallocate
+   USE periodic_table, ONLY: nelem, &
+                             ptable
+   USE string_table, ONLY: id2str, &
+                           s2s, &
+                           str2id
+   USE topology_types, ONLY: atom_info_type, &
+                             topology_parameters_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -52,7 +52,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_coordinate_xyz', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: my_default_index, strtmp
       CHARACTER(LEN=max_line_length)                     :: error_message
@@ -88,7 +88,7 @@ CONTAINS
       Frames: DO
          ! Atom numbers
          CALL parser_get_object(parser, natom)
-         frame = frame+1
+         frame = frame + 1
          IF (frame == 1) THEN
             CALL reallocate(atom_info%id_molname, 1, natom)
             CALL reallocate(atom_info%id_resname, 1, natom)

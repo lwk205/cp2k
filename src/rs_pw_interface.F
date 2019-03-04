@@ -10,34 +10,34 @@
 !> \author JGH (04.2014)
 ! **************************************************************************************************
 MODULE rs_pw_interface
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE cp_spline_utils,                 ONLY: pw_prolongate_s3,&
-                                              pw_restrict_s3
-   USE gaussian_gridlevels,             ONLY: gridlevel_info_type
-   USE input_constants,                 ONLY: pw_interp,&
-                                              spline3_pbc_interp
-   USE input_section_types,             ONLY: section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_p_type,&
-                                              pw_pools_create_pws,&
-                                              pw_pools_give_back_pws
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE realspace_grid_types,            ONLY: pw2rs,&
-                                              realspace_grid_desc_p_type,&
-                                              realspace_grid_p_type,&
-                                              rs2pw,&
-                                              rs_grid_release,&
-                                              rs_pw_transfer
+   USE cp_log_handling, ONLY: cp_to_string
+   USE cp_spline_utils, ONLY: pw_prolongate_s3, &
+                              pw_restrict_s3
+   USE gaussian_gridlevels, ONLY: gridlevel_info_type
+   USE input_constants, ONLY: pw_interp, &
+                              spline3_pbc_interp
+   USE input_section_types, ONLY: section_vals_val_get
+   USE kinds, ONLY: dp
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_p_type, &
+                            pw_pools_create_pws, &
+                            pw_pools_give_back_pws
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE realspace_grid_types, ONLY: pw2rs, &
+                                   realspace_grid_desc_p_type, &
+                                   realspace_grid_p_type, &
+                                   rs2pw, &
+                                   rs_grid_release, &
+                                   rs_pw_transfer
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -124,7 +124,7 @@ CONTAINS
          CASE (spline3_pbc_interp)
             DO igrid_level = gridlevel_info%ngrid_levels, 2, -1
                CALL pw_prolongate_s3(mgrid_rspace(igrid_level)%pw, &
-                                     mgrid_rspace(igrid_level-1)%pw, pw_pools(igrid_level)%pool, &
+                                     mgrid_rspace(igrid_level - 1)%pw, pw_pools(igrid_level)%pool, &
                                      pw_env%interp_section)
             END DO
             CALL pw_copy(mgrid_rspace(1)%pw, rho%pw)
@@ -161,7 +161,7 @@ CONTAINS
       TYPE(pw_p_type), INTENT(INOUT)                     :: rho, rho_gspace
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'density_rs2pw_basic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, igrid_level, interp_kind
       TYPE(gridlevel_info_type), POINTER                 :: gridlevel_info
@@ -211,7 +211,7 @@ CONTAINS
          CASE (spline3_pbc_interp)
             DO igrid_level = gridlevel_info%ngrid_levels, 2, -1
                CALL pw_prolongate_s3(mgrid_rspace(igrid_level)%pw, &
-                                     mgrid_rspace(igrid_level-1)%pw, pw_pools(igrid_level)%pool, &
+                                     mgrid_rspace(igrid_level - 1)%pw, pw_pools(igrid_level)%pool, &
                                      pw_env%interp_section)
             END DO
             CALL pw_copy(mgrid_rspace(1)%pw, rho%pw)
@@ -250,7 +250,7 @@ CONTAINS
       TYPE(pw_env_type), POINTER                         :: pw_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'potential_pw2rs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: auxbas_grid, handle, igrid_level, &
                                                             interp_kind
@@ -299,14 +299,14 @@ CONTAINS
          CALL pw_pools_give_back_pws(pw_pools, mgrid_gspace)
       CASE (spline3_pbc_interp)
          CALL pw_copy(v_rspace%pw, mgrid_rspace(1)%pw)
-         DO igrid_level = 1, gridlevel_info%ngrid_levels-1
-            CALL pw_zero(mgrid_rspace(igrid_level+1)%pw)
+         DO igrid_level = 1, gridlevel_info%ngrid_levels - 1
+            CALL pw_zero(mgrid_rspace(igrid_level + 1)%pw)
             CALL pw_restrict_s3(mgrid_rspace(igrid_level)%pw, &
-                                mgrid_rspace(igrid_level+1)%pw, pw_pools(igrid_level+1)%pool, &
+                                mgrid_rspace(igrid_level + 1)%pw, pw_pools(igrid_level + 1)%pool, &
                                 pw_env%interp_section)
             ! *** Multiply by the grid volume element ratio
-            mgrid_rspace(igrid_level+1)%pw%cr3d = &
-               mgrid_rspace(igrid_level+1)%pw%cr3d*8._dp
+            mgrid_rspace(igrid_level + 1)%pw%cr3d = &
+               mgrid_rspace(igrid_level + 1)%pw%cr3d*8._dp
          END DO
       CASE default
          CALL cp_abort(__LOCATION__, &

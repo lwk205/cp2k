@@ -39,28 +39,28 @@
 ! **************************************************************************************************
 PROGRAM cp2k
 
-   USE cp2k_info,                       ONLY: compile_revision,&
-                                              cp2k_flags,&
-                                              cp2k_version,&
-                                              id_cp2k_version,&
-                                              print_cp2k_license
-   USE cp2k_runs,                       ONLY: run_input,&
-                                              write_cp2k_html_manual,&
-                                              write_xml_file
-   USE f77_interface,                   ONLY: check_input,&
-                                              default_para_env,&
-                                              finalize_cp2k,&
-                                              init_cp2k
-   USE input_constants,                 ONLY: id_development_version
-   USE input_cp2k,                      ONLY: create_cp2k_root_section
-   USE input_section_types,             ONLY: section_release,&
-                                              section_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length
-   USE machine,                         ONLY: default_output_unit,&
-                                              m_getarg,&
-                                              m_iargc
-   USE message_passing,                 ONLY: mp_max
+   USE cp2k_info, ONLY: compile_revision, &
+                        cp2k_flags, &
+                        cp2k_version, &
+                        id_cp2k_version, &
+                        print_cp2k_license
+   USE cp2k_runs, ONLY: run_input, &
+                        write_cp2k_html_manual, &
+                        write_xml_file
+   USE f77_interface, ONLY: check_input, &
+                            default_para_env, &
+                            finalize_cp2k, &
+                            init_cp2k
+   USE input_constants, ONLY: id_development_version
+   USE input_cp2k, ONLY: create_cp2k_root_section
+   USE input_section_types, ONLY: section_release, &
+                                  section_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length
+   USE machine, ONLY: default_output_unit, &
+                      m_getarg, &
+                      m_iargc
+   USE message_passing, ONLY: mp_max
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -106,7 +106,7 @@ PROGRAM cp2k
 
    i_arg = 0
    arg_loop: DO WHILE (i_arg < n_arg)
-      i_arg = i_arg+1
+      i_arg = i_arg + 1
       CALL m_getarg(i_arg, arg_att)
       SELECT CASE (arg_att)
       CASE ("--check", "-c")
@@ -132,7 +132,7 @@ PROGRAM cp2k
          usage = .TRUE.
          run_it = .FALSE.
       CASE ("-i")
-         i_arg = i_arg+1
+         i_arg = i_arg + 1
          CALL m_getarg(i_arg, arg_att)
          ! argument does not start with a - it is an filename
          IF (.NOT. arg_att(1:1) == "-") THEN
@@ -145,7 +145,7 @@ PROGRAM cp2k
             EXIT arg_loop
          ENDIF
       CASE ("-o")
-         i_arg = i_arg+1
+         i_arg = i_arg + 1
          CALL m_getarg(i_arg, arg_att)
          ! argument does not start with a - it is an filename
          IF (.NOT. arg_att(1:1) == "-") THEN

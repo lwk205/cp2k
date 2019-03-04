@@ -8,21 +8,21 @@
 !> \author Teodoro Laino - 09.2007 University of Zurich [tlaino]
 ! **************************************************************************************************
 MODULE csvr_system_types
-   USE bibliography,                    ONLY: Bussi2007,&
-                                              cite_reference
-   USE extended_system_types,           ONLY: create_map_info_type,&
-                                              map_info_type,&
-                                              release_map_info_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE parallel_rng_types,              ONLY: GAUSSIAN,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_rng_seed,&
-                                              rng_stream_type
-   USE simpar_types,                    ONLY: simpar_type
-   USE string_utilities,                ONLY: compress
+   USE bibliography, ONLY: Bussi2007, &
+                           cite_reference
+   USE extended_system_types, ONLY: create_map_info_type, &
+                                    map_info_type, &
+                                    release_map_info_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE parallel_rng_types, ONLY: GAUSSIAN, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_rng_seed, &
+                                 rng_stream_type
+   USE simpar_types, ONLY: simpar_type
+   USE string_utilities, ONLY: compress
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -93,7 +93,7 @@ CONTAINS
       TYPE(csvr_system_type), POINTER                    :: csvr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'csvr_thermo_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=40)                                  :: name
       INTEGER                                            :: i, ithermo, my_index
@@ -114,7 +114,7 @@ CONTAINS
 
       seed(:, :, 1) = initial_seed
       DO ithermo = 2, csvr%glob_num_csvr
-         seed(:, :, ithermo) = next_rng_seed(seed(:, :, ithermo-1))
+         seed(:, :, ithermo) = next_rng_seed(seed(:, :, ithermo - 1))
       END DO
       ! Update initial seed
       initial_seed = next_rng_seed(seed(:, :, csvr%glob_num_csvr))
@@ -158,7 +158,7 @@ CONTAINS
       TYPE(csvr_thermo_type), DIMENSION(:), POINTER      :: nvt
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'csvr_thermo_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

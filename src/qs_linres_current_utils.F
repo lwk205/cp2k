@@ -18,101 +18,101 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE qs_linres_current_utils
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_array_utils,                  ONLY: cp_2d_i_p_type,&
-                                              cp_2d_r_p_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_scale_and_add
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: convert_offsets_to_sizes,&
-                                              dbcsr_copy,&
-                                              dbcsr_create,&
-                                              dbcsr_distribution_type,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type_antisymmetric
-   USE input_constants,                 ONLY: current_gauge_atom,&
-                                              current_gauge_r,&
-                                              current_gauge_r_and_step_func,&
-                                              current_orb_center_atom,&
-                                              current_orb_center_box,&
-                                              current_orb_center_common,&
-                                              current_orb_center_wannier,&
-                                              ot_precond_full_all
-   USE input_section_types,             ONLY: section_get_lval,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_linres_methods,               ONLY: linres_read_restart,&
-                                              linres_solver,&
-                                              linres_write_restart
-   USE qs_linres_op,                    ONLY: set_vecp
-   USE qs_linres_types,                 ONLY: current_env_create,&
-                                              current_env_type,&
-                                              deallocate_jrho_atom_set,&
-                                              get_current_env,&
-                                              init_jrho_atom_set,&
-                                              jrho_atom_type,&
-                                              linres_control_type,&
-                                              set_current_env
-   USE qs_loc_methods,                  ONLY: qs_print_cubes
-   USE qs_loc_types,                    ONLY: get_qs_loc_env,&
-                                              localized_wfn_control_type,&
-                                              qs_loc_env_new_type
-   USE qs_matrix_pools,                 ONLY: qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_operators_ao,                 ONLY: build_lin_mom_matrix
-   USE qs_p_env_types,                  ONLY: qs_p_env_type
-   USE qs_rho_types,                    ONLY: qs_rho_clear,&
-                                              qs_rho_create,&
-                                              qs_rho_retain,&
-                                              qs_rho_set
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_p_type,&
-                                              rs_grid_release
-   USE scf_control_types,               ONLY: scf_control_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_array_utils, ONLY: cp_2d_i_p_type, &
+                             cp_2d_r_p_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_scale_and_add
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: convert_offsets_to_sizes, &
+                        dbcsr_copy, &
+                        dbcsr_create, &
+                        dbcsr_distribution_type, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type_antisymmetric
+   USE input_constants, ONLY: current_gauge_atom, &
+                              current_gauge_r, &
+                              current_gauge_r_and_step_func, &
+                              current_orb_center_atom, &
+                              current_orb_center_box, &
+                              current_orb_center_common, &
+                              current_orb_center_wannier, &
+                              ot_precond_full_all
+   USE input_section_types, ONLY: section_get_lval, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_linres_methods, ONLY: linres_read_restart, &
+                                linres_solver, &
+                                linres_write_restart
+   USE qs_linres_op, ONLY: set_vecp
+   USE qs_linres_types, ONLY: current_env_create, &
+                              current_env_type, &
+                              deallocate_jrho_atom_set, &
+                              get_current_env, &
+                              init_jrho_atom_set, &
+                              jrho_atom_type, &
+                              linres_control_type, &
+                              set_current_env
+   USE qs_loc_methods, ONLY: qs_print_cubes
+   USE qs_loc_types, ONLY: get_qs_loc_env, &
+                           localized_wfn_control_type, &
+                           qs_loc_env_new_type
+   USE qs_matrix_pools, ONLY: qs_matrix_pools_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_operators_ao, ONLY: build_lin_mom_matrix
+   USE qs_p_env_types, ONLY: qs_p_env_type
+   USE qs_rho_types, ONLY: qs_rho_clear, &
+                           qs_rho_create, &
+                           qs_rho_retain, &
+                           qs_rho_set
+   USE realspace_grid_types, ONLY: realspace_grid_desc_p_type, &
+                                   rs_grid_release
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -137,12 +137,12 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_response', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: my_pos
       INTEGER :: first_center, handle, i, icenter, idir, ii, iii, ispin, ist_true, istate, j, &
-         jcenter, jstate, max_nbr_center, max_states, nao, natom, nbr_center(2), ncubes, nmo, &
-         nspins, nstates(2), output_unit
+                 jcenter, jstate, max_nbr_center, max_states, nao, natom, nbr_center(2), ncubes, nmo, &
+                 nspins, nstates(2), output_unit
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: first_sgf, last_sgf
       INTEGER, DIMENSION(:), POINTER                     :: list_cubes, row_blk_sizes
       INTEGER, DIMENSION(:, :, :), POINTER               :: statetrueindex
@@ -307,7 +307,7 @@ CONTAINS
       DO idir = 1, 3
          IF (should_stop) EXIT
          IF (output_unit > 0) THEN
-            WRITE (output_unit, "(T10,A)") "Response to the perturbation operator P_"//ACHAR(idir+119)
+            WRITE (output_unit, "(T10,A)") "Response to the perturbation operator P_"//ACHAR(idir + 119)
          ENDIF
          !
          ! Initial guess for psi1
@@ -346,7 +346,7 @@ CONTAINS
       DO idir = 1, 3
          IF (should_stop) EXIT
          IF (output_unit > 0) THEN
-            WRITE (output_unit, "(T10,A)") "Response to the perturbation operator L_"//ACHAR(idir+119)
+            WRITE (output_unit, "(T10,A)") "Response to the perturbation operator L_"//ACHAR(idir + 119)
          ENDIF
          !
          ! Initial guess for psi1
@@ -434,7 +434,7 @@ CONTAINS
                   IF (output_unit > 0) THEN
                      WRITE (output_unit, "(T10,A,I4,A)")&
                           & "Response to the perturbation operator (dk-dl)xp for -state- ", &
-                            icenter, " in dir. "//ACHAR(idir+119)
+                            icenter, " in dir. "//ACHAR(idir + 119)
                   ENDIF
                   !
                   DO ispin = 1, nspins
@@ -462,7 +462,7 @@ CONTAINS
                      DO jcenter = 1, nbr_center(ispin)
                         dl(1:3) = centers_set(ispin)%array(1:3, jcenter)
                         dkl = pbc(dl, dk, cell)
-                        DO j = center_list(ispin)%array(1, jcenter), center_list(ispin)%array(1, jcenter+1)-1
+                        DO j = center_list(ispin)%array(1, jcenter), center_list(ispin)%array(1, jcenter + 1) - 1
                            jstate = center_list(ispin)%array(2, j)
                            dkl_vec_ii(jstate) = dkl(ii)
                            dkl_vec_iii(jstate) = dkl(iii)
@@ -515,7 +515,7 @@ CONTAINS
                      !
                      ! need to reset those guys
                      ist_true = statetrueindex(idir, icenter, ispin)
-                     DO i = center_list(ispin)%array(1, ist_true), center_list(ispin)%array(1, ist_true+1)-1
+                     DO i = center_list(ispin)%array(1, ist_true), center_list(ispin)%array(1, ist_true + 1) - 1
                         istate = center_list(ispin)%array(2, i)
                         !
                         ! the optimized wfns are copied in the fm
@@ -588,11 +588,11 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, homo, i, iao, iatom, ibox, icenter, icount, idir, ii, ini, ir, is, ispin, &
-         istate, istate2, istate_next, ix, iy, iz, j, jstate, k, max_nbr_center, max_states, n, &
-         n_rep, nao, natom, nbr_box, ncubes, nmo, nspins, nstate, nstate_list(2), output_unit
+                 istate, istate2, istate_next, ix, iy, iz, j, jstate, k, max_nbr_center, max_states, n, &
+                 n_rep, nao, natom, nbr_box, ncubes, nmo, nspins, nstate, nstate_list(2), output_unit
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: buff, first_sgf, last_sgf
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: state_list
       INTEGER, DIMENSION(:), POINTER                     :: bounds, list, nbox, &
@@ -791,15 +791,15 @@ CONTAINS
                r(:) = pbc(localized_wfn_control%centers_set(ispin)%array(:, istate), cell)
                IF (r(1) .LT. 0.0_dp) THEN
                   localized_wfn_control%centers_set(ispin)%array(1, istate) = &
-                     r(1)+cell%hmat(1, 1)
+                     r(1) + cell%hmat(1, 1)
                ENDIF
                IF (r(2) .LT. 0.0_dp) THEN
                   localized_wfn_control%centers_set(ispin)%array(2, istate) = &
-                     r(2)+cell%hmat(2, 2)
+                     r(2) + cell%hmat(2, 2)
                ENDIF
                IF (r(3) .LT. 0.0_dp) THEN
                   localized_wfn_control%centers_set(ispin)%array(3, istate) = &
-                     r(3)+cell%hmat(3, 3)
+                     r(3) + cell%hmat(3, 3)
                ENDIF
             ENDDO
          ENDDO
@@ -827,11 +827,11 @@ CONTAINS
          CALL section_vals_val_get(current_section, "SELECTED_STATES_ON_ATOM_LIST", &
                                    i_rep_val=ir, i_vals=list)
          IF (ASSOCIATED(list)) THEN
-            CALL reallocate(current_env%selected_states_on_atom_list, 1, n+SIZE(list))
+            CALL reallocate(current_env%selected_states_on_atom_list, 1, n + SIZE(list))
             DO ini = 1, SIZE(list)
-               current_env%selected_states_on_atom_list(ini+n) = list(ini)
+               current_env%selected_states_on_atom_list(ini + n) = list(ini)
             ENDDO
-            n = n+SIZE(list)
+            n = n + SIZE(list)
          ENDIF
       ENDDO
       !
@@ -844,14 +844,14 @@ CONTAINS
             DO istate = 1, SIZE(center_array, 2)
                DO i = 1, SIZE(selected_states_on_atom_list, 1)
                   iatom = selected_states_on_atom_list(i)
-                  r(:) = pbc(center_array(1:3, istate)-particle_set(iatom)%r(:), cell)
+                  r(:) = pbc(center_array(1:3, istate) - particle_set(iatom)%r(:), cell)
                   ! SQRT(DOT_PRODUCT(r, r)) .LE. current_env%selected_states_atom_radius
                   IF ((DOT_PRODUCT(r, r)) .LE. (current_env%selected_states_atom_radius &
                                                 *current_env%selected_states_atom_radius)) &
                      THEN
                      !
                      ! add the state to the list
-                     nstate = nstate+1
+                     nstate = nstate + 1
                      state_list(nstate, ispin) = istate
                      EXIT
                   ENDIF
@@ -864,7 +864,7 @@ CONTAINS
             center_array => localized_wfn_control%centers_set(ispin)%array
             nstate = 0
             DO istate = 1, SIZE(center_array, 2)
-               nstate = nstate+1
+               nstate = nstate + 1
                state_list(nstate, ispin) = istate
             ENDDO
             nstate_list(ispin) = nstate
@@ -878,7 +878,7 @@ CONTAINS
          nstate = nstate_list(ispin)
          current_env%nstates(ispin) = nstate
          !
-         ALLOCATE (current_env%center_list(ispin)%array(2, nstate+1), &
+         ALLOCATE (current_env%center_list(ispin)%array(2, nstate + 1), &
                    current_env%centers_set(ispin)%array(3, nstate))
          current_env%center_list(ispin)%array(:, :) = HUGE(0)
          current_env%centers_set(ispin)%array(:, :) = HUGE(0.0_dp)
@@ -897,7 +897,7 @@ CONTAINS
                current_env%center_list(ispin)%array(1, is) = is
                current_env%center_list(ispin)%array(2, is) = istate
             ENDDO
-            current_env%center_list(ispin)%array(1, nstate+1) = nstate+1
+            current_env%center_list(ispin)%array(1, nstate + 1) = nstate + 1
             !
          CASE (current_orb_center_common)
             !
@@ -905,7 +905,7 @@ CONTAINS
             current_env%centers_set(ispin)%array(:, 1) = common_center(:)
             current_env%nbr_center(ispin) = 1
             current_env%center_list(ispin)%array(1, 1) = 1
-            current_env%center_list(ispin)%array(1, 2) = nstate+1
+            current_env%center_list(ispin)%array(1, 2) = nstate + 1
             DO is = 1, nstate
                istate = state_list(is, ispin)
                current_env%center_list(ispin)%array(2, is) = istate
@@ -923,7 +923,7 @@ CONTAINS
                DO iatom = 1, natom
                   r = pbc(particle_set(iatom)%r(:), cell)
                   rab = pbc(r, center_array(1:3, istate), cell)
-                  dist = SQRT(rab(1)**2+rab(2)**2+rab(3)**2)
+                  dist = SQRT(rab(1)**2 + rab(2)**2 + rab(3)**2)
                   IF (dist .LT. mdist) THEN
                      buff(is) = iatom
                      mdist = dist
@@ -940,8 +940,8 @@ CONTAINS
                DO is = 1, nstate
                   istate = state_list(is, ispin)
                   IF (buff(is) .EQ. iatom) THEN
-                     j = j+1
-                     i = i+1
+                     j = j + 1
+                     i = i + 1
                      is0 = .FALSE.
                      current_env%center_list(ispin)%array(2, i) = istate
                   ENDIF
@@ -950,14 +950,14 @@ CONTAINS
                   IF (output_unit > 0) THEN
                      WRITE (output_unit, '(T2,A,I6,A,I6)') 'clustering ', j, ' center(s) on atom ', iatom
                   ENDIF
-                  current_env%center_list(ispin)%array(1, ii+1) = &
-                     current_env%center_list(ispin)%array(1, ii)+j
+                  current_env%center_list(ispin)%array(1, ii + 1) = &
+                     current_env%center_list(ispin)%array(1, ii) + j
                   current_env%centers_set(ispin)%array(:, ii) = &
                      pbc(particle_set(iatom)%r, cell)
-                  ii = ii+1
+                  ii = ii + 1
                ENDIF
             ENDDO
-            current_env%nbr_center(ispin) = ii-1
+            current_env%nbr_center(ispin) = ii - 1
             !
             DEALLOCATE (buff)
          CASE (current_orb_center_box)
@@ -972,10 +972,10 @@ CONTAINS
             DO iz = 1, nbox(3)
                DO iy = 1, nbox(2)
                   DO ix = 1, nbox(1)
-                     rbuff(1, ibox) = cell%hmat(1, 1)*((REAL(ix, dp)-0.5_dp)/REAL(nbox(1), dp)-0.5_dp)
-                     rbuff(2, ibox) = cell%hmat(2, 2)*((REAL(iy, dp)-0.5_dp)/REAL(nbox(2), dp)-0.5_dp)
-                     rbuff(3, ibox) = cell%hmat(3, 3)*((REAL(iz, dp)-0.5_dp)/REAL(nbox(3), dp)-0.5_dp)
-                     ibox = ibox+1
+                     rbuff(1, ibox) = cell%hmat(1, 1)*((REAL(ix, dp) - 0.5_dp)/REAL(nbox(1), dp) - 0.5_dp)
+                     rbuff(2, ibox) = cell%hmat(2, 2)*((REAL(iy, dp) - 0.5_dp)/REAL(nbox(2), dp) - 0.5_dp)
+                     rbuff(3, ibox) = cell%hmat(3, 3)*((REAL(iz, dp) - 0.5_dp)/REAL(nbox(3), dp) - 0.5_dp)
+                     ibox = ibox + 1
                   ENDDO
                ENDDO
             ENDDO
@@ -985,7 +985,7 @@ CONTAINS
                mdist = HUGE(0.0_dp)
                DO ibox = 1, nbr_box
                   rab(:) = pbc(rbuff(:, ibox), center_array(1:3, istate), cell)
-                  dist = SQRT(rab(1)**2+rab(2)**2+rab(3)**2)
+                  dist = SQRT(rab(1)**2 + rab(2)**2 + rab(3)**2)
                   IF (dist .LT. mdist) THEN
                      buff(is) = ibox
                      mdist = dist
@@ -1002,8 +1002,8 @@ CONTAINS
                DO is = 1, nstate
                   istate = state_list(is, ispin)
                   IF (buff(is) .EQ. ibox) THEN
-                     j = j+1
-                     i = i+1
+                     j = j + 1
+                     i = i + 1
                      is0 = .FALSE.
                      current_env%center_list(ispin)%array(2, i) = istate
                   ENDIF
@@ -1012,13 +1012,13 @@ CONTAINS
                   IF (output_unit > 0) THEN
                      WRITE (output_unit, '(T2,A,I6,A,I6)') 'clustering ', j, ' center(s) on box ', ibox
                   ENDIF
-                  current_env%center_list(ispin)%array(1, ii+1) = &
-                     current_env%center_list(ispin)%array(1, ii)+j
+                  current_env%center_list(ispin)%array(1, ii + 1) = &
+                     current_env%center_list(ispin)%array(1, ii) + j
                   current_env%centers_set(ispin)%array(:, ii) = rbuff(:, ibox)
-                  ii = ii+1
+                  ii = ii + 1
                ENDIF
             ENDDO
-            current_env%nbr_center(ispin) = ii-1
+            current_env%nbr_center(ispin) = ii - 1
             !
             DEALLOCATE (buff, rbuff)
          CASE DEFAULT
@@ -1047,10 +1047,10 @@ CONTAINS
          jstate = 0
          DO icenter = 1, current_env%nbr_center(ispin)
             DO i = current_env%center_list(ispin)%array(1, icenter), &
-               current_env%center_list(ispin)%array(1, icenter+1)-1
+               current_env%center_list(ispin)%array(1, icenter + 1) - 1
                !
                istate = current_env%center_list(ispin)%array(2, i)
-               jstate = jstate+1
+               jstate = jstate + 1
                !
                IF (current_env%do_selected_states) THEN ! this should be removed. always reorder the states
                   ! the blocking works (so far) with all the precond except FULL_ALL
@@ -1082,15 +1082,15 @@ CONTAINS
             DO istate = 1, current_env%nbr_center(ispin)
                IF (current_env%centers_set(ispin)%array(1, istate) .LE. 0.0_dp) THEN
                   current_env%centers_set(ispin)%array(1, istate) = &
-                     current_env%centers_set(ispin)%array(1, istate)+cell%hmat(1, 1)
+                     current_env%centers_set(ispin)%array(1, istate) + cell%hmat(1, 1)
                ENDIF
                IF (current_env%centers_set(ispin)%array(2, istate) .LE. 0.0_dp) THEN
                   current_env%centers_set(ispin)%array(2, istate) = &
-                     current_env%centers_set(ispin)%array(2, istate)+cell%hmat(2, 2)
+                     current_env%centers_set(ispin)%array(2, istate) + cell%hmat(2, 2)
                ENDIF
                IF (current_env%centers_set(ispin)%array(3, istate) .LE. 0.0_dp) THEN
                   current_env%centers_set(ispin)%array(3, istate) = &
-                     current_env%centers_set(ispin)%array(3, istate)+cell%hmat(3, 3)
+                     current_env%centers_set(ispin)%array(3, istate) + cell%hmat(3, 3)
                ENDIF
             ENDDO
          ENDDO
@@ -1140,7 +1140,7 @@ CONTAINS
                         !
                         rab = pbc(center, center2, cell)
                         CALL set_vecp(idir, j, k)
-                        dist = SQRT(rab(j)*rab(j)+rab(k)*rab(k))
+                        dist = SQRT(rab(j)*rab(j) + rab(k)*rab(k))
                         !
                         IF (dist .LT. mdist) THEN
                            mdist = dist
@@ -1149,7 +1149,7 @@ CONTAINS
                      ENDIF
                   ENDDO ! istate2
                   !
-                  icount = icount+1
+                  icount = icount + 1
                   state_done(idir, istate_next) = .TRUE.
                   current_env%statetrueindex(idir, icount, ispin) = istate_next
                   center(1) = current_env%centers_set(ispin)%array(1, istate_next)
@@ -1171,7 +1171,7 @@ CONTAINS
       !
       IF (output_unit > 0) THEN
          WRITE (output_unit, "(T2,A,T60,A)") "CURRENT| Gauge used", &
-            REPEAT(' ', 20-LEN_TRIM(current_env%gauge_name))//TRIM(current_env%gauge_name)
+            REPEAT(' ', 20 - LEN_TRIM(current_env%gauge_name))//TRIM(current_env%gauge_name)
          WRITE (output_unit, "(T2,A,T79,L1)") "CURRENT| Use old gauge code", current_env%use_old_gauge_atom
          WRITE (output_unit, "(T2,A,T79,L1)") "CURRENT| Compute chi for PBC calculation", current_env%chi_pbc
          IF (current_env%gauge .EQ. current_gauge_atom) THEN
@@ -1179,7 +1179,7 @@ CONTAINS
                current_env%gauge_atom_radius
          ENDIF
          WRITE (output_unit, "(T2,A,T60,A)") "CURRENT| Orbital center used", &
-            REPEAT(' ', 20-LEN_TRIM(current_env%orb_center_name))//TRIM(current_env%orb_center_name)
+            REPEAT(' ', 20 - LEN_TRIM(current_env%orb_center_name))//TRIM(current_env%orb_center_name)
          IF (current_env%orb_center .EQ. current_orb_center_common) THEN
             WRITE (output_unit, "(T2,A,T50,3F10.6)") "CURRENT| Common center", common_center(1:3)
          ELSEIF (current_env%orb_center .EQ. current_orb_center_box) THEN
@@ -1205,11 +1205,11 @@ CONTAINS
          CALL section_vals_val_get(current_section,&
               &                    "PRINT%RESPONSE_FUNCTION_CUBES%CUBES_LU_BOUNDS", &
                                    i_vals=bounds)
-         ncubes = bounds(2)-bounds(1)+1
+         ncubes = bounds(2) - bounds(1) + 1
          IF (ncubes > 0) THEN
             ALLOCATE (current_env%list_cubes(ncubes))
             DO ir = 1, ncubes
-               current_env%list_cubes(ir) = bounds(1)+(ir-1)
+               current_env%list_cubes(ir) = bounds(1) + (ir - 1)
             ENDDO
          ENDIF
          IF (.NOT. ASSOCIATED(current_env%list_cubes)) THEN
@@ -1221,11 +1221,11 @@ CONTAINS
                CALL section_vals_val_get(current_section, "PRINT%RESPONSE_FUNCTION_CUBES%CUBES_LIST", &
                                          i_rep_val=ir, i_vals=list)
                IF (ASSOCIATED(list)) THEN
-                  CALL reallocate(current_env%list_cubes, 1, ncubes+SIZE(list))
+                  CALL reallocate(current_env%list_cubes, 1, ncubes + SIZE(list))
                   DO ini = 1, SIZE(list)
-                     current_env%list_cubes(ini+ncubes) = list(ini)
+                     current_env%list_cubes(ini + ncubes) = list(ini)
                   ENDDO
-                  ncubes = ncubes+SIZE(list)
+                  ncubes = ncubes + SIZE(list)
                ENDIF
             ENDDO ! ir
          ENDIF
@@ -1349,7 +1349,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_env_cleanup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, idir, ispin
       TYPE(pw_env_type), POINTER                         :: pw_env
@@ -1358,7 +1358,7 @@ CONTAINS
 
       NULLIFY (pw_env, rs_descs)
 
-      current_env%ref_count = current_env%ref_count-1
+      current_env%ref_count = current_env%ref_count - 1
       IF (current_env%ref_count == 0) THEN
          !
          !psi0_order

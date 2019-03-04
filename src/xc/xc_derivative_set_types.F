@@ -10,25 +10,25 @@
 !> \author fawzi & thomas
 ! **************************************************************************************************
 MODULE xc_derivative_set_types
-   USE cp_linked_list_xc_deriv,         ONLY: cp_sll_xc_deriv_dealloc,&
-                                              cp_sll_xc_deriv_insert_el,&
-                                              cp_sll_xc_deriv_next,&
-                                              cp_sll_xc_deriv_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_comm_self
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_create,&
-                                              pw_grid_release
-   USE pw_pool_types,                   ONLY: pw_pool_create,&
-                                              pw_pool_create_cr3d,&
-                                              pw_pool_release,&
-                                              pw_pool_retain,&
-                                              pw_pool_type
-   USE xc_derivative_desc,              ONLY: MAX_DERIVATIVE_DESC_LENGTH,&
-                                              standardize_derivative_desc
-   USE xc_derivative_types,             ONLY: xc_derivative_create,&
-                                              xc_derivative_release,&
-                                              xc_derivative_type
+   USE cp_linked_list_xc_deriv, ONLY: cp_sll_xc_deriv_dealloc, &
+                                      cp_sll_xc_deriv_insert_el, &
+                                      cp_sll_xc_deriv_next, &
+                                      cp_sll_xc_deriv_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_comm_self
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_grids, ONLY: pw_grid_create, &
+                       pw_grid_release
+   USE pw_pool_types, ONLY: pw_pool_create, &
+                            pw_pool_create_cr3d, &
+                            pw_pool_release, &
+                            pw_pool_retain, &
+                            pw_pool_type
+   USE xc_derivative_desc, ONLY: MAX_DERIVATIVE_DESC_LENGTH, &
+                                 standardize_derivative_desc
+   USE xc_derivative_types, ONLY: xc_derivative_create, &
+                                  xc_derivative_release, &
+                                  xc_derivative_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -72,7 +72,7 @@ CONTAINS
       TYPE(xc_derivative_type), POINTER                  :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_dset_get_derivative', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=MAX_DERIVATIVE_DESC_LENGTH)          :: std_deriv_desc
       LOGICAL                                            :: my_allocate_deriv
@@ -129,7 +129,7 @@ CONTAINS
 
       NULLIFY (derivative_set%derivs)
       derivative_set%ref_count = 1
-      derivative_set_last_id_nr = derivative_set_last_id_nr+1
+      derivative_set_last_id_nr = derivative_set_last_id_nr + 1
       derivative_set%id_nr = derivative_set_last_id_nr
       IF (PRESENT(pw_pool)) THEN
          derivative_set%pw_pool => pw_pool
@@ -159,7 +159,7 @@ CONTAINS
       TYPE(xc_derivative_set_type), POINTER              :: derivative_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_dset_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_sll_xc_deriv_type), POINTER                :: pos
       TYPE(xc_derivative_type), POINTER                  :: deriv_att
@@ -168,7 +168,7 @@ CONTAINS
       CPASSERT(ASSOCIATED(derivative_set))
       CPASSERT(derivative_set%ref_count > 0)
 
-      derivative_set%ref_count = derivative_set%ref_count-1
+      derivative_set%ref_count = derivative_set%ref_count - 1
       IF (derivative_set%ref_count == 0) THEN
          pos => derivative_set%derivs
          DO WHILE (cp_sll_xc_deriv_next(pos, el_att=deriv_att))
@@ -197,7 +197,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(deriv_set))
       CPASSERT(deriv_set%ref_count > 0)
-      deriv_set%ref_count = deriv_set%ref_count+1
+      deriv_set%ref_count = deriv_set%ref_count + 1
    END SUBROUTINE xc_dset_retain
 
 ! **************************************************************************************************
@@ -209,7 +209,7 @@ CONTAINS
       TYPE(xc_derivative_set_type), POINTER              :: deriv_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_dset_zero_all', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_sll_xc_deriv_type), POINTER                :: pos
       TYPE(xc_derivative_type), POINTER                  :: deriv_att

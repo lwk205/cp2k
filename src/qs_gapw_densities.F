@@ -5,28 +5,28 @@
 
 ! **************************************************************************************************
 MODULE qs_gapw_densities
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              gapw_control_type
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE qs_charges_types,                ONLY: qs_charges_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_harmonics_atom,               ONLY: harmonics_atom_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_local_rho_types,              ONLY: local_rho_type
-   USE qs_rho0_ggrid,                   ONLY: put_rho0_on_grid
-   USE qs_rho0_methods,                 ONLY: calculate_rho0_atom
-   USE qs_rho0_types,                   ONLY: rho0_atom_type,&
-                                              rho0_mpole_type
-   USE qs_rho_atom_methods,             ONLY: calculate_rho_atom
-   USE qs_rho_atom_types,               ONLY: rho_atom_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cp_control_types, ONLY: dft_control_type, &
+                               gapw_control_type
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE qs_charges_types, ONLY: qs_charges_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_harmonics_atom, ONLY: harmonics_atom_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_local_rho_types, ONLY: local_rho_type
+   USE qs_rho0_ggrid, ONLY: put_rho0_on_grid
+   USE qs_rho0_methods, ONLY: calculate_rho0_atom
+   USE qs_rho0_types, ONLY: rho0_atom_type, &
+                            rho0_mpole_type
+   USE qs_rho_atom_methods, ONLY: calculate_rho_atom
+   USE qs_rho_atom_types, ONLY: rho_atom_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -52,7 +52,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: do_rho0
 
       CHARACTER(len=*), PARAMETER :: routineN = 'prepare_gapw_den', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, ispin, natom, nspins, &
                                                             output_unit
@@ -149,7 +149,7 @@ CONTAINS
 !      Put the rho0_soft on the global grid
          CALL put_rho0_on_grid(qs_env, rho0_mpole, tot_rs_int)
          IF (ABS(rho0_h_tot) .GE. 1.0E-5_dp) THEN
-            IF (ABS(1.0_dp-ABS(tot_rs_int/rho0_h_tot)) .GT. 1.0E-3_dp) THEN
+            IF (ABS(1.0_dp - ABS(tot_rs_int/rho0_h_tot)) .GT. 1.0E-3_dp) THEN
                IF (output_unit > 0) THEN
                   WRITE (output_unit, '(/,72("*"))')
                   WRITE (output_unit, '(T2,A,T66,1E20.8)') &

@@ -8,18 +8,18 @@
 !> \author Teodoro Laino (12.2008) [tlaino]
 ! **************************************************************************************************
 MODULE semi_empirical_expns3_methods
-   USE cp_control_types,                ONLY: semi_empirical_control_type
-   USE input_constants,                 ONLY: do_method_undef
-   USE kinds,                           ONLY: dp
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE semi_empirical_expns3_types,     ONLY: semi_empirical_expns3_create
-   USE semi_empirical_int3_utils,       ONLY: coeff_int_3,&
-                                              ijkl_low_3
-   USE semi_empirical_int_arrays,       ONLY: indexa,&
-                                              l_index
-   USE semi_empirical_types,            ONLY: semi_empirical_type
-   USE semi_empirical_utils,            ONLY: get_se_type
+   USE cp_control_types, ONLY: semi_empirical_control_type
+   USE input_constants, ONLY: do_method_undef
+   USE kinds, ONLY: dp
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE semi_empirical_expns3_types, ONLY: semi_empirical_expns3_create
+   USE semi_empirical_int3_utils, ONLY: coeff_int_3, &
+                                        ijkl_low_3
+   USE semi_empirical_int_arrays, ONLY: indexa, &
+                                        l_index
+   USE semi_empirical_types, ONLY: semi_empirical_type
+   USE semi_empirical_utils, ONLY: get_se_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -46,7 +46,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: method_id
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_expns3_setup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, itype, j, nkinds
       LOGICAL                                            :: check
@@ -192,7 +192,7 @@ CONTAINS
          DO j = 1, sepj%natorb
             lk = l_index(j)
             kl = indexa(j, j)
-            kr = kr+1
+            kr = kr + 1
             sepi%expns3_int(jkind)%expns3%w(kr) = &
                ijkl_low_3(sepi, sepj, ij, kl, li, li, lk, lk, 0, do_method_undef, coeff_int_3)
          END DO
@@ -206,7 +206,7 @@ CONTAINS
          DO j = 1, sepi%natorb
             lk = l_index(j)
             kl = indexa(j, j)
-            kr = kr+1
+            kr = kr + 1
             sepj%expns3_int(ikind)%expns3%w(kr) = &
                ijkl_low_3(sepj, sepi, ij, kl, li, li, lk, lk, 0, do_method_undef, coeff_int_3)
          END DO

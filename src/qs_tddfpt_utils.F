@@ -8,37 +8,37 @@
 !>      09-JUL-2002, TCH, development started
 ! **************************************************************************************************
 MODULE qs_tddfpt_utils
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              tddfpt_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_scale,&
-                                              cp_fm_scale_and_add,&
-                                              cp_fm_trace
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_invert
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_submatrix,&
-                                              cp_fm_init_random,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_set_submatrix,&
-                                              cp_fm_to_fm
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE kinds,                           ONLY: dp
-   USE physcon,                         ONLY: evolt
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_mo_types,                     ONLY: get_mo_set
-   USE qs_p_env_methods,                ONLY: p_env_create,&
-                                              p_env_psi0_changed
-   USE qs_p_env_types,                  ONLY: p_env_release,&
-                                              qs_p_env_type
-   USE qs_tddfpt_types,                 ONLY: tddfpt_env_allocate,&
-                                              tddfpt_env_deallocate,&
-                                              tddfpt_env_type
+   USE cp_control_types, ONLY: dft_control_type, &
+                               tddfpt_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_fm_basic_linalg, ONLY: cp_fm_scale, &
+                                 cp_fm_scale_and_add, &
+                                 cp_fm_trace
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_invert
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_submatrix, &
+                          cp_fm_init_random, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_set_submatrix, &
+                          cp_fm_to_fm
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE kinds, ONLY: dp
+   USE physcon, ONLY: evolt
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_mo_types, ONLY: get_mo_set
+   USE qs_p_env_methods, ONLY: p_env_create, &
+                               p_env_psi0_changed
+   USE qs_p_env_types, ONLY: p_env_release, &
+                             qs_p_env_type
+   USE qs_tddfpt_types, ONLY: tddfpt_env_allocate, &
+                              tddfpt_env_deallocate, &
+                              tddfpt_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -107,7 +107,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'tddfpt_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: n_spins, spin
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_s
@@ -159,7 +159,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'co_initial_guess', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, n_cols, n_lumos, n_orbits, n_rows, &
                                                             n_spins, oo, spin, vo
@@ -203,7 +203,7 @@ CONTAINS
          ! create a SORTED list of initial guesses !
          !-----------------------------------------!
          ! first element
-         evd = tddfpt_control%lumos_eigenvalues(1, spin)-orbital_eigenvalues(n_orbits)
+         evd = tddfpt_control%lumos_eigenvalues(1, spin) - orbital_eigenvalues(n_orbits)
          ALLOCATE (sorter_start)
          sorter_start%orbit = n_orbits
          sorter_start%lumo = 1
@@ -215,7 +215,7 @@ CONTAINS
 
                IF (oo == n_orbits .AND. vo == 1) CYCLE ! already in list
 
-               evd = tddfpt_control%lumos_eigenvalues(vo, spin)-orbital_eigenvalues(oo)
+               evd = tddfpt_control%lumos_eigenvalues(vo, spin) - orbital_eigenvalues(oo)
 
                sorter_iterator => sorter_start
                NULLIFY (sorter_pointer)
@@ -250,11 +250,11 @@ CONTAINS
                        guess(:, sorter_iterator%orbit), 1)
             CALL cp_fm_set_submatrix(matrices(i, spin)%matrix, &
                                      guess(:, 1:n_orbits))
-            energies(i) = energies(i)+sorter_iterator%value/REAL(n_spins, dp)
+            energies(i) = energies(i) + sorter_iterator%value/REAL(n_spins, dp)
             sorter_iterator => sorter_iterator%next
          END DO
          IF (n_v > n_orbits*n_lumos) THEN
-            DO i = n_orbits*n_lumos+1, n_v
+            DO i = n_orbits*n_lumos + 1, n_v
                CALL cp_fm_init_random(matrices(i, spin)%matrix, n_orbits)
                energies(i) = 1.0E38_dp
             END DO
@@ -286,7 +286,7 @@ CONTAINS
       TYPE(tddfpt_env_type), INTENT(IN)                  :: t_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'find_contributions', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, n_ev, n_spins, occ, output_unit, &
                                                             spin, virt
@@ -345,14 +345,14 @@ CONTAINS
                                            1, virt, nrows(spin), 1)
                   contribution = 0.0_dp
                   DO j = 1, nrows(spin)
-                     contribution = contribution+homo_coeff_col(j, 1)*lumo_coeff_col(j, 1)
+                     contribution = contribution + homo_coeff_col(j, 1)*lumo_coeff_col(j, 1)
                   END DO
-                  summed_contributions = summed_contributions+(contribution)**2
+                  summed_contributions = summed_contributions + (contribution)**2
                   IF (ABS(contribution) > 5.0e-2_dp) THEN
                      IF (output_unit > 0) WRITE (output_unit, '(14X,I5,A,I5,10X,F8.3,5X,F8.3)') &
-                        occ, " ->", nhomos(spin)+virt, ABS(contribution), summed_contributions
+                        occ, " ->", nhomos(spin) + virt, ABS(contribution), summed_contributions
                   END IF
-                  IF (ABS(summed_contributions-1.0_dp) < 1.0e-3_dp) CYCLE searchloop
+                  IF (ABS(summed_contributions - 1.0_dp) < 1.0e-3_dp) CYCLE searchloop
                END DO
             END DO searchloop
          END DO
@@ -398,7 +398,7 @@ CONTAINS
                                       X(spin)%matrix%matrix_struct%ncol_global, &
                                       1.0_dp, 0.0_dp)
          CALL cp_fm_trace(X(spin)%matrix, tmp_vec(spin)%matrix, tmp)
-         norm = norm+tmp
+         norm = norm + tmp
       END DO
 
       norm = SQRT(norm)
@@ -428,7 +428,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'reorthogonalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, n_spins, spin
       REAL(DP)                                           :: dot_product, tmp
@@ -446,7 +446,7 @@ CONTAINS
             dot_product = 0.0_dp
             DO spin = 1, n_spins
                CALL cp_fm_trace(SV_set(i, spin)%matrix, work(spin)%matrix, tmp)
-               dot_product = dot_product+tmp
+               dot_product = dot_product + tmp
             END DO
             DO spin = 1, n_spins
                CALL cp_fm_scale_and_add(1.0_dp, X(spin)%matrix, &

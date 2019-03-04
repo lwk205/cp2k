@@ -19,19 +19,19 @@
 ! **************************************************************************************************
 MODULE qs_mo_types
 
-   USE cp_dbcsr_operations,             ONLY: dbcsr_copy_columns_hack
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_type,&
-                                              fm_pool_create_fm
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_init_p,&
-                                              dbcsr_release_p,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
+   USE cp_dbcsr_operations, ONLY: dbcsr_copy_columns_hack
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_type, &
+                               fm_pool_create_fm
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_init_p, &
+                        dbcsr_release_p, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -100,7 +100,7 @@ CONTAINS
       TYPE(mo_set_type), POINTER                         :: mo_set_new, mo_set_old
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'duplicate_mo_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nmo
 
@@ -163,7 +163,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: n_el_f, maxocc, flexible_electron_count
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_mo_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(mo_set)) CALL deallocate_mo_set(mo_set)
 
@@ -245,17 +245,17 @@ CONTAINS
          nomo = NINT(mo_set%nelectron/mo_set%maxocc)
          mo_set%occupation_numbers(1:nomo) = mo_set%maxocc
       ELSE
-         nomo = INT(mo_set%nelectron/mo_set%maxocc)+1
+         nomo = INT(mo_set%nelectron/mo_set%maxocc) + 1
          ! Initialize MO occupations
-         mo_set%occupation_numbers(1:nomo-1) = mo_set%maxocc
-         mo_set%occupation_numbers(nomo) = mo_set%nelectron-(nomo-1)*mo_set%maxocc
+         mo_set%occupation_numbers(1:nomo - 1) = mo_set%maxocc
+         mo_set%occupation_numbers(nomo) = mo_set%nelectron - (nomo - 1)*mo_set%maxocc
       END IF
 
       CPASSERT(nmo >= nomo)
       CPASSERT((SIZE(mo_set%occupation_numbers) == nmo))
 
       mo_set%homo = nomo
-      mo_set%lfomo = nomo+1
+      mo_set%lfomo = nomo + 1
       mo_set%mu = mo_set%eigenvalues(nomo)
 
    END SUBROUTINE init_mo_set
@@ -273,7 +273,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: convert_dbcsr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mo_set_restrict', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: my_convert_dbcsr
@@ -313,7 +313,7 @@ CONTAINS
       TYPE(mo_set_type), POINTER                         :: mo_set
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'deallocate_mo_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(mo_set)) THEN
          IF (ASSOCIATED(mo_set%eigenvalues)) THEN

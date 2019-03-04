@@ -10,44 +10,44 @@
 !> \author Noam Bernstein
 ! **************************************************************************************************
 MODULE qmmmx_util
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              set_atomic_kind
-   USE cell_types,                      ONLY: cell_copy,&
-                                              cell_type,&
-                                              pbc
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit,&
-                                              cp_logger_get_default_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE fist_neighbor_list_types,        ONLY: fist_neighbor_deallocate,&
-                                              fist_neighbor_type
-   USE fist_neighbor_lists,             ONLY: build_fist_neighbor_lists
-   USE input_section_types,             ONLY: &
-        section_vals_add_values, section_vals_duplicate, section_vals_get, &
-        section_vals_get_subs_vals, section_vals_get_subs_vals3, section_vals_release, &
-        section_vals_remove_values, section_vals_set_subs_vals, section_vals_type, &
-        section_vals_val_get, section_vals_val_set, section_vals_write
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE molecule_list_types,             ONLY: molecule_list_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE qmmm_ff_fist,                    ONLY: qmmm_ff_precond_only_qm
-   USE qmmm_types,                      ONLY: qmmm_env_get
-   USE qmmm_types_low,                  ONLY: force_mixing_label_QM_core,&
-                                              force_mixing_label_QM_core_list,&
-                                              force_mixing_label_QM_dynamics,&
-                                              force_mixing_label_QM_dynamics_list,&
-                                              force_mixing_label_buffer,&
-                                              force_mixing_label_buffer_list,&
-                                              force_mixing_label_none,&
-                                              force_mixing_label_termination
-   USE qmmm_util,                       ONLY: apply_qmmm_translate
-   USE qmmmx_types,                     ONLY: qmmmx_env_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                set_atomic_kind
+   USE cell_types, ONLY: cell_copy, &
+                         cell_type, &
+                         pbc
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit, &
+                              cp_logger_get_default_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE fist_neighbor_list_types, ONLY: fist_neighbor_deallocate, &
+                                       fist_neighbor_type
+   USE fist_neighbor_lists, ONLY: build_fist_neighbor_lists
+   USE input_section_types, ONLY: &
+      section_vals_add_values, section_vals_duplicate, section_vals_get, &
+      section_vals_get_subs_vals, section_vals_get_subs_vals3, section_vals_release, &
+      section_vals_remove_values, section_vals_set_subs_vals, section_vals_type, &
+      section_vals_val_get, section_vals_val_set, section_vals_write
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE molecule_list_types, ONLY: molecule_list_type
+   USE molecule_types, ONLY: molecule_type
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE qmmm_ff_fist, ONLY: qmmm_ff_precond_only_qm
+   USE qmmm_types, ONLY: qmmm_env_get
+   USE qmmm_types_low, ONLY: force_mixing_label_QM_core, &
+                             force_mixing_label_QM_core_list, &
+                             force_mixing_label_QM_dynamics, &
+                             force_mixing_label_QM_dynamics_list, &
+                             force_mixing_label_buffer, &
+                             force_mixing_label_buffer_list, &
+                             force_mixing_label_none, &
+                             force_mixing_label_termination
+   USE qmmm_util, ONLY: apply_qmmm_translate
+   USE qmmmx_types, ONLY: qmmmx_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -73,7 +73,7 @@ CONTAINS
       TYPE(qmmmx_env_type), POINTER                      :: qmmmx_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'apply_qmmmx_translate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ip
       TYPE(cell_type), POINTER                           :: cell_core, cell_extended
@@ -119,11 +119,11 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: labels_changed
 
       CHARACTER(len=*), PARAMETER :: routineN = 'update_force_mixing_labels', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length), POINTER      :: adaptive_exclude_molecules(:)
       INTEGER :: i_rep_section, i_rep_val, ip, max_n_qm, n_new, n_rep_exclude, n_rep_section, &
-         n_rep_val, natoms, output_unit, QM_extended_seed_min_label_val
+                 n_rep_val, natoms, output_unit, QM_extended_seed_min_label_val
       INTEGER, ALLOCATABLE                               :: new_full_labels(:), orig_full_labels(:)
       INTEGER, POINTER                                   :: broken_bonds(:), cur_indices(:), &
                                                             cur_labels(:), mm_index_entry(:), &
@@ -390,13 +390,13 @@ CONTAINS
                           "already set, but not in new_indices array")
          new_labels(old_index) = label
       ELSE
-         n_new = n_new+1
+         n_new = n_new + 1
          IF (n_new > max_n_qm) &
             CALL cp_abort(__LOCATION__, &
                           "add_new_label tried to add more atoms "// &
                           "than allowed by &FORCE_MIXING&MAX_N_QM!")
-         IF (n_new > SIZE(new_indices)) CALL reallocate(new_indices, 1, n_new+9)
-         IF (n_new > SIZE(new_labels)) CALL reallocate(new_labels, 1, n_new+9)
+         IF (n_new > SIZE(new_indices)) CALL reallocate(new_indices, 1, n_new + 9)
+         IF (n_new > SIZE(new_labels)) CALL reallocate(new_labels, 1, n_new + 9)
          new_indices(n_new) = ip
          new_labels(n_new) = label
       ENDIF
@@ -444,12 +444,12 @@ CONTAINS
       INTEGER, OPTIONAL, POINTER                         :: broken_bonds(:)
 
       CHARACTER(len=*), PARAMETER :: routineN = 'add_layer_hysteretically', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i_ind, im, im_exclude, ip, ipair, &
                                                             ipairkind, j_ind, output_unit
       LOGICAL :: adaptive_exclude, i_in_new_seed, i_outside_new_seed, j_in_new_seed, &
-         j_outside_new_seed, molec_in_inner, molec_in_outer
+                 j_outside_new_seed, molec_in_inner, molec_in_outer
       REAL(dp)                                           :: r_ij(3), r_ij_mag
 
       output_unit = cp_logger_get_default_unit_nr()
@@ -471,7 +471,7 @@ CONTAINS
             j_outside_new_seed = (new_full_labels(j_ind) < seed_min_label_val)
 
             IF ((i_in_new_seed .AND. j_outside_new_seed) .OR. (j_in_new_seed .AND. i_outside_new_seed)) THEN
-               r_ij = pbc(particle_set(i_ind)%r-particle_set(j_ind)%r, cell)
+               r_ij = pbc(particle_set(i_ind)%r - particle_set(j_ind)%r, cell)
                r_ij_mag = SQRT(SUM(r_ij**2))
                IF (i_in_new_seed .AND. j_outside_new_seed .AND. (r_ij_mag < nearest_dist(j_ind))) THEN
                   nearest_dist(j_ind) = r_ij_mag
@@ -535,7 +535,7 @@ CONTAINS
       TYPE(fist_neighbor_type), POINTER                  :: nlist
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_neighbor_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: kind_name
       CHARACTER(LEN=default_string_length), POINTER      :: kind_name_a(:)
@@ -601,11 +601,11 @@ CONTAINS
                                                             qmmm_extended_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'setup_force_mixing_qmmm_sections', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length), POINTER      :: elem_mapping(:, :), elem_mapping_entry(:)
       INTEGER :: delta_charge, i_rep_section_core, i_rep_section_extended, i_rep_val_core, &
-         i_rep_val_extended, ielem, ip, n_elements, output_unit
+                 i_rep_val_extended, ielem, ip, n_elements, output_unit
       INTEGER, POINTER                                   :: cur_indices(:), cur_labels(:)
       LOGICAL                                            :: mapped, new_element_core, &
                                                             new_element_extended
@@ -710,14 +710,14 @@ CONTAINS
                 cur_labels(ip) /= force_mixing_label_termination) THEN
                qm_kind_section => section_vals_get_subs_vals3(qmmm_extended_section, "QM_KIND")
                IF (new_element_extended) THEN ! add new QM_KIND section for this element
-                  i_rep_section_extended = i_rep_section_extended+1
+                  i_rep_section_extended = i_rep_section_extended + 1
                   CALL section_vals_add_values(qm_kind_section)
                   CALL section_vals_val_set(qm_kind_section, "_SECTION_PARAMETERS_", i_rep_section=i_rep_section_extended, &
                                             c_val=elem_mapping(2, ielem))
                   i_rep_val_extended = 0
                   new_element_extended = .FALSE.
                ENDIF
-               i_rep_val_extended = i_rep_val_extended+1
+               i_rep_val_extended = i_rep_val_extended + 1
                CALL section_vals_val_set(qm_kind_section, "MM_INDEX", i_rep_section=i_rep_section_extended, &
                                          i_rep_val=i_rep_val_extended, i_val=cur_indices(ip))
             ENDIF ! is a non-termination QM atom
@@ -728,14 +728,14 @@ CONTAINS
             IF (cur_labels(ip) == force_mixing_label_QM_core) THEN
                qm_kind_section => section_vals_get_subs_vals3(qmmm_core_section, "QM_KIND")
                IF (new_element_core) THEN ! add new QM_KIND section for this element
-                  i_rep_section_core = i_rep_section_core+1
+                  i_rep_section_core = i_rep_section_core + 1
                   CALL section_vals_add_values(qm_kind_section)
                   CALL section_vals_val_set(qm_kind_section, "_SECTION_PARAMETERS_", i_rep_section=i_rep_section_core, &
                                             c_val=elem_mapping(2, ielem))
                   i_rep_val_core = 0
                   new_element_core = .FALSE.
                ENDIF
-               i_rep_val_core = i_rep_val_core+1
+               i_rep_val_core = i_rep_val_core + 1
                CALL section_vals_val_set(qm_kind_section, "MM_INDEX", i_rep_section=i_rep_section_core, &
                                          i_rep_val=i_rep_val_core, i_val=cur_indices(ip))
             ENDIF ! is a non-termination QM atom
@@ -769,7 +769,7 @@ CONTAINS
       INTEGER, POINTER                                   :: indices(:), labels(:)
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_force_mixing_indices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i_rep_val, n_indices, n_labels, n_reps
       INTEGER, POINTER                                   :: indices_entry(:), labels_entry(:)
@@ -791,15 +791,15 @@ CONTAINS
       DO i_rep_val = 1, n_reps
          CALL section_vals_val_get(restart_section, "INDICES", &
                                    i_rep_val=i_rep_val, i_vals=indices_entry)
-         n_indices = n_indices+SIZE(indices_entry)
+         n_indices = n_indices + SIZE(indices_entry)
       END DO
       ALLOCATE (indices(n_indices))
       n_indices = 0
       DO i_rep_val = 1, n_reps
          CALL section_vals_val_get(restart_section, "INDICES", &
                                    i_rep_val=i_rep_val, i_vals=indices_entry)
-         indices(n_indices+1:n_indices+SIZE(indices_entry)) = indices_entry
-         n_indices = n_indices+SIZE(indices_entry)
+         indices(n_indices + 1:n_indices + SIZE(indices_entry)) = indices_entry
+         n_indices = n_indices + SIZE(indices_entry)
       END DO
 
       CALL section_vals_val_get(restart_section, "LABELS", n_rep_val=n_reps)
@@ -807,15 +807,15 @@ CONTAINS
       DO i_rep_val = 1, n_reps
          CALL section_vals_val_get(restart_section, "LABELS", &
                                    i_rep_val=i_rep_val, i_vals=labels_entry)
-         n_labels = n_labels+SIZE(labels_entry)
+         n_labels = n_labels + SIZE(labels_entry)
       END DO
       ALLOCATE (labels(n_labels))
       n_labels = 0
       DO i_rep_val = 1, n_reps
          CALL section_vals_val_get(restart_section, "LABELS", &
                                    i_rep_val=i_rep_val, i_vals=labels_entry)
-         labels(n_labels+1:n_labels+SIZE(labels_entry)) = labels_entry
-         n_labels = n_labels+SIZE(labels_entry)
+         labels(n_labels + 1:n_labels + SIZE(labels_entry)) = labels_entry
+         n_labels = n_labels + SIZE(labels_entry)
       END DO
 
       IF (n_indices /= n_labels) &

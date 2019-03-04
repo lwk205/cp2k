@@ -18,31 +18,31 @@
 !> \author CJM
 ! **************************************************************************************************
 MODULE force_fields_ext
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_methods,               ONLY: parser_get_next_line,&
-                                              parser_get_object,&
-                                              parser_search_string,&
-                                              parser_test_next_token
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE force_field_kind_types,          ONLY: do_ff_g96
-   USE force_field_types,               ONLY: amber_info_type,&
-                                              charmm_info_type,&
-                                              force_field_type,&
-                                              gromos_info_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_types,                  ONLY: particle_type
-   USE string_utilities,                ONLY: uppercase
-   USE topology_amber,                  ONLY: rdparm_amber_8
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_methods, ONLY: parser_get_next_line, &
+                                parser_get_object, &
+                                parser_search_string, &
+                                parser_test_next_token
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE force_field_kind_types, ONLY: do_ff_g96
+   USE force_field_types, ONLY: amber_info_type, &
+                                charmm_info_type, &
+                                force_field_type, &
+                                gromos_info_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE particle_types, ONLY: particle_type
+   USE string_utilities, ONLY: uppercase
+   USE topology_amber, ONLY: rdparm_amber_8
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -70,7 +70,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: mm_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_force_field_gromos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: ekt = 2.5_dp
 
       CHARACTER(LEN=default_string_length)               :: label
@@ -197,8 +197,8 @@ CONTAINS
                gro_info%bend_theta0(itype) = COS(gro_info%bend_theta0(itype))
             ELSE ! Assume its G87
                cost2 = COS(gro_info%bend_theta0(itype))*COS(gro_info%bend_theta0(itype))
-               sdet = cost2*cost2-(2.0_dp*cost2-1.0_dp)*(1.0_dp-ekt/gro_info%bend_k(itype))
-               csq = (cost2-SQRT(sdet))/(2.0_dp*cost2-1.0_dp)
+               sdet = cost2*cost2 - (2.0_dp*cost2 - 1.0_dp)*(1.0_dp - ekt/gro_info%bend_k(itype))
+               csq = (cost2 - SQRT(sdet))/(2.0_dp*cost2 - 1.0_dp)
                gro_info%bend_k(itype) = ekt/ACOS(csq)**2
             END IF
             gro_info%bend_k(itype) = cp_unit_to_cp2k(gro_info%bend_k(itype), "kjmol")
@@ -271,7 +271,7 @@ CONTAINS
          gro_info%nonbond_c12_14 = 0._dp
          gro_info%nonbond_c6_14 = 0._dp
 
-         DO itype = 1, ntype*(ntype+1)/2
+         DO itype = 1, ntype*(ntype + 1)/2
             CALL parser_get_next_line(parser, 1)
             CALL parser_get_object(parser, iatom)
             CALL parser_get_object(parser, jatom)
@@ -318,7 +318,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: mm_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_force_field_charmm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: label, string, string2, string3, string4
       CHARACTER(LEN=default_string_length), DIMENSION(1) :: bond_section
@@ -382,7 +382,7 @@ CONTAINS
                   IF (ANY(string == avail_section)) EXIT
                   CALL parser_get_object(parser, string2)
                   CALL uppercase(string2)
-                  nbond = nbond+1
+                  nbond = nbond + 1
                   CALL reallocate(chm_info%bond_a, 1, nbond)
                   CALL reallocate(chm_info%bond_b, 1, nbond)
                   CALL reallocate(chm_info%bond_k, 1, nbond)
@@ -435,7 +435,7 @@ CONTAINS
                   CALL parser_get_object(parser, string3)
                   CALL uppercase(string2)
                   CALL uppercase(string3)
-                  nbend = nbend+1
+                  nbend = nbend + 1
                   CALL reallocate(chm_info%bend_a, 1, nbend)
                   CALL reallocate(chm_info%bend_b, 1, nbend)
                   CALL reallocate(chm_info%bend_c, 1, nbend)
@@ -456,7 +456,7 @@ CONTAINS
                   chm_info%bend_theta0(nbend) = cp_unit_to_cp2k(chm_info%bend_theta0(nbend), "deg")
                   chm_info%bend_k(nbend) = cp_unit_to_cp2k(chm_info%bend_k(nbend), "kcalmol*rad^-2")
                   IF (parser_test_next_token(parser) == "FLT") THEN
-                     nub = nub+1
+                     nub = nub + 1
                      CALL reallocate(chm_info%ub_a, 1, nub)
                      CALL reallocate(chm_info%ub_b, 1, nub)
                      CALL reallocate(chm_info%ub_c, 1, nub)
@@ -511,7 +511,7 @@ CONTAINS
                   CALL uppercase(string2)
                   CALL uppercase(string3)
                   CALL uppercase(string4)
-                  ntorsion = ntorsion+1
+                  ntorsion = ntorsion + 1
                   CALL reallocate(chm_info%torsion_a, 1, ntorsion)
                   CALL reallocate(chm_info%torsion_b, 1, ntorsion)
                   CALL reallocate(chm_info%torsion_c, 1, ntorsion)
@@ -572,7 +572,7 @@ CONTAINS
                   CALL uppercase(string2)
                   CALL uppercase(string3)
                   CALL uppercase(string4)
-                  nimpr = nimpr+1
+                  nimpr = nimpr + 1
                   CALL reallocate(chm_info%impr_a, 1, nimpr)
                   CALL reallocate(chm_info%impr_b, 1, nimpr)
                   CALL reallocate(chm_info%impr_c, 1, nimpr)
@@ -623,7 +623,7 @@ CONTAINS
                   CALL parser_get_object(parser, string)
                   CALL uppercase(string)
                   IF (ANY(string == avail_section)) EXIT
-                  nnonbond = nnonbond+1
+                  nnonbond = nnonbond + 1
                   CALL reallocate(chm_info%nonbond_a, 1, nnonbond)
                   CALL reallocate(chm_info%nonbond_eps, 1, nnonbond)
                   CALL reallocate(chm_info%nonbond_rmin2, 1, nnonbond)
@@ -640,7 +640,7 @@ CONTAINS
                   chm_info%nonbond_eps(nnonbond) = cp_unit_to_cp2k(chm_info%nonbond_eps(nnonbond), &
                                                                    "kcalmol")
                   IF (parser_test_next_token(parser) == "FLT") THEN
-                     nonfo = nonfo+1
+                     nonfo = nonfo + 1
                      CALL reallocate(chm_info%nonbond_a_14, 1, nonfo)
                      CALL reallocate(chm_info%nonbond_eps_14, 1, nonfo)
                      CALL reallocate(chm_info%nonbond_rmin2_14, 1, nonfo)
@@ -687,7 +687,7 @@ CONTAINS
       TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_force_field_amber', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iw
       TYPE(amber_info_type), POINTER                     :: amb_info
@@ -795,7 +795,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nline
 
       CHARACTER(len=*), PARAMETER :: routineN = 'charmm_get_next_line', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       CHARACTER(LEN=1), PARAMETER                        :: continuation_char = "-"
 
       INTEGER                                            :: i, len_line

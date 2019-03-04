@@ -11,65 +11,65 @@
 !> \author JGH (03-05-2006)
 ! **************************************************************************************************
 MODULE qs_electric_field_gradient
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE eigenvalueproblems,              ONLY: diagonalise
-   USE input_section_types,             ONLY: section_get_lval,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fac,&
-                                              fourpi
-   USE message_passing,                 ONLY: mp_sum
-   USE orbital_pointers,                ONLY: indso,&
-                                              nsoset
-   USE particle_types,                  ONLY: particle_type
-   USE paw_proj_set_types,              ONLY: get_paw_proj_set,&
-                                              paw_proj_set_type
-   USE physcon,                         ONLY: a_bohr,&
-                                              e_charge,&
-                                              joule
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_dr2,&
-                                              pw_integral_ab,&
-                                              pw_smoothing,&
-                                              pw_structure_factor,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_spline_utils,                 ONLY: &
-        Eval_Interp_Spl3_pbc, Eval_d_Interp_Spl3_pbc, find_coeffs, pw_spline_do_precond, &
-        pw_spline_precond_create, pw_spline_precond_release, pw_spline_precond_set_kind, &
-        pw_spline_precond_type, spl3_pbc
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_gapw_densities,               ONLY: prepare_gapw_den
-   USE qs_harmonics_atom,               ONLY: get_none0_cg_list,&
-                                              harmonics_atom_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_methods,                   ONLY: calc_rho_tot_gspace
-   USE qs_rho_atom_types,               ONLY: rho_atom_type
-   USE qs_rho_types,                    ONLY: qs_rho_type
-   USE util,                            ONLY: get_limit,&
-                                              sort
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE eigenvalueproblems, ONLY: diagonalise
+   USE input_section_types, ONLY: section_get_lval, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fac, &
+                            fourpi
+   USE message_passing, ONLY: mp_sum
+   USE orbital_pointers, ONLY: indso, &
+                               nsoset
+   USE particle_types, ONLY: particle_type
+   USE paw_proj_set_types, ONLY: get_paw_proj_set, &
+                                 paw_proj_set_type
+   USE physcon, ONLY: a_bohr, &
+                      e_charge, &
+                      joule
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_dr2, &
+                         pw_integral_ab, &
+                         pw_smoothing, &
+                         pw_structure_factor, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_spline_utils, ONLY: &
+      Eval_Interp_Spl3_pbc, Eval_d_Interp_Spl3_pbc, find_coeffs, pw_spline_do_precond, &
+      pw_spline_precond_create, pw_spline_precond_release, pw_spline_precond_set_kind, &
+      pw_spline_precond_type, spl3_pbc
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_gapw_densities, ONLY: prepare_gapw_den
+   USE qs_harmonics_atom, ONLY: get_none0_cg_list, &
+                                harmonics_atom_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_methods, ONLY: calc_rho_tot_gspace
+   USE qs_rho_atom_types, ONLY: rho_atom_type
+   USE qs_rho_types, ONLY: qs_rho_type
+   USE util, ONLY: get_limit, &
+                   sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -232,7 +232,7 @@ CONTAINS
 
       DO i = 1, 3
          DO j = 1, i
-            ij = (i*(i-1))/2+j
+            ij = (i*(i - 1))/2 + j
             CALL pw_pool_create_pw(auxbas_pw_pool, dvr2(ij)%pw, &
                                    use_data=COMPLEXDATA1D, in_space=RECIPROCALSPACE)
             CALL pw_dr2(v_hartree_gspace%pw, dvr2(ij)%pw, i, j)
@@ -286,12 +286,12 @@ CONTAINS
             IF (efg_interpolation) THEN
                DO i = 1, 3
                   DO j = 1, i
-                     ij = (i*(i-1))/2+j
+                     ij = (i*(i - 1))/2 + j
                      efg_val = Eval_Interp_Spl3_pbc(ra, dvspl(ij)%pw)
                      efg_tensor(i, j, iatom) = -efg_val
                      efg_tensor(j, i, iatom) = efg_tensor(i, j, iatom)
                      IF (efg_debug) THEN
-                        chk_spl = chk_spl+efg_val+ &
+                        chk_spl = chk_spl + efg_val + &
                                   SUM(Eval_d_Interp_Spl3_pbc(ra, dvspl(ij)%pw))
                      END IF
                   END DO
@@ -300,7 +300,7 @@ CONTAINS
                CALL pw_structure_factor(structure_factor%pw, ra)
                DO i = 1, 3
                   DO j = 1, i
-                     ij = (i*(i-1))/2+j
+                     ij = (i*(i - 1))/2 + j
                      efg_tensor(i, j, iatom) = -pw_integral_ab(dvr2(ij)%pw, structure_factor%pw)
                      efg_tensor(j, i, iatom) = efg_tensor(i, j, iatom)
                   END DO
@@ -318,16 +318,16 @@ CONTAINS
             DO iat = 1, natomkind
                iatom = atom_list(iat)
                efg_tensor(1, 1, iatom) = efg_tensor(1, 1, iatom) &
-                                         +f1*(vh0(iatom, 2))-f2*(vh0(iatom, 0))
+                                         + f1*(vh0(iatom, 2)) - f2*(vh0(iatom, 0))
                efg_tensor(2, 2, iatom) = efg_tensor(2, 2, iatom) &
-                                         -f1*(vh0(iatom, 2))-f2*(vh0(iatom, 0))
-               efg_tensor(3, 3, iatom) = efg_tensor(3, 3, iatom)+2._dp*f2*(vh0(iatom, 0))
-               efg_tensor(1, 2, iatom) = efg_tensor(1, 2, iatom)+f1*(vh0(iatom, -2))
-               efg_tensor(2, 1, iatom) = efg_tensor(2, 1, iatom)+f1*(vh0(iatom, -2))
-               efg_tensor(1, 3, iatom) = efg_tensor(1, 3, iatom)+f1*(vh0(iatom, 1))
-               efg_tensor(3, 1, iatom) = efg_tensor(3, 1, iatom)+f1*(vh0(iatom, 1))
-               efg_tensor(2, 3, iatom) = efg_tensor(2, 3, iatom)+f1*(vh0(iatom, -1))
-               efg_tensor(3, 2, iatom) = efg_tensor(3, 2, iatom)+f1*(vh0(iatom, -1))
+                                         - f1*(vh0(iatom, 2)) - f2*(vh0(iatom, 0))
+               efg_tensor(3, 3, iatom) = efg_tensor(3, 3, iatom) + 2._dp*f2*(vh0(iatom, 0))
+               efg_tensor(1, 2, iatom) = efg_tensor(1, 2, iatom) + f1*(vh0(iatom, -2))
+               efg_tensor(2, 1, iatom) = efg_tensor(2, 1, iatom) + f1*(vh0(iatom, -2))
+               efg_tensor(1, 3, iatom) = efg_tensor(1, 3, iatom) + f1*(vh0(iatom, 1))
+               efg_tensor(3, 1, iatom) = efg_tensor(3, 1, iatom) + f1*(vh0(iatom, 1))
+               efg_tensor(2, 3, iatom) = efg_tensor(2, 3, iatom) + f1*(vh0(iatom, -1))
+               efg_tensor(3, 2, iatom) = efg_tensor(3, 2, iatom) + f1*(vh0(iatom, -1))
             END DO
          END IF
 
@@ -351,7 +351,7 @@ CONTAINS
                WRITE (UNIT=unit_nr, FMT="(T2,I5,T8,A,T12,A,T15,6F11.5)") &
                   iatom, element_symbol, "PW", ((efg_pw(i, j, iatom), i=1, j), j=1, 3)
                WRITE (UNIT=unit_nr, FMT="(T12,A,T15,6F11.5)") &
-                  "AT", ((efg_tensor(i, j, iatom)-efg_pw(i, j, iatom), i=1, j), j=1, 3)
+                  "AT", ((efg_tensor(i, j, iatom) - efg_pw(i, j, iatom), i=1, j), j=1, 3)
             END IF
          ENDDO
          IF (unit_nr > 0) THEN
@@ -375,7 +375,7 @@ CONTAINS
             WRITE (UNIT=unit_nr, FMT="(T12,A,T39,3F14.7)") &
                "EFG Tensor eigenvalues", efg_diagval(:, iatom)
             WRITE (UNIT=unit_nr, FMT="(T12,A,T67,F14.7)") "EFG Tensor anisotropy", &
-               (efg_diagval(1, iatom)-efg_diagval(2, iatom))/efg_diagval(3, iatom)
+               (efg_diagval(1, iatom) - efg_diagval(2, iatom))/efg_diagval(3, iatom)
             WRITE (UNIT=unit_nr, FMT=*)
          END IF
       ENDDO
@@ -431,8 +431,8 @@ CONTAINS
       CHARACTER(len=*), PARAMETER :: routineN = 'vlimit_atom', routineP = moduleN//':'//routineN
 
       INTEGER :: i, i1, i2, iat, iatom, icg, ipgf1, ipgf2, iset1, iset2, iso, iso1, iso1_first, &
-         iso1_last, iso2, iso2_first, iso2_last, l, l_iso, llmax, m1s, m2s, m_iso, max_iso_not0, &
-         max_iso_not0_local, max_s_harm, maxl, maxso, mepos, n1s, n2s, nset, num_pe, size1, size2
+                 iso1_last, iso2, iso2_first, iso2_last, l, l_iso, llmax, m1s, m2s, m_iso, max_iso_not0, &
+                 max_iso_not0_local, max_s_harm, maxl, maxso, mepos, n1s, n2s, nset, num_pe, size1, size2
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: cg_n_list
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: cg_list
       INTEGER, DIMENSION(2)                              :: bo
@@ -483,27 +483,27 @@ CONTAINS
 
             n1s = nsoset(lmax(iset1))
             DO ipgf1 = 1, npgf(iset1)
-               iso1_first = nsoset(lmin(iset1)-1)+1+n1s*(ipgf1-1)+m1s
-               iso1_last = nsoset(lmax(iset1))+n1s*(ipgf1-1)+m1s
-               size1 = iso1_last-iso1_first+1
+               iso1_first = nsoset(lmin(iset1) - 1) + 1 + n1s*(ipgf1 - 1) + m1s
+               iso1_last = nsoset(lmax(iset1)) + n1s*(ipgf1 - 1) + m1s
+               size1 = iso1_last - iso1_first + 1
                iso1_first = o2nindex(iso1_first)
                iso1_last = o2nindex(iso1_last)
-               i1 = iso1_last-iso1_first+1
+               i1 = iso1_last - iso1_first + 1
                CPASSERT(size1 == i1)
-               i1 = nsoset(lmin(iset1)-1)+1
+               i1 = nsoset(lmin(iset1) - 1) + 1
 
                n2s = nsoset(lmax(iset2))
                DO ipgf2 = 1, npgf(iset2)
-                  iso2_first = nsoset(lmin(iset2)-1)+1+n2s*(ipgf2-1)+m2s
-                  iso2_last = nsoset(lmax(iset2))+n2s*(ipgf2-1)+m2s
-                  size2 = iso2_last-iso2_first+1
+                  iso2_first = nsoset(lmin(iset2) - 1) + 1 + n2s*(ipgf2 - 1) + m2s
+                  iso2_last = nsoset(lmax(iset2)) + n2s*(ipgf2 - 1) + m2s
+                  size2 = iso2_last - iso2_first + 1
                   iso2_first = o2nindex(iso2_first)
                   iso2_last = o2nindex(iso2_last)
-                  i2 = iso2_last-iso2_first+1
+                  i2 = iso2_last - iso2_first + 1
                   CPASSERT(size2 == i2)
-                  i2 = nsoset(lmin(iset2)-1)+1
+                  i2 = nsoset(lmin(iset2) - 1) + 1
 
-                  zet12 = zet(ipgf1, iset1)+zet(ipgf2, iset2)
+                  zet12 = zet(ipgf1, iset1) + zet(ipgf2, iset2)
 
                   vgg = 0.0_dp
 
@@ -513,9 +513,9 @@ CONTAINS
                      DO icg = 1, cg_n_list(iso)
                         iso1 = cg_list(1, icg, iso)
                         iso2 = cg_list(2, icg, iso)
-                        l = indso(1, iso1)+indso(1, iso2)
+                        l = indso(1, iso1) + indso(1, iso2)
                         IF (MOD(l, 2) == 0 .AND. l > 0) THEN
-                           vgg(l/2) = fourpi/10._dp*fac(l-2)/zet12**(l/2)
+                           vgg(l/2) = fourpi/10._dp*fac(l - 2)/zet12**(l/2)
                         END IF
                      END DO
                   END DO
@@ -526,12 +526,12 @@ CONTAINS
                      CPC_sphere = 0.0_dp
                      DO i = 1, nspins
                         coeff => rho_atom_set(iatom)%cpc_h(i)%r_coef
-                        CPC_sphere(i1:i1+size1-1, i2:i2+size2-1) = &
-                           CPC_sphere(i1:i1+size1-1, i2:i2+size2-1)+ &
+                        CPC_sphere(i1:i1 + size1 - 1, i2:i2 + size2 - 1) = &
+                           CPC_sphere(i1:i1 + size1 - 1, i2:i2 + size2 - 1) + &
                            coeff(iso1_first:iso1_last, iso2_first:iso2_last)
                         coeff => rho_atom_set(iatom)%cpc_s(i)%r_coef
-                        CPC_sphere(i1:i1+size1-1, i2:i2+size2-1) = &
-                           CPC_sphere(i1:i1+size1-1, i2:i2+size2-1)- &
+                        CPC_sphere(i1:i1 + size1 - 1, i2:i2 + size2 - 1) = &
+                           CPC_sphere(i1:i1 + size1 - 1, i2:i2 + size2 - 1) - &
                            coeff(iso1_first:iso1_last, iso2_first:iso2_last)
                      ENDDO ! i
 
@@ -542,9 +542,9 @@ CONTAINS
                         DO icg = 1, cg_n_list(iso)
                            iso1 = cg_list(1, icg, iso)
                            iso2 = cg_list(2, icg, iso)
-                           l = indso(1, iso1)+indso(1, iso2)
+                           l = indso(1, iso1) + indso(1, iso2)
                            IF (MOD(l, 2) == 0 .AND. l > 0) THEN
-                              vlimit(iatom, m_iso) = vlimit(iatom, m_iso)+ &
+                              vlimit(iatom, m_iso) = vlimit(iatom, m_iso) + &
                                                      vgg(l/2)*CPC_sphere(iso1, iso2)*my_CG(iso1, iso2, iso)
                            END IF
                         ENDDO ! icg
@@ -554,9 +554,9 @@ CONTAINS
 
                ENDDO ! ipgf2
             ENDDO ! ipgf1
-            m2s = m2s+maxso
+            m2s = m2s + maxso
          ENDDO ! iset2
-         m1s = m1s+maxso
+         m1s = m1s + maxso
       ENDDO ! iset1
 
       CALL mp_sum(vlimit, para_env%group)

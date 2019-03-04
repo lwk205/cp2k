@@ -8,32 +8,32 @@
 !> \author Teodoro Laino, 03.2009
 ! **************************************************************************************************
 MODULE molden_utils
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_get_submatrix
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE orbital_pointers,                ONLY: nco,&
-                                              nso
-   USE orbital_symbols,                 ONLY: cgf_symbol
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_get_submatrix
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE orbital_pointers, ONLY: nco, &
+                               nso
+   USE orbital_symbols, ONLY: cgf_symbol
    USE orbital_transformation_matrices, ONLY: orbtramat
-   USE particle_types,                  ONLY: particle_type
-   USE periodic_table,                  ONLY: get_ptable_info
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_mo_types,                     ONLY: mo_set_p_type
+   USE particle_types, ONLY: particle_type
+   USE periodic_table, ONLY: get_ptable_info
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_mo_types, ONLY: mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -62,7 +62,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: print_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_mos_molden', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=1)                                   :: angmom
       CHARACTER(LEN=12), DIMENSION(15)                   :: shell_symbol
@@ -70,7 +70,7 @@ CONTAINS
       CHARACTER(LEN=15)                                  :: fmtstr1
       CHARACTER(LEN=2)                                   :: element_symbol
       INTEGER :: digits, handle, i, iatom, icgf, ico, icol, ikind, ipgf, irow, irow_in, iset, &
-         isgf, ishell, ispin, iw, lshell, ncgf, ncol_global, nrow_global, nset, nsgf, shellgf, z
+                 isgf, ishell, ispin, iw, lshell, ncgf, ncol_global, nrow_global, nset, nsgf, shellgf, z
       INTEGER, DIMENSION(15)                             :: orbmap
       INTEGER, DIMENSION(:), POINTER                     :: nshell
       INTEGER, DIMENSION(:, :), POINTER                  :: l
@@ -93,7 +93,7 @@ CONTAINS
 
          CALL section_vals_val_get(print_section, "MOS_MOLDEN%NDIGITS", i_val=digits)
          fmtstr1 = "(I6,1X,ES  .  )"
-         WRITE (UNIT=fmtstr1(10:11), FMT="(I2)") digits+7
+         WRITE (UNIT=fmtstr1(10:11), FMT="(I2)") digits + 7
          WRITE (UNIT=fmtstr1(13:14), FMT="(I2)") digits
 
          IF (mos(1)%mo_set%use_mo_coeff_b) THEN
@@ -149,7 +149,7 @@ CONTAINS
                         ! functions. So we undo the normalisation factors included in the gccs
                         ! Reverse engineered from basis_set_types, normalise_gcc_orb
                         prefac = 2_dp**orb_basis_set%l(ishell, iset)*(2/pi)**0.75_dp
-                        expzet = 0.25_dp*(2*orb_basis_set%l(ishell, iset)+3.0_dp)
+                        expzet = 0.25_dp*(2*orb_basis_set%l(ishell, iset) + 3.0_dp)
                         WRITE (UNIT=iw, &
                                FMT="((T51,2F15.6))") &
                            (orb_basis_set%zet(ipgf, iset), &
@@ -206,8 +206,8 @@ CONTAINS
                                       orbtramat(lshell)%s2c, nso(lshell), &
                                       smatrix(isgf, 1), nsgf, 0.0_dp, &
                                       cmatrix(icgf, 1), ncgf)
-                           icgf = icgf+nco(lshell)
-                           isgf = isgf+nso(lshell)
+                           icgf = icgf + nco(lshell)
+                           isgf = isgf + nso(lshell)
                         END DO
                      END DO
                   END IF
@@ -245,9 +245,9 @@ CONTAINS
                               DO ico = 1, nco(lshell)
                                  mo_coeff(shellgf) = cmatrix(irow, icol)
                                  shell_symbol(shellgf) = bcgf_symbol(icgf)
-                                 icgf = icgf+1
-                                 shellgf = shellgf+1
-                                 irow = irow+1
+                                 icgf = icgf + 1
+                                 shellgf = shellgf + 1
+                                 irow = irow + 1
                               END DO ! ico
                               !------------------------------------------------------------------------
                               ! convert from CP2K MOLDEN format ordering
@@ -323,7 +323,7 @@ CONTAINS
       DO orbital = 1, 15
          IF (orbmap(orbital) .NE. 0) THEN
             IF (mo_coeff(orbmap(orbital)) .GT. 10.0**(-digits)) THEN
-               WRITE (iw, fmtstr1) irow_in+orbital, mo_coeff(orbmap(orbital))
+               WRITE (iw, fmtstr1) irow_in + orbital, mo_coeff(orbmap(orbital))
             END IF
          END IF
       END DO
@@ -356,7 +356,7 @@ CONTAINS
       INTEGER, DIMENSION(:), OPTIONAL, POINTER           :: list
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_vibrations_molden', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: element_symbol
       INTEGER                                            :: handle, i, iw, j, k, l, z
@@ -410,12 +410,12 @@ CONTAINS
          l = 0
          DO i = 1, SIZE(eigen_vec, 2)
             IF ((.NOT. dump_only_positive) .OR. (freq(i) >= 0._dp)) THEN
-               l = l+1
+               l = l + 1
                WRITE (iw, '(T2,A,1X,I6)') "vibration", l
                DO j = 1, SIZE(particles)
                   IF (my_list(j) .NE. 0) THEN
-                     k = (my_list(j)-1)*3
-                     WRITE (iw, '(T2,3(F12.6,3X))') eigen_vec(k+1, i), eigen_vec(k+2, i), eigen_vec(k+3, i)
+                     k = (my_list(j) - 1)*3
+                     WRITE (iw, '(T2,3(F12.6,3X))') eigen_vec(k + 1, i), eigen_vec(k + 2, i), eigen_vec(k + 3, i)
                   ELSE
                      WRITE (iw, '(T2,3(F12.6,3X))') 0.0_dp, 0.0_dp, 0.0_dp
                   END IF

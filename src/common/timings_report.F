@@ -14,34 +14,34 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE timings_report
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dict,                            ONLY: dict_get,&
-                                              dict_haskey,&
-                                              dict_i4tuple_callstat_item_type,&
-                                              dict_items
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              int_8
-   USE list,                            ONLY: list_destroy,&
-                                              list_get,&
-                                              list_init,&
-                                              list_isready,&
-                                              list_pop,&
-                                              list_push,&
-                                              list_size
-   USE list_routinereport,              ONLY: list_routinereport_type
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_max,&
-                                              mp_maxloc,&
-                                              mp_sum
-   USE timings,                         ONLY: get_timer_env
-   USE timings_base_type,               ONLY: call_stat_type,&
-                                              routine_report_type,&
-                                              routine_stat_type
-   USE timings_types,                   ONLY: timer_env_type
-   USE util,                            ONLY: sort
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dict, ONLY: dict_get, &
+                   dict_haskey, &
+                   dict_i4tuple_callstat_item_type, &
+                   dict_items
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    int_8
+   USE list, ONLY: list_destroy, &
+                   list_get, &
+                   list_init, &
+                   list_isready, &
+                   list_pop, &
+                   list_push, &
+                   list_size
+   USE list_routinereport, ONLY: list_routinereport_type
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_max, &
+                              mp_maxloc, &
+                              mp_sum
+   USE timings, ONLY: get_timer_env
+   USE timings_base_type, ONLY: call_stat_type, &
+                                routine_report_type, &
+                                routine_stat_type
+   USE timings_types, ONLY: timer_env_type
+   USE util, ONLY: sort
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE

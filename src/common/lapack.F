@@ -40,10 +40,10 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dsyev(jobz, uplo, n, a, lda, w, work, lwork, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: jobz, uplo
-      INTEGER                                            :: N, LDA
-      REAL(KIND=dp)                                      :: A(LDA, *), W(*), WORK(*)
-      INTEGER                                            :: LWORK, INFO
+         CHARACTER                                          :: jobz, uplo
+         INTEGER                                            :: N, LDA
+         REAL(KIND=dp)                                      :: A(LDA, *), W(*), WORK(*)
+         INTEGER                                            :: LWORK, INFO
 
       END SUBROUTINE dsyev
    END INTERFACE
@@ -66,13 +66,13 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dsygv(itype, jobz, uplo, n, a, lda, b, ldb, w, work, lwork, info)
          USE kinds, ONLY: dp
-      INTEGER                                            :: itype
-      CHARACTER                                          :: jobz, uplo
-      INTEGER                                            :: N, LDA
-      REAL(KIND=dp)                                      :: A(LDA, *)
-      INTEGER                                            :: LDB
-      REAL(KIND=dp)                                      :: B(LDB, *), W(*), WORK(*)
-      INTEGER                                            :: LWORK, INFO
+         INTEGER                                            :: itype
+         CHARACTER                                          :: jobz, uplo
+         INTEGER                                            :: N, LDA
+         REAL(KIND=dp)                                      :: A(LDA, *)
+         INTEGER                                            :: LDB
+         REAL(KIND=dp)                                      :: B(LDB, *), W(*), WORK(*)
+         INTEGER                                            :: LWORK, INFO
 
       END SUBROUTINE dsygv
    END INTERFACE
@@ -93,14 +93,14 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE zhpev(jobz, uplo, n, ap, w, z, ldz, work, rwork, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: jobz, uplo
-      INTEGER                                            :: n
-      COMPLEX(KIND=dp)                                   :: ap(*)
-      REAL(KIND=dp)                                      :: w(*)
-      INTEGER                                            :: ldz
-      COMPLEX(KIND=dp)                                   :: z(ldz, *), work(*)
-      REAL(KIND=dp)                                      :: rwork(*)
-      INTEGER                                            :: info
+         CHARACTER                                          :: jobz, uplo
+         INTEGER                                            :: n
+         COMPLEX(KIND=dp)                                   :: ap(*)
+         REAL(KIND=dp)                                      :: w(*)
+         INTEGER                                            :: ldz
+         COMPLEX(KIND=dp)                                   :: z(ldz, *), work(*)
+         REAL(KIND=dp)                                      :: rwork(*)
+         INTEGER                                            :: info
 
       END SUBROUTINE zhpev
    END INTERFACE
@@ -123,13 +123,13 @@ MODULE lapack
       SUBROUTINE dspgv(itype, jobz, uplo, n, ap, bp, w, z, ldz, work, &
                        info)
          USE kinds, ONLY: dp
-      INTEGER                                            :: itype
-      CHARACTER                                          :: jobz, uplo
-      INTEGER                                            :: n
-      REAL(KIND=dp)                                      :: ap(*), bp(*), w(*)
-      INTEGER                                            :: ldz
-      REAL(KIND=dp)                                      :: z(ldz, *), work(*)
-      INTEGER                                            :: info
+         INTEGER                                            :: itype
+         CHARACTER                                          :: jobz, uplo
+         INTEGER                                            :: n
+         REAL(KIND=dp)                                      :: ap(*), bp(*), w(*)
+         INTEGER                                            :: ldz
+         REAL(KIND=dp)                                      :: z(ldz, *), work(*)
+         INTEGER                                            :: info
 
       END SUBROUTINE dspgv
    END INTERFACE
@@ -153,15 +153,15 @@ MODULE lapack
       SUBROUTINE zhpgv(itype, jobz, uplo, n, ap, bp, w, z, ldz, work, &
                        rwork, info)
          USE kinds, ONLY: dp
-      INTEGER                                            :: itype
-      CHARACTER                                          :: jobz, uplo
-      INTEGER                                            :: n
-      COMPLEX(KIND=dp)                                   :: ap(*), bp(*)
-      REAL(KIND=dp)                                      :: w(*)
-      INTEGER                                            :: ldz
-      COMPLEX(KIND=dp)                                   :: z(ldz, *), work(*)
-      REAL(KIND=dp)                                      :: rwork(*)
-      INTEGER                                            :: info
+         INTEGER                                            :: itype
+         CHARACTER                                          :: jobz, uplo
+         INTEGER                                            :: n
+         COMPLEX(KIND=dp)                                   :: ap(*), bp(*)
+         REAL(KIND=dp)                                      :: w(*)
+         INTEGER                                            :: ldz
+         COMPLEX(KIND=dp)                                   :: z(ldz, *), work(*)
+         REAL(KIND=dp)                                      :: rwork(*)
+         INTEGER                                            :: info
 
       END SUBROUTINE zhpgv
    END INTERFACE
@@ -187,14 +187,14 @@ MODULE lapack
       SUBROUTINE dgesvd(jobu, jobvt, m, n, a, lda, s, u, ldu, vt, ldvt, &
                         work, lwork, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: jobu, jobvt
-      INTEGER                                            :: m, n, lda
-      REAL(KIND=dp)                                      :: a(lda, *), s(*)
-      INTEGER                                            :: ldu
-      REAL(KIND=dp)                                      :: u(ldu, *)
-      INTEGER                                            :: ldvt
-      REAL(KIND=dp)                                      :: vt(ldvt, *), work(*)
-      INTEGER                                            :: lwork, info
+         CHARACTER                                          :: jobu, jobvt
+         INTEGER                                            :: m, n, lda
+         REAL(KIND=dp)                                      :: a(lda, *), s(*)
+         INTEGER                                            :: ldu
+         REAL(KIND=dp)                                      :: u(ldu, *)
+         INTEGER                                            :: ldvt
+         REAL(KIND=dp)                                      :: vt(ldvt, *), work(*)
+         INTEGER                                            :: lwork, info
 
       END SUBROUTINE dgesvd
    END INTERFACE
@@ -221,17 +221,17 @@ MODULE lapack
       SUBROUTINE zgesvd(jobu, jobvt, m, n, a, lda, s, u, ldu, vt, ldvt, &
                         work, lwork, rwork, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: jobu, jobvt
-      INTEGER                                            :: m, n, lda
-      COMPLEX(KIND=dp)                                   :: a(lda, *)
-      REAL(KIND=dp)                                      :: s(*)
-      INTEGER                                            :: ldu
-      COMPLEX(KIND=dp)                                   :: u(ldu, *)
-      INTEGER                                            :: ldvt
-      COMPLEX(KIND=dp)                                   :: vt(ldvt, *), work(*)
-      INTEGER                                            :: lwork
-      REAL(KIND=dp)                                      :: rwork(*)
-      INTEGER                                            :: info
+         CHARACTER                                          :: jobu, jobvt
+         INTEGER                                            :: m, n, lda
+         COMPLEX(KIND=dp)                                   :: a(lda, *)
+         REAL(KIND=dp)                                      :: s(*)
+         INTEGER                                            :: ldu
+         COMPLEX(KIND=dp)                                   :: u(ldu, *)
+         INTEGER                                            :: ldvt
+         COMPLEX(KIND=dp)                                   :: vt(ldvt, *), work(*)
+         INTEGER                                            :: lwork
+         REAL(KIND=dp)                                      :: rwork(*)
+         INTEGER                                            :: info
 
       END SUBROUTINE zgesvd
    END INTERFACE
@@ -247,10 +247,10 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dpotrf(uplo, n, a, lda, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: uplo
-      INTEGER                                            :: n, lda
-      REAL(KIND=dp)                                      :: a(lda, *)
-      INTEGER                                            :: info
+         CHARACTER                                          :: uplo
+         INTEGER                                            :: n, lda
+         REAL(KIND=dp)                                      :: a(lda, *)
+         INTEGER                                            :: info
 
       END SUBROUTINE dpotrf
    END INTERFACE
@@ -266,10 +266,10 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE zpotrf(uplo, n, a, lda, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: uplo
-      INTEGER                                            :: n, lda
-      COMPLEX(KIND=dp)                                   :: a(lda, *)
-      INTEGER                                            :: info
+         CHARACTER                                          :: uplo
+         INTEGER                                            :: n, lda
+         COMPLEX(KIND=dp)                                   :: a(lda, *)
+         INTEGER                                            :: info
 
       END SUBROUTINE zpotrf
    END INTERFACE
@@ -286,10 +286,10 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dtrtri(uplo, diag, n, a, lda, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: uplo, diag
-      INTEGER                                            :: n, lda
-      REAL(KIND=dp)                                      :: a(lda, *)
-      INTEGER                                            :: info
+         CHARACTER                                          :: uplo, diag
+         INTEGER                                            :: n, lda
+         REAL(KIND=dp)                                      :: a(lda, *)
+         INTEGER                                            :: info
 
       END SUBROUTINE dtrtri
    END INTERFACE
@@ -306,10 +306,10 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE ztrtri(uplo, diag, n, a, lda, info)
          USE kinds, ONLY: dp
-      CHARACTER                                          :: uplo, diag
-      INTEGER                                            :: n, lda
-      COMPLEX(KIND=dp)                                   :: a(lda, *)
-      INTEGER                                            :: info
+         CHARACTER                                          :: uplo, diag
+         INTEGER                                            :: n, lda
+         COMPLEX(KIND=dp)                                   :: a(lda, *)
+         INTEGER                                            :: info
 
       END SUBROUTINE ztrtri
    END INTERFACE
@@ -328,11 +328,11 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dgesv(n, nrhs, a, lda, ipiv, b, ldb, info)
          USE kinds, ONLY: dp
-      INTEGER                                            :: N, NRHS, LDA
-      REAL(KIND=dp)                                      :: A(LDA, *)
-      INTEGER                                            :: IPIV(*), LDB
-      REAL(KIND=dp)                                      :: B(LDB, *)
-      INTEGER                                            :: INFO
+         INTEGER                                            :: N, NRHS, LDA
+         REAL(KIND=dp)                                      :: A(LDA, *)
+         INTEGER                                            :: IPIV(*), LDB
+         REAL(KIND=dp)                                      :: B(LDB, *)
+         INTEGER                                            :: INFO
 
       END SUBROUTINE dgesv
    END INTERFACE
@@ -353,11 +353,11 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dgbsv(n, kl, ku, nrhs, ab, ldab, ipiv, b, ldb, info)
          USE kinds, ONLY: dp
-      INTEGER                                            :: N, KL, KU, NRHS, LDAB
-      REAL(KIND=dp)                                      :: AB(LDAB, *)
-      INTEGER                                            :: IPIV(*), LDB
-      REAL(KIND=dp)                                      :: B(LDB, *)
-      INTEGER                                            :: INFO
+         INTEGER                                            :: N, KL, KU, NRHS, LDAB
+         REAL(KIND=dp)                                      :: AB(LDAB, *)
+         INTEGER                                            :: IPIV(*), LDB
+         REAL(KIND=dp)                                      :: B(LDB, *)
+         INTEGER                                            :: INFO
 
       END SUBROUTINE dgbsv
    END INTERFACE
@@ -381,13 +381,13 @@ MODULE lapack
 ! **************************************************************************************************
       SUBROUTINE dgelss(m, n, nrhs, a, lda, b, ldb, s, rcond, rank, work, lwork, info)
          USE kinds, ONLY: dp
-      INTEGER                                            :: m, n, nrhs, lda
-      REAL(KIND=dp)                                      :: a(lda, *)
-      INTEGER                                            :: ldb
-      REAL(KIND=dp)                                      :: b(ldb, *), s(*), rcond
-      INTEGER                                            :: rank
-      REAL(KIND=dp)                                      :: work(*)
-      INTEGER                                            :: lwork, info
+         INTEGER                                            :: m, n, nrhs, lda
+         REAL(KIND=dp)                                      :: a(lda, *)
+         INTEGER                                            :: ldb
+         REAL(KIND=dp)                                      :: b(ldb, *), s(*), rcond
+         INTEGER                                            :: rank
+         REAL(KIND=dp)                                      :: work(*)
+         INTEGER                                            :: lwork, info
 
       END SUBROUTINE dgelss
    END INTERFACE

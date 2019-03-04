@@ -9,30 +9,30 @@
 !> \author Teodoro Laino (03.2008) [tlaino]
 ! **************************************************************************************************
 MODULE external_potential_methods
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_set,&
-                                              force_env_type
-   USE force_fields_util,               ONLY: get_generic_info
-   USE fparser,                         ONLY: evalf,&
-                                              evalfd,&
-                                              finalizef,&
-                                              initf,&
-                                              parsef
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_list_types,             ONLY: particle_list_type
-   USE string_utilities,                ONLY: compress
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_set, &
+                              force_env_type
+   USE force_fields_util, ONLY: get_generic_info
+   USE fparser, ONLY: evalf, &
+                      evalfd, &
+                      finalizef, &
+                      initf, &
+                      parsef
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE particle_list_types, ONLY: particle_list_type
+   USE string_utilities, ONLY: compress
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -53,7 +53,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'add_external_potential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: coupling_function
       CHARACTER(LEN=default_string_length)               :: def_error, this_error
@@ -94,9 +94,9 @@ CONTAINS
          CALL section_vals_val_get(ext_pot_section, "ATOMS_LIST", n_rep_val=a_var, i_rep_section=rep)
          DO k = 1, a_var
             CALL section_vals_val_get(ext_pot_section, "ATOMS_LIST", i_rep_val=k, i_vals=iatms, i_rep_section=rep)
-            CALL reallocate(nparticle, 1, natom+SIZE(iatms))
-            nparticle(natom+1:natom+SIZE(iatms)) = iatms
-            natom = natom+SIZE(iatms)
+            CALL reallocate(nparticle, 1, natom + SIZE(iatms))
+            nparticle(natom + 1:natom + SIZE(iatms)) = iatms
+            natom = natom + SIZE(iatms)
          END DO
          IF (a_var == 0) THEN
             natom = particles%n_els
@@ -112,7 +112,7 @@ CONTAINS
             my_val(2) = particles%els(iatom)%r(2)
             my_val(3) = particles%els(iatom)%r(3)
 
-            energy = energy+evalf(1, my_val)
+            energy = energy + evalf(1, my_val)
             DO j = 1, 3
                dedf = evalfd(1, j, my_val, dx, err)
                IF (ABS(err) > lerr) THEN
@@ -125,7 +125,7 @@ CONTAINS
                                ' Error '//TRIM(this_error)//' in computing numerical derivatives larger then'// &
                                TRIM(def_error)//' .')
                END IF
-               particles%els(iatom)%f(j) = particles%els(iatom)%f(j)-dedf
+               particles%els(iatom)%f(j) = particles%els(iatom)%f(j) - dedf
             END DO
          END DO
          CALL force_env_set(force_env, additional_potential=energy)

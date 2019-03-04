@@ -11,8 +11,8 @@
 ! **************************************************************************************************
 
 MODULE tmc_move_types
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
+   USE kinds, ONLY: default_string_length, &
+                    dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -85,7 +85,7 @@ CONTAINS
       INTEGER                                            :: nr_temp
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'move_types_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(move_types))
 
@@ -117,7 +117,7 @@ CONTAINS
       TYPE(tmc_move_type), POINTER                       :: move_types
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'move_types_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(move_types))
 

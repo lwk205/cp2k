@@ -11,42 +11,42 @@
 !> \author CJM SEPT-12-02
 ! **************************************************************************************************
 MODULE md_environment_types
-   USE averages_types,                  ONLY: average_quantities_type,&
-                                              create_averages,&
-                                              release_averages,&
-                                              retain_averages
-   USE barostat_types,                  ONLY: barostat_type,&
-                                              release_barostat_type,&
-                                              retain_barostat_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE extended_system_types,           ONLY: npt_info_type
-   USE force_env_types,                 ONLY: force_env_release,&
-                                              force_env_retain,&
-                                              force_env_type
-   USE free_energy_types,               ONLY: fe_env_release,&
-                                              free_energy_type
-   USE input_constants,                 ONLY: do_thermo_al,&
-                                              langevin_ensemble
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE md_ener_types,                   ONLY: md_ener_type,&
-                                              release_md_ener,&
-                                              retain_md_ener
-   USE reftraj_types,                   ONLY: reftraj_type,&
-                                              release_reftraj,&
-                                              retain_reftraj
-   USE simpar_types,                    ONLY: simpar_type
-   USE thermal_region_types,            ONLY: release_thermal_regions,&
-                                              retain_thermal_regions,&
-                                              thermal_regions_type
-   USE thermostat_types,                ONLY: release_thermostats,&
-                                              retain_thermostats,&
-                                              thermostat_type,&
-                                              thermostats_type
+   USE averages_types, ONLY: average_quantities_type, &
+                             create_averages, &
+                             release_averages, &
+                             retain_averages
+   USE barostat_types, ONLY: barostat_type, &
+                             release_barostat_type, &
+                             retain_barostat_type
+   USE cell_types, ONLY: cell_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE extended_system_types, ONLY: npt_info_type
+   USE force_env_types, ONLY: force_env_release, &
+                              force_env_retain, &
+                              force_env_type
+   USE free_energy_types, ONLY: fe_env_release, &
+                                free_energy_type
+   USE input_constants, ONLY: do_thermo_al, &
+                              langevin_ensemble
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE md_ener_types, ONLY: md_ener_type, &
+                            release_md_ener, &
+                            retain_md_ener
+   USE reftraj_types, ONLY: reftraj_type, &
+                            release_reftraj, &
+                            retain_reftraj
+   USE simpar_types, ONLY: simpar_type
+   USE thermal_region_types, ONLY: release_thermal_regions, &
+                                   retain_thermal_regions, &
+                                   thermal_regions_type
+   USE thermostat_types, ONLY: release_thermostats, &
+                               retain_thermostats, &
+                               thermostat_type, &
+                               thermostats_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -108,7 +108,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: averages_section
 
       ALLOCATE (md_env)
-      last_md_env_id = last_md_env_id+1
+      last_md_env_id = last_md_env_id + 1
       md_env%id_nr = last_md_env_id
       md_env%ref_count = 1
 
@@ -159,7 +159,7 @@ CONTAINS
 
       IF (ASSOCIATED(md_env)) THEN
          CPASSERT(md_env%ref_count > 0)
-         md_env%ref_count = md_env%ref_count-1
+         md_env%ref_count = md_env%ref_count - 1
          IF (md_env%ref_count == 0) THEN
             CALL fe_env_release(md_env%fe_env)
             CALL cp_para_env_release(md_env%para_env)

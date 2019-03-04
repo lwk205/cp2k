@@ -10,39 +10,39 @@
 ! **************************************************************************************************
 
 MODULE input_cp2k_md
-   USE bibliography,                    ONLY: &
-        Evans1983, Guidon2008, Kantorovich2008, Kantorovich2008a, Kolafa2004, Kuhne2007, &
-        Minary2003, Ricci2003, Tuckerman1992, VandeVondele2002, West2006
-   USE cp_output_handling,              ONLY: add_last_numeric,&
-                                              cp_print_key_section_create,&
-                                              debug_print_level,&
-                                              high_print_level,&
-                                              low_print_level,&
-                                              medium_print_level
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE input_constants,                 ONLY: &
-        isokin_ensemble, langevin_ensemble, md_init_default, md_init_vib, npe_f_ensemble, &
-        npe_i_ensemble, nph_ensemble, nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, &
-        npt_f_ensemble, npt_i_ensemble, nve_ensemble, nvt_adiabatic_ensemble, nvt_ensemble, &
-        reftraj_ensemble
-   USE input_cp2k_barostats,            ONLY: create_barostat_section
-   USE input_cp2k_thermostats,          ONLY: create_region_section,&
-                                              create_thermo_fast_section,&
-                                              create_thermo_slow_section,&
-                                              create_thermostat_section
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: integer_t,&
-                                              lchar_t,&
-                                              real_t
-   USE kinds,                           ONLY: dp
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: &
+      Evans1983, Guidon2008, Kantorovich2008, Kantorovich2008a, Kolafa2004, Kuhne2007, &
+      Minary2003, Ricci2003, Tuckerman1992, VandeVondele2002, West2006
+   USE cp_output_handling, ONLY: add_last_numeric, &
+                                 cp_print_key_section_create, &
+                                 debug_print_level, &
+                                 high_print_level, &
+                                 low_print_level, &
+                                 medium_print_level
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE input_constants, ONLY: &
+      isokin_ensemble, langevin_ensemble, md_init_default, md_init_vib, npe_f_ensemble, &
+      npe_i_ensemble, nph_ensemble, nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, &
+      npt_f_ensemble, npt_i_ensemble, nve_ensemble, nvt_adiabatic_ensemble, nvt_ensemble, &
+      reftraj_ensemble
+   USE input_cp2k_barostats, ONLY: create_barostat_section
+   USE input_cp2k_thermostats, ONLY: create_region_section, &
+                                     create_thermo_fast_section, &
+                                     create_thermo_slow_section, &
+                                     create_thermostat_section
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: integer_t, &
+                              lchar_t, &
+                              real_t
+   USE kinds, ONLY: dp
+   USE string_utilities, ONLY: s2a
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -64,7 +64,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_md_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -324,7 +324,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_langevin_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -375,7 +375,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_md_print_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key
@@ -470,7 +470,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_respa_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -505,7 +505,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_reftraj_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection
@@ -623,7 +623,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_msd_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -703,7 +703,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_msst_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -769,7 +769,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_shell_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: thermo_section
@@ -833,7 +833,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_adiabatic_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: thermo_fast_section, thermo_slow_section
@@ -906,7 +906,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_softening_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -955,7 +955,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_thermal_region_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, region_section, subsection
@@ -1081,7 +1081,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_cascade_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -1146,7 +1146,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_avgs_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection
@@ -1180,7 +1180,7 @@ CONTAINS
 
       CALL cp_print_key_section_create(print_key, "PRINT_AVERAGES", &
                                        description="Controls the output the averaged quantities", &
-                                       print_level=debug_print_level+1, common_iter_levels=1, &
+                                       print_level=debug_print_level + 1, common_iter_levels=1, &
                                        filename="")
       CALL section_add_subsection(section, print_key)
       CALL section_release(print_key)
@@ -1199,7 +1199,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_avgs_restart_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1381,7 +1381,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_vib_init_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

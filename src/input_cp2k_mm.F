@@ -12,41 +12,41 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE input_cp2k_mm
-   USE bibliography,                    ONLY: &
-        Devynck2012, Dick1958, Foiles1986, Mitchell1993, QUIP_ref, Siepmann1995, Tersoff1988, &
-        Tosi1964a, Tosi1964b, Yamada2000
-   USE cp_output_handling,              ONLY: cp_print_key_section_create,&
-                                              debug_print_level,&
-                                              high_print_level,&
-                                              low_print_level,&
-                                              medium_print_level,&
-                                              silent_print_level
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE force_field_kind_types,          ONLY: &
-        do_ff_amber, do_ff_charmm, do_ff_cubic, do_ff_fues, do_ff_g87, do_ff_g96, do_ff_harmonic, &
-        do_ff_legendre, do_ff_mixed_bend_stretch, do_ff_mm2, do_ff_mm3, do_ff_mm4, do_ff_morse, &
-        do_ff_opls, do_ff_quartic, do_ff_undef
-   USE input_constants,                 ONLY: use_mom_ref_coac,&
-                                              use_mom_ref_com,&
-                                              use_mom_ref_user,&
-                                              use_mom_ref_zero
-   USE input_cp2k_field,                ONLY: create_per_efield_section
-   USE input_cp2k_poisson,              ONLY: create_poisson_section
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: char_t,&
-                                              integer_t,&
-                                              lchar_t,&
-                                              real_t
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: &
+      Devynck2012, Dick1958, Foiles1986, Mitchell1993, QUIP_ref, Siepmann1995, Tersoff1988, &
+      Tosi1964a, Tosi1964b, Yamada2000
+   USE cp_output_handling, ONLY: cp_print_key_section_create, &
+                                 debug_print_level, &
+                                 high_print_level, &
+                                 low_print_level, &
+                                 medium_print_level, &
+                                 silent_print_level
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE force_field_kind_types, ONLY: &
+      do_ff_amber, do_ff_charmm, do_ff_cubic, do_ff_fues, do_ff_g87, do_ff_g96, do_ff_harmonic, &
+      do_ff_legendre, do_ff_mixed_bend_stretch, do_ff_mm2, do_ff_mm3, do_ff_mm4, do_ff_morse, &
+      do_ff_opls, do_ff_quartic, do_ff_undef
+   USE input_constants, ONLY: use_mom_ref_coac, &
+                              use_mom_ref_com, &
+                              use_mom_ref_user, &
+                              use_mom_ref_zero
+   USE input_cp2k_field, ONLY: create_per_efield_section
+   USE input_cp2k_poisson, ONLY: create_poisson_section
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: char_t, &
+                              integer_t, &
+                              lchar_t, &
+                              real_t
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -72,7 +72,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mm_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: subsection
 
@@ -114,7 +114,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_print_mm_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key
@@ -177,7 +177,7 @@ CONTAINS
 
       CALL cp_print_key_section_create(print_key, "FF_PARAMETER_FILE", description= &
                                        "Controls the printing of Force Field parameter file", &
-                                       print_level=debug_print_level+1, filename="", common_iter_levels=2)
+                                       print_level=debug_print_level + 1, filename="", common_iter_levels=2)
       CALL section_add_subsection(section, print_key)
       CALL section_release(print_key)
 
@@ -214,7 +214,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_forcefield_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -374,7 +374,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_SPLINE_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -453,7 +453,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_TORSION_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -520,7 +520,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_IMPROPER_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -578,7 +578,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_OPBEND_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -638,7 +638,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_BEND_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -768,7 +768,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: label
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_BOND_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: tag
       TYPE(keyword_type), POINTER                        :: keyword
@@ -858,7 +858,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_charges_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -887,7 +887,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_charge_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -923,7 +923,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_quadrupole_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -961,7 +961,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_dipole_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -1002,7 +1002,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_damping_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1059,7 +1059,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_shell_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1155,7 +1155,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_NONBONDED14_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: subsection
 
@@ -1193,7 +1193,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_NONBONDED_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: subsection
 
@@ -1267,7 +1267,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_neighbor_lists_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1314,7 +1314,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_GENPOT_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1406,7 +1406,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_EAM_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1451,7 +1451,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_QUIP_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1509,7 +1509,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_LJ_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1575,7 +1575,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_Williams_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1648,7 +1648,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_Goodwin_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1734,7 +1734,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_ipbv_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1786,7 +1786,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_BMHFT_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1874,7 +1874,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_BMHFTD_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1978,7 +1978,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_Buck4r_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -2093,7 +2093,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_Buckmorse_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -2210,7 +2210,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_Tersoff_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -2362,7 +2362,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_Siepmann_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -2490,7 +2490,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: print_level
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_dipoles_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

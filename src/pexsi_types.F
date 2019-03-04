@@ -14,25 +14,25 @@
 ! **************************************************************************************************
 
 MODULE pexsi_types
-   USE bibliography,                    ONLY: Lin2009,&
-                                              Lin2013,&
-                                              cite_reference
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE dbcsr_api,                       ONLY: csr_type,&
-                                              dbcsr_p_type,&
-                                              dbcsr_scale,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE message_passing,                 ONLY: mp_dims_create,&
-                                              mp_environ
-   USE pexsi_interface,                 ONLY: cp_pexsi_get_options,&
-                                              cp_pexsi_options,&
-                                              cp_pexsi_plan_finalize,&
-                                              cp_pexsi_plan_initialize,&
-                                              cp_pexsi_set_options
+   USE bibliography, ONLY: Lin2009, &
+                           Lin2013, &
+                           cite_reference
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE dbcsr_api, ONLY: csr_type, &
+                        dbcsr_p_type, &
+                        dbcsr_scale, &
+                        dbcsr_type
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE message_passing, ONLY: mp_dims_create, &
+                              mp_environ
+   USE pexsi_interface, ONLY: cp_pexsi_get_options, &
+                              cp_pexsi_options, &
+                              cp_pexsi_plan_finalize, &
+                              cp_pexsi_plan_initialize, &
+                              cp_pexsi_set_options
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -153,7 +153,7 @@ CONTAINS
       ! is the smallest number greater or equal to min_ranks_per_pole that divides
       ! MPI size without remainder.
       DO WHILE (MOD(numnodes, pexsi_env%num_ranks_per_pole) .NE. 0)
-         pexsi_env%num_ranks_per_pole = pexsi_env%num_ranks_per_pole+1
+         pexsi_env%num_ranks_per_pole = pexsi_env%num_ranks_per_pole + 1
       ENDDO
 
       CALL cp_pexsi_get_options(pexsi_env%options, npSymbFact=npSymbFact)
@@ -199,7 +199,7 @@ CONTAINS
       TYPE(lib_pexsi_env), INTENT(INOUT)                 :: pexsi_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'lib_pexsi_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
 
@@ -235,7 +235,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(INOUT), OPTIONAL             :: kTS
 
       CHARACTER(len=*), PARAMETER :: routineN = 'convert_nspin_cp2k_pexsi', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: scaling

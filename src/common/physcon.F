@@ -64,8 +64,8 @@
 ! **************************************************************************************************
 MODULE physcon
 
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
 
    IMPLICIT NONE
 

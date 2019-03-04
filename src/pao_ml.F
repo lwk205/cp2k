@@ -8,49 +8,49 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_ml
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE cell_types,                      ONLY: cell_create,&
-                                              cell_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_iterator_blocks_left,&
-                                              dbcsr_iterator_next_block,&
-                                              dbcsr_iterator_start,&
-                                              dbcsr_iterator_stop,&
-                                              dbcsr_iterator_type,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_sum
-   USE pao_input,                       ONLY: id2str,&
-                                              pao_ml_gp,&
-                                              pao_ml_lazy,&
-                                              pao_ml_nn,&
-                                              pao_ml_prior_mean,&
-                                              pao_ml_prior_zero,&
-                                              pao_rotinv_param
-   USE pao_io,                          ONLY: pao_ioblock_type,&
-                                              pao_iokind_type,&
-                                              pao_kinds_ensure_equal,&
-                                              pao_read_raw
-   USE pao_ml_descriptor,               ONLY: pao_ml_calc_descriptor
-   USE pao_ml_gaussprocess,             ONLY: pao_ml_gp_gradient,&
-                                              pao_ml_gp_predict,&
-                                              pao_ml_gp_train
-   USE pao_ml_neuralnet,                ONLY: pao_ml_nn_gradient,&
-                                              pao_ml_nn_predict,&
-                                              pao_ml_nn_train
-   USE pao_types,                       ONLY: pao_env_type,&
-                                              training_matrix_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE cell_types, ONLY: cell_create, &
+                         cell_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_iterator_blocks_left, &
+                        dbcsr_iterator_next_block, &
+                        dbcsr_iterator_start, &
+                        dbcsr_iterator_stop, &
+                        dbcsr_iterator_type, &
+                        dbcsr_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_sum
+   USE pao_input, ONLY: id2str, &
+                        pao_ml_gp, &
+                        pao_ml_lazy, &
+                        pao_ml_nn, &
+                        pao_ml_prior_mean, &
+                        pao_ml_prior_zero, &
+                        pao_rotinv_param
+   USE pao_io, ONLY: pao_ioblock_type, &
+                     pao_iokind_type, &
+                     pao_kinds_ensure_equal, &
+                     pao_read_raw
+   USE pao_ml_descriptor, ONLY: pao_ml_calc_descriptor
+   USE pao_ml_gaussprocess, ONLY: pao_ml_gp_gradient, &
+                                  pao_ml_gp_predict, &
+                                  pao_ml_gp_train
+   USE pao_ml_neuralnet, ONLY: pao_ml_nn_gradient, &
+                               pao_ml_nn_predict, &
+                               pao_ml_nn_train
+   USE pao_types, ONLY: pao_env_type, &
+                        training_matrix_type
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -144,7 +144,7 @@ CONTAINS
       CHARACTER(LEN=default_path_length)                 :: filename
 
       CHARACTER(len=*), PARAMETER :: routineN = 'add_to_training_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: param
       INTEGER                                            :: iatom, ikind, natoms, nkinds, nparams
@@ -219,7 +219,7 @@ CONTAINS
          ALLOCATE (new_point)
 
          ! training-point input, calculate descriptor only on one rank
-         IF (MOD(iatom-1, para_env%num_pe) == para_env%mepos) THEN
+         IF (MOD(iatom - 1, para_env%num_pe) == para_env%mepos) THEN
             CALL pao_ml_calc_descriptor(pao, &
                                         my_particle_set, &
                                         qs_kind_set, &
@@ -237,7 +237,7 @@ CONTAINS
 
          ! add to linked list
          ikind = kindsmap(atom2kind(iatom))
-         training_lists(ikind)%npoints = training_lists(ikind)%npoints+1
+         training_lists(ikind)%npoints = training_lists(ikind)%npoints + 1
          new_point%next => training_lists(ikind)%head
          training_lists(ikind)%head => new_point
       ENDDO
@@ -367,11 +367,11 @@ CONTAINS
          DO i = 1, npoints
             IF (ALLOCATED(cur_point%input)) THEN
                training_matrix%inputs(:, i) = cur_point%input(:)
-               ninputs = ninputs+1
+               ninputs = ninputs + 1
             ENDIF
             IF (ALLOCATED(cur_point%output)) THEN
                training_matrix%outputs(:, i) = cur_point%output(:)
-               noutputs = noutputs+1
+               noutputs = noutputs + 1
             ENDIF
             ! advance to next entry and deallocate the current one
             prev_point => cur_point
@@ -423,7 +423,7 @@ CONTAINS
 
          ! substract prior from all training points
          DO i = 1, npoints
-            training_matrix%outputs(:, i) = training_matrix%outputs(:, i)-training_matrix%prior
+            training_matrix%outputs(:, i) = training_matrix%outputs(:, i) - training_matrix%prior
          ENDDO
       ENDDO
 
@@ -560,7 +560,7 @@ CONTAINS
          DEALLOCATE (descriptor)
 
          !add prior
-         block_X(:, 1) = block_X(:, 1)+pao%ml_training_matrices(ikind)%prior
+         block_X(:, 1) = block_X(:, 1) + pao%ml_training_matrices(ikind)%prior
       ENDDO
       CALL dbcsr_iterator_stop(iter)
 !$OMP END PARALLEL

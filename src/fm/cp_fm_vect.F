@@ -10,9 +10,9 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_fm_vect
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_retain
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_retain
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -36,7 +36,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: matrixes
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_vect_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -62,7 +62,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: copy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_vect_copy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

@@ -11,12 +11,12 @@
 
 MODULE ls_matrix_exp
 
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, &
-        dbcsr_filter, dbcsr_frobenius_norm, dbcsr_multiply, dbcsr_p_type, dbcsr_scale, dbcsr_set, &
-        dbcsr_transposed, dbcsr_type, dbcsr_type_complex_8
-   USE kinds,                           ONLY: dp
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, &
+      dbcsr_filter, dbcsr_frobenius_norm, dbcsr_multiply, dbcsr_p_type, dbcsr_scale, dbcsr_set, &
+      dbcsr_transposed, dbcsr_type, dbcsr_type_complex_8
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -68,7 +68,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: filter_eps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_complex_dbcsr_gemm_3', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       CHARACTER(LEN=1)                                   :: transa2, transb2
@@ -166,7 +166,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(in)                          :: filter_eps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'taylor_only_imaginary_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: handle, i, nloop
@@ -203,7 +203,7 @@ CONTAINS
       !the inverse of the prefactor in the taylor series
       tmp = 1.0_dp
       DO i = 1, nloop
-         CALL dbcsr_scale(T1, 1.0_dp/(REAL(i, dp)*2.0_dp-1.0_dp))
+         CALL dbcsr_scale(T1, 1.0_dp/(REAL(i, dp)*2.0_dp - 1.0_dp))
          CALL dbcsr_filter(T1, filter_eps)
          CALL dbcsr_multiply("N", "N", square_fac, im_matrix, T1, zero, &
                              T2, filter_eps=filter_eps)
@@ -261,7 +261,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(in)                          :: filter_eps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'taylor_full_complex_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       COMPLEX(KIND=dp), PARAMETER                        :: one = (1.0_dp, 0.0_dp), &
                                                             zero = (0.0_dp, 0.0_dp)
 
@@ -351,7 +351,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(in)                          :: filter_eps, filter_eps_small, eps_exp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'bch_expansion_imaginary_propagator', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: handle, i, unit_nr
@@ -443,7 +443,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(in)                          :: filter_eps, filter_eps_small, eps_exp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'bch_expansion_complex_propagator', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: handle, i, unit_nr

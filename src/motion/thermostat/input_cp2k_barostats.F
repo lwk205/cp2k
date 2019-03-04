@@ -9,30 +9,30 @@
 !> \author teo & fawzi
 ! **************************************************************************************************
 MODULE input_cp2k_barostats
-   USE barostat_types,                  ONLY: do_clv_x,&
-                                              do_clv_xy,&
-                                              do_clv_xyz,&
-                                              do_clv_xz,&
-                                              do_clv_y,&
-                                              do_clv_yz,&
-                                              do_clv_z
-   USE cp_output_handling,              ONLY: cp_print_key_section_create,&
-                                              high_print_level
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE input_cp2k_thermostats,          ONLY: create_mass_section,&
-                                              create_thermostat_section,&
-                                              create_velocity_section
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: real_t
-   USE kinds,                           ONLY: dp
-   USE string_utilities,                ONLY: s2a
+   USE barostat_types, ONLY: do_clv_x, &
+                             do_clv_xy, &
+                             do_clv_xyz, &
+                             do_clv_xz, &
+                             do_clv_y, &
+                             do_clv_yz, &
+                             do_clv_z
+   USE cp_output_handling, ONLY: cp_print_key_section_create, &
+                                 high_print_level
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE input_cp2k_thermostats, ONLY: create_mass_section, &
+                                     create_thermostat_section, &
+                                     create_velocity_section
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: real_t
+   USE kinds, ONLY: dp
+   USE string_utilities, ONLY: s2a
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -55,7 +55,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_barostat_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection, thermo_section
@@ -132,7 +132,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_print_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: print_key
 

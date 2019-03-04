@@ -10,74 +10,74 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE qs_wannier90
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_copy_general,&
-                                              cp_fm_create,&
-                                              cp_fm_get_element,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_para_env,                     ONLY: cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type,&
-                                              dbcsr_type_antisymmetric,&
-                                              dbcsr_type_symmetric
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE kpoint_methods,                  ONLY: kpoint_env_initialize,&
-                                              kpoint_init_cell_index,&
-                                              kpoint_initialize_mos,&
-                                              rskp_transform
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_create,&
-                                              kpoint_env_type,&
-                                              kpoint_release,&
-                                              kpoint_type
-   USE machine,                         ONLY: m_datum
-   USE mathconstants,                   ONLY: twopi
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: angstrom,&
-                                              evolt
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_env_release,&
-                                              qs_environment_type
-   USE qs_gamma2kp,                     ONLY: create_kp_from_gamma
-   USE qs_matrix_pools,                 ONLY: mpools_get
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              init_mo_set,&
-                                              mo_set_p_type
-   USE qs_moments,                      ONLY: build_berry_kpoint_matrix
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_scf_diagonalization,          ONLY: do_general_diag_kp
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE scf_control_types,               ONLY: scf_control_type
-   USE wannier90,                       ONLY: wannier_setup
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         get_cell
+   USE cp_blacs_env, ONLY: cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_copy_general, &
+                          cp_fm_create, &
+                          cp_fm_get_element, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_para_env, ONLY: cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_deallocate_matrix, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type, &
+                        dbcsr_type_antisymmetric, &
+                        dbcsr_type_symmetric
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE kpoint_methods, ONLY: kpoint_env_initialize, &
+                             kpoint_init_cell_index, &
+                             kpoint_initialize_mos, &
+                             rskp_transform
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_create, &
+                           kpoint_env_type, &
+                           kpoint_release, &
+                           kpoint_type
+   USE machine, ONLY: m_datum
+   USE mathconstants, ONLY: twopi
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: angstrom, &
+                      evolt
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_env_release, &
+                                   qs_environment_type
+   USE qs_gamma2kp, ONLY: create_kp_from_gamma
+   USE qs_matrix_pools, ONLY: mpools_get
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          init_mo_set, &
+                          mo_set_p_type
+   USE qs_moments, ONLY: build_berry_kpoint_matrix
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_scf_diagonalization, ONLY: do_general_diag_kp
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE scf_control_types, ONLY: scf_control_type
+   USE wannier90, ONLY: wannier_setup
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -107,7 +107,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'wannier90_interface', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iw
       LOGICAL                                            :: explicit
@@ -154,7 +154,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'wannier90_files', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: num_nnmax = 12
 
       CHARACTER(len=2)                                   :: asym
@@ -162,8 +162,8 @@ CONTAINS
       CHARACTER(LEN=256)                                 :: datx
       CHARACTER(len=default_string_length)               :: filename, seed_name
       INTEGER :: i, i_rep, ib, ib1, ib2, ibs, ic, ik, ik2, ikk, ikpgr, ispin, iunit, ix, iy, iz, &
-         k, n_rep, nadd, nao, nbs, nexcl, nkp, nmo, nntot, nspins, num_atoms, num_bands, &
-         num_bands_tot, num_kpts, num_wann
+                 k, n_rep, nadd, nao, nbs, nexcl, nkp, nmo, nntot, nspins, num_atoms, num_bands, &
+                 num_bands_tot, num_kpts, num_wann
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: exclude_bands
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: nblist, nnlist
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: nncell
@@ -219,15 +219,15 @@ CONTAINS
       nexcl = 0
       DO i_rep = 1, n_rep
          CALL section_vals_val_get(input, "EXCLUDE_BANDS", i_rep_val=i_rep, i_vals=invals)
-         nexcl = nexcl+SIZE(invals)
+         nexcl = nexcl + SIZE(invals)
       END DO
       IF (nexcl > 0) THEN
          ALLOCATE (exclude_bands(nexcl))
          nexcl = 0
          DO i_rep = 1, n_rep
             CALL section_vals_val_get(input, "EXCLUDE_BANDS", i_rep_val=i_rep, i_vals=invals)
-            exclude_bands(nexcl+1:nexcl+SIZE(invals)) = invals(:)
-            nexcl = nexcl+SIZE(invals)
+            exclude_bands(nexcl + 1:nexcl + SIZE(invals)) = invals(:)
+            nexcl = nexcl + SIZE(invals)
          END DO
       END IF
       !
@@ -250,10 +250,10 @@ CONTAINS
       kpoint%use_real_wfn = .FALSE.
       kpoint%parallel_group_size = 0
       i = 0
-      DO ix = 0, mp_grid(1)-1
-         DO iy = 0, mp_grid(2)-1
-            DO iz = 0, mp_grid(3)-1
-               i = i+1
+      DO ix = 0, mp_grid(1) - 1
+         DO iy = 0, mp_grid(2) - 1
+            DO iz = 0, mp_grid(3) - 1
+               i = i + 1
                kpt_latt(1, i) = REAL(ix, KIND=dp)/REAL(mp_grid(1), KIND=dp)
                kpt_latt(2, i) = REAL(iy, KIND=dp)/REAL(mp_grid(2), KIND=dp)
                kpt_latt(3, i) = REAL(iz, KIND=dp)/REAL(mp_grid(3), KIND=dp)
@@ -269,7 +269,7 @@ CONTAINS
       ! number of bands in calculation
       CALL get_qs_env(qs_env, mos=mos)
       CALL get_mo_set(mo_set=mos(1)%mo_set, nao=nao, nmo=num_bands_tot)
-      num_bands_tot = MIN(nao, num_bands_tot+nadd)
+      num_bands_tot = MIN(nao, num_bands_tot + nadd)
       num_bands = num_wann
       num_atoms = SIZE(particle_set)
       ALLOCATE (atoms_cart(3, num_atoms))
@@ -360,7 +360,7 @@ CONTAINS
       DO ik = 1, SIZE(kpoint%kp_env)
          CALL mpools_get(kpoint%mpools, ao_mo_fm_pools=ao_mo_fm_pools)
          moskp => kpoint%kp_env(ik)%kpoint_env%mos
-         ikk = kpoint%kp_range(1)+ik-1
+         ikk = kpoint%kp_range(1) + ik - 1
          CPASSERT(ASSOCIATED(moskp))
          DO ispin = 1, SIZE(moskp, 2)
             DO ic = 1, SIZE(moskp, 1)
@@ -403,14 +403,14 @@ CONTAINS
       nbs = 0
       DO ik = 1, num_kpts
          DO i = 1, nntot
-            bvec(1:3) = kpt_latt(1:3, nnlist(ik, i))-kpt_latt(1:3, ik)+nncell(1:3, ik, i)
+            bvec(1:3) = kpt_latt(1:3, nnlist(ik, i)) - kpt_latt(1:3, ik) + nncell(1:3, ik, i)
             ibs = 0
             DO k = 1, nbs
-               IF (SUM(ABS(bvec(1:3)-b_latt(1:3, k))) < 1.e-6_dp) THEN
+               IF (SUM(ABS(bvec(1:3) - b_latt(1:3, k))) < 1.e-6_dp) THEN
                   ibs = k
                   EXIT
                END IF
-               IF (SUM(ABS(bvec(1:3)+b_latt(1:3, k))) < 1.e-6_dp) THEN
+               IF (SUM(ABS(bvec(1:3) + b_latt(1:3, k))) < 1.e-6_dp) THEN
                   ibs = -k
                   EXIT
                END IF
@@ -420,7 +420,7 @@ CONTAINS
                nblist(ik, i) = ibs
             ELSE
                ! new lattice vector
-               nbs = nbs+1
+               nbs = nbs + 1
                b_latt(1:3, nbs) = bvec(1:3)
                nblist(ik, i) = nbs
             END IF
@@ -475,7 +475,7 @@ CONTAINS
             ! get the MO coefficients for this k-point
             my_kpgrp = (ik >= kpoint%kp_range(1) .AND. ik <= kpoint%kp_range(2))
             IF (my_kpgrp) THEN
-               ikk = ik-kpoint%kp_range(1)+1
+               ikk = ik - kpoint%kp_range(1) + 1
                kp => kpoint%kp_env(ikk)%kpoint_env
                CPASSERT(SIZE(kp%mos, 1) == 2)
                fmr => kp%mos(1, ispin)%mo_set%mo_coeff
@@ -493,7 +493,7 @@ CONTAINS
                ik2 = nnlist(ik, i)
                mygrp = (ik2 >= kpoint%kp_range(1) .AND. ik2 <= kpoint%kp_range(2))
                IF (mygrp) THEN
-                  ikk = ik2-kpoint%kp_range(1)+1
+                  ikk = ik2 - kpoint%kp_range(1) + 1
                   kp => kpoint%kp_env(ikk)%kpoint_env
                   CPASSERT(SIZE(kp%mos, 1) == 2)
                   fmr => kp%mos(1, ispin)%mo_set%mo_coeff
@@ -591,7 +591,7 @@ CONTAINS
          my_kpgrp = (ik >= kp_range(1) .AND. ik <= kp_range(2))
          DO ispin = 1, nspins
             IF (my_kpgrp) THEN
-               ikpgr = ik-kp_range(1)+1
+               ikpgr = ik - kp_range(1) + 1
                kp => kpoint%kp_env(ikpgr)%kpoint_env
                CALL get_mo_set(kp%mos(1, ispin)%mo_set, eigenvalues=eigenvalues)
                eigval(1:nmo) = eigenvalues(1:nmo)

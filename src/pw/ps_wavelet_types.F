@@ -9,7 +9,7 @@
 ! **************************************************************************************************
 MODULE ps_wavelet_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -52,7 +52,7 @@ CONTAINS
       TYPE(ps_wavelet_type), POINTER                     :: wavelet
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ps_wavelet_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(wavelet)) THEN
          IF (ASSOCIATED(wavelet%karray)) &

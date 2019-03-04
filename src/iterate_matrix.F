@@ -9,23 +9,23 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE iterate_matrix
-   USE arnoldi_api,                     ONLY: arnoldi_data_type,&
-                                              arnoldi_extremal
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_filter, &
-        dbcsr_frobenius_norm, dbcsr_gershgorin_norm, dbcsr_get_diag, dbcsr_get_info, &
-        dbcsr_get_matrix_type, dbcsr_get_occupation, dbcsr_multiply, dbcsr_norm, &
-        dbcsr_norm_maxabsnorm, dbcsr_p_type, dbcsr_release, dbcsr_scale, dbcsr_set, &
-        dbcsr_set_diag, dbcsr_trace, dbcsr_transposed, dbcsr_type, dbcsr_type_no_symmetry
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE mathconstants,                   ONLY: ifac
-   USE mathlib,                         ONLY: abnormal_value
+   USE arnoldi_api, ONLY: arnoldi_data_type, &
+                          arnoldi_extremal
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_filter, &
+      dbcsr_frobenius_norm, dbcsr_gershgorin_norm, dbcsr_get_diag, dbcsr_get_info, &
+      dbcsr_get_matrix_type, dbcsr_get_occupation, dbcsr_multiply, dbcsr_norm, &
+      dbcsr_norm_maxabsnorm, dbcsr_p_type, dbcsr_release, dbcsr_scale, dbcsr_set, &
+      dbcsr_set_diag, dbcsr_trace, dbcsr_transposed, dbcsr_type, dbcsr_type_no_symmetry
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE mathconstants, ONLY: ifac
+   USE mathlib, ONLY: abnormal_value
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -156,9 +156,9 @@ CONTAINS
             order=order_lanczos, &
             eps_lanczos=eps_lanczos, &
             max_iter_lanczos=max_iter_lanczos)
-         recursion_depth = recursion_depth+1
+         recursion_depth = recursion_depth + 1
          CALL determinant(tmp3, det0, threshold)
-         recursion_depth = recursion_depth-1
+         recursion_depth = recursion_depth - 1
          det = det*det0*det0
 
       ELSE
@@ -187,7 +187,7 @@ CONTAINS
 
             ! get trace
             CALL dbcsr_trace(tmp1, trace)
-            trace = trace*sign_iter/(1.0_dp*(i+1))
+            trace = trace*sign_iter/(1.0_dp*(i + 1))
             sign_iter = -sign_iter
 
             ! update the determinant
@@ -202,8 +202,8 @@ CONTAINS
             IF (unit_nr > 0) THEN
                WRITE (unit_nr, '(T6,A,1X,I3,1X,F7.5,F16.10,F10.3,F11.3)') &
                   "Determinant iter", i, occ_matrix, &
-                  det, t2-t1, &
-                  (flop1+flop2)/(1.0E6_dp*MAX(0.001_dp, t2-t1))
+                  det, t2 - t1, &
+                  (flop1 + flop2)/(1.0E6_dp*MAX(0.001_dp, t2 - t1))
                CALL m_flush(unit_nr)
             ENDIF
 
@@ -378,8 +378,8 @@ CONTAINS
 
          IF (unit_nr > 0) THEN
             WRITE (unit_nr, '(T6,A,1X,I3,1X,F10.8,E12.3,F12.3,F13.3)') "Taylor iter", i, occ_matrix, &
-               maxnorm_matrix, t2-t1, &
-               flop2/(1.0E6_dp*MAX(0.001_dp, t2-t1))
+               maxnorm_matrix, t2 - t1, &
+               flop2/(1.0E6_dp*MAX(0.001_dp, t2 - t1))
             CALL m_flush(unit_nr)
          ENDIF
 
@@ -456,7 +456,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: silent
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'invert_Hotelling', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: accelerator_type, handle, i, &
                                                             my_max_iter_lanczos, unit_nr
@@ -464,7 +464,7 @@ CONTAINS
       LOGICAL                                            :: arnoldi_converged, converged, &
                                                             use_inv_guess
       REAL(KIND=dp) :: convergence, frob_matrix, gershgorin_norm, max_ev, maxnorm_matrix, min_ev, &
-         my_eps_lanczos, my_filter_eps, occ_matrix, scalingf, t1, t2
+                       my_eps_lanczos, my_filter_eps, occ_matrix, scalingf, t1, t2
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(dbcsr_type), TARGET                           :: tmp1, tmp2
 
@@ -560,7 +560,7 @@ CONTAINS
          ENDIF
 
          ! 2.0 would be the correct scaling however, we should make sure here, that we are in the convergence radius
-         scalingf = 1.9_dp/(max_eV+min_eV)
+         scalingf = 1.9_dp/(max_eV + min_eV)
          CALL dbcsr_scale(tmp1, scalingf)
          CALL dbcsr_scale(matrix_inverse, scalingf)
          min_ev = min_ev*scalingf
@@ -591,14 +591,14 @@ CONTAINS
 
          ! use the scalar form of the algorithm to trace the EV
          IF (accelerator_type == 1) THEN
-            min_ev = min_ev*(2.0_dp-min_ev)
-            IF (PRESENT(norm_convergence)) maxnorm_matrix = ABS(min_eV-1.0_dp)
+            min_ev = min_ev*(2.0_dp - min_ev)
+            IF (PRESENT(norm_convergence)) maxnorm_matrix = ABS(min_eV - 1.0_dp)
          ENDIF
 
          IF (unit_nr > 0) THEN
             WRITE (unit_nr, '(T6,A,1X,I3,1X,F10.8,E12.3,F12.3,F13.3)') "Hotelling iter", i, occ_matrix, &
-               maxnorm_matrix, t2-t1, &
-               (flop1+flop2)/(1.0E6_dp*MAX(0.001_dp, t2-t1))
+               maxnorm_matrix, t2 - t1, &
+               (flop1 + flop2)/(1.0E6_dp*MAX(0.001_dp, t2 - t1))
             CALL m_flush(unit_nr)
          ENDIF
 
@@ -609,8 +609,8 @@ CONTAINS
 
          ! scale the matrix for improved convergence
          IF (accelerator_type == 1) THEN
-            min_ev = min_ev*2.0_dp/(min_ev+1.0_dp)
-            CALL dbcsr_scale(matrix_inverse, 2.0_dp/(min_ev+1.0_dp))
+            min_ev = min_ev*2.0_dp/(min_ev + 1.0_dp)
+            CALL dbcsr_scale(matrix_inverse, 2.0_dp/(min_ev + 1.0_dp))
          ENDIF
 
          t1 = m_walltime()
@@ -659,7 +659,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: threshold
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'matrix_sign_Newton_Schulz', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: count, handle, i, unit_nr
       INTEGER(KIND=int_8)                                :: flop1, flop2
@@ -719,8 +719,8 @@ CONTAINS
 
          IF (unit_nr > 0) THEN
             WRITE (unit_nr, '(T6,A,1X,I3,1X,F10.8,E12.3,F12.3,F13.3)') "NS sign iter ", i, occ_matrix, &
-               frob_matrix/frob_matrix_base, t2-t1, &
-               (flop1+flop2)/(1.0E6_dp*MAX(0.001_dp, t2-t1))
+               frob_matrix/frob_matrix_base, t2 - t1, &
+               (flop1 + flop2)/(1.0E6_dp*MAX(0.001_dp, t2 - t1))
             CALL m_flush(unit_nr)
          ENDIF
 
@@ -775,7 +775,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: converged
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'matrix_sqrt_Newton_Schulz', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, unit_nr
       INTEGER(KIND=int_8)                                :: flop1, flop2, flop3, flop4, flop5
@@ -830,7 +830,7 @@ CONTAINS
          ENDIF
          ! conservatively assume we get a relatively large error (100*threshold_lanczos) in the estimates
          ! and adjust the scaling to be on the safe side
-         scaling = 2.0_dp/(max_ev+min_ev+100*eps_lanczos)
+         scaling = 2.0_dp/(max_ev + min_ev + 100*eps_lanczos)
 
       ENDIF
 
@@ -887,10 +887,10 @@ CONTAINS
             ob = 48.0_dp/35.0_dp
             oc = -64.0_dp/35.0_dp
             od = 128.0_dp/35.0_dp
-            a = (oa-1)/2
-            b = ob*(a+1)-oc-a*(a+1)**2
-            c = ob-b-a*(a+1)
-            d = od-b*c
+            a = (oa - 1)/2
+            b = ob*(a + 1) - oc - a*(a + 1)**2
+            c = ob - b - a*(a + 1)
+            d = od - b*c
             ! tmp2 = tmp1 ** 2 + a * tmp1
             CALL dbcsr_multiply("N", "N", 1.0_dp, tmp1, tmp1, 0.0_dp, tmp2, &
                                 filter_eps=threshold, flop=flop4)
@@ -933,8 +933,8 @@ CONTAINS
 
          IF (unit_nr > 0) THEN
             WRITE (unit_nr, '(T6,A,1X,I3,1X,F10.8,E12.3,F12.3,F13.3)') "NS sqrt iter ", i, occ_matrix, &
-               conv, t2-t1, &
-               (flop1+flop2+flop3+flop4+flop5)/(1.0E6_dp*MAX(0.001_dp, t2-t1))
+               conv, t2 - t1, &
+               (flop1 + flop2 + flop3 + flop4 + flop5)/(1.0E6_dp*MAX(0.001_dp, t2 - t1))
             CALL m_flush(unit_nr)
          ENDIF
 
@@ -997,7 +997,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: omega, alpha, threshold
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'matrix_exponential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(dp), PARAMETER                                :: one = 1.0_dp, toll = 1.E-17_dp, &
                                                             zero = 0.0_dp
 
@@ -1022,7 +1022,7 @@ CONTAINS
       k = 1
       DO
          IF ((norm_scalar/2.0_dp**k) <= one) EXIT
-         k = k+1
+         k = k + 1
       END DO
 
       ! copy and scale the input matrix in matrix C and in matrix D
@@ -1051,7 +1051,7 @@ CONTAINS
       CALL dbcsr_create(D_product, template=matrix, matrix_type=dbcsr_type_no_symmetry)
       i = 1
       DO
-         i = i+1
+         i = i + 1
          ! compute D_product=D*C
          CALL dbcsr_multiply("N", "N", one, D, C, &
                              zero, D_product, filter_eps=threshold)
@@ -1105,7 +1105,7 @@ CONTAINS
       INTEGER                                            :: max_steps
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'purify_mcweeny_orth', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ispin, unit_nr
       REAL(KIND=dp)                                      :: frob_norm, trace
@@ -1170,7 +1170,7 @@ CONTAINS
       INTEGER                                            :: max_steps
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'purify_mcweeny_nonorth', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ispin, unit_nr
       REAL(KIND=dp)                                      :: frob_norm, trace

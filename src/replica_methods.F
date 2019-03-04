@@ -12,55 +12,55 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE replica_methods
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_add_iter_level
-   USE cp_para_env,                     ONLY: cp_cart_create,&
-                                              cp_para_env_create
-   USE cp_para_types,                   ONLY: cp_para_cart_type,&
-                                              cp_para_env_type
-   USE cp_result_types,                 ONLY: cp_result_create,&
-                                              cp_result_retain
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_set,&
-                                              cp_subsys_type
-   USE f77_interface,                   ONLY: calc_force,&
-                                              create_force_env,&
-                                              f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type,&
-                                              get_nparticle,&
-                                              get_pos,&
-                                              set_vel
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              use_qs_force
-   USE input_section_types,             ONLY: section_type,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set,&
-                                              section_vals_write
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_cart_create,&
-                                              mp_cart_sub,&
-                                              mp_comm_null,&
-                                              mp_sum
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_wf_history_methods,           ONLY: wfi_create,&
-                                              wfi_create_for_kp
-   USE qs_wf_history_types,             ONLY: wfi_retain
-   USE replica_types,                   ONLY: rep_env_sync,&
-                                              rep_env_sync_results,&
-                                              rep_envs_add_rep_env,&
-                                              rep_envs_get_rep_env,&
-                                              replica_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_add_iter_level
+   USE cp_para_env, ONLY: cp_cart_create, &
+                          cp_para_env_create
+   USE cp_para_types, ONLY: cp_para_cart_type, &
+                            cp_para_env_type
+   USE cp_result_types, ONLY: cp_result_create, &
+                              cp_result_retain
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_set, &
+                              cp_subsys_type
+   USE f77_interface, ONLY: calc_force, &
+                            create_force_env, &
+                            f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type, &
+                            get_nparticle, &
+                            get_pos, &
+                            set_vel
+   USE force_env_types, ONLY: force_env_get, &
+                              use_qs_force
+   USE input_section_types, ONLY: section_type, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set, &
+                                  section_vals_write
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE message_passing, ONLY: mp_cart_create, &
+                              mp_cart_sub, &
+                              mp_comm_null, &
+                              mp_sum
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_wf_history_methods, ONLY: wfi_create, &
+                                    wfi_create_for_kp
+   USE qs_wf_history_types, ONLY: wfi_retain
+   USE replica_types, ONLY: rep_env_sync, &
+                            rep_env_sync_results, &
+                            rep_envs_add_rep_env, &
+                            rep_envs_get_rep_env, &
+                            replica_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -102,7 +102,7 @@ CONTAINS
 
       CHARACTER(len=default_path_length)                 :: input_file_path, output_file_path
       INTEGER :: comm_cart, comm_f, comm_inter_rep, forcedim, i, i0, ierr, ip, ir, irep, lp, &
-         my_prep, new_env_id, nparticle, nrep_local, unit_nr
+                 my_prep, new_env_id, nparticle, nrep_local, unit_nr
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: gridinfo
       INTEGER, DIMENSION(2)                              :: dims, pos
       LOGICAL, DIMENSION(2)                              :: rdim
@@ -123,29 +123,29 @@ CONTAINS
          IF (row_force) forcedim = 2
       END IF
       my_prep = MIN(prep, para_env%num_pe)
-      dims(3-forcedim) = MIN(para_env%num_pe/my_prep, nrep)
+      dims(3 - forcedim) = MIN(para_env%num_pe/my_prep, nrep)
       dims(forcedim) = my_prep
       IF ((dims(1)*dims(2) /= para_env%num_pe) .AND. (unit_nr > 0)) THEN
          WRITE (unit_nr, FMT="(T2,A)") "REPLICA| WARNING: number of processors is not divisible by the number of replicas"
-         WRITE (unit_nr, FMT="(T2,A,I0,A)") "REPLICA| ", para_env%num_pe-dims(1)*dims(2), " MPI process(es) will be idle"
+         WRITE (unit_nr, FMT="(T2,A,I0,A)") "REPLICA| ", para_env%num_pe - dims(1)*dims(2), " MPI process(es) will be idle"
       END IF
       CALL mp_cart_create(comm_old=para_env%group, ndims=2, dims=dims, pos=pos, comm_cart=comm_cart)
       IF (comm_cart /= mp_comm_null) THEN
          CALL cp_cart_create(cart, comm_cart, ndims=2, owns_group=.TRUE.)
          NULLIFY (para_env_full)
          CALL cp_para_env_create(para_env_full, comm_cart, owns_group=.FALSE.)
-         rdim(3-forcedim) = .FALSE.
+         rdim(3 - forcedim) = .FALSE.
          rdim(forcedim) = .TRUE.
          CALL mp_cart_sub(comm=comm_cart, rdim=rdim, sub_comm=comm_f)
          CALL cp_para_env_create(para_env_f, comm_f, owns_group=.TRUE.)
-         rdim(3-forcedim) = .TRUE.
+         rdim(3 - forcedim) = .TRUE.
          rdim(forcedim) = .FALSE.
          CALL mp_cart_sub(comm=comm_cart, rdim=rdim, sub_comm=comm_inter_rep)
          CALL cp_para_env_create(para_env_inter_rep, comm_inter_rep, &
                                  owns_group=.TRUE.)
          ALLOCATE (rep_env)
       END IF
-      ALLOCATE (gridinfo(2, 0:para_env%num_pe-1))
+      ALLOCATE (gridinfo(2, 0:para_env%num_pe - 1))
       gridinfo = 0
       gridinfo(:, para_env%mepos) = pos
       CALL mp_sum(gridinfo, para_env%group)
@@ -153,17 +153,17 @@ CONTAINS
          WRITE (unit_nr, FMT="(T2,A,T71,I10)") "REPLICA| layout of the replica grid, number of groups ", para_env_inter_rep%num_pe
          WRITE (unit_nr, FMT="(T2,A,T71,I10)") "REPLICA| layout of the replica grid, size of each group", para_env_f%num_pe
          WRITE (unit_nr, FMT="(T2,A)", ADVANCE="NO") "REPLICA| MPI process to grid (group,rank) correspondence:"
-         DO i = 0, para_env%num_pe-1
+         DO i = 0, para_env%num_pe - 1
             IF (MODULO(i, 4) == 0) WRITE (unit_nr, *)
             WRITE (unit_nr, FMT='(A3,I4,A3,I4,A1,I4,A1)', ADVANCE="NO") &
-               "  (", i, " : ", gridinfo(3-forcedim, i), ",", &
+               "  (", i, " : ", gridinfo(3 - forcedim, i), ",", &
                gridinfo(forcedim, i), ")"
          END DO
          WRITE (unit_nr, *)
       ENDIF
       DEALLOCATE (gridinfo)
       IF (ASSOCIATED(rep_env)) THEN
-         last_rep_env_id = last_rep_env_id+1
+         last_rep_env_id = last_rep_env_id + 1
          rep_env%id_nr = last_rep_env_id
          rep_env%ref_count = 1
          rep_env%nrep = nrep
@@ -175,9 +175,9 @@ CONTAINS
          NULLIFY (rep_env%results)
 
          rep_env%force_dim = forcedim
-         rep_env%my_rep_group = cart%mepos(3-forcedim)
-         ALLOCATE (rep_env%inter_rep_rank(0:para_env_inter_rep%num_pe-1), &
-                   rep_env%force_rank(0:para_env_f%num_pe-1))
+         rep_env%my_rep_group = cart%mepos(3 - forcedim)
+         ALLOCATE (rep_env%inter_rep_rank(0:para_env_inter_rep%num_pe - 1), &
+                   rep_env%force_rank(0:para_env_f%num_pe - 1))
          rep_env%inter_rep_rank = 0
          rep_env%inter_rep_rank(rep_env%my_rep_group) = para_env_inter_rep%mepos
          CALL mp_sum(rep_env%inter_rep_rank, para_env_inter_rep%group)
@@ -192,8 +192,8 @@ CONTAINS
          ! with the structure PROJECT_NAME-r-N where N is the
          ! number of the local replica..
          lp = LEN_TRIM(input_file_path)
-         input_file_path(lp+1:LEN(input_file_path)) = "-r-"// &
-                                                      ADJUSTL(cp_to_string(rep_env%my_rep_group))
+         input_file_path(lp + 1:LEN(input_file_path)) = "-r-"// &
+                                                        ADJUSTL(cp_to_string(rep_env%my_rep_group))
          lp = LEN_TRIM(input_file_path)
          ! Setup new project name
          CALL section_vals_val_set(input, "GLOBAL%PROJECT_NAME", &
@@ -205,7 +205,7 @@ CONTAINS
 
          ! Dump an input file to warm-up new force_eval structures and
          ! delete them immediately afterwards..
-         input_file_path(lp+1:LEN(input_file_path)) = ".inp"
+         input_file_path(lp + 1:LEN(input_file_path)) = ".inp"
          IF (para_env_f%source == para_env_f%mepos) THEN
             CALL open_file(file_name=TRIM(input_file_path), file_status="UNKNOWN", &
                            file_form="FORMATTED", file_action="WRITE", &
@@ -233,21 +233,21 @@ CONTAINS
 
          i0 = nrep/para_env_inter_rep%num_pe
          ir = MODULO(nrep, para_env_inter_rep%num_pe)
-         DO ip = 0, para_env_inter_rep%num_pe-1
-            DO i = i0*ip+MIN(ip, ir)+1, i0*(ip+1)+MIN(ip+1, ir)
+         DO ip = 0, para_env_inter_rep%num_pe - 1
+            DO i = i0*ip + MIN(ip, ir) + 1, i0*(ip + 1) + MIN(ip + 1, ir)
                rep_env%replica_owner(i) = ip
             END DO
          END DO
 
          nrep_local = i0
-         IF (rep_env%my_rep_group < ir) nrep_local = nrep_local+1
+         IF (rep_env%my_rep_group < ir) nrep_local = nrep_local + 1
          ALLOCATE (rep_env%local_rep_indices(nrep_local), &
                    rep_env%rep_is_local(nrep))
          nrep_local = 0
          rep_env%rep_is_local = .FALSE.
          DO irep = 1, nrep
             IF (rep_env%replica_owner(irep) == rep_env%my_rep_group) THEN
-               nrep_local = nrep_local+1
+               nrep_local = nrep_local + 1
                rep_env%local_rep_indices(nrep_local) = irep
                rep_env%rep_is_local(irep) = .TRUE.
             END IF
@@ -260,7 +260,7 @@ CONTAINS
          rep_env%para_env_inter_rep => para_env_inter_rep
 
          ALLOCATE (rep_env%r(rep_env%ndim, nrep), rep_env%v(rep_env%ndim, nrep), &
-                   rep_env%f(rep_env%ndim+1, nrep))
+                   rep_env%f(rep_env%ndim + 1, nrep))
 
          rep_env%r = 0._dp
          rep_env%f = 0._dp
@@ -292,7 +292,7 @@ CONTAINS
       INTEGER, INTENT(out)                               :: ierr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_init_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, in_use, stat
       LOGICAL                                            :: do_kpoints, has_unit_metric
@@ -376,7 +376,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: calc_f
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_calc_e_f', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ierr, my_calc_f
 
@@ -409,7 +409,7 @@ CONTAINS
       INTEGER, INTENT(out)                               :: ierr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_calc_e_f_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(f_env_type), POINTER                          :: f_env
       TYPE(replica_env_type), POINTER                    :: rep_env
@@ -437,7 +437,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: calc_f
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_calc_e_f_int', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ierr, irep, md_iter, my_calc_f, ndim
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -485,7 +485,7 @@ CONTAINS
          CALL f_env_rm_defaults(f_env, ierr)
          CPASSERT(ierr == 0)
          CALL calc_force(rep_env%f_env_id, rep_env%r(:, irep), ndim, &
-                         rep_env%f(ndim+1, irep), rep_env%f(:ndim, irep), &
+                         rep_env%f(ndim + 1, irep), rep_env%f(:ndim, irep), &
                          my_calc_f, ierr)
          CPASSERT(ierr == 0)
       END DO

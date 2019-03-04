@@ -17,27 +17,27 @@
 ! **************************************************************************************************
 MODULE cp_parser_methods
 
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_buffer_types,          ONLY: copy_buffer_type,&
-                                              finalize_sub_buffer,&
-                                              initialize_sub_buffer
-   USE cp_parser_ilist_methods,         ONLY: ilist_reset,&
-                                              ilist_setup,&
-                                              ilist_update
-   USE cp_parser_inpp_methods,          ONLY: inpp_end_include,&
-                                              inpp_expand_variables,&
-                                              inpp_process_directive
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_reset
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp,&
-                                              int_8,&
-                                              max_line_length
-   USE message_passing,                 ONLY: mp_bcast
-   USE string_utilities,                ONLY: is_whitespace,&
-                                              uppercase
+   USE cp_log_handling, ONLY: cp_to_string
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_buffer_types, ONLY: copy_buffer_type, &
+                                     finalize_sub_buffer, &
+                                     initialize_sub_buffer
+   USE cp_parser_ilist_methods, ONLY: ilist_reset, &
+                                      ilist_setup, &
+                                      ilist_update
+   USE cp_parser_inpp_methods, ONLY: inpp_end_include, &
+                                     inpp_expand_variables, &
+                                     inpp_process_directive
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_reset
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp, &
+                    int_8, &
+                    max_line_length
+   USE message_passing, ONLY: mp_bcast
+   USE string_utilities, ONLY: is_whitespace, &
+                               uppercase
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -67,11 +67,11 @@ CONTAINS
    FUNCTION parser_location(parser) RESULT(res)
 
       TYPE(cp_parser_type), POINTER                      :: parser
-      CHARACTER&
-         (len=default_path_length+default_string_length) :: res
+      CHARACTER &
+         (len=default_path_length + default_string_length) :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'parser_location', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(parser))
       CPASSERT(parser%ref_count > 0)
@@ -98,7 +98,7 @@ CONTAINS
       TYPE(cp_parser_type), POINTER                      :: parser
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_store_status', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(parser))
       CPASSERT(parser%ref_count > 0)
@@ -125,7 +125,7 @@ CONTAINS
       TYPE(cp_parser_type), POINTER                      :: parser
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_retrieve_status', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(parser))
       CPASSERT(parser%ref_count > 0)
@@ -164,7 +164,7 @@ CONTAINS
       LOGICAL, INTENT(out), OPTIONAL                     :: at_end
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_read_line', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iline, istat
 
@@ -219,7 +219,7 @@ CONTAINS
       INTEGER, INTENT(OUT)                               :: istat
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_get_line_from_buffer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       istat = 0
       ! Check buffer
@@ -232,7 +232,7 @@ CONTAINS
             CALL parser_read_line_low(parser)
          END IF
       END IF
-      parser%buffer%present_line_number = parser%buffer%present_line_number+1
+      parser%buffer%present_line_number = parser%buffer%present_line_number + 1
       parser%input_line_number = parser%buffer%input_line_numbers(parser%buffer%present_line_number)
       parser%input_line = parser%buffer%input_lines(parser%buffer%present_line_number)
       IF ((parser%buffer%istat /= 0) .AND. &
@@ -253,7 +253,7 @@ CONTAINS
       TYPE(cp_parser_type), POINTER                      :: parser
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_read_line_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iline, imark, islen, istat, &
                                                             last_buffered_line_number
@@ -268,14 +268,14 @@ CONTAINS
       IF (parser%para_env%mepos == parser%para_env%source) THEN
          iline = 0
          istat = 0
-         parser%buffer%buffer_id = parser%buffer%buffer_id+1
+         parser%buffer%buffer_id = parser%buffer%buffer_id + 1
          parser%buffer%present_line_number = 0
          parser%buffer%last_line_number = parser%buffer%size
          last_buffered_line_number = parser%buffer%input_line_numbers(parser%buffer%size)
          DO WHILE (iline /= parser%buffer%size)
             ! Increment counters by 1
-            iline = iline+1
-            last_buffered_line_number = last_buffered_line_number+1
+            iline = iline + 1
+            last_buffered_line_number = last_buffered_line_number + 1
 
             ! Try to read the next line from file
             parser%buffer%input_line_numbers(iline) = last_buffered_line_number
@@ -302,7 +302,7 @@ CONTAINS
                      islen = LEN_TRIM(parser%buffer%input_lines(iline))
                      ! Handle index and cycle
                      last_buffered_line_number = 0
-                     iline = iline-1
+                     iline = iline - 1
                      CYCLE
                   END IF
                END IF
@@ -313,7 +313,7 @@ CONTAINS
                                         parser%buffer%input_line_numbers(iline), parser%input_unit)
                   ! Handle index and cycle
                   last_buffered_line_number = parser%buffer%input_line_numbers(iline)
-                  iline = iline-1
+                  iline = iline - 1
                   CYCLE
                END IF
             END IF
@@ -334,8 +334,8 @@ CONTAINS
                non_white_found = .TRUE.
             END IF
             IF (.NOT. non_white_found) THEN
-               iline = iline-1
-               last_buffered_line_number = last_buffered_line_number-1
+               iline = iline - 1
+               last_buffered_line_number = last_buffered_line_number - 1
             END IF
          END DO
       END IF
@@ -358,7 +358,7 @@ CONTAINS
       TYPE(cp_parser_type), POINTER                      :: parser
 
       CHARACTER(len=*), PARAMETER :: routineN = 'broadcast_input_information', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(cp_para_env_type), POINTER                    :: para_env
@@ -396,7 +396,7 @@ CONTAINS
       LOGICAL                                            :: resval
 
       CHARACTER(len=*), PARAMETER :: routineN = 'is_comment_line', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=1)                                   :: thischar
       INTEGER                                            :: icol
@@ -452,7 +452,7 @@ CONTAINS
       LOGICAL, INTENT(out), OPTIONAL                     :: at_end
 
       CHARACTER(len=*), PARAMETER :: routineN = 'parser_get_next_line', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: my_at_end
 
@@ -482,7 +482,7 @@ CONTAINS
       TYPE(cp_parser_type), POINTER                      :: parser
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_skip_space', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       LOGICAL                                            :: at_end
@@ -502,7 +502,7 @@ CONTAINS
       outer_loop: DO
 
          ! Increment the column counter
-         parser%icol = parser%icol+1
+         parser%icol = parser%icol + 1
 
          ! Quick return, if the end of line is found
          IF ((parser%icol > LEN_TRIM(parser%input_line)) .OR. &
@@ -516,7 +516,7 @@ CONTAINS
          IF (.NOT. is_whitespace(parser%input_line(parser%icol:parser%icol))) THEN
             ! Check for input line continuation
             IF (parser%input_line(parser%icol:parser%icol) == parser%continuation_character) THEN
-               inner_loop: DO i = parser%icol+1, LEN_TRIM(parser%input_line)
+               inner_loop: DO i = parser%icol + 1, LEN_TRIM(parser%input_line)
                   IF (is_whitespace(parser%input_line(i:i))) CYCLE inner_loop
                   IF (is_comment(parser, parser%input_line(i:i))) THEN
                      EXIT inner_loop
@@ -537,7 +537,7 @@ CONTAINS
                parser%icol = 0
                CYCLE outer_loop
             ELSE
-               parser%icol = parser%icol-1
+               parser%icol = parser%icol - 1
                parser%icol1 = parser%icol
                parser%icol2 = parser%icol
                RETURN
@@ -563,7 +563,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: string_length
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_next_token', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=1)                                   :: token
       INTEGER                                            :: i, len_trim_inputline, length
@@ -592,11 +592,11 @@ CONTAINS
          IF (parser%icol == -1) &
             CPABORT("Unexpectetly reached EOF"//TRIM(parser_location(parser)))
 
-         length = MIN(len_trim_inputline-parser%icol1+1, length)
-         parser%icol1 = parser%icol+1
-         parser%icol2 = parser%icol+length
+         length = MIN(len_trim_inputline - parser%icol1 + 1, length)
+         parser%icol1 = parser%icol + 1
+         parser%icol2 = parser%icol + length
          i = INDEX(parser%input_line(parser%icol1:parser%icol2), parser%quote_character)
-         IF (i > 0) parser%icol2 = parser%icol+i
+         IF (i > 0) parser%icol2 = parser%icol + i
          parser%icol = parser%icol2
 
       ELSE
@@ -614,7 +614,7 @@ CONTAINS
          outer_loop1: DO
 
             ! Increment the column counter
-            parser%icol = parser%icol+1
+            parser%icol = parser%icol + 1
 
             ! Quick return, if the end of line is found
             IF (parser%icol > len_trim_inputline) THEN
@@ -635,8 +635,8 @@ CONTAINS
                RETURN
             ELSE IF (token == parser%quote_character) THEN
                ! Read quoted string
-               parser%icol1 = parser%icol+1
-               parser%icol2 = parser%icol+INDEX(parser%input_line(parser%icol1:), parser%quote_character)
+               parser%icol1 = parser%icol + 1
+               parser%icol2 = parser%icol + INDEX(parser%input_line(parser%icol1:), parser%quote_character)
                IF (parser%icol2 == parser%icol) THEN
                   parser%icol1 = parser%icol
                   parser%icol2 = parser%icol
@@ -644,13 +644,13 @@ CONTAINS
                                 "Unmatched quotation mark found"//TRIM(parser_location(parser)))
                ELSE
                   parser%icol = parser%icol2
-                  parser%icol2 = parser%icol2-1
+                  parser%icol2 = parser%icol2 - 1
                   parser%first_separator = .TRUE.
                   RETURN
                END IF
             ELSE IF (token == parser%continuation_character) THEN
                ! Check for input line continuation
-               inner_loop1: DO i = parser%icol+1, len_trim_inputline
+               inner_loop1: DO i = parser%icol + 1, len_trim_inputline
                   IF (is_whitespace(parser%input_line(i:i))) THEN
                      CYCLE inner_loop1
                   ELSE IF (is_comment(parser, parser%input_line(i:i))) THEN
@@ -691,7 +691,7 @@ CONTAINS
 
          ! Search for the end of the next input string
          outer_loop2: DO
-            parser%icol = parser%icol+1
+            parser%icol = parser%icol + 1
             IF (parser%icol > len_trim_inputline) EXIT outer_loop2
             token = parser%input_line(parser%icol:parser%icol)
             IF (is_whitespace(token) .OR. is_comment(parser, token) .OR. &
@@ -703,7 +703,7 @@ CONTAINS
             END IF
          END DO outer_loop2
 
-         parser%icol2 = parser%icol-1
+         parser%icol2 = parser%icol - 1
 
          IF (parser%input_line(parser%icol:parser%icol) == &
              parser%continuation_character) parser%icol = parser%icol2
@@ -735,7 +735,7 @@ CONTAINS
       CHARACTER(LEN=3)                                   :: test_result
 
       CHARACTER(len=*), PARAMETER :: routineN = 'parser_test_next_token', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=max_line_length)                     :: error_message, string
       INTEGER                                            :: iz, n
@@ -838,10 +838,10 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: begin_line, search_from_begin_of_file
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_search_string', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=LEN(string))                         :: pattern
-      CHARACTER(LEN=max_line_length+1)                   :: current_line
+      CHARACTER(LEN=max_line_length + 1)                   :: current_line
       INTEGER                                            :: ipattern
       LOGICAL                                            :: at_end, begin, do_reset
 
@@ -872,7 +872,7 @@ CONTAINS
 
          IF (ipattern > 0) THEN
             found = .TRUE.
-            parser%icol = ipattern-1
+            parser%icol = ipattern - 1
             IF (PRESENT(line)) THEN
                IF (LEN(line) < LEN_TRIM(parser%input_line)) THEN
                   CALL cp_warn(__LOCATION__, &
@@ -929,16 +929,16 @@ CONTAINS
       istar = INDEX(string(1:n), "*")
 
       IF (idots /= 0) THEN
-         contains_integer_object = is_integer(string(1:idots-1)) .AND. &
-                                   is_integer(string(idots+2:n))
+         contains_integer_object = is_integer(string(1:idots - 1)) .AND. &
+                                   is_integer(string(idots + 2:n))
       ELSE IF (istar /= 0) THEN
          i = 1
          DO WHILE (istar /= 0)
-            IF (.NOT. is_integer(string(i:i+istar-2))) THEN
+            IF (.NOT. is_integer(string(i:i + istar - 2))) THEN
                contains_integer_object = .FALSE.
                RETURN
             END IF
-            i = i+istar
+            i = i + istar
             istar = INDEX(string(i:n), "*")
          END DO
          contains_integer_object = is_integer(string(i:n))
@@ -1009,7 +1009,7 @@ CONTAINS
       LOGICAL, INTENT(out), OPTIONAL                     :: at_end
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_get_integer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=max_line_length)                     :: error_message
       INTEGER                                            :: nline
@@ -1024,7 +1024,7 @@ CONTAINS
       END IF
 
       IF (PRESENT(newline)) THEN
-         IF (newline) nline = nline+1
+         IF (newline) nline = nline + 1
       END IF
 
       CALL parser_get_next_line(parser, nline, at_end=my_at_end)
@@ -1099,7 +1099,7 @@ CONTAINS
       LOGICAL, INTENT(out), OPTIONAL                     :: at_end
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_get_logical', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=max_line_length)                     :: input_string
       INTEGER                                            :: input_string_length, nline
@@ -1115,7 +1115,7 @@ CONTAINS
       END IF
 
       IF (PRESENT(newline)) THEN
-         IF (newline) nline = nline+1
+         IF (newline) nline = nline + 1
       END IF
 
       CALL parser_get_next_line(parser, nline, at_end=my_at_end)
@@ -1132,7 +1132,7 @@ CONTAINS
          CALL parser_next_token(parser)
       END IF
 
-      input_string_length = parser%icol2-parser%icol1+1
+      input_string_length = parser%icol2 - parser%icol1 + 1
 
       IF (input_string_length == 0) THEN
          parser%icol1 = parser%icol
@@ -1146,7 +1146,7 @@ CONTAINS
       END IF
       CALL uppercase(input_string)
 
-      SELECT CASE (TRIM (input_string))
+      SELECT CASE (TRIM(input_string))
       CASE ("0", "F", ".F.", "FALSE", ".FALSE.", "N", "NO", "OFF")
          object = .FALSE.
       CASE ("1", "T", ".T.", "TRUE", ".TRUE.", "Y", "YES", "ON")
@@ -1181,7 +1181,7 @@ CONTAINS
       LOGICAL, INTENT(out), OPTIONAL                     :: at_end
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_get_real', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=max_line_length)                     :: error_message
       INTEGER                                            :: nline
@@ -1198,7 +1198,7 @@ CONTAINS
       END IF
 
       IF (PRESENT(newline)) THEN
-         IF (newline) nline = nline+1
+         IF (newline) nline = nline + 1
       END IF
 
       CALL parser_get_next_line(parser, nline, at_end=my_at_end)
@@ -1254,7 +1254,7 @@ CONTAINS
       LOGICAL, INTENT(out), OPTIONAL                     :: at_end
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parser_get_string', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: input_string_length, nline
       LOGICAL                                            :: my_at_end
@@ -1270,7 +1270,7 @@ CONTAINS
       END IF
 
       IF (PRESENT(newline)) THEN
-         IF (newline) nline = nline+1
+         IF (newline) nline = nline + 1
       END IF
 
       CALL parser_get_next_line(parser, nline, at_end=my_at_end)
@@ -1288,7 +1288,7 @@ CONTAINS
          CALL parser_next_token(parser)
       END IF
 
-      input_string_length = parser%icol2-parser%icol1+1
+      input_string_length = parser%icol2 - parser%icol1 + 1
 
       IF (input_string_length <= 0) THEN
          CALL cp_abort(__LOCATION__, &
@@ -1300,7 +1300,7 @@ CONTAINS
                        "> has more than "//cp_to_string(LEN(object))// &
                        " characters and is therefore too long to fit in the "// &
                        "specified variable"//TRIM(parser_location(parser)))
-         object = parser%input_line(parser%icol1:parser%icol1+LEN(object)-1)
+         object = parser%input_line(parser%icol1:parser%icol1 + LEN(object) - 1)
       ELSE
          object(:input_string_length) = parser%input_line(parser%icol1:parser%icol2)
       END IF
@@ -1343,12 +1343,12 @@ CONTAINS
       parsing_done = .FALSE.
 
       DO WHILE (.NOT. parsing_done)
-         i = i+iop
+         i = i + iop
          islash = INDEX(string(i:n), "/")
          istar = INDEX(string(i:n), "*")
          IF ((islash == 0) .AND. (istar == 0)) THEN
             ! Last factor found: read it and then exit the loop
-            iop = n-i+2
+            iop = n - i + 2
             parsing_done = .TRUE.
          ELSE IF ((islash > 0) .AND. (istar > 0)) THEN
             iop = MIN(islash, istar)
@@ -1357,20 +1357,20 @@ CONTAINS
          ELSE IF (istar > 0) THEN
             iop = istar
          END IF
-         READ (UNIT=string(i:i+iop-2), FMT=*, IOSTAT=istat) z
+         READ (UNIT=string(i:i + iop - 2), FMT=*, IOSTAT=istat) z
          IF (istat /= 0) THEN
             error_message = "A floating point type object was expected, found <"// &
-                            string(i:i+iop-2)//">"
+                            string(i:i + iop - 2)//">"
             RETURN
          END IF
          IF (i == 1) THEN
             object = z
-         ELSE IF (string(i-1:i-1) == "*") THEN
+         ELSE IF (string(i - 1:i - 1) == "*") THEN
             object = object*z
          ELSE
             IF (z == 0.0_dp) THEN
                error_message = "Division by zero found <"// &
-                               string(i:i+iop-2)//">"
+                               string(i:i + iop - 2)//">"
                RETURN
             ELSE
                object = object/z
@@ -1411,7 +1411,7 @@ CONTAINS
       parsing_done = .FALSE.
 
       DO WHILE (.NOT. parsing_done)
-         i = i+iop
+         i = i + iop
          ! note that INDEX always starts counting from 1 if found. Thus iop
          ! will give the length of the integer number plus 1
          iop = INDEX(string(i:n), "*")
@@ -1420,20 +1420,20 @@ CONTAINS
             ! note that iop will always be the length of one integer plus 1
             ! and we still need to calculate it here as it is need for fmtstr
             ! below to determine integer format length
-            iop = n-i+2
+            iop = n - i + 2
             parsing_done = .TRUE.
          END IF
          istat = 1
-         IF (iop-1 > 0) THEN
+         IF (iop - 1 > 0) THEN
             ! need an explicit fmtstr here. With 'FMT=*' compilers from intel and pgi will also
             ! read float numbers as integers, without setting istat non-zero, i.e. string="0.3", istat=0, iz8=0
             ! this leads to wrong CP2K results (e.g. parsing force fields).
-            WRITE (fmtstr, FMT='(A,I0,A)') '(I', iop-1, ')'
-            READ (UNIT=string(i:i+iop-2), FMT=fmtstr, IOSTAT=istat) iz8
+            WRITE (fmtstr, FMT='(A,I0,A)') '(I', iop - 1, ')'
+            READ (UNIT=string(i:i + iop - 2), FMT=fmtstr, IOSTAT=istat) iz8
          ENDIF
          IF (istat /= 0) THEN
             error_message = "An integer type object was expected, found <"// &
-                            string(i:i+iop-2)//">"
+                            string(i:i + iop - 2)//">"
             RETURN
          END IF
          IF (i == 1) THEN
@@ -1442,7 +1442,7 @@ CONTAINS
             object8 = object8*iz8
          END IF
          IF (ABS(object8) > HUGE(0)) THEN
-            error_message = "The specified integer number <"//string(i:i+iop-2)// &
+            error_message = "The specified integer number <"//string(i:i + iop - 2)// &
                             "> exceeds the allowed range of a 32-bit integer number."
             RETURN
          END IF

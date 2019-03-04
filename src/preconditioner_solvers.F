@@ -11,37 +11,37 @@
 !> \author Joost VandeVondele (09.2002)
 ! **************************************************************************************************
 MODULE preconditioner_solvers
-   USE arnoldi_api,                     ONLY: arnoldi_data_type,&
-                                              arnoldi_ev,&
-                                              deallocate_arnoldi_data,&
-                                              get_selected_ritz_val,&
-                                              setup_arnoldi_data
-   USE bibliography,                    ONLY: Schiffmann2015,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_upper_to_full
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_invert
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_create, dbcsr_filter, dbcsr_get_info, dbcsr_get_occupation, dbcsr_init_p, &
-        dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_real_8
-   USE input_constants,                 ONLY: ot_precond_solver_default,&
-                                              ot_precond_solver_direct,&
-                                              ot_precond_solver_inv_chol,&
-                                              ot_precond_solver_update
-   USE iterate_matrix,                  ONLY: invert_Hotelling
-   USE kinds,                           ONLY: dp
-   USE preconditioner_types,            ONLY: preconditioner_type
+   USE arnoldi_api, ONLY: arnoldi_data_type, &
+                          arnoldi_ev, &
+                          deallocate_arnoldi_data, &
+                          get_selected_ritz_val, &
+                          setup_arnoldi_data
+   USE bibliography, ONLY: Schiffmann2015, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr
+   USE cp_fm_basic_linalg, ONLY: cp_fm_upper_to_full
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_invert
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_create, dbcsr_filter, dbcsr_get_info, dbcsr_get_occupation, dbcsr_init_p, &
+      dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_real_8
+   USE input_constants, ONLY: ot_precond_solver_default, &
+                              ot_precond_solver_direct, &
+                              ot_precond_solver_inv_chol, &
+                              ot_precond_solver_update
+   USE iterate_matrix, ONLY: invert_Hotelling
+   USE kinds, ONLY: dp
+   USE preconditioner_types, ONLY: preconditioner_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -69,7 +69,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_h
 
       CHARACTER(len=*), PARAMETER :: routineN = 'solve_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(dp)                                           :: occ_matrix
 
@@ -126,7 +126,7 @@ CONTAINS
       TYPE(dbcsr_type), OPTIONAL, POINTER                :: matrix_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_inverse_cholesky', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, info
       TYPE(cp_fm_type), POINTER                          :: fm, fm_work
@@ -179,7 +179,7 @@ CONTAINS
       TYPE(dbcsr_type), OPTIONAL, POINTER                :: matrix_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_fact_cholesky', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, info_out
       TYPE(cp_fm_type), POINTER                          :: fm
@@ -222,7 +222,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_h
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_inverse_update', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: use_guess
@@ -269,7 +269,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: cond_num
 
       CHARACTER(len=*), PARAMETER :: routineN = 'estimate_cond_num', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: max_ev, min_ev
@@ -312,7 +312,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: dbcsr_matrix, template_mat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'transfer_fm_to_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -351,7 +351,7 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: context
 
       CHARACTER(len=*), PARAMETER :: routineN = 'transfer_dbcsr_to_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, n
       TYPE(cp_fm_struct_type), POINTER                   :: fm_struct_tmp

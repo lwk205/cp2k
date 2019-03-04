@@ -10,19 +10,19 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_fm_struct
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_flush
-   USE message_passing,                 ONLY: mp_sum
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_flush
+   USE message_passing, ONLY: mp_sum
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -215,8 +215,8 @@ CONTAINS
          fmstruct%ncol_block = fmstruct%nrow_block
       END IF
 
-      ALLOCATE (fmstruct%nrow_locals(0:(fmstruct%context%num_pe(1)-1)), &
-                fmstruct%ncol_locals(0:(fmstruct%context%num_pe(2)-1)))
+      ALLOCATE (fmstruct%nrow_locals(0:(fmstruct%context%num_pe(1) - 1)), &
+                fmstruct%ncol_locals(0:(fmstruct%context%num_pe(2) - 1)))
       IF (.NOT. PRESENT(template_fmstruct)) &
          fmstruct%first_p_pos = (/0, 0/)
       IF (PRESENT(first_p_pos)) fmstruct%first_p_pos = first_p_pos
@@ -273,7 +273,7 @@ CONTAINS
       END IF
 
       NULLIFY (fmstruct%row_indices, fmstruct%col_indices)
-      last_fmstruct_id_nr = last_fmstruct_id_nr+1
+      last_fmstruct_id_nr = last_fmstruct_id_nr + 1
       fmstruct%id_nr = last_fmstruct_id_nr
       fmstruct%ref_count = 1
 
@@ -304,11 +304,11 @@ CONTAINS
       TYPE(cp_fm_struct_type), POINTER                   :: fmstruct
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_struct_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(fmstruct))
       CPASSERT(fmstruct%ref_count > 0)
-      fmstruct%ref_count = fmstruct%ref_count+1
+      fmstruct%ref_count = fmstruct%ref_count + 1
    END SUBROUTINE cp_fm_struct_retain
 
 ! **************************************************************************************************
@@ -322,11 +322,11 @@ CONTAINS
       TYPE(cp_fm_struct_type), POINTER                   :: fmstruct
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_struct_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(fmstruct)) THEN
          CPASSERT(fmstruct%ref_count > 0)
-         fmstruct%ref_count = fmstruct%ref_count-1
+         fmstruct%ref_count = fmstruct%ref_count - 1
          IF (fmstruct%ref_count < 1) THEN
             CALL cp_blacs_env_release(fmstruct%context)
             CALL cp_para_env_release(fmstruct%para_env)
@@ -363,7 +363,7 @@ CONTAINS
       LOGICAL                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_struct_equivalent', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -516,10 +516,10 @@ CONTAINS
       LOGICAL                                            :: col, row
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_struct_double', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: nblocks, ncol_block, ncol_global, nempty, newdim_col, newdim_row, nfilled, &
-         nprocs_col, nprocs_row, nrow_block, nrow_global
+                 nprocs_col, nprocs_row, nrow_block, nrow_global
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CALL cp_fm_struct_get(struct, nrow_global=nrow_global, &
@@ -536,10 +536,10 @@ CONTAINS
             newdim_col = 0
          ELSE
             !Divide ncol_global by ncol_block and round up
-            nblocks = (ncol_global+ncol_block-1)/ncol_block
+            nblocks = (ncol_global + ncol_block - 1)/ncol_block
             nfilled = MOD(nblocks, nprocs_col)
-            nempty = MOD(nprocs_col-nfilled, nprocs_col)
-            newdim_col = 2*ncol_global+2*nempty*ncol_block+2*MOD(ncol_block-MOD(ncol_global, ncol_block), ncol_block)
+            nempty = MOD(nprocs_col - nfilled, nprocs_col)
+            newdim_col = 2*ncol_global + 2*nempty*ncol_block + 2*MOD(ncol_block - MOD(ncol_global, ncol_block), ncol_block)
          END IF
       END IF
 
@@ -548,10 +548,10 @@ CONTAINS
             newdim_row = 0
          ELSE
             !Divide nrow_global by nrow_block and round up
-            nblocks = (nrow_global+nrow_block-1)/nrow_block
+            nblocks = (nrow_global + nrow_block - 1)/nrow_block
             nfilled = MOD(nblocks, nprocs_row)
-            nempty = MOD(nprocs_row-nfilled, nprocs_row)
-            newdim_row = 2*nrow_global+2*nempty*nrow_block+2*MOD(nrow_block-MOD(nrow_global, nrow_block), nrow_block)
+            nempty = MOD(nprocs_row - nfilled, nprocs_row)
+            newdim_row = 2*nrow_global + 2*nempty*nrow_block + 2*MOD(nrow_block - MOD(nrow_global, nrow_block), nrow_block)
          END IF
       END IF
 

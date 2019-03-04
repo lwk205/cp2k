@@ -10,18 +10,18 @@
 ! **************************************************************************************************
 MODULE velocity_verlet_control
 
-   USE force_env_types,                 ONLY: force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: &
-        isokin_ensemble, langevin_ensemble, npe_f_ensemble, npe_i_ensemble, &
-        nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, npt_f_ensemble, npt_i_ensemble, &
-        nve_ensemble, nvt_adiabatic_ensemble, nvt_ensemble, reftraj_ensemble
-   USE integrator,                      ONLY: &
-        isokin, langevin, nph_uniaxial, nph_uniaxial_damped, npt_f, npt_i, nve, nve_respa, nvt, &
-        nvt_adiabatic, reftraj
-   USE md_environment_types,            ONLY: get_md_env,&
-                                              md_environment_type
-   USE simpar_types,                    ONLY: simpar_type
+   USE force_env_types, ONLY: force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: &
+      isokin_ensemble, langevin_ensemble, npe_f_ensemble, npe_i_ensemble, &
+      nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, npt_f_ensemble, npt_i_ensemble, &
+      nve_ensemble, nvt_adiabatic_ensemble, nvt_ensemble, reftraj_ensemble
+   USE integrator, ONLY: &
+      isokin, langevin, nph_uniaxial, nph_uniaxial_damped, npt_f, npt_i, nve, nve_respa, nvt, &
+      nvt_adiabatic, reftraj
+   USE md_environment_types, ONLY: get_md_env, &
+                                   md_environment_type
+   USE simpar_types, ONLY: simpar_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -46,7 +46,7 @@ CONTAINS
       TYPE(global_environment_type), POINTER             :: globenv
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'velocity_verlet', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(force_env_type), POINTER                      :: force_env

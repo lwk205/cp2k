@@ -7,28 +7,28 @@
 !> \brief Subroutines to compute Green functions
 ! **************************************************************************************************
 MODULE negf_green_methods
-   USE cp_cfm_basic_linalg,             ONLY: cp_cfm_gemm,&
-                                              cp_cfm_lu_invert,&
-                                              cp_cfm_norm,&
-                                              cp_cfm_scale,&
-                                              cp_cfm_scale_and_add,&
-                                              cp_cfm_scale_and_add_fm,&
-                                              cp_cfm_transpose
-   USE cp_cfm_types,                    ONLY: cp_cfm_create,&
-                                              cp_cfm_get_info,&
-                                              cp_cfm_release,&
-                                              cp_cfm_to_cfm,&
-                                              cp_cfm_type,&
-                                              cp_fm_to_cfm
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_get,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: gaussi,&
-                                              z_mone,&
-                                              z_one,&
-                                              z_zero
+   USE cp_cfm_basic_linalg, ONLY: cp_cfm_gemm, &
+                                  cp_cfm_lu_invert, &
+                                  cp_cfm_norm, &
+                                  cp_cfm_scale, &
+                                  cp_cfm_scale_and_add, &
+                                  cp_cfm_scale_and_add_fm, &
+                                  cp_cfm_transpose
+   USE cp_cfm_types, ONLY: cp_cfm_create, &
+                           cp_cfm_get_info, &
+                           cp_cfm_release, &
+                           cp_cfm_to_cfm, &
+                           cp_cfm_type, &
+                           cp_fm_to_cfm
+   USE cp_fm_struct, ONLY: cp_fm_struct_get, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: gaussi, &
+                            z_mone, &
+                            z_one, &
+                            z_zero
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -71,7 +71,7 @@ CONTAINS
       TYPE(cp_fm_struct_type), POINTER                   :: fm_struct
 
       CHARACTER(len=*), PARAMETER :: routineN = 'sancho_work_matrices_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ncols, nrows
 
@@ -103,7 +103,7 @@ CONTAINS
       TYPE(sancho_work_matrices_type), INTENT(inout)     :: work
 
       CHARACTER(len=*), PARAMETER :: routineN = 'sancho_work_matrices_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -179,7 +179,7 @@ CONTAINS
       END IF
 
       ! actually compute the Green's function
-      DO WHILE (cp_cfm_norm(work%b, 'M')+cp_cfm_norm(work%c, 'M') > conv)
+      DO WHILE (cp_cfm_norm(work%b, 'M') + cp_cfm_norm(work%c, 'M') > conv)
          ! A_n^-1
          CALL cp_cfm_to_cfm(work%a, work%a_inv)
          CALL cp_cfm_lu_invert(work%a_inv)
@@ -241,7 +241,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: transp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_contact_self_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao_contact, nao_scattering
 
@@ -282,7 +282,7 @@ CONTAINS
       TYPE(cp_cfm_type), POINTER                         :: gamma_c, self_energy_c
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_contact_broadening_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -320,7 +320,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: h_s, s_s, v_hartree_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_retarded_green_function', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 

@@ -12,45 +12,45 @@
 ! **************************************************************************************************
 
 MODULE population_analyses
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix,&
-                                              write_fm_with_basis_info
-   USE cp_fm_diag,                      ONLY: cp_fm_power
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_diag,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_deallocate_matrix, dbcsr_get_block_p, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_p_type, dbcsr_set, dbcsr_setname, dbcsr_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE message_passing,                 ONLY: mp_sum
-   USE orbital_pointers,                ONLY: nso
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix, &
+                              write_fm_with_basis_info
+   USE cp_fm_diag, ONLY: cp_fm_power
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_diag, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_deallocate_matrix, dbcsr_get_block_p, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_p_type, dbcsr_set, dbcsr_setname, dbcsr_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE message_passing, ONLY: mp_sum
+   USE orbital_pointers, ONLY: nso
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -81,7 +81,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit, print_level
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'lowdin_population_analysis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: headline
       INTEGER                                            :: handle, ispin, ndep, nsgf, nspin
@@ -254,7 +254,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit, print_level
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mulliken_population_analysis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: headline
       INTEGER                                            :: blk, handle, iatom, ic, isgf, ispin, &
@@ -368,19 +368,19 @@ CONTAINS
                DO jsgf = 1, SIZE(s_block, 2)
                   DO isgf = 1, SIZE(s_block, 1)
                      ps = p_block(isgf, jsgf)*s_block(isgf, jsgf)
-                     IF (ASSOCIATED(ps_block)) ps_block(isgf, jsgf) = ps_block(isgf, jsgf)+ps
-                     orbpop(sgfb, ispin) = orbpop(sgfb, ispin)+ps
+                     IF (ASSOCIATED(ps_block)) ps_block(isgf, jsgf) = ps_block(isgf, jsgf) + ps
+                     orbpop(sgfb, ispin) = orbpop(sgfb, ispin) + ps
                   END DO
-                  sgfb = sgfb+1
+                  sgfb = sgfb + 1
                END DO
                IF (iatom /= jatom) THEN
                   sgfa = first_sgf_atom(iatom)
                   DO isgf = 1, SIZE(s_block, 1)
                      DO jsgf = 1, SIZE(s_block, 2)
                         ps = p_block(isgf, jsgf)*s_block(isgf, jsgf)
-                        orbpop(sgfa, ispin) = orbpop(sgfa, ispin)+ps
+                        orbpop(sgfa, ispin) = orbpop(sgfa, ispin) + ps
                      END DO
-                     sgfa = sgfa+1
+                     sgfa = sgfa + 1
                   END DO
                END IF
             END DO
@@ -520,7 +520,7 @@ CONTAINS
                   l = lshell(ishell, iset)
                   DO iso = 1, nso(l)
                      IF (nspin == 1) THEN
-                        sumorbpop(1) = sumorbpop(1)+orbpop(iao, 1)
+                        sumorbpop(1) = sumorbpop(1) + orbpop(iao, 1)
                         IF (print_orbital_contributions) THEN
                            IF (isgf == 1) WRITE (UNIT=output_unit, FMT="(A)") ""
                            WRITE (UNIT=output_unit, &
@@ -528,34 +528,34 @@ CONTAINS
                               iao, element_symbol, sgf_symbol(isgf), orbpop(iao, 1)
                         END IF
                      ELSE
-                        sumorbpop(1:2) = sumorbpop(1:2)+orbpop(iao, 1:2)
-                        sumorbpop(3) = sumorbpop(3)+orbpop(iao, 1)-orbpop(iao, 2)
+                        sumorbpop(1:2) = sumorbpop(1:2) + orbpop(iao, 1:2)
+                        sumorbpop(3) = sumorbpop(3) + orbpop(iao, 1) - orbpop(iao, 2)
                         IF (print_orbital_contributions) THEN
                            IF (isgf == 1) WRITE (UNIT=output_unit, FMT="(A)") ""
                            WRITE (UNIT=output_unit, &
                                   FMT="(T2,I9,2X,A2,1X,A,T29,2(1X,F12.6),T68,F12.6)") &
                               iao, element_symbol, sgf_symbol(isgf), orbpop(iao, 1:2), &
-                              orbpop(iao, 1)-orbpop(iao, 2)
+                              orbpop(iao, 1) - orbpop(iao, 2)
                         END IF
                      END IF
-                     isgf = isgf+1
-                     iao = iao+1
+                     isgf = isgf + 1
+                     iao = iao + 1
                   END DO
                END DO
             END DO
             IF (nspin == 1) THEN
-               totsumorbpop(1) = totsumorbpop(1)+sumorbpop(1)
-               totsumorbpop(3) = totsumorbpop(3)+zeff-sumorbpop(1)
+               totsumorbpop(1) = totsumorbpop(1) + sumorbpop(1)
+               totsumorbpop(3) = totsumorbpop(3) + zeff - sumorbpop(1)
                WRITE (UNIT=output_unit, &
                       FMT="(T2,I7,5X,A2,2X,I6,T30,F12.6,T68,F12.6)") &
-                  iatom, element_symbol, ikind, sumorbpop(1), zeff-sumorbpop(1)
+                  iatom, element_symbol, ikind, sumorbpop(1), zeff - sumorbpop(1)
             ELSE
-               totsumorbpop(1:2) = totsumorbpop(1:2)+sumorbpop(1:2)
-               totsumorbpop(3) = totsumorbpop(3)+zeff-sumorbpop(1)-sumorbpop(2)
+               totsumorbpop(1:2) = totsumorbpop(1:2) + sumorbpop(1:2)
+               totsumorbpop(3) = totsumorbpop(3) + zeff - sumorbpop(1) - sumorbpop(2)
                WRITE (UNIT=output_unit, &
                       FMT="(T2,I7,5X,A2,2X,I6,T28,4(1X,F12.6))") &
                   iatom, element_symbol, ikind, sumorbpop(1:2), &
-                  zeff-sumorbpop(1)-sumorbpop(2), sumorbpop(3)
+                  zeff - sumorbpop(1) - sumorbpop(2), sumorbpop(3)
             END IF
          END IF ! atom has an orbital basis
       END DO ! next atom iatom
@@ -570,7 +570,7 @@ CONTAINS
          WRITE (UNIT=output_unit, &
                 FMT="(T2,A,T28,4(1X,F12.6),/)") &
             "# Total charge and spin", totsumorbpop(1:2), totsumorbpop(3), &
-            totsumorbpop(1)-totsumorbpop(2)
+            totsumorbpop(1) - totsumorbpop(2)
       END IF
 
       IF (output_unit > 0) CALL m_flush(output_unit)

@@ -7,50 +7,50 @@
 !> \brief calculate the orbitals for a given atomic kind type
 ! **************************************************************************************************
 MODULE atom_kind_orbitals
-   USE ai_onecenter,                    ONLY: sg_erfc
-   USE atom_electronic_structure,       ONLY: calculate_atom
-   USE atom_fit,                        ONLY: atom_fit_density
-   USE atom_operators,                  ONLY: atom_int_release,&
-                                              atom_int_setup,&
-                                              atom_ppint_release,&
-                                              atom_ppint_setup,&
-                                              atom_relint_release,&
-                                              atom_relint_setup
-   USE atom_types,                      ONLY: &
-        CGTO_BASIS, Clementi_geobas, GTO_BASIS, atom_basis_type, atom_gthpot_type, atom_integrals, &
-        atom_orbitals, atom_potential_type, atom_sgppot_type, atom_type, create_atom_orbs, &
-        create_atom_type, lmat, release_atom_basis, release_atom_potential, release_atom_type, &
-        set_atom
-   USE atom_utils,                      ONLY: atom_density,&
-                                              get_maxl_occ,&
-                                              get_maxn_occ
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE external_potential_types,        ONLY: all_potential_type,&
-                                              get_potential,&
-                                              gth_potential_type,&
-                                              sgp_potential_type
-   USE input_constants,                 ONLY: &
-        barrier_conf, do_analytic, do_dkh0_atom, do_dkh1_atom, do_dkh2_atom, do_dkh3_atom, &
-        do_gapw_log, do_nonrel_atom, do_numeric, do_rks_atom, do_sczoramp_atom, do_uks_atom, &
-        do_zoramp_atom, gth_pseudo, no_pseudo, poly_conf, rel_dkh, rel_none, rel_sczora_mp, &
-        rel_zora, rel_zora_full, rel_zora_mp, sgp_pseudo
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: dfac,&
-                                              pi
-   USE periodic_table,                  ONLY: ptable
-   USE physcon,                         ONLY: bohr
-   USE qs_grid_atom,                    ONLY: allocate_grid_atom,&
-                                              create_grid_atom,&
-                                              grid_atom_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              init_atom_electronic_state,&
-                                              qs_kind_type,&
-                                              set_pseudo_state
-   USE rel_control_types,               ONLY: rel_control_type
+   USE ai_onecenter, ONLY: sg_erfc
+   USE atom_electronic_structure, ONLY: calculate_atom
+   USE atom_fit, ONLY: atom_fit_density
+   USE atom_operators, ONLY: atom_int_release, &
+                             atom_int_setup, &
+                             atom_ppint_release, &
+                             atom_ppint_setup, &
+                             atom_relint_release, &
+                             atom_relint_setup
+   USE atom_types, ONLY: &
+      CGTO_BASIS, Clementi_geobas, GTO_BASIS, atom_basis_type, atom_gthpot_type, atom_integrals, &
+      atom_orbitals, atom_potential_type, atom_sgppot_type, atom_type, create_atom_orbs, &
+      create_atom_type, lmat, release_atom_basis, release_atom_potential, release_atom_type, &
+      set_atom
+   USE atom_utils, ONLY: atom_density, &
+                         get_maxl_occ, &
+                         get_maxn_occ
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE external_potential_types, ONLY: all_potential_type, &
+                                       get_potential, &
+                                       gth_potential_type, &
+                                       sgp_potential_type
+   USE input_constants, ONLY: &
+      barrier_conf, do_analytic, do_dkh0_atom, do_dkh1_atom, do_dkh2_atom, do_dkh3_atom, &
+      do_gapw_log, do_nonrel_atom, do_numeric, do_rks_atom, do_sczoramp_atom, do_uks_atom, &
+      do_zoramp_atom, gth_pseudo, no_pseudo, poly_conf, rel_dkh, rel_none, rel_sczora_mp, &
+      rel_zora, rel_zora_full, rel_zora_mp, sgp_pseudo
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: dfac, &
+                            pi
+   USE periodic_table, ONLY: ptable
+   USE physcon, ONLY: bohr
+   USE qs_grid_atom, ONLY: allocate_grid_atom, &
+                           create_grid_atom, &
+                           grid_atom_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            init_atom_electronic_state, &
+                            qs_kind_type, &
+                            set_pseudo_state
+   USE rel_control_types, ONLY: rel_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -107,7 +107,7 @@ CONTAINS
       INTEGER, DIMENSION(:), OPTIONAL                    :: nocc
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_atomic_orbitals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ii, ipgf, j, k, k1, k2, l, ll, m, mb, &
                                                             mo, ngp, nj, nr, ns, nset, nsgf, nu, &
@@ -226,12 +226,12 @@ CONTAINS
          basis%nbas = 0
          DO i = 1, nset
             DO j = lmin(i), MIN(lmax(i), lmat)
-               basis%nprim(j) = basis%nprim(j)+npgf(i)
+               basis%nprim(j) = basis%nprim(j) + npgf(i)
             END DO
             DO j = 1, nshell(i)
                l = ls(j, i)
                IF (l <= lmat) THEN
-                  basis%nbas(l) = basis%nbas(l)+1
+                  basis%nbas(l) = basis%nbas(l) + 1
                   k = basis%nbas(l)
                   CPASSERT(k <= 100)
                   set_index(l, k) = i
@@ -252,17 +252,17 @@ CONTAINS
             DO i = 1, nset
                IF (j >= lmin(i) .AND. j <= lmax(i)) THEN
                   DO ipgf = 1, npgf(i)
-                     basis%am(nj+ipgf, j) = zet(ipgf, i)
+                     basis%am(nj + ipgf, j) = zet(ipgf, i)
                   END DO
                   DO ii = 1, nshell(i)
                      IF (ls(ii, i) == j) THEN
-                        ns = ns+1
+                        ns = ns + 1
                         DO ipgf = 1, npgf(i)
-                           basis%cm(nj+ipgf, ns, j) = gcc(ipgf, ii, i)
+                           basis%cm(nj + ipgf, ns, j) = gcc(ipgf, ii, i)
                         END DO
                      END IF
                   END DO
-                  nj = nj+npgf(i)
+                  nj = nj + npgf(i)
                END IF
             END DO
          END DO
@@ -306,21 +306,21 @@ CONTAINS
                   rk = basis%grid%rad(k)
                   ear = EXP(-al*basis%grid%rad(k)**2)
                   basis%bf(k, i, l) = rk**l*ear
-                  basis%dbf(k, i, l) = (REAL(l, dp)*rk**(l-1)-2._dp*al*rk**(l+1))*ear
-                  basis%ddbf(k, i, l) = (REAL(l*(l-1), dp)*rk**(l-2)- &
-                                         2._dp*al*REAL(2*l+1, dp)*rk**(l)+4._dp*al*rk**(l+2))*ear
+                  basis%dbf(k, i, l) = (REAL(l, dp)*rk**(l - 1) - 2._dp*al*rk**(l + 1))*ear
+                  basis%ddbf(k, i, l) = (REAL(l*(l - 1), dp)*rk**(l - 2) - &
+                                         2._dp*al*REAL(2*l + 1, dp)*rk**(l) + 4._dp*al*rk**(l + 2))*ear
                END DO
             ELSEIF (basis%basis_type == CGTO_BASIS) THEN
                DO k = 1, nr
                   rk = basis%grid%rad(k)
                   ear = EXP(-al*basis%grid%rad(k)**2)
                   DO j = 1, basis%nbas(l)
-                     basis%bf(k, j, l) = basis%bf(k, j, l)+rk**l*ear*basis%cm(i, j, l)
+                     basis%bf(k, j, l) = basis%bf(k, j, l) + rk**l*ear*basis%cm(i, j, l)
                      basis%dbf(k, j, l) = basis%dbf(k, j, l) &
-                                          +(REAL(l, dp)*rk**(l-1)-2._dp*al*rk**(l+1))*ear*basis%cm(i, j, l)
-                     basis%ddbf(k, j, l) = basis%ddbf(k, j, l)+ &
-                                           (REAL(l*(l-1), dp)*rk**(l-2)-2._dp*al*REAL(2*l+1, dp)*rk**(l)+ &
-                                            4._dp*al*rk**(l+2))*ear*basis%cm(i, j, l)
+                                          + (REAL(l, dp)*rk**(l - 1) - 2._dp*al*rk**(l + 1))*ear*basis%cm(i, j, l)
+                     basis%ddbf(k, j, l) = basis%ddbf(k, j, l) + &
+                                           (REAL(l*(l - 1), dp)*rk**(l - 2) - 2._dp*al*REAL(2*l + 1, dp)*rk**(l) + &
+                                            4._dp*al*rk**(l + 2))*ear*basis%cm(i, j, l)
                   END DO
                END DO
             ELSE
@@ -361,8 +361,8 @@ CONTAINS
       atom%state%core(0:lmat, 1:7) = REAL(ncore(0:lmat, 1:7), dp)
       atom%state%occ = 0._dp
       IF (uks) THEN
-         atom%state%occ(0:lmat, 1:7) = REAL(ncalc(0:lmat, 1:7), dp)+ &
-                                       edelta(0:lmat, 1:7, 1)+edelta(0:lmat, 1:7, 2)
+         atom%state%occ(0:lmat, 1:7) = REAL(ncalc(0:lmat, 1:7), dp) + &
+                                       edelta(0:lmat, 1:7, 1) + edelta(0:lmat, 1:7, 2)
       ELSE
          atom%state%occ(0:lmat, 1:7) = REAL(ncalc(0:lmat, 1:7), dp)
       END IF
@@ -371,24 +371,24 @@ CONTAINS
          k = 0
          DO i = 1, 7
             IF (ncalc(l, i) > 0) THEN
-               k = k+1
+               k = k + 1
                IF (uks) THEN
-                  atom%state%occupation(l, k) = REAL(ncalc(l, i), dp)+ &
-                                                edelta(l, i, 1)+edelta(l, i, 2)
-                  atom%state%occa(l, k) = 0.5_dp*REAL(ncalc(l, i), dp)+edelta(l, i, 1)
-                  atom%state%occb(l, k) = 0.5_dp*REAL(ncalc(l, i), dp)+edelta(l, i, 2)
+                  atom%state%occupation(l, k) = REAL(ncalc(l, i), dp) + &
+                                                edelta(l, i, 1) + edelta(l, i, 2)
+                  atom%state%occa(l, k) = 0.5_dp*REAL(ncalc(l, i), dp) + edelta(l, i, 1)
+                  atom%state%occb(l, k) = 0.5_dp*REAL(ncalc(l, i), dp) + edelta(l, i, 2)
                ELSE
                   atom%state%occupation(l, k) = REAL(ncalc(l, i), dp)
                END IF
             END IF
          END DO
-         ok = REAL(2*l+1, KIND=dp)
+         ok = REAL(2*l + 1, KIND=dp)
          IF (uks) THEN
             DO i = 1, 7
                atom%state%occ(l, i) = MIN(atom%state%occ(l, i), 2.0_dp*ok)
                atom%state%occa(l, i) = MIN(atom%state%occa(l, i), ok)
                atom%state%occb(l, i) = MIN(atom%state%occb(l, i), ok)
-               atom%state%occupation(l, i) = atom%state%occa(l, i)+atom%state%occb(l, i)
+               atom%state%occupation(l, i) = atom%state%occa(l, i) + atom%state%occb(l, i)
             END DO
          ELSE
             DO i = 1, 7
@@ -398,7 +398,7 @@ CONTAINS
          END IF
       END DO
       IF (uks) THEN
-         atom%state%multiplicity = NINT(ABS(SUM(atom%state%occa-atom%state%occb))+1)
+         atom%state%multiplicity = NINT(ABS(SUM(atom%state%occa - atom%state%occb)) + 1)
       ELSE
          atom%state%multiplicity = -1
       END IF
@@ -415,15 +415,15 @@ CONTAINS
             DO k = 1, 7
                IF (uks) THEN
                   IF (atom%state%occa(l, k) > 0.0_dp) THEN
-                     nocc(1) = nocc(1)+2*l+1
+                     nocc(1) = nocc(1) + 2*l + 1
                   END IF
                   IF (atom%state%occb(l, k) > 0.0_dp) THEN
-                     nocc(2) = nocc(2)+2*l+1
+                     nocc(2) = nocc(2) + 2*l + 1
                   END IF
                ELSE
                   IF (atom%state%occupation(l, k) > 0.0_dp) THEN
-                     nocc(1) = nocc(1)+2*l+1
-                     nocc(2) = nocc(2)+2*l+1
+                     nocc(1) = nocc(1) + 2*l + 1
+                     nocc(2) = nocc(2) + 2*l + 1
                   END IF
                END IF
             END DO
@@ -465,25 +465,25 @@ CONTAINS
             ll = 2*l
             DO k1 = 1, atom%basis%nbas(l)
                DO k2 = 1, atom%basis%nbas(l)
-                  scal = SQRT(atom%integrals%ovlp(k1, k1, l)*atom%integrals%ovlp(k2, k2, l))/REAL(2*l+1, KIND=dp)
+                  scal = SQRT(atom%integrals%ovlp(k1, k1, l)*atom%integrals%ovlp(k2, k2, l))/REAL(2*l + 1, KIND=dp)
                   i = first_sgf(shell_index(l, k1), set_index(l, k1))
                   j = first_sgf(shell_index(l, k2), set_index(l, k2))
                   IF (uks) THEN
                      DO m = 0, ll
-                        pmat(i+m, j+m, 1) = atom%orbitals%pmata(k1, k2, l)*scal
-                        pmat(i+m, j+m, 2) = atom%orbitals%pmatb(k1, k2, l)*scal
+                        pmat(i + m, j + m, 1) = atom%orbitals%pmata(k1, k2, l)*scal
+                        pmat(i + m, j + m, 2) = atom%orbitals%pmatb(k1, k2, l)*scal
                      END DO
                   ELSE
                      DO m = 0, ll
-                        pmat(i+m, j+m, 1) = atom%orbitals%pmat(k1, k2, l)*scal
+                        pmat(i + m, j + m, 1) = atom%orbitals%pmat(k1, k2, l)*scal
                      END DO
                   END IF
                END DO
             END DO
          ENDDO
          IF (uks) THEN
-            pmat(:, :, 1) = pmat(:, :, 1)+pmat(:, :, 2)
-            pmat(:, :, 2) = pmat(:, :, 1)-2.0_dp*pmat(:, :, 2)
+            pmat(:, :, 1) = pmat(:, :, 1) + pmat(:, :, 2)
+            pmat(:, :, 2) = pmat(:, :, 1) - 2.0_dp*pmat(:, :, 2)
          END IF
       END IF
 
@@ -503,7 +503,7 @@ CONTAINS
                i = first_sgf(shell_index(l, k1), set_index(l, k1))
                j = first_sgf(shell_index(l, k2), set_index(l, k2))
                DO m = 0, ll
-                  fmat(i+m, j+m, 1) = atom%fmat%op(k1, k2, l)/scal
+                  fmat(i + m, j + m, 1) = atom%fmat%op(k1, k2, l)/scal
                END DO
             END DO
             END DO
@@ -527,11 +527,11 @@ CONTAINS
          DO l = 0, lmat
             DO i = 1, atom%state%maxn_occ(l)
                IF (atom%state%occupation(l, i) > 0.0_dp) THEN
-                  ii = ii+1
+                  ii = ii + 1
                   wfninfo(1, ii) = atom%state%occupation(l, i)
                   wfninfo(2, ii) = REAL(l, dp)
                   DO j = 1, atom%basis%nbas(l)
-                     wavefunction(:, ii) = wavefunction(:, ii)+ &
+                     wavefunction(:, ii) = wavefunction(:, ii) + &
                                            atom%orbitals%wfn(j, i, l)*basis%bf(:, j, l)
                   END DO
                END IF
@@ -571,7 +571,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: allelectron, confine
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_atomic_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: num_gto = 40
 
       INTEGER                                            :: i, ii, k, l, ll, m, mb, mo, ngp, nn, nr, &
@@ -580,7 +580,7 @@ CONTAINS
       INTEGER, DIMENSION(0:lmat, 10)                     :: ncalc, ncore, nelem
       INTEGER, DIMENSION(:), POINTER                     :: econf
       REAL(KIND=dp)                                      :: al, aval, cc, cval, ear, rk, xx, zeff
-      REAL(KIND=dp), DIMENSION(num_gto+2)                :: results
+      REAL(KIND=dp), DIMENSION(num_gto + 2)                :: results
       TYPE(all_potential_type), POINTER                  :: all_potential
       TYPE(atom_basis_type), POINTER                     :: basis
       TYPE(atom_integrals), POINTER                      :: integrals
@@ -679,7 +679,7 @@ CONTAINS
       basis%am = 0._dp
       DO l = 0, lmat
          DO i = 1, basis%nbas(l)
-            ll = i-1+starti(l)
+            ll = i - 1 + starti(l)
             basis%am(i, l) = aval*cval**(ll)
          END DO
       END DO
@@ -705,9 +705,9 @@ CONTAINS
                rk = basis%grid%rad(k)
                ear = EXP(-al*basis%grid%rad(k)**2)
                basis%bf(k, i, l) = rk**l*ear
-               basis%dbf(k, i, l) = (REAL(l, dp)*rk**(l-1)-2._dp*al*rk**(l+1))*ear
-               basis%ddbf(k, i, l) = (REAL(l*(l-1), dp)*rk**(l-2)- &
-                                      2._dp*al*REAL(2*l+1, dp)*rk**(l)+4._dp*al*rk**(l+2))*ear
+               basis%dbf(k, i, l) = (REAL(l, dp)*rk**(l - 1) - 2._dp*al*rk**(l + 1))*ear
+               basis%ddbf(k, i, l) = (REAL(l*(l - 1), dp)*rk**(l - 2) - &
+                                      2._dp*al*REAL(2*l + 1, dp)*rk**(l) + 4._dp*al*rk**(l + 2))*ear
             END DO
          END DO
       END DO
@@ -732,21 +732,21 @@ CONTAINS
          CALL set_pseudo_state(econf, z, ncalc, ncore, nelem)
       ELSE
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             nn = ptable(z)%e_conv(l)
             ii = 0
             DO
-               ii = ii+1
+               ii = ii + 1
                IF (nn <= ll) THEN
                   nelem(l, ii) = nn
                   EXIT
                ELSE
                   nelem(l, ii) = ll
-                  nn = nn-ll
+                  nn = nn - ll
                END IF
             END DO
          END DO
-         ncalc = nelem-ncore
+         ncalc = nelem - ncore
       END IF
 
       IF (qs_kind%ghost .OR. qs_kind%floating) THEN
@@ -767,7 +767,7 @@ CONTAINS
          k = 0
          DO i = 1, 7
             IF (ncalc(l, i) > 0) THEN
-               k = k+1
+               k = k + 1
                atom%state%occupation(l, k) = REAL(ncalc(l, i), dp)
             END IF
          END DO
@@ -808,7 +808,7 @@ CONTAINS
       cc = results(2)
       DO i = 1, ngto
          density(i, 1) = xx*cc**i
-         density(i, 2) = results(2+i)
+         density(i, 2) = results(2 + i)
       END DO
 
       ! clean up
@@ -837,7 +837,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: rtmat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_atomic_relkin', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ii, ipgf, j, k, k1, k2, l, ll, m, n, &
                                                             ngp, nj, nn, nr, ns, nset, nsgf, &
@@ -942,12 +942,12 @@ CONTAINS
          basis%nbas = 0
          DO i = 1, nset
             DO j = lmin(i), MIN(lmax(i), lmat)
-               basis%nprim(j) = basis%nprim(j)+npgf(i)
+               basis%nprim(j) = basis%nprim(j) + npgf(i)
             END DO
             DO j = 1, nshell(i)
                l = ls(j, i)
                IF (l <= lmat) THEN
-                  basis%nbas(l) = basis%nbas(l)+1
+                  basis%nbas(l) = basis%nbas(l) + 1
                   k = basis%nbas(l)
                   CPASSERT(k <= 100)
                   set_index(l, k) = i
@@ -968,17 +968,17 @@ CONTAINS
             DO i = 1, nset
                IF (j >= lmin(i) .AND. j <= lmax(i)) THEN
                   DO ipgf = 1, npgf(i)
-                     basis%am(nj+ipgf, j) = zet(ipgf, i)
+                     basis%am(nj + ipgf, j) = zet(ipgf, i)
                   END DO
                   DO ii = 1, nshell(i)
                      IF (ls(ii, i) == j) THEN
-                        ns = ns+1
+                        ns = ns + 1
                         DO ipgf = 1, npgf(i)
-                           basis%cm(nj+ipgf, ns, j) = gcc(ipgf, ii, i)
+                           basis%cm(nj + ipgf, ns, j) = gcc(ipgf, ii, i)
                         END DO
                      END IF
                   END DO
-                  nj = nj+npgf(i)
+                  nj = nj + npgf(i)
                END IF
             END DO
          END DO
@@ -986,7 +986,7 @@ CONTAINS
          ! Normalization as used in the atomic code
          ! We have to undo the Quickstep normalization
          DO j = 0, lmat
-            prefac = 2.0_dp*SQRT(pi/dfac(2*j+1))
+            prefac = 2.0_dp*SQRT(pi/dfac(2*j + 1))
             DO ipgf = 1, basis%nprim(j)
                DO ii = 1, basis%nbas(j)
                   basis%cm(ipgf, ii, j) = prefac*basis%cm(ipgf, ii, j)
@@ -1011,12 +1011,12 @@ CONTAINS
                   rk = basis%grid%rad(k)
                   ear = EXP(-al*basis%grid%rad(k)**2)
                   DO j = 1, basis%nbas(l)
-                     basis%bf(k, j, l) = basis%bf(k, j, l)+rk**l*ear*basis%cm(i, j, l)
+                     basis%bf(k, j, l) = basis%bf(k, j, l) + rk**l*ear*basis%cm(i, j, l)
                      basis%dbf(k, j, l) = basis%dbf(k, j, l) &
-                                          +(REAL(l, dp)*rk**(l-1)-2._dp*al*rk**(l+1))*ear*basis%cm(i, j, l)
-                     basis%ddbf(k, j, l) = basis%ddbf(k, j, l)+ &
-                                           (REAL(l*(l-1), dp)*rk**(l-2)-2._dp*al*REAL(2*l+1, dp)* &
-                                            rk**(l)+4._dp*al*rk**(l+2))*ear*basis%cm(i, j, l)
+                                          + (REAL(l, dp)*rk**(l - 1) - 2._dp*al*rk**(l + 1))*ear*basis%cm(i, j, l)
+                     basis%ddbf(k, j, l) = basis%ddbf(k, j, l) + &
+                                           (REAL(l*(l - 1), dp)*rk**(l - 2) - 2._dp*al*REAL(2*l + 1, dp)* &
+                                            rk**(l) + 4._dp*al*rk**(l + 2))*ear*basis%cm(i, j, l)
                   END DO
                END DO
             END DO
@@ -1036,21 +1036,21 @@ CONTAINS
          ncore = 0
          ncalc = 0
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             nn = ptable(z)%e_conv(l)
             ii = 0
             DO
-               ii = ii+1
+               ii = ii + 1
                IF (nn <= ll) THEN
                   nelem(l, ii) = nn
                   EXIT
                ELSE
                   nelem(l, ii) = ll
-                  nn = nn-ll
+                  nn = nn - ll
                END IF
             END DO
          END DO
-         ncalc = nelem-ncore
+         ncalc = nelem - ncore
 
          IF (qs_kind%ghost .OR. qs_kind%floating) THEN
             nelem = 0
@@ -1070,7 +1070,7 @@ CONTAINS
             k = 0
             DO i = 1, 7
                IF (ncalc(l, i) > 0) THEN
-                  k = k+1
+                  k = k + 1
                   atom%state%occupation(l, k) = REAL(ncalc(l, i), dp)
                END IF
             END DO
@@ -1123,12 +1123,12 @@ CONTAINS
                      CPABORT("")
                   CASE (do_zoramp_atom, do_sczoramp_atom)
                      DO m = 0, ll
-                        rtmat(i+m, j+m) = integrals%tzora(k1, k2, l)
+                        rtmat(i + m, j + m) = integrals%tzora(k1, k2, l)
                      END DO
                   CASE (do_dkh0_atom, do_dkh1_atom, do_dkh2_atom, do_dkh3_atom)
                      DO m = 0, ll
-                        rtmat(i+m, j+m) = integrals%hdkh(k1, k2, l)-integrals%kin(k1, k2, l)+ &
-                                          atom%zcore*integrals%core(k1, k2, l)
+                        rtmat(i + m, j + m) = integrals%hdkh(k1, k2, l) - integrals%kin(k1, k2, l) + &
+                                              atom%zcore*integrals%core(k1, k2, l)
                      END DO
                   END SELECT
                END DO
@@ -1136,7 +1136,7 @@ CONTAINS
          ENDDO
          DO k1 = 1, nsgf
             DO k2 = k1, nsgf
-               rtmat(k1, k2) = 0.5_dp*(rtmat(k1, k2)+rtmat(k2, k1))
+               rtmat(k1, k2) = 0.5_dp*(rtmat(k1, k2) + rtmat(k2, k1))
                rtmat(k2, k1) = rtmat(k1, k2)
             END DO
          END DO
@@ -1172,7 +1172,7 @@ CONTAINS
       TYPE(atom_gthpot_type)                             :: gth_atompot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'gth_potential_conversion', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, l, lm, n, ne, nexp_lpot, nexp_lsd, &
                                                             nexp_nlcc
@@ -1201,7 +1201,7 @@ CONTAINS
       gth_atompot%cl(:) = 0._dp
       IF (ac > 0._dp) THEN
          DO i = 1, ne
-            gth_atompot%cl(i) = ce(i)/(2._dp*ac)**(i-1)
+            gth_atompot%cl(i) = ce(i)/(2._dp*ac)**(i - 1)
          END DO
       END IF
       !extended type
@@ -1228,7 +1228,7 @@ CONTAINS
          DO j = 1, nexp_lpot
             ac = alpha_lpot(j)
             DO i = 1, 4
-               gth_atompot%cval_lpot(i, j) = cval_lpot(i, j)/(2._dp*ac)**(i-1)
+               gth_atompot%cval_lpot(i, j) = cval_lpot(i, j)/(2._dp*ac)**(i - 1)
             END DO
          END DO
       END IF
@@ -1245,7 +1245,7 @@ CONTAINS
          DO j = 1, nexp_lpot
             ac = alpha_lsd(j)
             DO i = 1, 4
-               gth_atompot%cval_lsd(i, j) = cval_lsd(i, j)/(2._dp*ac)**(i-1)
+               gth_atompot%cval_lsd(i, j) = cval_lsd(i, j)/(2._dp*ac)**(i - 1)
             END DO
          END DO
       END IF
@@ -1286,7 +1286,7 @@ CONTAINS
       TYPE(atom_sgppot_type)                             :: sgp_atompot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'sgp_potential_conversion', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: lm, n
       INTEGER, DIMENSION(:), POINTER                     :: ppeconf

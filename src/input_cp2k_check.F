@@ -10,33 +10,33 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE input_cp2k_check
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE cp_units,                        ONLY: cp_unit_set_create,&
-                                              cp_unit_set_release,&
-                                              cp_unit_set_type
-   USE input_constants,                 ONLY: &
-        do_region_global, do_thermo_al, do_thermo_csvr, do_thermo_gle, do_thermo_nose, &
-        do_thermo_same_as_part, negf_run, npt_f_ensemble, npt_i_ensemble, vdw_nl_LMKLL, &
-        xc_funct_b3lyp, xc_funct_beefvdw, xc_funct_blyp, xc_funct_bp, xc_funct_hcth120, &
-        xc_funct_no_shortcut, xc_funct_olyp, xc_funct_pade, xc_funct_pbe, xc_funct_pbe0, &
-        xc_funct_tpss, xc_funct_xwpbe, xc_none, xc_vdw_fun_nonloc
-   USE input_keyword_types,             ONLY: keyword_type
-   USE input_parsing,                   ONLY: section_vals_parse
-   USE input_section_types,             ONLY: &
-        section_type, section_vals_create, section_vals_get, section_vals_get_subs_vals, &
-        section_vals_get_subs_vals3, section_vals_release, section_vals_remove_values, &
-        section_vals_set_subs_vals, section_vals_type, section_vals_val_get, section_vals_val_set, &
-        section_vals_val_unset
-   USE input_val_types,                 ONLY: logical_t
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE xc_input_constants,              ONLY: do_vwn5
+   USE cp_log_handling, ONLY: cp_to_string
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE cp_units, ONLY: cp_unit_set_create, &
+                       cp_unit_set_release, &
+                       cp_unit_set_type
+   USE input_constants, ONLY: &
+      do_region_global, do_thermo_al, do_thermo_csvr, do_thermo_gle, do_thermo_nose, &
+      do_thermo_same_as_part, negf_run, npt_f_ensemble, npt_i_ensemble, vdw_nl_LMKLL, &
+      xc_funct_b3lyp, xc_funct_beefvdw, xc_funct_blyp, xc_funct_bp, xc_funct_hcth120, &
+      xc_funct_no_shortcut, xc_funct_olyp, xc_funct_pade, xc_funct_pbe, xc_funct_pbe0, &
+      xc_funct_tpss, xc_funct_xwpbe, xc_none, xc_vdw_fun_nonloc
+   USE input_keyword_types, ONLY: keyword_type
+   USE input_parsing, ONLY: section_vals_parse
+   USE input_section_types, ONLY: &
+      section_type, section_vals_create, section_vals_get, section_vals_get_subs_vals, &
+      section_vals_get_subs_vals3, section_vals_release, section_vals_remove_values, &
+      section_vals_set_subs_vals, section_vals_type, section_vals_val_get, section_vals_val_set, &
+      section_vals_val_unset
+   USE input_val_types, ONLY: logical_t
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE xc_input_constants, ONLY: do_vwn5
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -66,7 +66,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'check_cp2k_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iforce_eval, nforce_eval, &
                                                             run_type
@@ -142,7 +142,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: functionals, xc_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_functionals_expand', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: shortcut
 
@@ -285,7 +285,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'handle_ext_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(default_path_length)                     :: binary_restart_file, r_file_path
       CHARACTER(default_string_length)                   :: path
@@ -623,7 +623,7 @@ CONTAINS
          CALL section_vals_val_get(r_section, "RESTART_TEMPERATURE_ANNEALING", l_val=flag)
          IF (flag .AND. check_restart(input_file, restart_file, "MOTION%MD")) THEN
             CALL section_vals_val_get(input_file, "MOTION%MD%TEMPERATURE_ANNEALING", r_val=myt, explicit=explicit1)
-            IF ((.NOT. explicit1) .OR. (ABS(1._dp-myt) <= 1.E-10_dp)) THEN
+            IF ((.NOT. explicit1) .OR. (ABS(1._dp - myt) <= 1.E-10_dp)) THEN
                CALL cp_warn(__LOCATION__, &
                             "I'm about to override the input temperature "// &
                             "with the temperature found in external restart "// &
@@ -797,13 +797,13 @@ CONTAINS
          DIMENSION(:), POINTER                           :: restarted_infos
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_restart_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: isize
 
       isize = 0
       IF (ASSOCIATED(restarted_infos)) isize = SIZE(restarted_infos)
-      isize = isize+1
+      isize = isize + 1
       CALL reallocate(restarted_infos, 1, isize)
       restarted_infos(isize) = TRIM(label)
 
@@ -825,7 +825,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_restart_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 
@@ -836,23 +836,23 @@ CONTAINS
          WRITE (output_unit, '(1X,"*",T80,"*")')
          i = 1
          WRITE (output_unit, '(1X,"*",A,T26,A,T80,"*")') "    RESTART FILE NAME:  ", &
-            r_file_path(53*(i-1)+1:53*i)
+            r_file_path(53*(i - 1) + 1:53*i)
          DO i = 2, CEILING(REAL(LEN_TRIM(r_file_path), KIND=dp)/53.0_dp)
-            WRITE (output_unit, '(T1,1X,"*",T26,A,T80,"*")') r_file_path(53*(i-1)+1:53*i)
+            WRITE (output_unit, '(T1,1X,"*",T26,A,T80,"*")') r_file_path(53*(i - 1) + 1:53*i)
          END DO
          IF (LEN_TRIM(binary_restart_file) > 0) THEN
             i = 1
             WRITE (output_unit, '(1X,"*",A,T26,A,T80,"*")') "  BINARY RESTART FILE:  ", &
-               binary_restart_file(53*(i-1)+1:53*i)
+               binary_restart_file(53*(i - 1) + 1:53*i)
             DO i = 2, CEILING(REAL(LEN_TRIM(binary_restart_file), KIND=dp)/53.0_dp)
-               WRITE (output_unit, '(T1,1X,"*",T26,A,T80,"*")') binary_restart_file(53*(i-1)+1:53*i)
+               WRITE (output_unit, '(T1,1X,"*",T26,A,T80,"*")') binary_restart_file(53*(i - 1) + 1:53*i)
             END DO
          END IF
          WRITE (output_unit, '(1X,"*",T80,"*")')
          WRITE (output_unit, '(1X,"*", A,T80,"*")') " RESTARTED QUANTITIES:  "
          DO j = 1, SIZE(restarted_infos)
             DO i = 1, CEILING(REAL(LEN_TRIM(restarted_infos(j)), KIND=dp)/53.0_dp)
-               WRITE (output_unit, '(T1,1X,"*",T26,A,T80,"*")') restarted_infos(j) (53*(i-1)+1:53*i)
+               WRITE (output_unit, '(T1,1X,"*",T26,A,T80,"*")') restarted_infos(j) (53*(i - 1) + 1:53*i)
             END DO
          END DO
          WRITE (output_unit, '(1X,79("*"),/)')
@@ -878,7 +878,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: check
 
       CHARACTER(len=*), PARAMETER :: routineN = 'restart_thermostat', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: input_region, input_type, &
                                                             restart_region, restart_type
@@ -996,7 +996,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input_file
 
       CHARACTER(len=*), PARAMETER :: routineN = 'remove_restart_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iforce_eval, nforce_eval1
       LOGICAL                                            :: explicit1
@@ -1100,7 +1100,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: r_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'handle_defaults_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ik, nval
       LOGICAL                                            :: restart_default

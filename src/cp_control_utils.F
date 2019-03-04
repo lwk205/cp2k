@@ -7,58 +7,58 @@
 !> \brief Utilities to set up the control types
 ! **************************************************************************************************
 MODULE cp_control_utils
-   USE bibliography,                    ONLY: &
-        Andreussi2012, Dewar1977, Dewar1985, Elstner1998, Fattebert2002, Hu2007, Krack2000, &
-        Lippert1997, Lippert1999, Porezag1995, Repasky2002, Rocha2006, Schenter2008, Seifert1996, &
-        Souza2002, Stengel2009, Stewart1989, Stewart2007, Thiel1992, Umari2002, VanVoorhis2015, &
-        VandeVondele2005a, VandeVondele2005b, Zhechkov2005, cite_reference
-   USE cp_control_types,                ONLY: &
-        admm_control_create, admm_control_type, ddapc_control_create, ddapc_restraint_type, &
-        dft_control_create, dft_control_type, efield_type, qs_control_type, sccs_control_create, &
-        tddfpt2_control_type, tddfpt_control_create, tddfpt_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_units,                        ONLY: cp_unit_from_cp2k,&
-                                              cp_unit_to_cp2k
-   USE input_constants,                 ONLY: &
-        constant_env, custom_env, do_admm_basis_projection, do_admm_blocked_projection, &
-        do_admm_blocking_purify_full, do_admm_charge_constrained_projection, &
-        do_admm_exch_scaling_merlot, do_admm_purify_mcweeny, do_admm_purify_mo_diag, &
-        do_admm_purify_mo_no_diag, do_admm_purify_none, do_admm_purify_none_dm, &
-        do_ddapc_constraint, do_ddapc_restraint, do_method_am1, do_method_dftb, do_method_gapw, &
-        do_method_gapw_xc, do_method_gpw, do_method_lrigpw, do_method_mndo, do_method_mndod, &
-        do_method_ofgpw, do_method_pdg, do_method_pm3, do_method_pm6, do_method_pm6fm, &
-        do_method_pnnl, do_method_rigpw, do_method_rm1, do_pwgrid_ns_fullspace, &
-        do_pwgrid_ns_halfspace, do_pwgrid_spherical, do_s2_constraint, do_s2_restraint, &
-        do_se_is_kdso, do_se_is_kdso_d, do_se_is_slater, do_se_lr_ewald, do_se_lr_ewald_gks, &
-        do_se_lr_ewald_r3, do_se_lr_none, gaussian_env, numerical, ramp_env, &
-        real_time_propagation, sccs_andreussi, sccs_derivative_cd3, sccs_derivative_cd5, &
-        sccs_derivative_cd7, sccs_derivative_fft, sccs_fattebert_gygi, sic_ad, sic_eo, &
-        sic_list_all, sic_list_unpaired, sic_mauri_spz, sic_mauri_us, sic_none, slater, &
-        tddfpt_excitations, use_mom_ref_user, xas_dip_len
-   USE input_cp2k_dft,                  ONLY: create_dft_section,&
-                                              create_qs_section
-   USE input_enumeration_types,         ONLY: enum_i2c,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_get,&
-                                              keyword_type
-   USE input_section_types,             ONLY: &
-        section_get_ival, section_get_keyword, section_release, section_type, section_vals_get, &
-        section_vals_get_subs_vals, section_vals_type, section_vals_val_get, section_vals_val_set
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE qs_cdft_utils,                   ONLY: read_cdft_control_section
-   USE string_utilities,                ONLY: uppercase
-   USE util,                            ONLY: sort
-   USE xc_derivatives,                  ONLY: xc_functionals_get_needs
-   USE xc_input_constants,              ONLY: xc_deriv_collocate
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_type
-   USE xc_write_output,                 ONLY: xc_write
+   USE bibliography, ONLY: &
+      Andreussi2012, Dewar1977, Dewar1985, Elstner1998, Fattebert2002, Hu2007, Krack2000, &
+      Lippert1997, Lippert1999, Porezag1995, Repasky2002, Rocha2006, Schenter2008, Seifert1996, &
+      Souza2002, Stengel2009, Stewart1989, Stewart2007, Thiel1992, Umari2002, VanVoorhis2015, &
+      VandeVondele2005a, VandeVondele2005b, Zhechkov2005, cite_reference
+   USE cp_control_types, ONLY: &
+      admm_control_create, admm_control_type, ddapc_control_create, ddapc_restraint_type, &
+      dft_control_create, dft_control_type, efield_type, qs_control_type, sccs_control_create, &
+      tddfpt2_control_type, tddfpt_control_create, tddfpt_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_units, ONLY: cp_unit_from_cp2k, &
+                       cp_unit_to_cp2k
+   USE input_constants, ONLY: &
+      constant_env, custom_env, do_admm_basis_projection, do_admm_blocked_projection, &
+      do_admm_blocking_purify_full, do_admm_charge_constrained_projection, &
+      do_admm_exch_scaling_merlot, do_admm_purify_mcweeny, do_admm_purify_mo_diag, &
+      do_admm_purify_mo_no_diag, do_admm_purify_none, do_admm_purify_none_dm, &
+      do_ddapc_constraint, do_ddapc_restraint, do_method_am1, do_method_dftb, do_method_gapw, &
+      do_method_gapw_xc, do_method_gpw, do_method_lrigpw, do_method_mndo, do_method_mndod, &
+      do_method_ofgpw, do_method_pdg, do_method_pm3, do_method_pm6, do_method_pm6fm, &
+      do_method_pnnl, do_method_rigpw, do_method_rm1, do_pwgrid_ns_fullspace, &
+      do_pwgrid_ns_halfspace, do_pwgrid_spherical, do_s2_constraint, do_s2_restraint, &
+      do_se_is_kdso, do_se_is_kdso_d, do_se_is_slater, do_se_lr_ewald, do_se_lr_ewald_gks, &
+      do_se_lr_ewald_r3, do_se_lr_none, gaussian_env, numerical, ramp_env, &
+      real_time_propagation, sccs_andreussi, sccs_derivative_cd3, sccs_derivative_cd5, &
+      sccs_derivative_cd7, sccs_derivative_fft, sccs_fattebert_gygi, sic_ad, sic_eo, &
+      sic_list_all, sic_list_unpaired, sic_mauri_spz, sic_mauri_us, sic_none, slater, &
+      tddfpt_excitations, use_mom_ref_user, xas_dip_len
+   USE input_cp2k_dft, ONLY: create_dft_section, &
+                             create_qs_section
+   USE input_enumeration_types, ONLY: enum_i2c, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_get, &
+                                  keyword_type
+   USE input_section_types, ONLY: &
+      section_get_ival, section_get_keyword, section_release, section_type, section_vals_get, &
+      section_vals_get_subs_vals, section_vals_type, section_vals_val_get, section_vals_val_set
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE qs_cdft_utils, ONLY: read_cdft_control_section
+   USE string_utilities, ONLY: uppercase
+   USE util, ONLY: sort
+   USE xc_derivatives, ONLY: xc_functionals_get_needs
+   USE xc_input_constants, ONLY: xc_deriv_collocate
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_type
+   USE xc_write_output, ONLY: xc_write
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -87,7 +87,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_dft_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: basis_set_file_name, potential_file_name
       CHARACTER(LEN=default_string_length), &
@@ -180,7 +180,7 @@ CONTAINS
          CALL section_vals_val_get(dft_section, "AUTO_BASIS", i_rep_val=irep, c_vals=tmpstringlist)
          IF (SIZE(tmpstringlist) == 2) THEN
             CALL uppercase(tmpstringlist(2))
-            SELECT CASE (tmpstringlist (2))
+            SELECT CASE (tmpstringlist(2))
             CASE ("X")
                isize = -1
             CASE ("SMALL")
@@ -195,7 +195,7 @@ CONTAINS
                CPWARN("Unknown basis size in AUTO_BASIS keyword:"//TRIM(tmpstringlist(1)))
             END SELECT
             !
-            SELECT CASE (tmpstringlist (1))
+            SELECT CASE (tmpstringlist(1))
             CASE ("X")
             CASE ("RI_AUX")
                dft_control%auto_basis_ri_aux = isize
@@ -489,7 +489,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_mgrid_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, igrid_level, ngrid_level
       LOGICAL                                            :: explicit, multigrid_set
@@ -553,14 +553,14 @@ CONTAINS
          IF (qs_control%commensurate_mgrids) qs_control%progression_factor = 4.0_dp
          qs_control%e_cutoff(1) = qs_control%cutoff
          DO igrid_level = 2, ngrid_level
-            qs_control%e_cutoff(igrid_level) = qs_control%e_cutoff(igrid_level-1) &
+            qs_control%e_cutoff(igrid_level) = qs_control%e_cutoff(igrid_level - 1) &
                                                /qs_control%progression_factor
          END DO
       END IF
       ! check that multigrids are ordered
       DO igrid_level = 2, ngrid_level
          IF (qs_control%e_cutoff(igrid_level) > &
-             qs_control%e_cutoff(igrid_level-1)) THEN
+             qs_control%e_cutoff(igrid_level - 1)) THEN
             CPABORT("Multi-grids not ordered")
          END IF
       END DO
@@ -578,7 +578,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: qs_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_qs_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length), &
          DIMENSION(:), POINTER                           :: clist
@@ -592,8 +592,8 @@ CONTAINS
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: section
       TYPE(section_vals_type), POINTER :: cdft_control_section, ddapc_restraint_section, &
-         dftb_parameter, dftb_section, lri_optbas_section, mull_section, s2_restraint_section, &
-         se_section
+                                          dftb_parameter, dftb_section, lri_optbas_section, mull_section, s2_restraint_section, &
+                                          se_section
 
       CALL timeset(routineN, handle)
 
@@ -813,7 +813,7 @@ CONTAINS
          jj = 0
          DO k = 1, n_rep
             CALL section_vals_val_get(mull_section, "ATOMS", i_rep_val=k, i_vals=tmplist)
-            jj = jj+SIZE(tmplist)
+            jj = jj + SIZE(tmplist)
          END DO
          qs_control%mulliken_restraint_control%natoms = jj
          IF (qs_control%mulliken_restraint_control%natoms < 1) &
@@ -823,7 +823,7 @@ CONTAINS
          DO k = 1, n_rep
             CALL section_vals_val_get(mull_section, "ATOMS", i_rep_val=k, i_vals=tmplist)
             DO j = 1, SIZE(tmplist)
-               jj = jj+1
+               jj = jj + 1
                qs_control%mulliken_restraint_control%atoms(jj) = tmplist(j)
             END DO
          END DO
@@ -1049,7 +1049,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_tddfpt_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: kenergy_den
       TYPE(section_vals_type), POINTER                   :: sic_section, t_section
@@ -1092,7 +1092,7 @@ CONTAINS
       TYPE(qs_control_type), POINTER                     :: qs_control
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_tddfpt2_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: inds
@@ -1207,7 +1207,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_dft_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=20)                                  :: tmpStr
       INTEGER                                            :: handle, output_unit
@@ -1404,7 +1404,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_qs_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, igrid_level, ngrid_level, &
                                                             output_unit
@@ -1606,7 +1606,7 @@ CONTAINS
       TYPE(section_vals_type), OPTIONAL, POINTER         :: qs_section, ddapc_restraint_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_ddapc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, jj, k, n_rep
       INTEGER, DIMENSION(:), POINTER                     :: tmplist
@@ -1652,7 +1652,7 @@ CONTAINS
             CALL section_vals_val_get(ddapc_section, "ATOMS", i_rep_section=i, &
                                       i_rep_val=k, i_vals=tmplist)
             DO j = 1, SIZE(tmplist)
-               jj = jj+1
+               jj = jj + 1
             END DO
          END DO
          IF (jj < 1) CPABORT("Need at least 1 atom to use ddapc contraints")
@@ -1665,7 +1665,7 @@ CONTAINS
             CALL section_vals_val_get(ddapc_section, "ATOMS", i_rep_section=i, &
                                       i_rep_val=k, i_vals=tmplist)
             DO j = 1, SIZE(tmplist)
-               jj = jj+1
+               jj = jj + 1
                ddapc_restraint_control%atoms(jj) = tmplist(j)
             END DO
          END DO
@@ -1682,7 +1682,7 @@ CONTAINS
             CALL section_vals_val_get(ddapc_section, "COEFF", i_rep_section=i, &
                                       i_rep_val=k, r_vals=rtmplist)
             DO j = 1, SIZE(rtmplist)
-               jj = jj+1
+               jj = jj + 1
                IF (jj > ddapc_restraint_control%natoms) &
                   CPABORT("Need the same number of coeff as there are atoms ")
                ddapc_restraint_control%coeff(jj) = rtmplist(j)
@@ -1694,7 +1694,7 @@ CONTAINS
       k = 0
       DO i = 1, SIZE(qs_control%ddapc_restraint_control)
          IF (qs_control%ddapc_restraint_control(i)%ddapc_restraint_control%functional_form == &
-             do_ddapc_constraint) k = k+1
+             do_ddapc_constraint) k = k + 1
       END DO
       IF (k == 2) CALL cp_abort(__LOCATION__, &
                                 "Only a single constraint possible yet, try to use restraints instead ")
@@ -1711,7 +1711,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: efield_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_efield_sections', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: file_name
       INTEGER                                            :: i, io, j, n, unit_nr
@@ -1772,14 +1772,14 @@ CONTAINS
             DO WHILE (.TRUE.)
                READ (unit_nr, *, iostat=io)
                IF (io /= 0) EXIT
-               n = n+1
+               n = n + 1
             END DO
             REWIND (unit_nr)
-            ALLOCATE (efield%envelop_r_vars(n+1))
+            ALLOCATE (efield%envelop_r_vars(n + 1))
             !Store the timestep of the list in the first entry of the r_vars
             CALL section_vals_val_get(tmp_section, "TIMESTEP", r_val=efield%envelop_r_vars(1))
             !Read the file
-            DO j = 2, n+1
+            DO j = 2, n + 1
                READ (unit_nr, *) efield%envelop_r_vars(j)
                efield%envelop_r_vars(j) = cp_unit_to_cp2k(efield%envelop_r_vars(j), "volt/m")
             END DO
@@ -1800,7 +1800,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: rtp_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_rtp_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER, DIMENSION(:), POINTER                     :: tmp
 
@@ -1853,7 +1853,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_admm_block_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: irep, list_size, n_rep
       INTEGER, DIMENSION(:), POINTER                     :: tmplist

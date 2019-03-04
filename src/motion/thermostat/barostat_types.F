@@ -8,24 +8,24 @@
 !> \author teo [tlaino] - University of Zurich - 09.2007
 ! **************************************************************************************************
 MODULE barostat_types
-   USE cell_types,                      ONLY: cell_type
-   USE extended_system_init,            ONLY: initialize_npt
-   USE extended_system_types,           ONLY: npt_info_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: npe_f_ensemble,&
-                                              npe_i_ensemble,&
-                                              nph_uniaxial_damped_ensemble,&
-                                              nph_uniaxial_ensemble,&
-                                              npt_f_ensemble,&
-                                              npt_i_ensemble
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE simpar_types,                    ONLY: simpar_type
+   USE cell_types, ONLY: cell_type
+   USE extended_system_init, ONLY: initialize_npt
+   USE extended_system_types, ONLY: npt_info_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: npe_f_ensemble, &
+                              npe_i_ensemble, &
+                              nph_uniaxial_damped_ensemble, &
+                              nph_uniaxial_ensemble, &
+                              npt_f_ensemble, &
+                              npt_i_ensemble
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE simpar_types, ONLY: simpar_type
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -82,7 +82,7 @@ CONTAINS
       TYPE(global_environment_type), POINTER             :: globenv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_barostat_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check, explicit
       TYPE(cell_type), POINTER                           :: cell
@@ -99,7 +99,7 @@ CONTAINS
           simpar%ensemble == nph_uniaxial_ensemble .OR. &
           simpar%ensemble == nph_uniaxial_damped_ensemble) THEN
          ALLOCATE (barostat)
-         last_barostat_id_nr = last_barostat_id_nr+1
+         last_barostat_id_nr = last_barostat_id_nr + 1
          barostat%id_nr = last_barostat_id_nr
          barostat%ref_count = 1
          barostat%section => barostat_section
@@ -144,11 +144,11 @@ CONTAINS
       TYPE(barostat_type), POINTER                       :: barostat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'retain_barostat_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(barostat)) THEN
          CPASSERT(barostat%ref_count > 0)
-         barostat%ref_count = barostat%ref_count+1
+         barostat%ref_count = barostat%ref_count + 1
       END IF
    END SUBROUTINE retain_barostat_type
 
@@ -163,14 +163,14 @@ CONTAINS
       TYPE(barostat_type), POINTER                       :: barostat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_barostat_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check
 
       IF (ASSOCIATED(barostat)) THEN
          check = barostat%ref_count > 0
          CPASSERT(check)
-         barostat%ref_count = barostat%ref_count-1
+         barostat%ref_count = barostat%ref_count - 1
          IF (barostat%ref_count < 1) THEN
             IF (ASSOCIATED(barostat%npt)) THEN
                DEALLOCATE (barostat%npt)

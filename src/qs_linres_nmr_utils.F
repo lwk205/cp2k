@@ -19,37 +19,37 @@
 ! **************************************************************************************************
 MODULE qs_linres_nmr_utils
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_parser_methods,               ONLY: parser_get_next_line,&
-                                              parser_get_object
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE cp_units,                        ONLY: cp_unit_from_cp2k,&
-                                              cp_unit_to_cp2k
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_linres_types,                 ONLY: linres_control_type,&
-                                              nmr_env_create,&
-                                              nmr_env_type
-   USE qs_matrix_pools,                 ONLY: qs_matrix_pools_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_parser_methods, ONLY: parser_get_next_line, &
+                                parser_get_object
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE cp_units, ONLY: cp_unit_from_cp2k, &
+                       cp_unit_to_cp2k
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_linres_types, ONLY: linres_control_type, &
+                              nmr_env_create, &
+                              nmr_env_type
+   USE qs_matrix_pools, ONLY: qs_matrix_pools_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -216,12 +216,12 @@ CONTAINS
          CALL section_vals_val_get(nmr_section,&
               &                    "PRINT%SHIELDING_TENSOR%ATOMS_LU_BOUNDS", &
                                    i_vals=bounds)
-         nat_print = bounds(2)-bounds(1)+1
+         nat_print = bounds(2) - bounds(1) + 1
          IF (nat_print > 0) THEN
             ALLOCATE (nmr_env%cs_atom_list(nat_print))
             DO ir = 1, nat_print
-               nmr_env%cs_atom_list(ir) = bounds(1)+(ir-1)
-               nmr_env%do_calc_cs_atom(bounds(1)+(ir-1)) = 1
+               nmr_env%cs_atom_list(ir) = bounds(1) + (ir - 1)
+               nmr_env%do_calc_cs_atom(bounds(1) + (ir - 1)) = 1
             ENDDO
          ENDIF
 
@@ -234,12 +234,12 @@ CONTAINS
                CALL section_vals_val_get(nmr_section, "PRINT%SHIELDING_TENSOR%ATOMS_LIST", &
                                          i_rep_val=ir, i_vals=list)
                IF (ASSOCIATED(list)) THEN
-                  CALL reallocate(nmr_env%cs_atom_list, 1, nat_print+SIZE(list))
+                  CALL reallocate(nmr_env%cs_atom_list, 1, nat_print + SIZE(list))
                   DO ini = 1, SIZE(list)
-                     nmr_env%cs_atom_list(ini+nat_print) = list(ini)
+                     nmr_env%cs_atom_list(ini + nat_print) = list(ini)
                      nmr_env%do_calc_cs_atom(list(ini)) = 1
                   ENDDO
-                  nat_print = nat_print+SIZE(list)
+                  nat_print = nat_print + SIZE(list)
                ENDIF
             ENDDO ! ir
          ENDIF
@@ -310,9 +310,9 @@ CONTAINS
       TYPE(nmr_env_type)                                 :: nmr_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'nmr_env_cleanup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
-      nmr_env%ref_count = nmr_env%ref_count-1
+      nmr_env%ref_count = nmr_env%ref_count - 1
       IF (nmr_env%ref_count == 0) THEN
          IF (ASSOCIATED(nmr_env%cs_atom_list)) THEN
             DEALLOCATE (nmr_env%cs_atom_list)

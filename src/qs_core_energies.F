@@ -10,35 +10,35 @@
 !> \author Matthias Krack (27.04.2001)
 ! **************************************************************************************************
 MODULE qs_core_energies
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE atprop_types,                    ONLY: atprop_array_init,&
-                                              atprop_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type,&
-                                              dbcsr_trace,&
-                                              dbcsr_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: oorootpi,&
-                                              twopi
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE atprop_types, ONLY: atprop_array_init, &
+                           atprop_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type, &
+                        dbcsr_trace, &
+                        dbcsr_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: oorootpi, &
+                            twopi
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -81,7 +81,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nspin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_ptrace_gamma', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       REAL(KIND=dp)                                      :: etr
@@ -92,7 +92,7 @@ CONTAINS
       DO ispin = 1, nspin
          etr = 0.0_dp
          CALL dbcsr_trace(hmat(1)%matrix, pmat(ispin)%matrix, etr)
-         ecore = ecore+etr
+         ecore = ecore + etr
       END DO
 
       CALL timestop(handle)
@@ -118,7 +118,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nspin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_ptrace_kp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, ispin, nc
       REAL(KIND=dp)                                      :: etr
@@ -132,7 +132,7 @@ CONTAINS
          DO ic = 1, nc
             etr = 0.0_dp
             CALL dbcsr_trace(hmat(1, ic)%matrix, pmat(ispin, ic)%matrix, etr)
-            ecore = ecore+etr
+            ecore = ecore + etr
          END DO
       END DO
 
@@ -163,7 +163,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT)                         :: ecore
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_ptrace_1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -201,7 +201,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT), OPTIONAL               :: E_overlap_core
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_ecore_overlap', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, atom_b, group, handle, iatom, &
                                                             ikind, jatom, jkind, natom, nkind
@@ -284,10 +284,10 @@ CONTAINS
       DO WHILE (neighbor_list_iterate(nl_iterator) == 0)
          CALL get_iterator_info(nl_iterator, ikind=ikind, jkind=jkind, iatom=iatom, jatom=jatom, r=rab)
          zab = zeff(ikind)*zeff(jkind)
-         aab = alpha(ikind)*alpha(jkind)/(alpha(ikind)+alpha(jkind))
+         aab = alpha(ikind)*alpha(jkind)/(alpha(ikind) + alpha(jkind))
          rootaab = SQRT(aab)
          fab = 2.0_dp*oorootpi*zab*rootaab
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
          IF (rab2 > 1.e-8_dp) THEN
             IF (ikind == jkind .AND. iatom == jatom) THEN
                f = 0.5_dp
@@ -296,17 +296,17 @@ CONTAINS
             END IF
             dab = SQRT(rab2)
             eab = zab*erfc(rootaab*dab)/dab
-            ecore_overlap = ecore_overlap+f*eab
+            ecore_overlap = ecore_overlap + f*eab
             IF (atenergy) THEN
-               atprop%atecc(iatom) = atprop%atecc(iatom)+0.5_dp*f*eab
-               atprop%atecc(jatom) = atprop%atecc(jatom)+0.5_dp*f*eab
+               atprop%atecc(iatom) = atprop%atecc(iatom) + 0.5_dp*f*eab
+               atprop%atecc(jatom) = atprop%atecc(jatom) + 0.5_dp*f*eab
             END IF
             IF (calculate_forces) THEN
-               deab(:) = rab(:)*f*(eab+fab*EXP(-aab*rab2))/rab2
+               deab(:) = rab(:)*f*(eab + fab*EXP(-aab*rab2))/rab2
                atom_a = atom_of_kind(iatom)
                atom_b = atom_of_kind(jatom)
-               force(ikind)%core_overlap(:, atom_a) = force(ikind)%core_overlap(:, atom_a)+deab(:)
-               force(jkind)%core_overlap(:, atom_b) = force(jkind)%core_overlap(:, atom_b)-deab(:)
+               force(ikind)%core_overlap(:, atom_a) = force(ikind)%core_overlap(:, atom_a) + deab(:)
+               force(jkind)%core_overlap(:, atom_b) = force(jkind)%core_overlap(:, atom_b) - deab(:)
                IF (use_virial) THEN
                   CALL virial_pair_force(virial%pv_virial, 1._dp, deab, rab)
                END IF
@@ -345,7 +345,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT), OPTIONAL               :: E_self_core
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_ecore_self', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iatom, ikind, iparticle_local, &
                                                             natom, nparticle_local
@@ -370,7 +370,7 @@ CONTAINS
       DO ikind = 1, SIZE(atomic_kind_set)
          CALL get_atomic_kind(atomic_kind_set(ikind), natom=natom)
          CALL get_qs_kind(qs_kind_set(ikind), zeff=zeff, alpha_core_charge=alpha_core_charge)
-         ecore_self = ecore_self-REAL(natom, dp)*zeff**2*SQRT(alpha_core_charge)
+         ecore_self = ecore_self - REAL(natom, dp)*zeff**2*SQRT(alpha_core_charge)
       END DO
 
       energy%core_self = ecore_self/SQRT(twopi)
@@ -392,7 +392,7 @@ CONTAINS
                es = zeff**2*SQRT(alpha_core_charge)/SQRT(twopi)
                DO iparticle_local = 1, nparticle_local
                   iatom = local_particles%list(ikind)%array(iparticle_local)
-                  atprop%ateself(iatom) = atprop%ateself(iatom)-es
+                  atprop%ateself(iatom) = atprop%ateself(iatom) - es
                END DO
             END DO
          END IF

@@ -7,10 +7,10 @@
 !> \brief Storage to keep precomputed surface Green's functions
 ! **************************************************************************************************
 MODULE negf_green_cache
-   USE cp_cfm_types,                    ONLY: cp_cfm_p_type,&
-                                              cp_cfm_release
-   USE kinds,                           ONLY: dp
-   USE util,                            ONLY: sort
+   USE cp_cfm_types, ONLY: cp_cfm_p_type, &
+                           cp_cfm_release
+   USE kinds, ONLY: dp
+   USE util, ONLY: sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,7 +65,7 @@ CONTAINS
          nentries_exist = 0
       END IF
 
-      ALLOCATE (g_surf_contacts(ncontacts, nentries_exist+nnodes_extra))
+      ALLOCATE (g_surf_contacts(ncontacts, nentries_exist + nnodes_extra))
 
       IF (is_alloc) THEN
          DO i = 1, nentries_exist
@@ -79,7 +79,7 @@ CONTAINS
 
       DO i = 1, nnodes_extra
          DO icontact = 1, ncontacts
-            NULLIFY (g_surf_contacts(icontact, nentries_exist+i)%matrix)
+            NULLIFY (g_surf_contacts(icontact, nentries_exist + i)%matrix)
          END DO
       END DO
 

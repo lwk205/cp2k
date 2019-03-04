@@ -11,33 +11,33 @@
 !> \author Fawzi Mohamed
 ! *****************************************************************************
 MODULE qs_update_s_mstruct
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_ddapc_types,                  ONLY: cp_ddapc_release
-   USE cp_ddapc_util,                   ONLY: cp_ddapc_init
-   USE input_constants,                 ONLY: do_ppl_analytic,&
-                                              do_ppl_grid,&
-                                              kg_tnadd_embed,&
-                                              kg_tnadd_embed_ri
-   USE pw_methods,                      ONLY: pw_transfer
-   USE pw_types,                        ONLY: pw_p_type,&
-                                              pw_release
-   USE qs_collocate_density,            ONLY: calculate_ppl_grid,&
-                                              calculate_rho_core,&
-                                              calculate_rho_nlcc
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_did_change,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho_methods,                  ONLY: qs_rho_rebuild
-   USE qs_rho_types,                    ONLY: qs_rho_type
-   USE qs_scf_types,                    ONLY: scf_env_did_change
-   USE task_list_methods,               ONLY: generate_qs_task_list
-   USE task_list_types,                 ONLY: allocate_task_list,&
-                                              deallocate_task_list,&
-                                              task_list_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_ddapc_types, ONLY: cp_ddapc_release
+   USE cp_ddapc_util, ONLY: cp_ddapc_init
+   USE input_constants, ONLY: do_ppl_analytic, &
+                              do_ppl_grid, &
+                              kg_tnadd_embed, &
+                              kg_tnadd_embed_ri
+   USE pw_methods, ONLY: pw_transfer
+   USE pw_types, ONLY: pw_p_type, &
+                       pw_release
+   USE qs_collocate_density, ONLY: calculate_ppl_grid, &
+                                   calculate_rho_core, &
+                                   calculate_rho_nlcc
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_did_change, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho_methods, ONLY: qs_rho_rebuild
+   USE qs_rho_types, ONLY: qs_rho_type
+   USE qs_scf_types, ONLY: scf_env_did_change
+   USE task_list_methods, ONLY: generate_qs_task_list
+   USE task_list_types, ONLY: allocate_task_list, &
+                              deallocate_task_list, &
+                              task_list_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -64,7 +64,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_env_update_s_mstruct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: do_ppl
@@ -155,7 +155,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_create_task_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, isub
       LOGICAL                                            :: skip_load_balance_distributed, soft_valid
@@ -262,7 +262,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: rebuild_ao, rebuild_grids
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_env_rebuild_rho', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: do_admm, gapw_xc

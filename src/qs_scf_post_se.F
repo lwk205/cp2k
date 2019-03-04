@@ -12,53 +12,53 @@
 ! **************************************************************************************************
 MODULE qs_scf_post_se
 !
-   USE ai_moments,                      ONLY: moment
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_get_block_p,&
-                                              dbcsr_p_type
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: twopi
-   USE message_passing,                 ONLY: mp_sum
-   USE moments_utils,                   ONLY: get_reference_point
-   USE orbital_pointers,                ONLY: coset,&
-                                              ncoset
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: debye
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_methods,                   ONLY: qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_did_change
-   USE qs_mo_io,                        ONLY: write_mo_set
-   USE qs_mo_types,                     ONLY: mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE semi_empirical_types,            ONLY: get_se_param,&
-                                              semi_empirical_type
+   USE ai_moments, ONLY: moment
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_get_block_p, &
+                        dbcsr_p_type
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: twopi
+   USE message_passing, ONLY: mp_sum
+   USE moments_utils, ONLY: get_reference_point
+   USE orbital_pointers, ONLY: coset, &
+                               ncoset
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: debye
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_methods, ONLY: qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: qs_ks_did_change
+   USE qs_mo_io, ONLY: write_mo_set
+   USE qs_mo_types, ONLY: mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE semi_empirical_types, ONLY: get_se_param, &
+                                   semi_empirical_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -89,7 +89,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_post_calculation_se', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, output_unit
       LOGICAL                                            :: explicit, my_localized_wfn
@@ -208,7 +208,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_moments', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: description, dipole_type
       COMPLEX(KIND=dp)                                   :: dzeta, zeta
@@ -218,7 +218,7 @@ CONTAINS
                                                             unit_nr
       LOGICAL                                            :: do_berry, found
       REAL(KIND=dp) :: charge_tot, ci(3), dci(3), dipole(3), dipole_deriv(3), drcc(3), dria(3), &
-         dtheta, gvec(3), q, rcc(3), ria(3), tcharge(2), theta, tmp(3), via(3), zeff
+                       dtheta, gvec(3), q, rcc(3), ria(3), tcharge(2), theta, tmp(3), via(3), zeff
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: ncharge
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: mom
       REAL(KIND=dp), DIMENSION(:), POINTER               :: ref_point
@@ -277,11 +277,11 @@ CONTAINS
                                          block=pblock, found=found)
                   IF (found) THEN
                      DO j = 1, natorb
-                        tcharge(i) = tcharge(i)+pblock(j, j)
+                        tcharge(i) = tcharge(i) + pblock(j, j)
                      END DO
                   END IF
                END DO
-               ncharge(iat) = zeff-SUM(tcharge)
+               ncharge(iat) = zeff - SUM(tcharge)
             END DO
          END DO
          ! Contributions from net atomic charges
@@ -297,7 +297,7 @@ CONTAINS
             zphase = CMPLX(COS(ria), SIN(ria), dp)**charge_tot
 
             dria = twopi*MATMUL(cell%h_inv, drcc)
-            dzphase = charge_tot*CMPLX(-SIN(ria), COS(ria), dp)**(charge_tot-1.0_dp)*dria
+            dzphase = charge_tot*CMPLX(-SIN(ria), COS(ria), dp)**(charge_tot - 1.0_dp)*dria
 
             ggamma = CMPLX(1.0_dp, 0.0_dp, KIND=dp)
             dggamma = CMPLX(0.0_dp, 0.0_dp, KIND=dp)
@@ -314,19 +314,19 @@ CONTAINS
                      theta = SUM(ria(:)*gvec(:))
                      dtheta = SUM(via(:)*gvec(:))
                      zeta = CMPLX(COS(theta), SIN(theta), KIND=dp)**(-q)
-                     dzeta = -q*CMPLX(-SIN(theta), COS(theta), KIND=dp)**(-q-1.0_dp)*dtheta
-                     dggamma(j) = dggamma(j)*zeta+ggamma(j)*dzeta
+                     dzeta = -q*CMPLX(-SIN(theta), COS(theta), KIND=dp)**(-q - 1.0_dp)*dtheta
+                     dggamma(j) = dggamma(j)*zeta + ggamma(j)*dzeta
                      ggamma(j) = ggamma(j)*zeta
                   END DO
                ENDDO
             END DO
-            dggamma = dggamma*zphase+ggamma*dzphase
+            dggamma = dggamma*zphase + ggamma*dzphase
             ggamma = ggamma*zphase
             IF (ALL(REAL(ggamma, KIND=dp) /= 0.0_dp)) THEN
                tmp = AIMAG(ggamma)/REAL(ggamma, KIND=dp)
                ci = ATAN(tmp)
-               dci = (1.0_dp/(1.0_dp+tmp**2))* &
-                     (AIMAG(dggamma)*REAL(ggamma, KIND=dp)-AIMAG(ggamma)* &
+               dci = (1.0_dp/(1.0_dp + tmp**2))* &
+                     (AIMAG(dggamma)*REAL(ggamma, KIND=dp) - AIMAG(ggamma)* &
                       REAL(dggamma, KIND=dp))/(REAL(ggamma, KIND=dp))**2
                dipole = MATMUL(cell%hmat, ci)/twopi
                dipole_deriv = MATMUL(cell%hmat, dci)/twopi
@@ -337,8 +337,8 @@ CONTAINS
                ! no pbc(particle_set(i)%r(:),cell) so that the total dipole is the sum of the molecular dipoles
                ria = particle_set(i)%r(:)
                q = ncharge(i)
-               dipole = dipole-q*(ria-rcc)
-               dipole_deriv(:) = dipole_deriv(:)-q*(particle_set(i)%v(:)-drcc)
+               dipole = dipole - q*(ria - rcc)
+               dipole_deriv(:) = dipole_deriv(:) - q*(particle_set(i)%v(:) - drcc)
             END DO
          END IF
          ! Contributions from atomic polarization
@@ -358,12 +358,12 @@ CONTAINS
                                          block=pblock, found=found)
                   IF (found) THEN
                      CPASSERT(natorb == SIZE(pblock, 1))
-                     ix = coset(1, 0, 0)-1
-                     dipole(1) = dipole(1)+SUM(pblock*mom(:, :, ix))
-                     ix = coset(0, 1, 0)-1
-                     dipole(2) = dipole(2)+SUM(pblock*mom(:, :, ix))
-                     ix = coset(0, 0, 1)-1
-                     dipole(3) = dipole(3)+SUM(pblock*mom(:, :, ix))
+                     ix = coset(1, 0, 0) - 1
+                     dipole(1) = dipole(1) + SUM(pblock*mom(:, :, ix))
+                     ix = coset(0, 1, 0) - 1
+                     dipole(2) = dipole(2) + SUM(pblock*mom(:, :, ix))
+                     ix = coset(0, 0, 1) - 1
+                     dipole(3) = dipole(3) + SUM(pblock*mom(:, :, ix))
                   END IF
                END DO
             END DO
@@ -457,7 +457,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: ana
       CHARACTER(LEN=default_string_length)               :: aname
@@ -506,11 +506,11 @@ CONTAINS
                                          block=pblock, found=found)
                   IF (found) THEN
                      DO j = 1, natorb
-                        charges(iat, i) = charges(iat, i)+pblock(j, j)
+                        charges(iat, i) = charges(iat, i) + pblock(j, j)
                      END DO
                   END IF
                END DO
-               mcharge(iat) = zeff-SUM(charges(iat, 1:nspin))
+               mcharge(iat) = zeff - SUM(charges(iat, 1:nspin))
             END DO
          END DO
          !
@@ -549,7 +549,7 @@ CONTAINS
                      iat = atomic_kind_set(ikind)%atom_list(iatom)
                      WRITE (UNIT=unit_nr, &
                             FMT="(T2,I6,5X,A2,2X,I6,T29,4(1X,F12.6))") &
-                        iat, ana, ikind, charges(iat, 1:2), mcharge(iat), charges(iat, 1)-charges(iat, 2)
+                        iat, ana, ikind, charges(iat, 1:2), mcharge(iat), charges(iat, 1) - charges(iat, 2)
                   END DO
                END DO
                WRITE (UNIT=unit_nr, &
@@ -591,7 +591,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_available_results', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: after, handle, ispin, iw, output_unit
       LOGICAL                                            :: omit_headers

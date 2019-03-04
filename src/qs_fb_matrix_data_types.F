@@ -5,23 +5,23 @@
 
 MODULE qs_fb_matrix_data_types
 
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE qs_fb_buffer_types,              ONLY: fb_buffer_add,&
-                                              fb_buffer_create,&
-                                              fb_buffer_d_obj,&
-                                              fb_buffer_get,&
-                                              fb_buffer_has_data,&
-                                              fb_buffer_nullify,&
-                                              fb_buffer_release,&
-                                              fb_buffer_replace
-   USE qs_fb_hash_table_types,          ONLY: fb_hash_table_add,&
-                                              fb_hash_table_create,&
-                                              fb_hash_table_get,&
-                                              fb_hash_table_has_data,&
-                                              fb_hash_table_nullify,&
-                                              fb_hash_table_obj,&
-                                              fb_hash_table_release
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE qs_fb_buffer_types, ONLY: fb_buffer_add, &
+                                 fb_buffer_create, &
+                                 fb_buffer_d_obj, &
+                                 fb_buffer_get, &
+                                 fb_buffer_has_data, &
+                                 fb_buffer_nullify, &
+                                 fb_buffer_release, &
+                                 fb_buffer_replace
+   USE qs_fb_hash_table_types, ONLY: fb_hash_table_add, &
+                                     fb_hash_table_create, &
+                                     fb_hash_table_get, &
+                                     fb_hash_table_has_data, &
+                                     fb_hash_table_nullify, &
+                                     fb_hash_table_obj, &
+                                     fb_hash_table_release
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -96,7 +96,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), INTENT(IN)         :: blk
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_add', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: existing_ii, ii, ncols, nrows, old_nblks
       INTEGER(KIND=int_8)                                :: pair_ind
@@ -115,7 +115,7 @@ CONTAINS
          CALL fb_buffer_replace(matrix_data%obj%blks, existing_ii, RESHAPE(blk, (/nrows*ncols/)))
       ELSE
          old_nblks = matrix_data%obj%nblks
-         matrix_data%obj%nblks = old_nblks+1
+         matrix_data%obj%nblks = old_nblks + 1
          ii = matrix_data%obj%nblks
          ! resize lds if necessary
          IF (SIZE(matrix_data%obj%lds) .LT. ii) THEN
@@ -159,7 +159,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nmax, nencode
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
@@ -177,7 +177,7 @@ CONTAINS
                                nencode=nencode)
       ! book keeping stuff
       matrix_data%obj%ref_count = 1
-      matrix_data%obj%id_nr = last_fb_matrix_data_id+1
+      matrix_data%obj%id_nr = last_fb_matrix_data_id + 1
       last_fb_matrix_data_id = matrix_data%obj%id_nr
    END SUBROUTINE fb_matrix_data_create
 
@@ -198,7 +198,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: found
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_get', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ind_in_blks
       INTEGER(KIND=int_8)                                :: pair_ind
@@ -246,7 +246,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nmax, nencode
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: my_nmax
       LOGICAL                                            :: check_ok
@@ -292,14 +292,14 @@ CONTAINS
       TYPE(fb_matrix_data_obj), INTENT(INOUT)            :: matrix_data
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
       IF (ASSOCIATED(matrix_data%obj)) THEN
          check_ok = matrix_data%obj%ref_count > 0
          CPASSERT(check_ok)
-         matrix_data%obj%ref_count = matrix_data%obj%ref_count-1
+         matrix_data%obj%ref_count = matrix_data%obj%ref_count - 1
          IF (matrix_data%obj%ref_count == 0) THEN
             matrix_data%obj%ref_count = 1
             IF (fb_hash_table_has_data(matrix_data%obj%ind)) THEN
@@ -328,7 +328,7 @@ CONTAINS
       TYPE(fb_matrix_data_obj), INTENT(INOUT)            :: matrix_data
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
@@ -336,7 +336,7 @@ CONTAINS
       CPASSERT(check_ok)
       check_ok = matrix_data%obj%ref_count > 0
       CPASSERT(check_ok)
-      matrix_data%obj%ref_count = matrix_data%obj%ref_count+1
+      matrix_data%obj%ref_count = matrix_data%obj%ref_count + 1
    END SUBROUTINE fb_matrix_data_retain
 
 ! **************************************************************************************************
@@ -355,7 +355,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), INTENT(OUT), OPTIONAL    :: blk_sizes
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_matrix_data_status', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ii
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: buffer_sizes
@@ -400,7 +400,7 @@ CONTAINS
       row_8 = INT(row, int_8)
       col_8 = INT(col, int_8)
       nencode_8 = INT(nencode, int_8)
-      pair_ind = (row_8-1_int_8)*nencode_8+(col_8-1_int_8)+1
+      pair_ind = (row_8 - 1_int_8)*nencode_8 + (col_8 - 1_int_8) + 1
    END FUNCTION fb_matrix_data_encode_pair
 
 END MODULE qs_fb_matrix_data_types

@@ -8,28 +8,28 @@
 !> \author JGH (14.08.2004)
 ! **************************************************************************************************
 MODULE semi_empirical_utils
-   USE basis_set_types,                 ONLY: allocate_sto_basis_set,&
-                                              create_gto_from_sto_basis,&
-                                              gto_basis_set_type,&
-                                              set_sto_basis_set
-   USE cell_types,                      ONLY: cell_type,&
-                                              plane_distance
-   USE cp_control_types,                ONLY: semi_empirical_control_type
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_mndo, do_method_mndod, do_method_pchg, do_method_pdg, &
-        do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE semi_empirical_mpole_methods,    ONLY: semi_empirical_mpole_p_setup
-   USE semi_empirical_par_utils,        ONLY: get_se_basis,&
-                                              setup_1c_2el_int
-   USE semi_empirical_parameters,       ONLY: &
-        am1_default_parameter, mndo_default_parameter, pcharge_default_parameter, &
-        pdg_default_parameter, pm3_default_parameter, pm6_default_parameter, &
-        pm6fm_default_parameter, pnnl_default_parameter, rm1_default_parameter
-   USE semi_empirical_types,            ONLY: se_taper_type,&
-                                              semi_empirical_type
+   USE basis_set_types, ONLY: allocate_sto_basis_set, &
+                              create_gto_from_sto_basis, &
+                              gto_basis_set_type, &
+                              set_sto_basis_set
+   USE cell_types, ONLY: cell_type, &
+                         plane_distance
+   USE cp_control_types, ONLY: semi_empirical_control_type
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_mndo, do_method_mndod, do_method_pchg, do_method_pdg, &
+      do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE semi_empirical_mpole_methods, ONLY: semi_empirical_mpole_p_setup
+   USE semi_empirical_par_utils, ONLY: get_se_basis, &
+                                       setup_1c_2el_int
+   USE semi_empirical_parameters, ONLY: &
+      am1_default_parameter, mndo_default_parameter, pcharge_default_parameter, &
+      pdg_default_parameter, pm3_default_parameter, pm6_default_parameter, &
+      pm6fm_default_parameter, pnnl_default_parameter, rm1_default_parameter
+   USE semi_empirical_types, ONLY: se_taper_type, &
+                                   semi_empirical_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -57,7 +57,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'se_cutoff_compatible', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: explicit1, explicit2
       REAL(KIND=dp)                                      :: rc
@@ -165,7 +165,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: coulomb, exchange, lr_corr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_se_taper', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check, l_coulomb, l_exchange, l_lrc
 
@@ -203,7 +203,7 @@ CONTAINS
       TYPE(se_taper_type), POINTER                       :: se_taper
 
       CHARACTER(len=*), PARAMETER :: routineN = 'finalize_se_taper', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check
 
@@ -244,7 +244,7 @@ CONTAINS
          nq = 0
          lq = 0
          zet = 0._dp
-         DO l = 0, nshell-1
+         DO l = 0, nshell - 1
             nq(l) = get_se_basis(sep, l)
             lq(l) = l
             zet(l) = sep%sto_exponents(l)
@@ -282,7 +282,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: z, method
 
       CHARACTER(len=*), PARAMETER :: routineN = 'se_param_set_default', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(sep)) THEN
          IF (z < 0) THEN
@@ -335,7 +335,7 @@ CONTAINS
       IF (sep%dorb) sep%core_size = 10
 
       ! Get size of the all possible combinations of atomic orbitals
-      sep%atm_int_size = (sep%natorb+1)*sep%natorb/2
+      sep%atm_int_size = (sep%natorb + 1)*sep%natorb/2
 
    END SUBROUTINE se_param_set_default
 

@@ -5,18 +5,18 @@
 ! **************************************************************************************************
 MODULE qs_local_rho_types
 
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi,&
-                                              pi
-   USE memory_utilities,                ONLY: reallocate
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_harmonics_atom,               ONLY: harmonics_atom_type
-   USE qs_rho0_types,                   ONLY: deallocate_rho0_atom,&
-                                              deallocate_rho0_mpole,&
-                                              rho0_atom_type,&
-                                              rho0_mpole_type
-   USE qs_rho_atom_types,               ONLY: deallocate_rho_atom_set,&
-                                              rho_atom_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi, &
+                            pi
+   USE memory_utilities, ONLY: reallocate
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_harmonics_atom, ONLY: harmonics_atom_type
+   USE qs_rho0_types, ONLY: deallocate_rho0_atom, &
+                            deallocate_rho0_mpole, &
+                            rho0_atom_type, &
+                            rho0_mpole_type
+   USE qs_rho_atom_types, ONLY: deallocate_rho_atom_set, &
+                                rho_atom_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -134,10 +134,10 @@ CONTAINS
             rhoz%dr_coef(ir) = prefactor2*rhoz%r_coef(ir)
          END IF
          rhoz%vr_coef(ir) = prefactor3*erf(grid_atom%rad(ir)*c3)/grid_atom%rad(ir)
-         sum = sum+rhoz%r_coef(ir)*grid_atom%wr(ir)
+         sum = sum + rhoz%r_coef(ir)*grid_atom%wr(ir)
       END DO
       rhoz%one_atom = sum*harmonics%slm_int(1)
-      rhoz_tot = rhoz_tot+natom*rhoz%one_atom
+      rhoz_tot = rhoz_tot + natom*rhoz%one_atom
 
    END SUBROUTINE calculate_rhoz
 
@@ -150,7 +150,7 @@ CONTAINS
       TYPE(rhoz_type), DIMENSION(:), POINTER             :: rhoz_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_rhoz', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nkind
 
@@ -202,7 +202,7 @@ CONTAINS
       TYPE(local_rho_type), POINTER                      :: local_rho_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'local_rho_set_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (local_rho_set)
 
@@ -222,7 +222,7 @@ CONTAINS
       TYPE(local_rho_type), POINTER                      :: local_rho_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'local_rho_set_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(local_rho_set)) THEN
          IF (ASSOCIATED(local_rho_set%rho_atom_set)) THEN

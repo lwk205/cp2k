@@ -8,53 +8,53 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE ewald_methods_tb
-   USE atprop_types,                    ONLY: atprop_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dgs,                             ONLY: dg_sum_patch,&
-                                              dg_sum_patch_force_1d,&
-                                              dg_sum_patch_force_3d
-   USE ewald_environment_types,         ONLY: ewald_env_get,&
-                                              ewald_environment_type
-   USE ewald_pw_types,                  ONLY: ewald_pw_get,&
-                                              ewald_pw_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi,&
-                                              oorootpi
-   USE particle_types,                  ONLY: particle_type
-   USE pme_tools,                       ONLY: get_center,&
-                                              set_list
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_grids,                        ONLY: get_pw_grid_info
-   USE pw_methods,                      ONLY: pw_copy,&
-                                              pw_derive,&
-                                              pw_integral_a2b,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_rebuild,&
-                                              pw_poisson_solve
-   USE pw_poisson_types,                ONLY: greens_fn_type,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE realspace_grid_types,            ONLY: &
-        pw2rs, realspace_grid_desc_type, realspace_grid_p_type, realspace_grid_type, rs2pw, &
-        rs_grid_create, rs_grid_release, rs_grid_set_box, rs_grid_zero, rs_pw_transfer
-   USE spme,                            ONLY: get_patch
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE atprop_types, ONLY: atprop_type
+   USE cell_types, ONLY: cell_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dgs, ONLY: dg_sum_patch, &
+                  dg_sum_patch_force_1d, &
+                  dg_sum_patch_force_3d
+   USE ewald_environment_types, ONLY: ewald_env_get, &
+                                      ewald_environment_type
+   USE ewald_pw_types, ONLY: ewald_pw_get, &
+                             ewald_pw_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi, &
+                            oorootpi
+   USE particle_types, ONLY: particle_type
+   USE pme_tools, ONLY: get_center, &
+                        set_list
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_grids, ONLY: get_pw_grid_info
+   USE pw_methods, ONLY: pw_copy, &
+                         pw_derive, &
+                         pw_integral_a2b, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_rebuild, &
+                                 pw_poisson_solve
+   USE pw_poisson_types, ONLY: greens_fn_type, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE realspace_grid_types, ONLY: &
+      pw2rs, realspace_grid_desc_type, realspace_grid_p_type, realspace_grid_type, rs2pw, &
+      rs_grid_create, rs_grid_release, rs_grid_set_box, rs_grid_zero, rs_pw_transfer
+   USE spme, ONLY: get_patch
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -95,7 +95,7 @@ CONTAINS
       TYPE(atprop_type), POINTER                         :: atprop
 
       CHARACTER(len=*), PARAMETER :: routineN = 'tb_spme_evaluate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, handle, i, ig, ipart, j, n, &
                                                             npart, o_spline, p1
@@ -201,9 +201,9 @@ CONTAINS
             CALL get_patch(particle_set, box, green, npts, p1, rhos, is_core=.FALSE., &
                            is_shell=.FALSE., unit_charge=.TRUE.)
             CALL dg_sum_patch_force_1d(rpot, rhos, center(:, p1), fint)
-            atprop%atstress(1, 1, p1) = atprop%atstress(1, 1, p1)+0.5_dp*mcharge(p1)*fint*dvols
-            atprop%atstress(2, 2, p1) = atprop%atstress(2, 2, p1)+0.5_dp*mcharge(p1)*fint*dvols
-            atprop%atstress(3, 3, p1) = atprop%atstress(3, 3, p1)+0.5_dp*mcharge(p1)*fint*dvols
+            atprop%atstress(1, 1, p1) = atprop%atstress(1, 1, p1) + 0.5_dp*mcharge(p1)*fint*dvols
+            atprop%atstress(2, 2, p1) = atprop%atstress(2, 2, p1) + 0.5_dp*mcharge(p1)*fint*dvols
+            atprop%atstress(3, 3, p1) = atprop%atstress(3, 3, p1) + 0.5_dp*mcharge(p1)*fint*dvols
          END DO
 
          CALL pw_pool_create_pw(pw_pool, phib_g, &
@@ -212,7 +212,7 @@ CONTAINS
          ffb = 1.0_dp/fourpi
          DO i = 1, 3
             DO ig = grid_spme%first_gne0, grid_spme%ngpts_cut_local
-               phib_g%cc(ig) = ffb*dphi_g(i)%pw%cc(ig)*(1.0_dp+ffa*grid_spme%gsq(ig))
+               phib_g%cc(ig) = ffb*dphi_g(i)%pw%cc(ig)*(1.0_dp + ffa*grid_spme%gsq(ig))
                phib_g%cc(ig) = phib_g%cc(ig)*green%influence_fn%cc(ig)
             END DO
             IF (grid_spme%have_g0) phib_g%cc(1) = 0.0_dp
@@ -234,8 +234,8 @@ CONTAINS
                                  is_core=.FALSE., is_shell=.FALSE., unit_charge=.TRUE.)
                   ! integrate box and potential
                   CALL dg_sum_patch_force_1d(rpot, rhos, center(:, p1), fint)
-                  atprop%atstress(i, j, p1) = atprop%atstress(i, j, p1)+fint*dvols*mcharge(p1)
-                  IF (i /= j) atprop%atstress(j, i, p1) = atprop%atstress(j, i, p1)+fint*dvols*mcharge(p1)
+                  atprop%atstress(i, j, p1) = atprop%atstress(i, j, p1) + fint*dvols*mcharge(p1)
+                  IF (i /= j) atprop%atstress(j, i, p1) = atprop%atstress(j, i, p1) + fint*dvols*mcharge(p1)
                END DO
 
             END DO
@@ -264,7 +264,7 @@ CONTAINS
             END DO
          END DO
          ffa = (1.0_dp/fourpi)*(0.5_dp/alpha)**2
-         virial%pv_virial = virial%pv_virial-(ffa*f_stress-h_stress)/REAL(para_env%num_pe, dp)
+         virial%pv_virial = virial%pv_virial - (ffa*f_stress - h_stress)/REAL(para_env%num_pe, dp)
       END IF
 
       !--------END OF STRESS TENSOR CALCULATION -----------
@@ -301,13 +301,13 @@ CONTAINS
                         is_shell=.FALSE., unit_charge=.TRUE.)
 
          CALL dg_sum_patch_force_1d(rpot, rhos, center(:, p1), fint)
-         gmcharge(p1, 1) = gmcharge(p1, 1)+fint*dvols
+         gmcharge(p1, 1) = gmcharge(p1, 1) + fint*dvols
 
          IF (calculate_forces) THEN
             CALL dg_sum_patch_force_3d(drpot, rhos, center(:, p1), fat)
-            gmcharge(p1, 2) = gmcharge(p1, 2)-fat(1)*dvols
-            gmcharge(p1, 3) = gmcharge(p1, 3)-fat(2)*dvols
-            gmcharge(p1, 4) = gmcharge(p1, 4)-fat(3)*dvols
+            gmcharge(p1, 2) = gmcharge(p1, 2) - fat(1)*dvols
+            gmcharge(p1, 3) = gmcharge(p1, 3) - fat(2)*dvols
+            gmcharge(p1, 4) = gmcharge(p1, 4) - fat(3)*dvols
          END IF
 
       END DO
@@ -355,7 +355,7 @@ CONTAINS
       TYPE(atprop_type), POINTER                         :: atprop
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tb_ewald_overlap', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iatom, jatom, nmat
       REAL(KIND=dp)                                      :: dfr, dr, fr, pfr, rij(3)
@@ -373,14 +373,14 @@ CONTAINS
          dr = SQRT(SUM(rij(:)**2))
          IF (dr > 1.e-10) THEN
             fr = erfc(alpha*dr)/dr
-            gmcharge(iatom, 1) = gmcharge(iatom, 1)+mcharge(jatom)*fr
-            gmcharge(jatom, 1) = gmcharge(jatom, 1)+mcharge(iatom)*fr
+            gmcharge(iatom, 1) = gmcharge(iatom, 1) + mcharge(jatom)*fr
+            gmcharge(jatom, 1) = gmcharge(jatom, 1) + mcharge(iatom)*fr
             IF (nmat > 1) THEN
-               dfr = -2._dp*alpha*EXP(-alpha*alpha*dr*dr)*oorootpi/dr-fr/dr
+               dfr = -2._dp*alpha*EXP(-alpha*alpha*dr*dr)*oorootpi/dr - fr/dr
                dfr = -dfr/dr
                DO i = 2, nmat
-                  gmcharge(iatom, i) = gmcharge(iatom, i)-rij(i-1)*mcharge(jatom)*dfr
-                  gmcharge(jatom, i) = gmcharge(jatom, i)+rij(i-1)*mcharge(iatom)*dfr
+                  gmcharge(iatom, i) = gmcharge(iatom, i) - rij(i - 1)*mcharge(jatom)*dfr
+                  gmcharge(jatom, i) = gmcharge(jatom, i) + rij(i - 1)*mcharge(iatom)*dfr
                END DO
             END IF
             IF (use_virial) THEN

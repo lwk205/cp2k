@@ -8,25 +8,25 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE glbopt_minhop
-   USE bibliography,                    ONLY: Goedecker2004,&
-                                              cite_reference
-   USE glbopt_history,                  ONLY: history_add,&
-                                              history_finalize,&
-                                              history_fingerprint,&
-                                              history_fingerprint_match,&
-                                              history_fingerprint_type,&
-                                              history_init,&
-                                              history_lookup,&
-                                              history_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE physcon,                         ONLY: kelvin
-   USE swarm_message,                   ONLY: swarm_message_add,&
-                                              swarm_message_get,&
-                                              swarm_message_type
+   USE bibliography, ONLY: Goedecker2004, &
+                           cite_reference
+   USE glbopt_history, ONLY: history_add, &
+                             history_finalize, &
+                             history_fingerprint, &
+                             history_fingerprint_match, &
+                             history_fingerprint_type, &
+                             history_init, &
+                             history_lookup, &
+                             history_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE physcon, ONLY: kelvin
+   USE swarm_message, ONLY: swarm_message_add, &
+                            swarm_message_get, &
+                            swarm_message_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -221,7 +221,7 @@ CONTAINS
             this%worker_state(wid)%fp_hop = report_fp
          ENDIF
 
-         IF (this%worker_state(wid)%Epot_hop-this%worker_state(wid)%Epot < this%worker_state(wid)%Eaccept) THEN
+         IF (this%worker_state(wid)%Epot_hop - this%worker_state(wid)%Epot < this%worker_state(wid)%Eaccept) THEN
             ! accept
             IF (this%iw > 0) WRITE (this%iw, '(A)') " MINHOP| Accept"
             this%worker_state(wid)%Epot = this%worker_state(wid)%Epot_hop
@@ -230,12 +230,12 @@ CONTAINS
             this%worker_state(wid)%Epot_hop = HUGE(1.0)
 
             this%worker_state(wid)%Eaccept = this%worker_state(wid)%Eaccept*this%alpha1 !decreasing Eaccept
-            this%n_accepted = this%n_accepted+1
+            this%n_accepted = this%n_accepted + 1
          ELSE
             ! not accept
             IF (this%iw > 0) WRITE (this%iw, '(A)') " MINHOP| Reject"
             this%worker_state(wid)%Eaccept = this%worker_state(wid)%Eaccept*this%alpha2 !increasing Eaccept
-            this%n_rejected = this%n_rejected+1
+            this%n_rejected = this%n_rejected + 1
          ENDIF
       END IF
 

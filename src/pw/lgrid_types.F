@@ -14,9 +14,9 @@
 
 MODULE lgrid_types
 
-   USE kinds,                           ONLY: dp
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_p_type,&
-                                              rs_grid_max_ngpts
+   USE kinds, ONLY: dp
+   USE realspace_grid_types, ONLY: realspace_grid_desc_p_type, &
+                                   rs_grid_max_ngpts
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -82,7 +82,7 @@ CONTAINS
 
       IF (ASSOCIATED(lgrid)) THEN
          CPASSERT(lgrid%ref_count > 0)
-         lgrid%ref_count = lgrid%ref_count-1
+         lgrid%ref_count = lgrid%ref_count - 1
          IF (lgrid%ref_count < 1) THEN
             IF (ASSOCIATED(lgrid%r)) THEN
                DEALLOCATE (lgrid%r)
@@ -105,7 +105,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: nthreads
 
       CHARACTER(len=*), PARAMETER :: routineN = 'lgrid_allocate_grid', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -113,7 +113,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(lgrid))
       CPASSERT(.NOT. ASSOCIATED(lgrid%r))
-      ALLOCATE (lgrid%r(lgrid%ldim, 0:nthreads-1))
+      ALLOCATE (lgrid%r(lgrid%ldim, 0:nthreads - 1))
 
       CALL timestop(handle)
    END SUBROUTINE

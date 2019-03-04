@@ -5,19 +5,19 @@
 
 MODULE qs_fb_env_types
 
-   USE kinds,                           ONLY: dp
-   USE qs_fb_atomic_halo_types,         ONLY: fb_atomic_halo_list_associate,&
-                                              fb_atomic_halo_list_has_data,&
-                                              fb_atomic_halo_list_nullify,&
-                                              fb_atomic_halo_list_obj,&
-                                              fb_atomic_halo_list_release,&
-                                              fb_atomic_halo_list_retain
-   USE qs_fb_trial_fns_types,           ONLY: fb_trial_fns_associate,&
-                                              fb_trial_fns_has_data,&
-                                              fb_trial_fns_nullify,&
-                                              fb_trial_fns_obj,&
-                                              fb_trial_fns_release,&
-                                              fb_trial_fns_retain
+   USE kinds, ONLY: dp
+   USE qs_fb_atomic_halo_types, ONLY: fb_atomic_halo_list_associate, &
+                                      fb_atomic_halo_list_has_data, &
+                                      fb_atomic_halo_list_nullify, &
+                                      fb_atomic_halo_list_obj, &
+                                      fb_atomic_halo_list_release, &
+                                      fb_atomic_halo_list_retain
+   USE qs_fb_trial_fns_types, ONLY: fb_trial_fns_associate, &
+                                    fb_trial_fns_has_data, &
+                                    fb_trial_fns_nullify, &
+                                    fb_trial_fns_obj, &
+                                    fb_trial_fns_release, &
+                                    fb_trial_fns_retain
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -103,7 +103,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(fb_env%obj))
       CPASSERT(fb_env%obj%ref_count > 0)
-      fb_env%obj%ref_count = fb_env%obj%ref_count+1
+      fb_env%obj%ref_count = fb_env%obj%ref_count + 1
    END SUBROUTINE fb_env_retain
 
 ! **********************************************************************
@@ -119,7 +119,7 @@ CONTAINS
 
       IF (ASSOCIATED(fb_env%obj)) THEN
          CPASSERT(fb_env%obj%ref_count > 0)
-         fb_env%obj%ref_count = fb_env%obj%ref_count-1
+         fb_env%obj%ref_count = fb_env%obj%ref_count - 1
          IF (fb_env%obj%ref_count == 0) THEN
             fb_env%obj%ref_count = 1
             IF (ASSOCIATED(fb_env%obj%rcut)) THEN
@@ -166,7 +166,7 @@ CONTAINS
       TYPE(fb_env_obj), INTENT(IN)                       :: b
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_env_associate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       a%obj => b%obj
    END SUBROUTINE fb_env_associate
@@ -183,7 +183,7 @@ CONTAINS
       LOGICAL                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_env_has_data', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       res = ASSOCIATED(fb_env%obj)
    END FUNCTION fb_env_has_data
@@ -211,7 +211,7 @@ CONTAINS
       NULLIFY (fb_env%obj%local_atoms)
       fb_env%obj%nlocal_atoms = 0
       fb_env%obj%ref_count = 1
-      fb_env%obj%id_nr = last_fb_env_id+1
+      fb_env%obj%id_nr = last_fb_env_id + 1
       last_fb_env_id = fb_env%obj%id_nr
    END SUBROUTINE fb_env_create
 

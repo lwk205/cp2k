@@ -9,26 +9,26 @@
 !> \author JGH (12.2017)
 ! **************************************************************************************************
 MODULE basis_set_output
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp2k_info,                       ONLY: compile_revision,&
-                                              cp2k_version,&
-                                              r_datx,&
-                                              r_host_name,&
-                                              r_user_name
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp2k_info, ONLY: compile_revision, &
+                        cp2k_version, &
+                        r_datx, &
+                        r_host_name, &
+                        r_user_name
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -53,7 +53,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: base_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_basis_set_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: element_symbol
       CHARACTER(LEN=default_string_length)               :: bname, filename
@@ -66,7 +66,7 @@ CONTAINS
       TYPE(qs_kind_type), POINTER                        :: qs_kind
 
       IF (ncalls > 0) RETURN
-      ncalls = ncalls+1
+      ncalls = ncalls + 1
 
       logger => cp_get_default_logger()
       ounit = cp_logger_get_default_io_unit(logger)
@@ -159,7 +159,7 @@ CONTAINS
          lset = 0
          DO ishell = 1, nshell(iset)
             ll = l(ishell, iset)
-            lset(ll) = lset(ll)+1
+            lset(ll) = lset(ll) + 1
          END DO
          WRITE (iunit, "(I5,2I3,I5,2X,10(I3))") n(1, iset), lmin(iset), lmax(iset), npgf(iset), &
             (lset(ll), ll=lmin(iset), lmax(iset))

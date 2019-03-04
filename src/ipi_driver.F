@@ -10,42 +10,42 @@
 !> \author Michele Ceriotti 03.2012
 ! **************************************************************************************************
 MODULE ipi_driver
-   USE ISO_C_BINDING,                   ONLY: C_CHAR,&
-                                              C_DOUBLE,&
-                                              C_INT,&
-                                              C_LOC,&
-                                              C_NULL_CHAR,&
-                                              C_PTR
-   USE bibliography,                    ONLY: Ceriotti2014,&
-                                              Kapil2016,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_create,&
-                                              cell_release,&
-                                              cell_type,&
-                                              init_cell
-   USE cp_external_control,             ONLY: external_control
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_set,&
-                                              cp_subsys_type
-   USE force_env_methods,               ONLY: force_env_calc_energy_force
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp,&
-                                              int_4
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_irecv,&
-                                              mp_send,&
-                                              mp_sync,&
-                                              mp_testany
-   USE virial_types,                    ONLY: virial_type
+   USE ISO_C_BINDING, ONLY: C_CHAR, &
+                            C_DOUBLE, &
+                            C_INT, &
+                            C_LOC, &
+                            C_NULL_CHAR, &
+                            C_PTR
+   USE bibliography, ONLY: Ceriotti2014, &
+                           Kapil2016, &
+                           cite_reference
+   USE cell_types, ONLY: cell_create, &
+                         cell_release, &
+                         cell_type, &
+                         init_cell
+   USE cp_external_control, ONLY: external_control
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_set, &
+                              cp_subsys_type
+   USE force_env_methods, ONLY: force_env_calc_energy_force
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp, &
+                    int_4
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_irecv, &
+                              mp_send, &
+                              mp_sync, &
+                              mp_testany
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -74,7 +74,7 @@ MODULE ipi_driver
    INTERFACE
       SUBROUTINE uwait(sec) BIND(C, NAME="uwait")
          USE ISO_C_BINDING, ONLY: C_DOUBLE
-      REAL(C_DOUBLE)                                     :: sec
+         REAL(C_DOUBLE)                                     :: sec
 
       END SUBROUTINE
    END INTERFACE
@@ -393,7 +393,7 @@ CONTAINS
          IF (ionode) THEN
             CALL readbuffer(socket, header, MSGLEN)
             wait_msg = 0
-            DO iwait = 0, para_env%num_pe-1
+            DO iwait = 0, para_env%num_pe - 1
                IF (iwait /= para_env%source) THEN
                   CALL mp_send(msg=wait_msg, dest=iwait, gid=para_env%group, tag=666)
                ENDIF
@@ -447,7 +447,7 @@ CONTAINS
             ii = 0
             DO ip = 1, subsys%particles%n_els
                DO idir = 1, 3
-                  ii = ii+1
+                  ii = ii + 1
                   subsys%particles%els(ip)%r(idir) = combuf(ii)
                END DO
             END DO
@@ -462,7 +462,7 @@ CONTAINS
             ii = 0
             DO ip = 1, subsys%particles%n_els
                DO idir = 1, 3
-                  ii = ii+1
+                  ii = ii + 1
                   combuf(ii) = subsys%particles%els(ip)%f(idir)
                END DO
             END DO

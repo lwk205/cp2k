@@ -14,63 +14,63 @@
 !> \version 1.0
 ! **************************************************************************************************
 MODULE dft_plus_u
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE bibliography,                    ONLY: Dudarev1997,&
-                                              Dudarev1998,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_fm_to_dbcsr,&
-                                              cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix,&
-                                              write_fm_with_basis_info
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_transpose
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr,&
-                                              low_print_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_deallocate_matrix, dbcsr_get_block_diag, dbcsr_get_block_p, &
-        dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
-        dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_set, dbcsr_type
-   USE input_constants,                 ONLY: plus_u_lowdin,&
-                                              plus_u_mulliken,&
-                                              plus_u_mulliken_charges
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathlib,                         ONLY: jacobi
-   USE message_passing,                 ONLY: mp_sum
-   USE orbital_symbols,                 ONLY: sgf_symbol
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: evolt
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type,&
-                                              set_qs_kind
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE bibliography, ONLY: Dudarev1997, &
+                           Dudarev1998, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_fm_to_dbcsr, &
+                                  cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix, &
+                              write_fm_with_basis_info
+   USE cp_fm_basic_linalg, ONLY: cp_fm_transpose
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr, &
+                                 low_print_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_deallocate_matrix, dbcsr_get_block_diag, dbcsr_get_block_p, &
+      dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
+      dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_set, dbcsr_type
+   USE input_constants, ONLY: plus_u_lowdin, &
+                              plus_u_mulliken, &
+                              plus_u_mulliken_charges
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathlib, ONLY: jacobi
+   USE message_passing, ONLY: mp_sum
+   USE orbital_symbols, ONLY: sgf_symbol
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: evolt
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type, &
+                            set_qs_kind
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_types, ONLY: qs_scf_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -211,8 +211,8 @@ CONTAINS
       CHARACTER(LEN=6), ALLOCATABLE, DIMENSION(:)        :: symbol
       CHARACTER(LEN=default_string_length)               :: atomic_kind_name
       INTEGER :: atom_a, handle, i, i0, iatom, ikind, iorb, isb, iset, isgf, ishell, ispin, j, &
-         jsb, jset, jsgf, jshell, lu, m, max_scf, n, natom, natom_of_kind, nkind, norb, nsb, &
-         nsbsize, nset, nsgf, nsgf_kind, nspin
+                 jsb, jset, jsgf, jshell, lu, m, max_scf, n, natom, natom_of_kind, nkind, norb, nsb, &
+                 nsbsize, nset, nsgf, nsgf_kind, nspin
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: first_sgf_atom
       INTEGER, DIMENSION(1)                              :: iloc
       INTEGER, DIMENSION(:), POINTER                     :: atom_list, nshell, orbitals
@@ -476,7 +476,7 @@ CONTAINS
 
             IF ((ispin == 1) .AND. (u_ramping > 0.0_dp)) THEN
                IF (qs_env%scf_env%iter_delta <= eps_u_ramping) THEN
-                  u_minus_j = MIN(u_minus_j+u_ramping, u_minus_j_target)
+                  u_minus_j = MIN(u_minus_j + u_ramping, u_minus_j_target)
                   CALL set_qs_kind(qs_kind_set(ikind), u_minus_j=u_minus_j)
                END IF
                IF (should_output .AND. (output_unit > 0)) THEN
@@ -502,11 +502,11 @@ CONTAINS
             nsb = 0
             DO iset = 1, nset
                DO ishell = 1, nshell(iset)
-                  IF (l(ishell, iset) == lu) nsb = nsb+1
+                  IF (l(ishell, iset) == lu) nsb = nsb + 1
                END DO
             END DO
 
-            nsbsize = (2*lu+1)
+            nsbsize = (2*lu + 1)
             n = nsb*nsbsize
 
             ALLOCATE (q_matrix(n, n))
@@ -518,7 +518,7 @@ CONTAINS
                IF (output_unit > 0) THEN
                   ALLOCATE (symbol(nsbsize))
                   DO m = -lu, lu
-                     symbol(lu+m+1) = sgf_symbol(0, lu, m)
+                     symbol(lu + m + 1) = sgf_symbol(0, lu, m)
                   END DO
                   IF (nspin > 1) THEN
                      WRITE (UNIT=spin_info, FMT="(A8,I2)") " of spin", ispin
@@ -558,13 +558,13 @@ CONTAINS
                      DO ishell = 1, nshell(iset)
                         IF (l(ishell, iset) /= lu) CYCLE
                         DO isgf = first_sgf(ishell, iset), last_sgf(ishell, iset)
-                           i = i+1
+                           i = i + 1
                            j = 0
                            DO jset = 1, nset
                               DO jshell = 1, nshell(jset)
                                  IF (l(jshell, jset) /= lu) CYCLE
                                  DO jsgf = first_sgf(jshell, jset), last_sgf(jshell, jset)
-                                    j = j+1
+                                    j = j + 1
                                     q_matrix(i, j) = q_block(isgf, jsgf)
                                  END DO ! next contracted spherical Gaussian function "jsgf"
                               END DO ! next shell "jshell"
@@ -589,8 +589,8 @@ CONTAINS
                         q_matrix(:, :) = 0.0_dp
                         DO isb = 1, nsb
                            trq = 0.0_dp
-                           DO i = (isb-1)*nsbsize+1, isb*nsbsize
-                              trq = trq+q_eigval(i)
+                           DO i = (isb - 1)*nsbsize + 1, isb*nsbsize
+                              trq = trq + q_eigval(i)
                            END DO
                            IF (smear) THEN
                               occ = trq/REAL(norb, KIND=dp)
@@ -599,28 +599,28 @@ CONTAINS
                            END IF
                            orb_occ(:) = .FALSE.
                            iloc = MAXLOC(q_eigvec(:, isb*nsbsize))
-                           jsb = INT((iloc(1)-1)/nsbsize)+1
+                           jsb = INT((iloc(1) - 1)/nsbsize) + 1
                            i = 0
-                           i0 = (jsb-1)*nsbsize+1
+                           i0 = (jsb - 1)*nsbsize + 1
                            iorb = -1000
                            DO j = i0, jsb*nsbsize
-                              i = i+1
+                              i = i + 1
                               IF (i > norb) THEN
                                  DO m = -lu, lu
-                                    IF (.NOT. orb_occ(lu+m+1)) THEN
-                                       iorb = i0+lu+m
-                                       orb_occ(lu+m+1) = .TRUE.
+                                    IF (.NOT. orb_occ(lu + m + 1)) THEN
+                                       iorb = i0 + lu + m
+                                       orb_occ(lu + m + 1) = .TRUE.
                                     END IF
                                  END DO
                               ELSE
-                                 iorb = i0+lu+orbitals(i)
-                                 orb_occ(lu+orbitals(i)+1) = .TRUE.
+                                 iorb = i0 + lu + orbitals(i)
+                                 orb_occ(lu + orbitals(i) + 1) = .TRUE.
                               END IF
                               CPASSERT(iorb /= -1000)
                               iloc = MAXLOC(q_eigvec(iorb, :))
                               q_eigval(iloc(1)) = MIN(occ, trq)
                               q_matrix(:, iloc(1)) = q_eigval(iloc(1))*q_eigvec(:, iloc(1)) ! backtransform left
-                              trq = trq-q_eigval(iloc(1))
+                              trq = trq - q_eigval(iloc(1))
                            END DO
                         END DO
                         q_matrix(:, :) = MATMUL(q_matrix, TRANSPOSE(q_eigvec)) ! backtransform right
@@ -634,9 +634,9 @@ CONTAINS
                   trq2 = 0.0_dp
 
                   DO i = 1, n
-                     trq = trq+q_matrix(i, i)
+                     trq = trq + q_matrix(i, i)
                      DO j = 1, n
-                        trq2 = trq2+q_matrix(i, j)*q_matrix(j, i)
+                        trq2 = trq2 + q_matrix(i, j)*q_matrix(j, i)
                      END DO
                   END DO
 
@@ -645,7 +645,7 @@ CONTAINS
 
                   ! Calculate energy contribution to E(U)
 
-                  energy%dft_plus_u = energy%dft_plus_u+0.5_dp*u_minus_j*(trq-trq2)/fspin
+                  energy%dft_plus_u = energy%dft_plus_u + 0.5_dp*u_minus_j*(trq - trq2)/fspin
 
                   ! Calculate potential V(U) = dE(U)/dq
 
@@ -663,15 +663,15 @@ CONTAINS
                         DO ishell = 1, nshell(iset)
                            IF (l(ishell, iset) /= lu) CYCLE
                            DO isgf = first_sgf(ishell, iset), last_sgf(ishell, iset)
-                              i = i+1
+                              i = i + 1
                               j = 0
                               DO jset = 1, nset
                                  DO jshell = 1, nshell(jset)
                                     IF (l(jshell, jset) /= lu) CYCLE
                                     DO jsgf = first_sgf(jshell, jset), last_sgf(jshell, jset)
-                                       j = j+1
+                                       j = j + 1
                                        IF (isgf == jsgf) THEN
-                                          v_block(isgf, isgf) = u_minus_j*(0.5_dp-fspin*q_matrix(i, i))
+                                          v_block(isgf, isgf) = u_minus_j*(0.5_dp - fspin*q_matrix(i, i))
                                        ELSE
                                           v_block(isgf, jsgf) = -u_minus_j*fspin*q_matrix(j, i)
                                        END IF
@@ -695,8 +695,8 @@ CONTAINS
                      q_work(:, :) = 0.0_dp
                      DO isb = 1, nsb
                         j = 0
-                        DO i = (isb-1)*nsbsize+1, isb*nsbsize
-                           j = j+1
+                        DO i = (isb - 1)*nsbsize + 1, isb*nsbsize
+                           j = j + 1
                            q_work(isb, j) = q_matrix(i, i)
                         END DO
                      END DO
@@ -863,8 +863,8 @@ CONTAINS
       CHARACTER(LEN=6), ALLOCATABLE, DIMENSION(:)        :: symbol
       CHARACTER(LEN=default_string_length)               :: atomic_kind_name
       INTEGER :: atom_a, handle, i, i0, iatom, ikind, iorb, isb, iset, isgf, ishell, ispin, j, &
-         jsb, jset, jsgf, jshell, lu, m, max_scf, n, natom, natom_of_kind, nkind, norb, nsb, &
-         nsbsize, nset, nsgf_kind, nspin
+                 jsb, jset, jsgf, jshell, lu, m, max_scf, n, natom, natom_of_kind, nkind, norb, nsb, &
+                 nsbsize, nset, nsgf_kind, nspin
       INTEGER, DIMENSION(1)                              :: iloc
       INTEGER, DIMENSION(:), POINTER                     :: atom_list, nshell, orbitals
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgf, l, last_sgf
@@ -1092,7 +1092,7 @@ CONTAINS
 
             IF ((ispin == 1) .AND. (u_ramping > 0.0_dp)) THEN
                IF (qs_env%scf_env%iter_delta <= eps_u_ramping) THEN
-                  u_minus_j = MIN(u_minus_j+u_ramping, u_minus_j_target)
+                  u_minus_j = MIN(u_minus_j + u_ramping, u_minus_j_target)
                   CALL set_qs_kind(qs_kind_set(ikind), u_minus_j=u_minus_j)
                END IF
                IF (should_output .AND. (output_unit > 0)) THEN
@@ -1120,11 +1120,11 @@ CONTAINS
             nsb = 0
             DO iset = 1, nset
                DO ishell = 1, nshell(iset)
-                  IF (l(ishell, iset) == lu) nsb = nsb+1
+                  IF (l(ishell, iset) == lu) nsb = nsb + 1
                END DO
             END DO
 
-            nsbsize = (2*lu+1)
+            nsbsize = (2*lu + 1)
             n = nsb*nsbsize
 
             ALLOCATE (q_matrix(n, n))
@@ -1136,7 +1136,7 @@ CONTAINS
                IF (output_unit > 0) THEN
                   ALLOCATE (symbol(nsbsize))
                   DO m = -lu, lu
-                     symbol(lu+m+1) = sgf_symbol(0, lu, m)
+                     symbol(lu + m + 1) = sgf_symbol(0, lu, m)
                   END DO
                   IF (nspin > 1) THEN
                      WRITE (UNIT=spin_info, FMT="(A8,I2)") " of spin", ispin
@@ -1176,13 +1176,13 @@ CONTAINS
                      DO ishell = 1, nshell(iset)
                         IF (l(ishell, iset) /= lu) CYCLE
                         DO isgf = first_sgf(ishell, iset), last_sgf(ishell, iset)
-                           i = i+1
+                           i = i + 1
                            j = 0
                            DO jset = 1, nset
                               DO jshell = 1, nshell(jset)
                                  IF (l(jshell, jset) /= lu) CYCLE
                                  DO jsgf = first_sgf(jshell, jset), last_sgf(jshell, jset)
-                                    j = j+1
+                                    j = j + 1
                                     q_matrix(i, j) = q_block(isgf, jsgf)
                                  END DO ! next contracted spherical Gaussian function "jsgf"
                               END DO ! next shell "jshell"
@@ -1211,8 +1211,8 @@ CONTAINS
                         END IF
                         DO isb = 1, nsb
                            trq = 0.0_dp
-                           DO i = (isb-1)*nsbsize+1, isb*nsbsize
-                              trq = trq+q_eigval(i)
+                           DO i = (isb - 1)*nsbsize + 1, isb*nsbsize
+                              trq = trq + q_eigval(i)
                            END DO
                            IF (smear) THEN
                               occ = trq/REAL(norb, KIND=dp)
@@ -1221,28 +1221,28 @@ CONTAINS
                            END IF
                            orb_occ(:) = .FALSE.
                            iloc = MAXLOC(q_eigvec(:, isb*nsbsize))
-                           jsb = INT((iloc(1)-1)/nsbsize)+1
+                           jsb = INT((iloc(1) - 1)/nsbsize) + 1
                            i = 0
-                           i0 = (jsb-1)*nsbsize+1
+                           i0 = (jsb - 1)*nsbsize + 1
                            iorb = -1000
                            DO j = i0, jsb*nsbsize
-                              i = i+1
+                              i = i + 1
                               IF (i > norb) THEN
                                  DO m = -lu, lu
-                                    IF (.NOT. orb_occ(lu+m+1)) THEN
-                                       iorb = i0+lu+m
-                                       orb_occ(lu+m+1) = .TRUE.
+                                    IF (.NOT. orb_occ(lu + m + 1)) THEN
+                                       iorb = i0 + lu + m
+                                       orb_occ(lu + m + 1) = .TRUE.
                                     END IF
                                  END DO
                               ELSE
-                                 iorb = i0+lu+orbitals(i)
-                                 orb_occ(lu+orbitals(i)+1) = .TRUE.
+                                 iorb = i0 + lu + orbitals(i)
+                                 orb_occ(lu + orbitals(i) + 1) = .TRUE.
                               END IF
                               CPASSERT(iorb /= -1000)
                               iloc = MAXLOC(q_eigvec(iorb, :))
                               q_eigval(iloc(1)) = MIN(occ, trq)
                               q_matrix(:, iloc(1)) = q_eigval(iloc(1))*q_eigvec(:, iloc(1)) ! backtransform left
-                              trq = trq-q_eigval(iloc(1))
+                              trq = trq - q_eigval(iloc(1))
                            END DO
                         END DO
                         q_matrix(:, :) = MATMUL(q_matrix, TRANSPOSE(q_eigvec)) ! backtransform right
@@ -1256,9 +1256,9 @@ CONTAINS
                   trq2 = 0.0_dp
 
                   DO i = 1, n
-                     trq = trq+q_matrix(i, i)
+                     trq = trq + q_matrix(i, i)
                      DO j = 1, n
-                        trq2 = trq2+q_matrix(i, j)*q_matrix(j, i)
+                        trq2 = trq2 + q_matrix(i, j)*q_matrix(j, i)
                      END DO
                   END DO
 
@@ -1267,7 +1267,7 @@ CONTAINS
 
                   ! Calculate energy contribution to E(U)
 
-                  energy%dft_plus_u = energy%dft_plus_u+0.5_dp*u_minus_j*(trq-trq2)/fspin
+                  energy%dft_plus_u = energy%dft_plus_u + 0.5_dp*u_minus_j*(trq - trq2)/fspin
 
                   ! Calculate potential V(U) = dE(U)/dq
 
@@ -1285,15 +1285,15 @@ CONTAINS
                         DO ishell = 1, nshell(iset)
                            IF (l(ishell, iset) /= lu) CYCLE
                            DO isgf = first_sgf(ishell, iset), last_sgf(ishell, iset)
-                              i = i+1
+                              i = i + 1
                               j = 0
                               DO jset = 1, nset
                                  DO jshell = 1, nshell(jset)
                                     IF (l(jshell, jset) /= lu) CYCLE
                                     DO jsgf = first_sgf(jshell, jset), last_sgf(jshell, jset)
-                                       j = j+1
+                                       j = j + 1
                                        IF (isgf == jsgf) THEN
-                                          v_block(isgf, isgf) = u_minus_j*(0.5_dp-fspin*q_matrix(i, i))
+                                          v_block(isgf, isgf) = u_minus_j*(0.5_dp - fspin*q_matrix(i, i))
                                        ELSE
                                           v_block(isgf, jsgf) = -u_minus_j*fspin*q_matrix(j, i)
                                        END IF
@@ -1317,8 +1317,8 @@ CONTAINS
                      q_work(:, :) = 0.0_dp
                      DO isb = 1, nsb
                         j = 0
-                        DO i = (isb-1)*nsbsize+1, isb*nsbsize
-                           j = j+1
+                        DO i = (isb - 1)*nsbsize + 1, isb*nsbsize
+                           j = j + 1
                            q_work(isb, j) = q_matrix(i, i)
                         END DO
                      END DO
@@ -1425,7 +1425,7 @@ CONTAINS
 
                   IF (orthonormal_basis) THEN
                      DO isgf = 1, SIZE(h_block, 1)
-                        h_block(isgf, isgf) = h_block(isgf, isgf)+v_block(isgf, isgf)
+                        h_block(isgf, isgf) = h_block(isgf, isgf) + v_block(isgf, isgf)
                      END DO
                   ELSE
                      CALL dbcsr_get_block_p(matrix=sm_s, &
@@ -1436,7 +1436,7 @@ CONTAINS
                      CPASSERT(ASSOCIATED(s_block))
                      DO jsgf = 1, SIZE(h_block, 2)
                         DO isgf = 1, SIZE(h_block, 1)
-                           h_block(isgf, jsgf) = h_block(isgf, jsgf)+v_block(isgf, jsgf)*s_block(isgf, jsgf)
+                           h_block(isgf, jsgf) = h_block(isgf, jsgf) + v_block(isgf, jsgf)*s_block(isgf, jsgf)
                         END DO
                      END DO
                   END IF ! orthonormal basis set
@@ -1513,13 +1513,13 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit, print_level
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mulliken_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=10)                                  :: spin_info
       CHARACTER(LEN=6), ALLOCATABLE, DIMENSION(:)        :: symbol
       CHARACTER(LEN=default_string_length)               :: atomic_kind_name
       INTEGER :: atom_a, blk, handle, i, iatom, ikind, isb, iset, isgf, ishell, ispin, jatom, &
-         jsgf, lu, m, natom, natom_of_kind, nkind, nsb, nset, nsgf, nspin, sgf
+                 jsgf, lu, m, natom, natom_of_kind, nkind, nsb, nset, nsgf, nspin, sgf
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: first_sgf_atom
       INTEGER, DIMENSION(:), POINTER                     :: atom_list, nshell
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgf, l, last_sgf
@@ -1668,8 +1668,8 @@ CONTAINS
                IF (ASSOCIATED(p_block)) THEN
                   sgf = first_sgf_atom(iatom)
                   DO isgf = 1, SIZE(p_block, 1)
-                     trps(sgf) = trps(sgf)+p_block(isgf, isgf)
-                     sgf = sgf+1
+                     trps(sgf) = trps(sgf) + p_block(isgf, isgf)
+                     sgf = sgf + 1
                   END DO
                END IF
 
@@ -1685,18 +1685,18 @@ CONTAINS
                sgf = first_sgf_atom(jatom)
                DO jsgf = 1, SIZE(p_block, 2)
                   DO isgf = 1, SIZE(p_block, 1)
-                     trps(sgf) = trps(sgf)+p_block(isgf, jsgf)*s_block(isgf, jsgf)
+                     trps(sgf) = trps(sgf) + p_block(isgf, jsgf)*s_block(isgf, jsgf)
                   END DO
-                  sgf = sgf+1
+                  sgf = sgf + 1
                END DO
 
                IF (iatom /= jatom) THEN
                   sgf = first_sgf_atom(iatom)
                   DO isgf = 1, SIZE(p_block, 1)
                      DO jsgf = 1, SIZE(p_block, 2)
-                        trps(sgf) = trps(sgf)+p_block(isgf, jsgf)*s_block(isgf, jsgf)
+                        trps(sgf) = trps(sgf) + p_block(isgf, jsgf)*s_block(isgf, jsgf)
                      END DO
-                     sgf = sgf+1
+                     sgf = sgf + 1
                   END DO
                END IF
 
@@ -1746,7 +1746,7 @@ CONTAINS
 
             IF ((ispin == 1) .AND. (u_ramping > 0.0_dp)) THEN
                IF (qs_env%scf_env%iter_delta <= eps_u_ramping) THEN
-                  u_minus_j = MIN(u_minus_j+u_ramping, u_minus_j_target)
+                  u_minus_j = MIN(u_minus_j + u_ramping, u_minus_j_target)
                   CALL set_qs_kind(qs_kind_set(ikind), u_minus_j=u_minus_j)
                END IF
                IF (should_output .AND. (output_unit > 0)) THEN
@@ -1772,19 +1772,19 @@ CONTAINS
             nsb = 0
             DO iset = 1, nset
                DO ishell = 1, nshell(iset)
-                  IF (l(ishell, iset) == lu) nsb = nsb+1
+                  IF (l(ishell, iset) == lu) nsb = nsb + 1
                END DO
             END DO
 
-            ALLOCATE (q_ii(nsb, 2*lu+1))
+            ALLOCATE (q_ii(nsb, 2*lu + 1))
 
             ! Print headline if requested
 
             IF (should_output .AND. (print_level > low_print_level)) THEN
                IF (output_unit > 0) THEN
-                  ALLOCATE (symbol(2*lu+1))
+                  ALLOCATE (symbol(2*lu + 1))
                   DO m = -lu, lu
-                     symbol(lu+m+1) = sgf_symbol(0, lu, m)
+                     symbol(lu + m + 1) = sgf_symbol(0, lu, m)
                   END DO
                   IF (nspin > 1) THEN
                      WRITE (UNIT=spin_info, FMT="(A8,I2)") " of spin", ispin
@@ -1794,7 +1794,7 @@ CONTAINS
                   WRITE (UNIT=output_unit, FMT="(/,T3,A,I0,A,/,/,T5,A,10(2X,A6))") &
                      "DFT+U occupations"//TRIM(spin_info)//" for the atoms of atomic kind ", ikind, &
                      ": "//TRIM(atomic_kind_name), &
-                     "Atom   Shell  ", (ADJUSTR(symbol(i)), i=1, 2*lu+1), " Trace"
+                     "Atom   Shell  ", (ADJUSTR(symbol(i)), i=1, 2*lu + 1), " Trace"
                   DEALLOCATE (symbol)
                END IF
             END IF
@@ -1825,21 +1825,21 @@ CONTAINS
                   DO iset = 1, nset
                      DO ishell = 1, nshell(iset)
                         IF (l(ishell, iset) == lu) THEN
-                           isb = isb+1
+                           isb = isb + 1
                            i = 0
                            DO isgf = first_sgf(ishell, iset), last_sgf(ishell, iset)
                               q = fspin*trps(sgf)
-                              i = i+1
+                              i = i + 1
                               q_ii(isb, i) = q
-                              energy%dft_plus_u = energy%dft_plus_u+ &
-                                                  0.5_dp*u_minus_j*(q-q**2)/fspin
+                              energy%dft_plus_u = energy%dft_plus_u + &
+                                                  0.5_dp*u_minus_j*(q - q**2)/fspin
                               IF (.NOT. just_energy) THEN
-                                 dEdq(sgf) = dEdq(sgf)+u_minus_j*(0.5_dp-q)
+                                 dEdq(sgf) = dEdq(sgf) + u_minus_j*(0.5_dp - q)
                               END IF
-                              sgf = sgf+1
+                              sgf = sgf + 1
                            END DO ! next contracted spherical Gaussian function "isgf"
                         ELSE
-                           sgf = sgf+last_sgf(ishell, iset)-first_sgf(ishell, iset)+1
+                           sgf = sgf + last_sgf(ishell, iset) - first_sgf(ishell, iset) + 1
                         END IF ! angular momentum requested for DFT+U correction
                      END DO ! next shell "ishell"
                   END DO ! next shell set "iset"
@@ -1856,7 +1856,7 @@ CONTAINS
                            atom_a, isb, q_ii(isb, :), SUM(q_ii(isb, :))
                      END DO
                      WRITE (UNIT=output_unit, FMT="(T12,A,2X,10F8.3)") &
-                        "Total", (SUM(q_ii(:, i)), i=1, 2*lu+1), SUM(q_ii)
+                        "Total", (SUM(q_ii(:, i)), i=1, 2*lu + 1), SUM(q_ii)
                      WRITE (UNIT=output_unit, FMT="(A)") ""
                   END IF
                END IF ! should output
@@ -1890,8 +1890,8 @@ CONTAINS
                   IF (ASSOCIATED(h_block)) THEN
                      sgf = first_sgf_atom(iatom)
                      DO isgf = 1, SIZE(h_block, 1)
-                        h_block(isgf, isgf) = h_block(isgf, isgf)+dEdq(sgf)
-                        sgf = sgf+1
+                        h_block(isgf, isgf) = h_block(isgf, isgf) + dEdq(sgf)
+                        sgf = sgf + 1
                      END DO
                   END IF
 
@@ -1914,10 +1914,10 @@ CONTAINS
                      IF (dEdq(sgf) /= 0.0_dp) THEN
                         v = 0.5_dp*dEdq(sgf)
                         DO jsgf = 1, SIZE(h_block, 2)
-                           h_block(isgf, jsgf) = h_block(isgf, jsgf)+v*s_block(isgf, jsgf)
+                           h_block(isgf, jsgf) = h_block(isgf, jsgf) + v*s_block(isgf, jsgf)
                         END DO
                      END IF
-                     sgf = sgf+1
+                     sgf = sgf + 1
                   END DO
 
                   sgf = first_sgf_atom(jatom)
@@ -1926,10 +1926,10 @@ CONTAINS
                      IF (dEdq(sgf) /= 0.0_dp) THEN
                         v = 0.5_dp*dEdq(sgf)
                         DO isgf = 1, SIZE(h_block, 1)
-                           h_block(isgf, jsgf) = h_block(isgf, jsgf)+v*s_block(isgf, jsgf)
+                           h_block(isgf, jsgf) = h_block(isgf, jsgf) + v*s_block(isgf, jsgf)
                         END DO
                      END IF
-                     sgf = sgf+1
+                     sgf = sgf + 1
                   END DO
 
                END IF ! orthonormal basis set
@@ -1973,10 +1973,10 @@ CONTAINS
                   IF (dEdq(sgf) /= 0.0_dp) THEN
                      v = -0.5_dp*dEdq(sgf)
                      DO jsgf = 1, SIZE(w_block, 2)
-                        w_block(isgf, jsgf) = w_block(isgf, jsgf)+v*p_block(isgf, jsgf)
+                        w_block(isgf, jsgf) = w_block(isgf, jsgf) + v*p_block(isgf, jsgf)
                      END DO
                   END IF
-                  sgf = sgf+1
+                  sgf = sgf + 1
                END DO
 
                sgf = first_sgf_atom(jatom)
@@ -1985,10 +1985,10 @@ CONTAINS
                   IF (dEdq(sgf) /= 0.0_dp) THEN
                      v = -0.5_dp*dEdq(sgf)
                      DO isgf = 1, SIZE(w_block, 1)
-                        w_block(isgf, jsgf) = w_block(isgf, jsgf)+v*p_block(isgf, jsgf)
+                        w_block(isgf, jsgf) = w_block(isgf, jsgf) + v*p_block(isgf, jsgf)
                      END DO
                   END IF
-                  sgf = sgf+1
+                  sgf = sgf + 1
                END DO
 
             END DO ! next block node "jatom"

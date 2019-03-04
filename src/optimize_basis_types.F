@@ -4,10 +4,10 @@
 !--------------------------------------------------------------------------------------------------!
 MODULE optimize_basis_types
 
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE powell,                          ONLY: opt_state_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE powell, ONLY: opt_state_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -129,7 +129,7 @@ CONTAINS
       TYPE(basis_optimization_type)                      :: opt_bas
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_basis_optimization_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: igroup, ikind
 
@@ -167,12 +167,12 @@ CONTAINS
       TYPE(kind_basis_type)                              :: kind
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_kind_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ibasis, icont, iinfo, iset
 
       IF (ALLOCATED(kind%deriv_info)) THEN
-         DO iinfo = 0, SIZE(kind%deriv_info)-1
+         DO iinfo = 0, SIZE(kind%deriv_info) - 1
             IF (ALLOCATED(kind%deriv_info(iinfo)%remove_contr)) DEALLOCATE (kind%deriv_info(iinfo)%remove_contr)
             IF (ALLOCATED(kind%deriv_info(iinfo)%remove_set)) DEALLOCATE (kind%deriv_info(iinfo)%remove_set)
             IF (ALLOCATED(kind%deriv_info(iinfo)%in_use_set)) DEALLOCATE (kind%deriv_info(iinfo)%in_use_set)
@@ -188,7 +188,7 @@ CONTAINS
       END IF
 
       IF (ALLOCATED(kind%flex_basis)) THEN
-         DO ibasis = 0, SIZE(kind%flex_basis)-1
+         DO ibasis = 0, SIZE(kind%flex_basis) - 1
             IF (ALLOCATED(kind%flex_basis(ibasis)%subset)) THEN
                DO iset = 1, SIZE(kind%flex_basis(ibasis)%subset)
                   IF (ALLOCATED(kind%flex_basis(ibasis)%subset(iset)%l)) &

@@ -16,41 +16,41 @@
 !> \author Matthias Krack (28.06.2000)
 ! **************************************************************************************************
 MODULE qs_diis
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_scale_and_add,&
-                                              cp_fm_symm,&
-                                              cp_fm_trace
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_maxabsval,&
-                                              cp_fm_p_type,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_maxabs, dbcsr_multiply, dbcsr_p_type, &
-        dbcsr_release, dbcsr_set, dbcsr_trace, dbcsr_transposed, dbcsr_type
-   USE dm_ls_scf_types,                 ONLY: ls_scf_env_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathlib,                         ONLY: diamat_all
-   USE qs_diis_types,                   ONLY: qs_diis_buffer_type,&
-                                              qs_diis_buffer_type_sparse
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE string_utilities,                ONLY: compress
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_scale_and_add, &
+                                 cp_fm_symm, &
+                                 cp_fm_trace
+   USE cp_fm_struct, ONLY: cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_maxabsval, &
+                          cp_fm_p_type, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_maxabs, dbcsr_multiply, dbcsr_p_type, &
+      dbcsr_release, dbcsr_set, dbcsr_trace, dbcsr_transposed, dbcsr_type
+   USE dm_ls_scf_types, ONLY: ls_scf_env_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathlib, ONLY: diamat_all
+   USE qs_diis_types, ONLY: qs_diis_buffer_type, &
+                            qs_diis_buffer_type_sparse
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE string_utilities, ONLY: compress
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -85,7 +85,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: nbuffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_diis_b_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -100,7 +100,7 @@ CONTAINS
       NULLIFY (diis_buffer%parameter)
       diis_buffer%nbuffer = nbuffer
       diis_buffer%ncall = 0
-      last_diis_b_id = last_diis_b_id+1
+      last_diis_b_id = last_diis_b_id + 1
       diis_buffer%id_nr = last_diis_b_id
       diis_buffer%ref_count = 1
 
@@ -132,7 +132,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: scf_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_diis_b_check_i_alloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ibuffer, ispin, nbuffer, &
                                                             output_unit
@@ -184,7 +184,7 @@ CONTAINS
       END IF
 
       IF (.NOT. ASSOCIATED(diis_buffer%b_matrix)) THEN
-         ALLOCATE (diis_buffer%b_matrix(nbuffer+1, nbuffer+1))
+         ALLOCATE (diis_buffer%b_matrix(nbuffer + 1, nbuffer + 1))
          diis_buffer%b_matrix = 0.0_dp
          output_unit = cp_print_key_unit_nr(logger, scf_section, "PRINT%DIIS_INFO", &
                                             extension=".scfLog")
@@ -290,8 +290,8 @@ CONTAINS
 
       error_max = 0.0_dp
 
-      ib = MODULO(diis_buffer%ncall, diis_buffer%nbuffer)+1
-      diis_buffer%ncall = diis_buffer%ncall+1
+      ib = MODULO(diis_buffer%ncall, diis_buffer%nbuffer) + 1
+      diis_buffer%ncall = diis_buffer%ncall + 1
       nb = MIN(diis_buffer%ncall, diis_buffer%nbuffer)
 
       DO ispin = 1, nspin
@@ -320,7 +320,7 @@ CONTAINS
                             occupation_numbers=occb)
 
             DO imo = 1, nmo
-               occ(imo) = SQRT(occa(imo)+occb(imo))
+               occ(imo) = SQRT(occa(imo) + occb(imo))
             END DO
 
             CALL cp_fm_to_fm(c, sc)
@@ -410,7 +410,7 @@ CONTAINS
                old_errors => diis_buffer%error(jb, ispin)%matrix
                new_errors => diis_buffer%error(ib, ispin)%matrix
                CALL cp_fm_trace(old_errors, new_errors, tmp)
-               b(jb, ib) = b(jb, ib)+tmp
+               b(jb, ib) = b(jb, ib) + tmp
             END DO
             b(ib, jb) = b(jb, ib)
          END DO
@@ -425,7 +425,7 @@ CONTAINS
 
       IF (diis_step) THEN
 
-         nb1 = nb+1
+         nb1 = nb + 1
 
          ALLOCATE (a(nb1, nb1))
          ALLOCATE (b(nb1, nb1))
@@ -516,7 +516,7 @@ CONTAINS
       TYPE(qs_diis_buffer_type), POINTER                 :: diis_buffer
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_diis_b_clear', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -567,7 +567,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: threshold
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_diis_b_step_4lscf', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER :: eigenvalue_threshold = 1.0E-12_dp
 
       INTEGER                                            :: handle, ib, ispin, jb, my_nmixing, nb, &
@@ -604,8 +604,8 @@ CONTAINS
          nspin)
       error_max = 0.0_dp
 
-      ib = MODULO(diis_buffer%ncall, diis_buffer%nbuffer)+1
-      diis_buffer%ncall = diis_buffer%ncall+1
+      ib = MODULO(diis_buffer%ncall, diis_buffer%nbuffer) + 1
+      diis_buffer%ncall = diis_buffer%ncall + 1
       nb = MIN(diis_buffer%ncall, diis_buffer%nbuffer)
 ! Create scratch arrays
       CALL dbcsr_create(matrix_tmp, &
@@ -695,7 +695,7 @@ CONTAINS
                CALL dbcsr_trace(old_errors, &
                                 new_errors, &
                                 tmp) ! out : < f_i | f_j >
-               b(jb, ib) = b(jb, ib)+tmp
+               b(jb, ib) = b(jb, ib) + tmp
             END DO ! end-loop-ispin
             b(ib, jb) = b(jb, ib)
          END DO ! end-loop-jb
@@ -705,7 +705,7 @@ CONTAINS
 
       ! Perform DIIS step
       IF (diis_step) THEN
-         nb1 = nb+1
+         nb1 = nb + 1
          ALLOCATE (a(nb1, nb1))
          ALLOCATE (b(nb1, nb1))
          ALLOCATE (ev(nb1))
@@ -783,7 +783,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nspin
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_diis_b_check_i_alloc_sparse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ibuffer, ispin, nbuffer
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -827,7 +827,7 @@ CONTAINS
       END IF
 
       IF (.NOT. ASSOCIATED(diis_buffer%b_matrix)) THEN
-         ALLOCATE (diis_buffer%b_matrix(nbuffer+1, nbuffer+1))
+         ALLOCATE (diis_buffer%b_matrix(nbuffer + 1, nbuffer + 1))
 
          diis_buffer%b_matrix = 0.0_dp
       END IF
@@ -849,7 +849,7 @@ CONTAINS
       TYPE(qs_diis_buffer_type_sparse), POINTER          :: diis_buffer
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_diis_b_clear_sparse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -880,7 +880,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: nbuffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_diis_b_create_sparse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -895,7 +895,7 @@ CONTAINS
       NULLIFY (diis_buffer%parameter)
       diis_buffer%nbuffer = nbuffer
       diis_buffer%ncall = 0
-      last_diis_b_id = last_diis_b_id+1
+      last_diis_b_id = last_diis_b_id + 1
       diis_buffer%id_nr = last_diis_b_id
       diis_buffer%ref_count = 1
 

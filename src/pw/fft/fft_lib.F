@@ -4,21 +4,21 @@
 !--------------------------------------------------------------------------------------------------!
 MODULE fft_lib
 
-   USE fft_kinds,                       ONLY: dp
-   USE fft_plan,                        ONLY: fft_plan_type
-   USE fftsg_lib,                       ONLY: fftsg1dm,&
-                                              fftsg3d,&
-                                              fftsg_do_cleanup,&
-                                              fftsg_do_init,&
-                                              fftsg_get_lengths
-   USE fftw3_lib,                       ONLY: fftw31dm,&
-                                              fftw33d,&
-                                              fftw3_create_plan_1dm,&
-                                              fftw3_create_plan_3d,&
-                                              fftw3_destroy_plan,&
-                                              fftw3_do_cleanup,&
-                                              fftw3_do_init,&
-                                              fftw3_get_lengths
+   USE fft_kinds, ONLY: dp
+   USE fft_plan, ONLY: fft_plan_type
+   USE fftsg_lib, ONLY: fftsg1dm, &
+                        fftsg3d, &
+                        fftsg_do_cleanup, &
+                        fftsg_do_init, &
+                        fftsg_get_lengths
+   USE fftw3_lib, ONLY: fftw31dm, &
+                        fftw33d, &
+                        fftw3_create_plan_1dm, &
+                        fftw3_create_plan_3d, &
+                        fftw3_destroy_plan, &
+                        fftw3_do_cleanup, &
+                        fftw3_do_init, &
+                        fftw3_get_lengths
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE

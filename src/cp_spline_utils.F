@@ -10,24 +10,24 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE cp_spline_utils
-   USE input_constants,                 ONLY: spline3_nopbc_interp,&
-                                              spline3_pbc_interp
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_spline_utils,                 ONLY: &
-        add_coarse2fine, add_fine2coarse, find_coeffs, pw_spline_do_precond, &
-        pw_spline_precond_create, pw_spline_precond_release, pw_spline_precond_set_kind, &
-        pw_spline_precond_type, spl3_1d_transf_border1, spl3_1d_transf_coeffs, spl3_nopbc, &
-        spl3_nopbct, spl3_pbc
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_type
+   USE input_constants, ONLY: spline3_nopbc_interp, &
+                              spline3_pbc_interp
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_spline_utils, ONLY: &
+      add_coarse2fine, add_fine2coarse, find_coeffs, pw_spline_do_precond, &
+      pw_spline_precond_create, pw_spline_precond_release, pw_spline_precond_set_kind, &
+      pw_spline_precond_type, spl3_1d_transf_border1, spl3_1d_transf_coeffs, spl3_nopbc, &
+      spl3_nopbct, spl3_pbc
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,7 +65,7 @@ CONTAINS
       TYPE(pw_spline_precond_type), POINTER              :: precond
       TYPE(pw_type), POINTER                             :: coeffs, values
 
-      ifile = ifile+1
+      ifile = ifile + 1
       CALL timeset(routineN, handle)
       CALL section_vals_val_get(param_section, "safe_computation", &
                                 l_val=safe_computation)
@@ -153,7 +153,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: param_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_prolongate_s3', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: aint_precond, handle, interp_kind, &
                                                             max_iter, precond_kind
@@ -164,7 +164,7 @@ CONTAINS
       TYPE(pw_spline_precond_type), POINTER              :: precond
       TYPE(pw_type), POINTER                             :: coeffs
 
-      ifile = ifile+1
+      ifile = ifile + 1
       CALL timeset(routineN, handle)
       NULLIFY (coeffs)
       CALL pw_pool_create_pw(coarse_pool, coeffs, use_data=REALDATA3D, &

@@ -13,18 +13,18 @@
 
 MODULE xc_xlda_hole_t_c_lr
 
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE mathlib,                         ONLY: expint
-   USE xc_derivative_set_types,         ONLY: xc_derivative_set_type,&
-                                              xc_dset_get_derivative
-   USE xc_derivative_types,             ONLY: xc_derivative_get,&
-                                              xc_derivative_type
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_type
-   USE xc_rho_set_types,                ONLY: xc_rho_set_get,&
-                                              xc_rho_set_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE mathlib, ONLY: expint
+   USE xc_derivative_set_types, ONLY: xc_derivative_set_type, &
+                                      xc_dset_get_derivative
+   USE xc_derivative_types, ONLY: xc_derivative_get, &
+                                  xc_derivative_type
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_type
+   USE xc_rho_set_types, ONLY: xc_rho_set_get, &
+                               xc_rho_set_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -126,7 +126,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: params
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xlda_hole_t_c_lr_lda_eval', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, npoints
       INTEGER, DIMENSION(:, :), POINTER                  :: bo
@@ -148,7 +148,7 @@ CONTAINS
 
       CALL xc_rho_set_get(rho_set, rho=rho, &
                           local_bounds=bo, rho_cutoff=epsilon_rho)
-      npoints = (bo(2, 1)-bo(1, 1)+1)*(bo(2, 2)-bo(1, 2)+1)*(bo(2, 3)-bo(1, 3)+1)
+      npoints = (bo(2, 1) - bo(1, 1) + 1)*(bo(2, 2) - bo(1, 2) + 1)*(bo(2, 3) - bo(1, 3) + 1)
 
       dummy => rho
 
@@ -203,7 +203,7 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: epsilon_rho, sx, R
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xlda_hole_t_c_lr_lda_calc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ip
       REAL(dp)                                           :: my_rho
@@ -245,7 +245,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: sx, R
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xlda_hole_t_c_lr_lda_calc_0', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: t1, t12, t14, t15, t19, t2, t22, t23, &
                                                             t24, t25, t3, t32, t33, t36, t4, t41, &
@@ -269,31 +269,31 @@ CONTAINS
          t23 = t22*t7
          t24 = D*t14*t23
          t25 = EXP(-t24)
-         t32 = 9+4*A*t14*t23
+         t32 = 9 + 4*A*t14*t23
          t33 = LOG(t32)
          t36 = D**2
          t41 = expint(1, t24)
          t46 = 0.1e1_dp/t36
          t62 = LOG(0.2e1_dp)
          t64 = LOG(A)
-         t67 = A*t12+0.3e1_dp/0.2e1_dp*E*t15*t3*t6*t5*t19*t25 &
-               -A*t33/0.2e1_dp+E/t36/D*t25+A*t41/0.2e1_dp+E*t14 &
-               *t22*t7*t46*t25+B*t19*t25/0.2e1_dp+C*t46*t25/0.2e1_dp &
-               +C*t14*t22*t7*t19*t25/0.2e1_dp+A*t62+A*t64 &
+         t67 = A*t12 + 0.3e1_dp/0.2e1_dp*E*t15*t3*t6*t5*t19*t25 &
+               - A*t33/0.2e1_dp + E/t36/D*t25 + A*t41/0.2e1_dp + E*t14 &
+               *t22*t7*t46*t25 + B*t19*t25/0.2e1_dp + C*t46*t25/0.2e1_dp &
+               + C*t14*t22*t7*t19*t25/0.2e1_dp + A*t62 + A*t64 &
                /0.2e1_dp
          t68 = t9*t67
-         e_0 = e_0+(0.2e1_dp/0.3e1_dp*t2*t68)*sx
+         e_0 = e_0 + (0.2e1_dp/0.3e1_dp*t2*t68)*sx
       END IF
       IF (order >= 1 .OR. order == -1) THEN
          t82 = A/rho
          t86 = t4**2
          t91 = A**2
          t95 = 0.1e1_dp/t6*t4
-         e_rho = e_rho+(0.4e1_dp/0.3e1_dp*rho*pi*t68-0.4e1_dp/0.9e1_dp*t1*t4*pi &
-                        *t3/t7/t5*t67+0.2e1_dp/0.3e1_dp*t2*t9*(t82/0.3e1_dp- &
-                                                               0.3e1_dp*E*t15*t14*t86*rho*t25-0.4e1_dp/0.3e1_dp*t91*t14 &
-                                                               *t22*t95/t32-t82*t25/0.3e1_dp-B*t14*t22*t95*t25 &
-                                                               /0.3e1_dp-C*t15*t3*t6*t4*t25))*sx
+         e_rho = e_rho + (0.4e1_dp/0.3e1_dp*rho*pi*t68 - 0.4e1_dp/0.9e1_dp*t1*t4*pi &
+                          *t3/t7/t5*t67 + 0.2e1_dp/0.3e1_dp*t2*t9*(t82/0.3e1_dp - &
+                                                                   0.3e1_dp*E*t15*t14*t86*rho*t25 - 0.4e1_dp/0.3e1_dp*t91*t14 &
+                                                                   *t22*t95/t32 - t82*t25/0.3e1_dp - B*t14*t22*t95*t25 &
+                                                                   /0.3e1_dp - C*t15*t3*t6*t4*t25))*sx
       END IF
 
    END SUBROUTINE xlda_hole_t_c_lr_lda_calc_0
@@ -320,7 +320,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: params
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xlda_hole_t_c_lr_lsd_eval', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, npoints
       INTEGER, DIMENSION(:, :), POINTER                  :: bo
@@ -342,7 +342,7 @@ CONTAINS
 
       CALL xc_rho_set_get(rho_set, rhoa=rhoa, rhob=rhob, &
                           local_bounds=bo, rho_cutoff=epsilon_rho)
-      npoints = (bo(2, 1)-bo(1, 1)+1)*(bo(2, 2)-bo(1, 2)+1)*(bo(2, 3)-bo(1, 3)+1)
+      npoints = (bo(2, 1) - bo(1, 1) + 1)*(bo(2, 2) - bo(1, 2) + 1)*(bo(2, 3) - bo(1, 3) + 1)
 
       dummy => rhoa
 
@@ -411,7 +411,7 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: epsilon_rho, sx, R
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xlda_hole_t_c_lr_lsd_calc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ip
       REAL(dp)                                           :: e_tmp, my_rho
@@ -424,7 +424,7 @@ CONTAINS
             e_tmp = 0.0_dp
             CALL xlda_hole_t_c_lr_lda_calc_0(order, my_rho, e_tmp, e_rho(ip), &
                                              sx, R)
-            e_0(ip) = e_0(ip)+0.5_dp*e_tmp
+            e_0(ip) = e_0(ip) + 0.5_dp*e_tmp
          END IF
       END DO
 

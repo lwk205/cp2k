@@ -9,13 +9,13 @@
 ! **************************************************************************************************
 MODULE xc_derivative_types
 
-   USE kinds,                           ONLY: dp
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_cr3d,&
-                                              pw_pool_type
-   USE xc_derivative_desc,              ONLY: MAX_DERIVATIVE_DESC_LENGTH,&
-                                              MAX_LABEL_LENGTH,&
-                                              create_split_derivative_desc,&
-                                              standardize_derivative_desc
+   USE kinds, ONLY: dp
+   USE pw_pool_types, ONLY: pw_pool_give_back_cr3d, &
+                            pw_pool_type
+   USE xc_derivative_desc, ONLY: MAX_DERIVATIVE_DESC_LENGTH, &
+                                 MAX_LABEL_LENGTH, &
+                                 create_split_derivative_desc, &
+                                 standardize_derivative_desc
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -67,7 +67,7 @@ CONTAINS
       REAL(kind=dp), DIMENSION(:, :, :), POINTER         :: cr3d_ptr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_derivative_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=MAX_DERIVATIVE_DESC_LENGTH)          :: my_desc
 
@@ -75,7 +75,7 @@ CONTAINS
 
       derivative%ref_count = 1
       derivative%id_nr = derivative_id_nr
-      derivative_id_nr = derivative_id_nr+1
+      derivative_id_nr = derivative_id_nr + 1
       CALL standardize_derivative_desc(desc, my_desc)
       CALL create_split_derivative_desc(my_desc, derivative%split_desc)
       derivative%desc = my_desc
@@ -94,11 +94,11 @@ CONTAINS
       TYPE(xc_derivative_type), POINTER                  :: deriv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_derivative_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(deriv))
       CPASSERT(deriv%ref_count > 0)
-      deriv%ref_count = deriv%ref_count+1
+      deriv%ref_count = deriv%ref_count + 1
    END SUBROUTINE xc_derivative_retain
 
 ! **************************************************************************************************
@@ -113,12 +113,12 @@ CONTAINS
       TYPE(pw_pool_type), OPTIONAL, POINTER              :: pw_pool
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_derivative_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(derivative))
       CPASSERT(derivative%ref_count >= 1)
 
-      derivative%ref_count = derivative%ref_count-1
+      derivative%ref_count = derivative%ref_count - 1
       IF (derivative%ref_count == 0) THEN
          IF (PRESENT(pw_pool)) THEN
             IF (ASSOCIATED(pw_pool)) THEN
@@ -163,7 +163,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: accept_null_data
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xc_derivative_get', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: my_accept_null_data
 

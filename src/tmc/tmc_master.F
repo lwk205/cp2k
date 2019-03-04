@@ -19,56 +19,56 @@
 ! **************************************************************************************************
 
 MODULE tmc_master
-   USE cell_types,                      ONLY: init_cell
-   USE cp_external_control,             ONLY: external_control
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE machine,                         ONLY: m_flush,&
-                                              m_memory,&
-                                              m_walltime
-   USE tmc_calculations,                ONLY: get_subtree_efficiency
-   USE tmc_cancelation,                 ONLY: free_cancelation_list
-   USE tmc_dot_tree,                    ONLY: create_dot_color,&
-                                              create_global_tree_dot_color,&
-                                              finalize_draw_tree,&
-                                              init_draw_trees
-   USE tmc_file_io,                     ONLY: print_restart_file,&
-                                              write_element_in_file
-   USE tmc_messages,                    ONLY: communicate_atom_types,&
-                                              recv_msg,&
-                                              send_msg,&
-                                              stop_whole_group,&
-                                              tmc_message
-   USE tmc_move_handle,                 ONLY: check_moves,&
-                                              print_move_types
-   USE tmc_stati,                       ONLY: &
-        TMC_CANCELING_MESSAGE, TMC_CANCELING_RECEIPT, TMC_STATUS_FAILED, &
-        TMC_STATUS_WAIT_FOR_NEW_TASK, TMC_STATUS_WORKER_INIT, TMC_STAT_ANALYSIS_REQUEST, &
-        TMC_STAT_ANALYSIS_RESULT, TMC_STAT_APPROX_ENERGY_REQUEST, TMC_STAT_APPROX_ENERGY_RESULT, &
-        TMC_STAT_ENERGY_REQUEST, TMC_STAT_ENERGY_RESULT, TMC_STAT_INIT_ANALYSIS, &
-        TMC_STAT_MD_REQUEST, TMC_STAT_MD_RESULT, TMC_STAT_NMC_REQUEST, TMC_STAT_NMC_RESULT, &
-        TMC_STAT_SCF_STEP_ENER_RECEIVE, TMC_STAT_START_CONF_REQUEST, TMC_STAT_START_CONF_RESULT
-   USE tmc_tree_acceptance,             ONLY: check_acceptance_of_depending_subtree_nodes,&
-                                              check_elements_for_acc_prob_update,&
-                                              tree_update
-   USE tmc_tree_build,                  ONLY: create_new_gt_tree_node,&
-                                              deallocate_sub_tree_node,&
-                                              finalize_init,&
-                                              finalize_trees,&
-                                              init_tree_mod,&
-                                              remove_all_trees
-   USE tmc_tree_search,                 ONLY: count_nodes_in_trees,&
-                                              count_prepared_nodes_in_trees,&
-                                              search_next_energy_calc
-   USE tmc_tree_types,                  ONLY: &
-        elem_array_type, elem_list_type, global_tree_type, status_accepted, &
-        status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
-        status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
-        status_canceled_ener, status_canceled_nmc, status_created, status_rejected, tree_type
-   USE tmc_types,                       ONLY: tmc_env_type
+   USE cell_types, ONLY: init_cell
+   USE cp_external_control, ONLY: external_control
+   USE cp_log_handling, ONLY: cp_to_string
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE global_types, ONLY: global_environment_type
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE machine, ONLY: m_flush, &
+                      m_memory, &
+                      m_walltime
+   USE tmc_calculations, ONLY: get_subtree_efficiency
+   USE tmc_cancelation, ONLY: free_cancelation_list
+   USE tmc_dot_tree, ONLY: create_dot_color, &
+                           create_global_tree_dot_color, &
+                           finalize_draw_tree, &
+                           init_draw_trees
+   USE tmc_file_io, ONLY: print_restart_file, &
+                          write_element_in_file
+   USE tmc_messages, ONLY: communicate_atom_types, &
+                           recv_msg, &
+                           send_msg, &
+                           stop_whole_group, &
+                           tmc_message
+   USE tmc_move_handle, ONLY: check_moves, &
+                              print_move_types
+   USE tmc_stati, ONLY: &
+      TMC_CANCELING_MESSAGE, TMC_CANCELING_RECEIPT, TMC_STATUS_FAILED, &
+      TMC_STATUS_WAIT_FOR_NEW_TASK, TMC_STATUS_WORKER_INIT, TMC_STAT_ANALYSIS_REQUEST, &
+      TMC_STAT_ANALYSIS_RESULT, TMC_STAT_APPROX_ENERGY_REQUEST, TMC_STAT_APPROX_ENERGY_RESULT, &
+      TMC_STAT_ENERGY_REQUEST, TMC_STAT_ENERGY_RESULT, TMC_STAT_INIT_ANALYSIS, &
+      TMC_STAT_MD_REQUEST, TMC_STAT_MD_RESULT, TMC_STAT_NMC_REQUEST, TMC_STAT_NMC_RESULT, &
+      TMC_STAT_SCF_STEP_ENER_RECEIVE, TMC_STAT_START_CONF_REQUEST, TMC_STAT_START_CONF_RESULT
+   USE tmc_tree_acceptance, ONLY: check_acceptance_of_depending_subtree_nodes, &
+                                  check_elements_for_acc_prob_update, &
+                                  tree_update
+   USE tmc_tree_build, ONLY: create_new_gt_tree_node, &
+                             deallocate_sub_tree_node, &
+                             finalize_init, &
+                             finalize_trees, &
+                             init_tree_mod, &
+                             remove_all_trees
+   USE tmc_tree_search, ONLY: count_nodes_in_trees, &
+                              count_prepared_nodes_in_trees, &
+                              search_next_energy_calc
+   USE tmc_tree_types, ONLY: &
+      elem_array_type, elem_list_type, global_tree_type, status_accepted, &
+      status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
+      status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
+      status_canceled_ener, status_canceled_nmc, status_created, status_rejected, tree_type
+   USE tmc_types, ONLY: tmc_env_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -101,7 +101,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'cancel_calculations', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, stat, wg
       TYPE(elem_list_type), POINTER                      :: tmp_element
@@ -144,7 +144,7 @@ CONTAINS
          work_list(wg)%canceled = .TRUE.
 
          ! counting the amount of canceled elements
-         cancel_count = cancel_count+1
+         cancel_count = cancel_count + 1
 
          ! delete element from canceling list
          IF (.NOT. ASSOCIATED(cancel_list%next)) THEN
@@ -174,7 +174,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'send_analysis_tasks', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dest, stat, wg
       TYPE(elem_list_type), POINTER                      :: list_tmp
@@ -218,8 +218,8 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'do_tmc_master', routineP = moduleN//':'//routineN
 
       INTEGER :: cancel_count, handle, last_output, reactivation_cc_count, &
-         reactivation_ener_count, restart_count, restarted_elem_nr, stat, walltime_delay, &
-         walltime_offset, wg, worker_counter
+                 reactivation_ener_count, restart_count, restarted_elem_nr, stat, walltime_delay, &
+                 walltime_offset, wg, worker_counter
       INTEGER(KIND=int_8)                                :: mem
       INTEGER, DIMENSION(6)                              :: nr_of_job
       INTEGER, DIMENSION(:), POINTER                     :: tree_elem_counters, tree_elem_heads
@@ -271,8 +271,8 @@ CONTAINS
       worker_timings_aver(:) = 0.0_dp
       ! remembers state of workers and their actual configurations
       ! the actual working group, communicating with
-      ALLOCATE (worker_info(tmc_env%tmc_comp_set%para_env_m_w%num_pe-1))
-      ALLOCATE (ana_worker_info(tmc_env%tmc_comp_set%para_env_m_ana%num_pe-1))
+      ALLOCATE (worker_info(tmc_env%tmc_comp_set%para_env_m_w%num_pe - 1))
+      ALLOCATE (ana_worker_info(tmc_env%tmc_comp_set%para_env_m_ana%num_pe - 1))
 
       ! get the start configuration form the first (exact energy) worker,
       !   master should/could have no Force environment
@@ -319,14 +319,14 @@ CONTAINS
       ! init restart counter (espacially for restart case)
       IF (tmc_env%m_env%restart_out_step .NE. 0) THEN
          restart_count = INT(tmc_env%m_env%result_count(0)/ &
-                             REAL(tmc_env%m_env%restart_out_step, KIND=dp))+1
+                             REAL(tmc_env%m_env%restart_out_step, KIND=dp)) + 1
       END IF
       restarted_elem_nr = tmc_env%m_env%result_count(0)
 
 !TODO check conf and cell of both input files (cell has to be equal,
 !           beacuse it is used as reference cell for scaling the cell)
       ! communicate the reference cell size
-      DO wg = 1, tmc_env%tmc_comp_set%para_env_m_w%num_pe-1
+      DO wg = 1, tmc_env%tmc_comp_set%para_env_m_w%num_pe - 1
          stat = TMC_STATUS_WORKER_INIT
          CALL tmc_message(msg_type=stat, send_recv=send_msg, dest=wg, &
                           para_env=tmc_env%tmc_comp_set%para_env_m_w, &
@@ -335,7 +335,7 @@ CONTAINS
 
       ! send the atom informations to all analysis workers
       IF (tmc_env%tmc_comp_set%para_env_m_ana%num_pe .GT. 1) THEN
-         DO wg = 1, tmc_env%tmc_comp_set%para_env_m_ana%num_pe-1
+         DO wg = 1, tmc_env%tmc_comp_set%para_env_m_ana%num_pe - 1
             stat = TMC_STAT_INIT_ANALYSIS
             CALL tmc_message(msg_type=stat, send_recv=send_msg, dest=wg, &
                              para_env=tmc_env%tmc_comp_set%para_env_m_ana, &
@@ -360,7 +360,7 @@ CONTAINS
       IF (tmc_env%m_env%gt_head%conf(1)%elem%stat .EQ. status_calc_approx_ener) THEN
          wg = 1
          IF (tmc_env%tmc_comp_set%group_cc_nr .GT. 0) &
-            wg = tmc_env%tmc_comp_set%group_ener_nr+1
+            wg = tmc_env%tmc_comp_set%group_ener_nr + 1
          stat = TMC_STAT_APPROX_ENERGY_REQUEST
          CALL tmc_message(msg_type=stat, send_recv=send_msg, dest=wg, &
                           para_env=tmc_env%tmc_comp_set%para_env_m_w, &
@@ -428,12 +428,12 @@ CONTAINS
                worker_info(wg)%busy = .FALSE.
 
                IF (ASSOCIATED(worker_info(wg)%elem)) THEN
-                  SELECT CASE (worker_info (wg)%elem%stat)
+                  SELECT CASE (worker_info(wg)%elem%stat)
                   CASE (status_cancel_ener)
                      !-- timings
-                     worker_timings_aver(4) = (worker_timings_aver(4)*nr_of_job(6)+ &
-                                               (m_walltime()-worker_info(wg)%start_time))/REAL(nr_of_job(6)+1, KIND=dp)
-                     nr_of_job(6) = nr_of_job(6)+1
+                     worker_timings_aver(4) = (worker_timings_aver(4)*nr_of_job(6) + &
+                                               (m_walltime() - worker_info(wg)%start_time))/REAL(nr_of_job(6) + 1, KIND=dp)
+                     nr_of_job(6) = nr_of_job(6) + 1
 
                      worker_info(wg)%elem%stat = status_canceled_ener
                      worker_info(wg)%elem%potential = 8000.0_dp
@@ -443,9 +443,9 @@ CONTAINS
                      END IF
                   CASE (status_cancel_nmc)
                      !-- timings
-                     worker_timings_aver(3) = (worker_timings_aver(3)*nr_of_job(5)+ &
-                                               (m_walltime()-worker_info(wg)%start_time))/REAL(nr_of_job(5)+1, KIND=dp)
-                     nr_of_job(5) = nr_of_job(5)+1
+                     worker_timings_aver(3) = (worker_timings_aver(3)*nr_of_job(5) + &
+                                               (m_walltime() - worker_info(wg)%start_time))/REAL(nr_of_job(5) + 1, KIND=dp)
+                     nr_of_job(5) = nr_of_job(5) + 1
 
                      worker_info(wg)%elem%stat = status_canceled_nmc
                      worker_info(wg)%elem%potential = 8000.0_dp
@@ -464,7 +464,7 @@ CONTAINS
                CPABORT("")
                ! -- ENERGY RESULT -----------------
             CASE (TMC_STAT_APPROX_ENERGY_RESULT)
-               nr_of_job(3) = nr_of_job(3)+1
+               nr_of_job(3) = nr_of_job(3) + 1
                worker_info(wg)%busy = .FALSE.
                worker_info(wg)%elem%stat = status_created
                IF (tmc_env%params%DRAW_TREE) THEN
@@ -478,11 +478,11 @@ CONTAINS
             CASE (TMC_STAT_NMC_RESULT, TMC_STAT_MD_RESULT)
                IF (.NOT. worker_info(wg)%canceled) worker_info(wg)%busy = .FALSE.
                !-- timings for Nested Monte Carlo calculation
-               worker_timings_aver(1) = (worker_timings_aver(1)*nr_of_job(3)+ &
-                                         (m_walltime()-worker_info(wg)%start_time))/REAL(nr_of_job(3)+1, KIND=dp)
-               nr_of_job(3) = nr_of_job(3)+1
+               worker_timings_aver(1) = (worker_timings_aver(1)*nr_of_job(3) + &
+                                         (m_walltime() - worker_info(wg)%start_time))/REAL(nr_of_job(3) + 1, KIND=dp)
+               nr_of_job(3) = nr_of_job(3) + 1
 
-               worker_info(wg)%start_time = m_walltime()-worker_info(wg)%start_time
+               worker_info(wg)%start_time = m_walltime() - worker_info(wg)%start_time
                CALL set_walltime_delay(worker_info(wg)%start_time, walltime_delay)
                worker_info(wg)%elem%stat = status_created
                IF (tmc_env%params%DRAW_TREE) THEN
@@ -522,7 +522,7 @@ CONTAINS
                                       tmc_params=tmc_env%params, &
                                       elem=worker_info(wg)%elem)
                      worker_info(wg)%busy = .TRUE.
-                     nr_of_job(2) = nr_of_job(2)+1
+                     nr_of_job(2) = nr_of_job(2) + 1
                      IF (tmc_env%params%DRAW_TREE) THEN
                         CALL create_dot_color(tree_element=worker_info(wg)%elem, &
                                               tmc_params=tmc_env%params)
@@ -536,11 +536,11 @@ CONTAINS
                ! -- ENERGY RESULT --------------------
             CASE (TMC_STAT_ENERGY_RESULT)
                !-- timings
-               worker_timings_aver(2) = (worker_timings_aver(2)*nr_of_job(4)+ &
-                                         (m_walltime()-worker_info(wg)%start_time))/REAL(nr_of_job(4)+1, KIND=dp)
-               nr_of_job(4) = nr_of_job(4)+1
+               worker_timings_aver(2) = (worker_timings_aver(2)*nr_of_job(4) + &
+                                         (m_walltime() - worker_info(wg)%start_time))/REAL(nr_of_job(4) + 1, KIND=dp)
+               nr_of_job(4) = nr_of_job(4) + 1
 
-               worker_info(wg)%start_time = m_walltime()-worker_info(wg)%start_time
+               worker_info(wg)%start_time = m_walltime() - worker_info(wg)%start_time
                CALL set_walltime_delay(worker_info(wg)%start_time, walltime_delay)
 
                IF (.NOT. worker_info(wg)%canceled) &
@@ -634,15 +634,15 @@ CONTAINS
          CALL external_control(should_stop=external_stop, flag="TMC", globenv=globenv)
          IF ((ANY(tmc_env%m_env%result_count(1:) .GE. tmc_env%m_env%num_MC_elem) &
               .AND. flag) .OR. &
-             (m_walltime()-run_time_start .GT. &
-              tmc_env%m_env%walltime-walltime_delay-walltime_offset) .OR. &
+             (m_walltime() - run_time_start .GT. &
+              tmc_env%m_env%walltime - walltime_delay - walltime_offset) .OR. &
              external_stop) THEN
             WRITE (tmc_env%m_env%io_unit, FMT="(/,T2,A)") REPEAT("=", 79)
             ! calculations NOT finished, walltime exceeded
             IF (.NOT. ANY(tmc_env%m_env%result_count(1:) &
                           .GE. tmc_env%m_env%num_MC_elem)) THEN
                WRITE (tmc_env%m_env%io_unit, *) "Walltime exceeded.", &
-                  m_walltime()-run_time_start, " of ", tmc_env%m_env%walltime-walltime_delay-walltime_offset, &
+                  m_walltime() - run_time_start, " of ", tmc_env%m_env%walltime - walltime_delay - walltime_offset, &
                   "(incl. delay", walltime_delay, "and offset", walltime_offset, ") left"
             ELSE
                ! calculations finished
@@ -681,8 +681,8 @@ CONTAINS
          ! =====================================================================
          !-- NEW TASK (if worker not busy sumit next task)
          ! =====================================================================
-         worker_counter = worker_counter+1
-         wg = MODULO(worker_counter, tmc_env%tmc_comp_set%para_env_m_w%num_pe-1)+1
+         worker_counter = worker_counter + 1
+         wg = MODULO(worker_counter, tmc_env%tmc_comp_set%para_env_m_w%num_pe - 1) + 1
 
          IF (DEBUG .GE. 16 .AND. ALL(worker_info(:)%busy)) &
             WRITE (tmc_env%m_env%io_unit, *) "all workers are busy"
@@ -740,7 +740,7 @@ CONTAINS
                                 para_env=tmc_env%tmc_comp_set%para_env_m_w, &
                                 tmc_params=tmc_env%params, &
                                 elem=gt_elem_tmp%conf(gt_elem_tmp%mv_conf)%elem)
-               nr_of_job(1) = nr_of_job(1)+1
+               nr_of_job(1) = nr_of_job(1) + 1
             CASE (status_created, status_calculate_energy)
                ! in case of parallel tempering the node can be already be calculating (related to another global tree node
                !-- send task to calculate system property
@@ -753,7 +753,7 @@ CONTAINS
                                 para_env=tmc_env%tmc_comp_set%para_env_m_w, &
                                 tmc_params=tmc_env%params, &
                                 elem=gt_elem_tmp%conf(gt_elem_tmp%mv_conf)%elem)
-               nr_of_job(2) = nr_of_job(2)+1
+               nr_of_job(2) = nr_of_job(2) + 1
             CASE (status_calculate_MD)
                stat = TMC_STAT_MD_REQUEST
                CALL tmc_message(msg_type=stat, send_recv=send_msg, dest=wg, &
@@ -761,7 +761,7 @@ CONTAINS
                                 tmc_params=tmc_env%params, &
                                 elem=gt_elem_tmp%conf(gt_elem_tmp%mv_conf)%elem)
 !                           temperature=tmc_env%params%Temp(gt_elem_tmp%mv_conf), &
-               nr_of_job(1) = nr_of_job(1)+1
+               nr_of_job(1) = nr_of_job(1) + 1
             CASE (status_calculate_NMC_steps)
                !-- send information of element, which should be calculated
                stat = TMC_STAT_NMC_REQUEST
@@ -769,7 +769,7 @@ CONTAINS
                                 para_env=tmc_env%tmc_comp_set%para_env_m_w, &
                                 tmc_params=tmc_env%params, &
                                 elem=gt_elem_tmp%conf(gt_elem_tmp%mv_conf)%elem)
-               nr_of_job(1) = nr_of_job(1)+1
+               nr_of_job(1) = nr_of_job(1) + 1
             CASE (status_cancel_nmc, status_cancel_ener)
                ! skip that task until receipt is received
                ! no status update
@@ -835,8 +835,8 @@ CONTAINS
                   tmc_env%m_env%estim_corr_wrong(2), &
                   tmc_env%m_env%estim_corr_wrong(4)
                WRITE (tmc_env%m_env%io_unit, *) &
-                  "Time: ", INT(m_walltime()-run_time_start), "of", &
-                  INT(tmc_env%m_env%walltime-walltime_delay-walltime_offset), &
+                  "Time: ", INT(m_walltime() - run_time_start), "of", &
+                  INT(tmc_env%m_env%walltime - walltime_delay - walltime_offset), &
                   "sec needed. "
                CALL m_memory(mem)
                WRITE (tmc_env%m_env%io_unit, *) &
@@ -851,7 +851,7 @@ CONTAINS
                 restart_count*tmc_env%m_env%restart_out_step) THEN
                CALL print_restart_file(tmc_env=tmc_env, job_counts=nr_of_job, &
                                        timings=worker_timings_aver)
-               restart_count = restart_count+1
+               restart_count = restart_count + 1
             END IF
 
          END IF !worker busy?
@@ -891,9 +891,9 @@ CONTAINS
       END IF
       WRITE (tmc_env%m_env%io_unit, FMT="(A,F10.2)") &
          " computing time of one Markov chain element ", &
-         (m_walltime()-run_time_start)/REAL(tmc_env%m_env%result_count(0)- &
-                                            restarted_elem_nr, KIND=dp)
-      WRITE (tmc_env%m_env%io_unit, FMT="(A,F10.2)") " TMC run time[s]: ", m_walltime()-run_time_start
+         (m_walltime() - run_time_start)/REAL(tmc_env%m_env%result_count(0) - &
+                                              restarted_elem_nr, KIND=dp)
+      WRITE (tmc_env%m_env%io_unit, FMT="(A,F10.2)") " TMC run time[s]: ", m_walltime() - run_time_start
       WRITE (tmc_env%m_env%io_unit, FMT="(/,T2,A)") REPEAT("=", 79)
 
       !-- FINALIZE
@@ -935,12 +935,12 @@ CONTAINS
       INTEGER                                            :: walltime_delay
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'set_walltime_delay', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(time .GE. 0.0_dp)
 
       IF (time .GT. walltime_delay) THEN
-         walltime_delay = INT(time)+1
+         walltime_delay = INT(time) + 1
       END IF
    END SUBROUTINE set_walltime_delay
 

@@ -10,81 +10,81 @@
 ! **************************************************************************************************
 MODULE et_coupling_proj
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE bibliography,                    ONLY: Futera2017,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver,&
-                                              cp_fm_power
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_equivalent,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_to_fm_submat,&
-                                              cp_fm_type,&
-                                              cp_fm_vectorssum
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_get_ivals,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE orbital_pointers,                ONLY: nso
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: evolt
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_wavefunction
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_mo_occupation,                ONLY: set_mo_occupation
-   USE qs_mo_types,                     ONLY: allocate_mo_set,&
-                                              deallocate_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE bibliography, ONLY: Futera2017, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale
+   USE cp_fm_diag, ONLY: choose_eigv_solver, &
+                         cp_fm_power
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_equivalent, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_to_fm_submat, &
+                          cp_fm_type, &
+                          cp_fm_vectorssum
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_get_ivals, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE kpoint_types, ONLY: kpoint_type
+   USE orbital_pointers, ONLY: nso
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: evolt
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: calculate_wavefunction
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_mo_occupation, ONLY: set_mo_occupation
+   USE qs_mo_types, ONLY: allocate_mo_set, &
+                          deallocate_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -152,7 +152,7 @@ CONTAINS
       TYPE(et_cpl), POINTER                              :: ec
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_ec_data', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, k
 
@@ -263,7 +263,7 @@ CONTAINS
                                 nset=n_set, nshell=n_shell, l=ang_mom_id)
          DO j = 1, n_set
             DO k = 1, n_shell(j)
-               atom_nf(i) = atom_nf(i)+nso(ang_mom_id(k, j))
+               atom_nf(i) = atom_nf(i) + nso(ang_mom_id(k, j))
             END DO
          END DO
       END DO
@@ -271,7 +271,7 @@ CONTAINS
       ! Sanity check
       n = 0
       DO i = 1, n_atoms
-         n = n+atom_nf(i)
+         n = n + atom_nf(i)
       END DO
       CPASSERT(n == n_ao)
 
@@ -279,8 +279,8 @@ CONTAINS
       ALLOCATE (atom_ps(n_atoms))
       CPASSERT(ASSOCIATED(atom_ps))
       atom_ps = 1
-      DO i = 1, n_atoms-1
-         atom_ps(i+1) = atom_ps(i)+atom_nf(i)
+      DO i = 1, n_atoms - 1
+         atom_ps(i + 1) = atom_ps(i) + atom_nf(i)
       END DO
 
       ! Number of blocks
@@ -319,7 +319,7 @@ CONTAINS
                CPABORT('invalid fragment atom ID ('//TRIM(ADJUSTL(cp_to_string(atom_id(j))))//')')
             ! Check if the atom is not in previously-defined blocks
             found = .FALSE.
-            DO k = 1, i-1
+            DO k = 1, i - 1
                DO l = 1, ec%block(k)%n_atoms
                   IF (ec%block(k)%atom(l)%id == atom_id(j)) THEN
                      CPWARN('multiple definition of atom'//TRIM(ADJUSTL(cp_to_string(atom_id(j)))))
@@ -340,7 +340,7 @@ CONTAINS
             END IF
             ! Save the atom
             IF (.NOT. found) THEN
-               ec%block(i)%n_atoms = ec%block(i)%n_atoms+1
+               ec%block(i)%n_atoms = ec%block(i)%n_atoms + 1
                t(ec%block(i)%n_atoms) = atom_id(j)
             END IF
          END DO
@@ -354,10 +354,10 @@ CONTAINS
             ec%block(i)%atom(j)%id = t(j)
             ec%block(i)%atom(j)%n_ao = atom_nf(ec%block(i)%atom(j)%id)
             ec%block(i)%atom(j)%ao_pos = atom_ps(ec%block(i)%atom(j)%id)
-            ec%block(i)%n_ao = ec%block(i)%n_ao+ec%block(i)%atom(j)%n_ao
+            ec%block(i)%n_ao = ec%block(i)%n_ao + ec%block(i)%atom(j)%n_ao
          END DO
 
-         ec%n_atoms = ec%n_atoms+ec%block(i)%n_atoms
+         ec%n_atoms = ec%n_atoms + ec%block(i)%n_atoms
       END DO
 
       ! Clean memory
@@ -532,8 +532,8 @@ CONTAINS
                                      nw_p_rows, nw_p_cols, cw_row, cw_col, &
                                      iw_p_row, iw_p_col, cw_row_f, cw_col_f)
                         CALL infog2l( &
-                           ec%block(ir)%atom(jr)%ao_pos+kr-1, &
-                           ec%block(ic)%atom(jc)%ao_pos+kc-1, &
+                           ec%block(ir)%atom(jr)%ao_pos + kr - 1, &
+                           ec%block(ic)%atom(jc)%ao_pos + kc - 1, &
                            mat_h%matrix_struct%descriptor, &
                            nh_p_rows, nh_p_cols, ch_row, ch_col, &
                            ih_p_row, ih_p_col, ch_row_f, ch_col_f)
@@ -554,14 +554,14 @@ CONTAINS
                         END IF
 #else
                         mat_w%local_data(nr, nc) = mat_h%local_data( &
-                                                   ec%block(ir)%atom(jr)%ao_pos+kr-1, &
-                                                   ec%block(ic)%atom(jc)%ao_pos+kc-1)
+                                                   ec%block(ir)%atom(jr)%ao_pos + kr - 1, &
+                                                   ec%block(ic)%atom(jc)%ao_pos + kc - 1)
 #endif
-                        nc = nc+1
+                        nc = nc + 1
                      END DO
                   END DO
                END DO
-               nr = nr+1
+               nr = nr + 1
             END DO
          END DO
       END DO
@@ -586,7 +586,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: mat_t, mat_i, mat_w
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_s_half_inv_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: n_deps
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: mat_s
@@ -636,7 +636,7 @@ CONTAINS
       INTEGER                                            :: n_ao, n_spins
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_block_hamiltonian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: mat_h
@@ -691,7 +691,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: mat_h
 
       CHARACTER(len=*), PARAMETER :: routineN = 'hamiltonian_block_diag', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, k, l, n_spins, spin
       REAL(KIND=dp), DIMENSION(:), POINTER               :: vec_e
@@ -767,7 +767,7 @@ CONTAINS
             DEALLOCATE (vec_e)
 
             ! Off-set for next block
-            j = j+ec%block(i)%n_ao
+            j = j + ec%block(i)%n_ao
 
          END DO
 
@@ -802,10 +802,10 @@ CONTAINS
 
                END IF
                ! Off-set for next block
-               l = l+ec%block(j)%n_ao
+               l = l + ec%block(j)%n_ao
             END DO
             ! Off-set for next block
-            k = k+ec%block(i)%n_ao
+            k = k + ec%block(i)%n_ao
          END DO
 
          ! Clean memory
@@ -889,7 +889,7 @@ CONTAINS
          DO k = 1, blk_at(j)%n_ao
 #if defined(__SCALAPACK)
             c = 0.0_dp
-            CALL infog2l(blk_at(j)%ao_pos+k-1, id, mo%matrix_struct%descriptor, &
+            CALL infog2l(blk_at(j)%ao_pos + k - 1, id, mo%matrix_struct%descriptor, &
                          n_p_rows, n_p_cols, c_row, c_col, &
                          i_p_row, i_p_col, c_row_f, c_col_f)
             ! local element
@@ -901,9 +901,9 @@ CONTAINS
                CALL dgebr2d(mo%matrix_struct%context%group, 'All', ' ', 1, 1, c, 1, c_row_f, c_col_f)
             END IF
 #else
-            c = mo%local_data(blk_at(j)%ao_pos+k-1, id)
+            c = mo%local_data(blk_at(j)%ao_pos + k - 1, id)
 #endif
-            c2 = c2+c*c
+            c2 = c2 + c*c
          END DO
 
       END DO
@@ -1158,7 +1158,7 @@ CONTAINS
 #if defined(__SCALAPACK)
 
       DO i = 1, ec%n_blocks
-         DO j = i+1, ec%n_blocks
+         DO j = i + 1, ec%n_blocks
 
             nr = ec%block(i)%hab(1, j)%matrix%matrix_struct%nrow_global
             nc = ec%block(i)%hab(1, j)%matrix%matrix_struct%ncol_global
@@ -1215,7 +1215,7 @@ CONTAINS
       IF (output_unit > 0) THEN
 
          DO i = 1, ec%n_blocks
-            DO j = i+1, ec%n_blocks
+            DO j = i + 1, ec%n_blocks
                DO k = 1, MIN(ec%block(i)%n_ao, n_states)
                   DO l = 1, MIN(ec%block(j)%n_ao, n_states)
 
@@ -1266,7 +1266,7 @@ CONTAINS
       INTEGER                                            :: n_ao, n_mo
 
       CHARACTER(len=*), PARAMETER :: routineN = 'normalize_mo_vectors', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp), DIMENSION(:), POINTER               :: vec_t
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
@@ -1390,7 +1390,7 @@ CONTAINS
             DO ic = 1, ec%block(id)%n_atoms
                DO jc = 1, ec%block(id)%atom(ic)%n_ao
 #if defined(__SCALAPACK)
-                  CALL infog2l(ec%block(id)%atom(ir)%ao_pos+jr-1, nc, &
+                  CALL infog2l(ec%block(id)%atom(ir)%ao_pos + jr - 1, nc, &
                                mat_w%matrix_struct%descriptor, &
                                ns_p_rows, ns_p_cols, cs_row, cs_col, &
                                is_p_row, is_p_col, cs_row_f, cs_col_f)
@@ -1413,13 +1413,13 @@ CONTAINS
                      END IF
                   END IF
 #else
-                  mat_w%local_data(ec%block(id)%atom(ir)%ao_pos+jr-1, nc) = &
+                  mat_w%local_data(ec%block(id)%atom(ir)%ao_pos + jr - 1, nc) = &
                      mat_u%local_data(nr, nc)
 #endif
-                  nc = nc+1
+                  nc = nc + 1
                END DO
             END DO
-            nr = nr+1
+            nr = nr + 1
          END DO
       END DO
 
@@ -1452,7 +1452,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), POINTER               :: vec_e
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_block_mo_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: n_ao, n_el, n_mo
       REAL(KIND=dp)                                      :: mx_occ
@@ -1497,7 +1497,7 @@ CONTAINS
          n_el = n_el/2
          IF (MOD(ec%block(id)%n_electrons, 2) == 1) THEN
             IF (spin == 1) &
-               n_el = n_el+1
+               n_el = n_el + 1
          END IF
       END IF
 
@@ -1698,7 +1698,7 @@ CONTAINS
                   CALL section_vals_val_get(mo_sec, keyword_name='NHOMO', i_val=n)
 
                   IF (n > 0) THEN
-                     DO k = MAX(1, mo%homo-n+1), mo%homo
+                     DO k = MAX(1, mo%homo - n + 1), mo%homo
                         CALL save_mo_cube(qs_env, logger, print_sec, mo, i, k, j)
                      END DO
                   END IF
@@ -1707,7 +1707,7 @@ CONTAINS
                   CALL section_vals_val_get(mo_sec, keyword_name='NLUMO', i_val=n)
 
                   IF (n > 0) THEN
-                     DO k = mo%lfomo, MIN(mo%lfomo+n-1, mo%nmo)
+                     DO k = mo%lfomo, MIN(mo%lfomo + n - 1, mo%nmo)
                         CALL save_mo_cube(qs_env, logger, print_sec, mo, i, k, j)
                      END DO
                   END IF
@@ -1734,7 +1734,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calc_et_coupling_proj', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, k, n_ao, n_atoms, output_unit
       LOGICAL                                            :: do_kp, master
@@ -1812,7 +1812,7 @@ CONTAINS
          WRITE (output_unit, '(T3,A,I10)') &
             'Number of fragment atoms           = ', ec%n_atoms
          WRITE (output_unit, '(T3,A,I10)') &
-            'Number of unassigned atoms         = ', n_atoms-ec%n_atoms
+            'Number of unassigned atoms         = ', n_atoms - ec%n_atoms
          WRITE (output_unit, '(T3,A,I10)') &
             'Number of AO basis functions       = ', n_ao
 
@@ -1838,11 +1838,11 @@ CONTAINS
                WRITE (output_unit, '(T3,A)') 'Block atom IDs                     ='
                DO j = 1, ec%block(i)%n_atoms/10
                   WRITE (output_unit, '(T3,A,10I6)') '      ', &
-                     (ec%block(i)%atom((j-1)*10+k)%id, k=1, 10)
+                     (ec%block(i)%atom((j - 1)*10 + k)%id, k=1, 10)
                END DO
                IF (MOD(ec%block(i)%n_atoms, 10) /= 0) THEN
                   WRITE (output_unit, '(T3,A,10I6)') '      ', &
-                     (ec%block(i)%atom(k+10*(ec%block(i)%n_atoms/10))%id, &
+                     (ec%block(i)%atom(k + 10*(ec%block(i)%n_atoms/10))%id, &
                       k=1, MOD(ec%block(i)%n_atoms, 10))
                END IF
 

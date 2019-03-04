@@ -8,26 +8,26 @@
 !> \author teo [tlaino] - University of Zurich - 02.2008
 ! **************************************************************************************************
 MODULE barostat_utils
-   USE barostat_types,                  ONLY: barostat_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE extended_system_types,           ONLY: npt_info_type
-   USE input_constants,                 ONLY: npe_f_ensemble,&
-                                              npe_i_ensemble,&
-                                              nph_uniaxial_damped_ensemble,&
-                                              nph_uniaxial_ensemble,&
-                                              npt_f_ensemble,&
-                                              npt_i_ensemble
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE physcon,                         ONLY: angstrom,&
-                                              femtoseconds,&
-                                              kelvin
-   USE simpar_types,                    ONLY: simpar_type
+   USE barostat_types, ONLY: barostat_type
+   USE cell_types, ONLY: cell_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE extended_system_types, ONLY: npt_info_type
+   USE input_constants, ONLY: npe_f_ensemble, &
+                              npe_i_ensemble, &
+                              nph_uniaxial_damped_ensemble, &
+                              nph_uniaxial_ensemble, &
+                              npt_f_ensemble, &
+                              npt_i_ensemble
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE physcon, ONLY: angstrom, &
+                      femtoseconds, &
+                      kelvin
+   USE simpar_types, ONLY: simpar_type
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -58,7 +58,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT)                         :: baro_kin, baro_pot
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_baro_energies', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
       REAL(dp)                                           :: iv0, v0, v_shock
@@ -71,7 +71,7 @@ CONTAINS
          baro_kin = 0.0_dp
          DO i = 1, 3
             DO j = 1, 3
-               baro_kin = baro_kin+0.5_dp*npt(i, j)%v**2*npt(i, j)%mass
+               baro_kin = baro_kin + 0.5_dp*npt(i, j)%v**2*npt(i, j)%mass
             END DO
          END DO
       ELSEIF (simpar%ensemble == nph_uniaxial_ensemble .OR. simpar%ensemble == nph_uniaxial_damped_ensemble) THEN
@@ -80,7 +80,7 @@ CONTAINS
          v_shock = simpar%v_shock
 
          ! Valid only for orthorhombic cell
-         baro_pot = -0.5_dp*v_shock*v_shock*(1._dp-cell%deth*iv0)**2-simpar%p0*(v0-cell%deth)
+         baro_pot = -0.5_dp*v_shock*v_shock*(1._dp - cell%deth*iv0)**2 - simpar%p0*(v0 - cell%deth)
          ! Valid only for orthorhombic cell
          baro_kin = 0.5_dp*npt(1, 1)%v*npt(1, 1)%v*npt(1, 1)%mass
       END IF
@@ -107,7 +107,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: time
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_barostat_status', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: baro, nfree
       LOGICAL                                            :: new_file

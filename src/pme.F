@@ -10,53 +10,53 @@
 ! **************************************************************************************************
 MODULE pme
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE atprop_types,                    ONLY: atprop_type
-   USE bibliography,                    ONLY: cite_reference,&
-                                              darden1993
-   USE cell_types,                      ONLY: cell_type
-   USE dg_rho0_types,                   ONLY: dg_rho0_type
-   USE dg_types,                        ONLY: dg_get,&
-                                              dg_type
-   USE dgs,                             ONLY: dg_get_patch,&
-                                              dg_get_strucfac,&
-                                              dg_sum_patch,&
-                                              dg_sum_patch_force_1d,&
-                                              dg_sum_patch_force_3d
-   USE ewald_environment_types,         ONLY: ewald_env_get,&
-                                              ewald_environment_type
-   USE ewald_pw_types,                  ONLY: ewald_pw_get,&
-                                              ewald_pw_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi
-   USE particle_types,                  ONLY: particle_type
-   USE pme_tools,                       ONLY: get_center,&
-                                              set_list
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_methods,                      ONLY: pw_copy,&
-                                              pw_derive,&
-                                              pw_integral_a2b,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE realspace_grid_types,            ONLY: &
-        pw2rs, realspace_grid_desc_type, realspace_grid_p_type, realspace_grid_type, rs2pw, &
-        rs_grid_create, rs_grid_release, rs_grid_set_box, rs_grid_zero, rs_pw_transfer
-   USE shell_potential_types,           ONLY: shell_kind_type
-   USE structure_factor_types,          ONLY: structure_factor_type
-   USE structure_factors,               ONLY: structure_factor_allocate,&
-                                              structure_factor_deallocate,&
-                                              structure_factor_init
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE atprop_types, ONLY: atprop_type
+   USE bibliography, ONLY: cite_reference, &
+                           darden1993
+   USE cell_types, ONLY: cell_type
+   USE dg_rho0_types, ONLY: dg_rho0_type
+   USE dg_types, ONLY: dg_get, &
+                       dg_type
+   USE dgs, ONLY: dg_get_patch, &
+                  dg_get_strucfac, &
+                  dg_sum_patch, &
+                  dg_sum_patch_force_1d, &
+                  dg_sum_patch_force_3d
+   USE ewald_environment_types, ONLY: ewald_env_get, &
+                                      ewald_environment_type
+   USE ewald_pw_types, ONLY: ewald_pw_get, &
+                             ewald_pw_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi
+   USE particle_types, ONLY: particle_type
+   USE pme_tools, ONLY: get_center, &
+                        set_list
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_methods, ONLY: pw_copy, &
+                         pw_derive, &
+                         pw_integral_a2b, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE realspace_grid_types, ONLY: &
+      pw2rs, realspace_grid_desc_type, realspace_grid_p_type, realspace_grid_type, rs2pw, &
+      rs_grid_create, rs_grid_release, rs_grid_set_box, rs_grid_zero, rs_pw_transfer
+   USE shell_potential_types, ONLY: shell_kind_type
+   USE structure_factor_types, ONLY: structure_factor_type
+   USE structure_factors, ONLY: structure_factor_allocate, &
+                                structure_factor_deallocate, &
+                                structure_factor_init
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -267,22 +267,22 @@ CONTAINS
             ! add boxes to real space grid (big box)
             CALL dg_sum_patch_force_1d(rpot, rhos1, exp_igr%centre(:, p1), fat1)
             IF (atprop%energy) THEN
-               atprop%atener(p1) = atprop%atener(p1)+0.5_dp*fat1*dvols
+               atprop%atener(p1) = atprop%atener(p1) + 0.5_dp*fat1*dvols
             END IF
             IF (atprop%stress) THEN
-               atprop%atstress(1, 1, p1) = atprop%atstress(1, 1, p1)+0.5_dp*fat1*dvols
-               atprop%atstress(2, 2, p1) = atprop%atstress(2, 2, p1)+0.5_dp*fat1*dvols
-               atprop%atstress(3, 3, p1) = atprop%atstress(3, 3, p1)+0.5_dp*fat1*dvols
+               atprop%atstress(1, 1, p1) = atprop%atstress(1, 1, p1) + 0.5_dp*fat1*dvols
+               atprop%atstress(2, 2, p1) = atprop%atstress(2, 2, p1) + 0.5_dp*fat1*dvols
+               atprop%atstress(3, 3, p1) = atprop%atstress(3, 3, p1) + 0.5_dp*fat1*dvols
             END IF
             IF (p2 /= 0) THEN
                CALL dg_sum_patch_force_1d(rpot, rhos2, exp_igr%centre(:, p2), fat1)
                IF (atprop%energy) THEN
-                  atprop%atener(p2) = atprop%atener(p2)+0.5_dp*fat1*dvols
+                  atprop%atener(p2) = atprop%atener(p2) + 0.5_dp*fat1*dvols
                END IF
                IF (atprop%stress) THEN
-                  atprop%atstress(1, 1, p2) = atprop%atstress(1, 1, p2)+0.5_dp*fat1*dvols
-                  atprop%atstress(2, 2, p2) = atprop%atstress(2, 2, p2)+0.5_dp*fat1*dvols
-                  atprop%atstress(3, 3, p2) = atprop%atstress(3, 3, p2)+0.5_dp*fat1*dvols
+                  atprop%atstress(1, 1, p2) = atprop%atstress(1, 1, p2) + 0.5_dp*fat1*dvols
+                  atprop%atstress(2, 2, p2) = atprop%atstress(2, 2, p2) + 0.5_dp*fat1*dvols
+                  atprop%atstress(3, 3, p2) = atprop%atstress(3, 3, p2) + 0.5_dp*fat1*dvols
                END IF
             END IF
          END DO
@@ -297,7 +297,7 @@ CONTAINS
             ffb = 1.0_dp/fourpi
             DO i = 1, 3
                DO ig = grid_b%first_gne0, grid_b%ngpts_cut_local
-                  phi_g%cc(ig) = ffb*dphi_g(i)%pw%cc(ig)*(ffa*grid_b%gsq(ig)+1.0_dp)
+                  phi_g%cc(ig) = ffb*dphi_g(i)%pw%cc(ig)*(ffa*grid_b%gsq(ig) + 1.0_dp)
                   phi_g%cc(ig) = phi_g%cc(ig)*poisson_env%green_fft%influence_fn%cc(ig)
                END DO
                IF (grid_b%have_g0) phi_g%cc(1) = 0.0_dp
@@ -319,12 +319,12 @@ CONTAINS
                                     rhos1, rhos2, charges=charges)
                      ! add boxes to real space grid (big box)
                      CALL dg_sum_patch_force_1d(rpot, rhos1, exp_igr%centre(:, p1), fat1)
-                     atprop%atstress(i, j, p1) = atprop%atstress(i, j, p1)+fat1*dvols
-                     IF (i /= j) atprop%atstress(j, i, p1) = atprop%atstress(j, i, p1)+fat1*dvols
+                     atprop%atstress(i, j, p1) = atprop%atstress(i, j, p1) + fat1*dvols
+                     IF (i /= j) atprop%atstress(j, i, p1) = atprop%atstress(j, i, p1) + fat1*dvols
                      IF (p2 /= 0) THEN
                         CALL dg_sum_patch_force_1d(rpot, rhos2, exp_igr%centre(:, p2), fat1)
-                        atprop%atstress(i, j, p2) = atprop%atstress(i, j, p2)+fat1*dvols
-                        IF (i /= j) atprop%atstress(j, i, p2) = atprop%atstress(j, i, p2)+fat1*dvols
+                        atprop%atstress(i, j, p2) = atprop%atstress(i, j, p2) + fat1*dvols
+                        IF (i /= j) atprop%atstress(j, i, p2) = atprop%atstress(j, i, p2) + fat1*dvols
                      END IF
                   END DO
                END DO
@@ -350,7 +350,7 @@ CONTAINS
          END DO
          ffa = (1.0_dp/fourpi)*(0.5_dp/dg_rho0%zet(1))**2
          f_stress = -ffa*f_stress
-         pv_g = h_stress+f_stress
+         pv_g = h_stress + f_stress
       END IF
 
       !--------END OF STRESS TENSOR CALCULATION -----------
@@ -397,31 +397,31 @@ CONTAINS
                CALL dg_sum_patch_force_3d(drpot, rhos1, &
                                           exp_igr%core_centre(:, particle_set(p1)%shell_index), fat)
                fgcore_coulomb(1, particle_set(p1)%shell_index) = &
-                  fgcore_coulomb(1, particle_set(p1)%shell_index)-fat(1)*dvols
+                  fgcore_coulomb(1, particle_set(p1)%shell_index) - fat(1)*dvols
                fgcore_coulomb(2, particle_set(p1)%shell_index) = &
-                  fgcore_coulomb(2, particle_set(p1)%shell_index)-fat(2)*dvols
+                  fgcore_coulomb(2, particle_set(p1)%shell_index) - fat(2)*dvols
                fgcore_coulomb(3, particle_set(p1)%shell_index) = &
-                  fgcore_coulomb(3, particle_set(p1)%shell_index)-fat(3)*dvols
+                  fgcore_coulomb(3, particle_set(p1)%shell_index) - fat(3)*dvols
             ELSE
                CALL dg_sum_patch_force_3d(drpot, rhos1, exp_igr%centre(:, p1), fat)
-               fg_coulomb(1, p1) = fg_coulomb(1, p1)-fat(1)*dvols
-               fg_coulomb(2, p1) = fg_coulomb(2, p1)-fat(2)*dvols
-               fg_coulomb(3, p1) = fg_coulomb(3, p1)-fat(3)*dvols
+               fg_coulomb(1, p1) = fg_coulomb(1, p1) - fat(1)*dvols
+               fg_coulomb(2, p1) = fg_coulomb(2, p1) - fat(2)*dvols
+               fg_coulomb(3, p1) = fg_coulomb(3, p1) - fat(3)*dvols
             END IF
             IF (p2 /= 0 .AND. is2_core) THEN
                CALL dg_sum_patch_force_3d(drpot, rhos1, &
                                           exp_igr%core_centre(:, particle_set(p2)%shell_index), fat)
                fgcore_coulomb(1, particle_set(p2)%shell_index) = &
-                  fgcore_coulomb(1, particle_set(p2)%shell_index)-fat(1)*dvols
+                  fgcore_coulomb(1, particle_set(p2)%shell_index) - fat(1)*dvols
                fgcore_coulomb(2, particle_set(p2)%shell_index) = &
-                  fgcore_coulomb(2, particle_set(p2)%shell_index)-fat(2)*dvols
+                  fgcore_coulomb(2, particle_set(p2)%shell_index) - fat(2)*dvols
                fgcore_coulomb(3, particle_set(p2)%shell_index) = &
-                  fgcore_coulomb(3, particle_set(p2)%shell_index)-fat(3)*dvols
+                  fgcore_coulomb(3, particle_set(p2)%shell_index) - fat(3)*dvols
             ELSEIF (p2 /= 0) THEN
                CALL dg_sum_patch_force_3d(drpot, rhos2, exp_igr%centre(:, p2), fat)
-               fg_coulomb(1, p2) = fg_coulomb(1, p2)-fat(1)*dvols
-               fg_coulomb(2, p2) = fg_coulomb(2, p2)-fat(2)*dvols
-               fg_coulomb(3, p2) = fg_coulomb(3, p2)-fat(3)*dvols
+               fg_coulomb(1, p2) = fg_coulomb(1, p2) - fat(1)*dvols
+               fg_coulomb(2, p2) = fg_coulomb(2, p2) - fat(2)*dvols
+               fg_coulomb(3, p2) = fg_coulomb(3, p2) - fat(3)*dvols
             END IF
 
          END DO
@@ -442,14 +442,14 @@ CONTAINS
 
             ! sum boxes on real space grids (big box)
             CALL dg_sum_patch_force_3d(drpot, rhos1, exp_igr%shell_centre(:, p1), fat)
-            fgshell_coulomb(1, p1) = fgshell_coulomb(1, p1)-fat(1)*dvols
-            fgshell_coulomb(2, p1) = fgshell_coulomb(2, p1)-fat(2)*dvols
-            fgshell_coulomb(3, p1) = fgshell_coulomb(3, p1)-fat(3)*dvols
+            fgshell_coulomb(1, p1) = fgshell_coulomb(1, p1) - fat(1)*dvols
+            fgshell_coulomb(2, p1) = fgshell_coulomb(2, p1) - fat(2)*dvols
+            fgshell_coulomb(3, p1) = fgshell_coulomb(3, p1) - fat(3)*dvols
             IF (p2 /= 0) THEN
                CALL dg_sum_patch_force_3d(drpot, rhos2, exp_igr%shell_centre(:, p2), fat)
-               fgshell_coulomb(1, p2) = fgshell_coulomb(1, p2)-fat(1)*dvols
-               fgshell_coulomb(2, p2) = fgshell_coulomb(2, p2)-fat(2)*dvols
-               fgshell_coulomb(3, p2) = fgshell_coulomb(3, p2)-fat(3)*dvols
+               fgshell_coulomb(1, p2) = fgshell_coulomb(1, p2) - fat(1)*dvols
+               fgshell_coulomb(2, p2) = fgshell_coulomb(2, p2) - fat(2)*dvols
+               fgshell_coulomb(3, p2) = fgshell_coulomb(3, p2) - fat(3)*dvols
             END IF
          END DO
 
@@ -656,7 +656,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), OPTIONAL, POINTER     :: charges
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_patch_again', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       COMPLEX(KIND=dp), DIMENSION(:), POINTER            :: ex1, ex2, ey1, ey2, ez1, ez2
       LOGICAL                                            :: my_is1_core, my_is1_shell, my_is2_core, &

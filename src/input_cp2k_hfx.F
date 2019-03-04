@@ -10,27 +10,27 @@
 !> \author Manuel Guidon
 ! **************************************************************************************************
 MODULE input_cp2k_hfx
-   USE bibliography,                    ONLY: Guidon2008,&
-                                              Guidon2009
-   USE cp_output_handling,              ONLY: add_last_numeric,&
-                                              cp_print_key_section_create,&
-                                              medium_print_level
-   USE input_constants,                 ONLY: &
-        do_hfx_potential_coulomb, do_hfx_potential_gaussian, do_hfx_potential_id, &
-        do_hfx_potential_long, do_hfx_potential_mix_cl, do_hfx_potential_mix_cl_trunc, &
-        do_hfx_potential_mix_lg, do_hfx_potential_short, do_hfx_potential_truncated, ehrenfest, &
-        gaussian
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: real_t
-   USE kinds,                           ONLY: dp
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: Guidon2008, &
+                           Guidon2009
+   USE cp_output_handling, ONLY: add_last_numeric, &
+                                 cp_print_key_section_create, &
+                                 medium_print_level
+   USE input_constants, ONLY: &
+      do_hfx_potential_coulomb, do_hfx_potential_gaussian, do_hfx_potential_id, &
+      do_hfx_potential_long, do_hfx_potential_mix_cl, do_hfx_potential_mix_cl_trunc, &
+      do_hfx_potential_mix_lg, do_hfx_potential_short, do_hfx_potential_truncated, ehrenfest, &
+      gaussian
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: real_t
+   USE kinds, ONLY: dp
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -52,7 +52,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hfx_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection
@@ -136,7 +136,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hf_load_balance_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key
@@ -208,7 +208,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hf_potential_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -305,7 +305,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hf_screening_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -381,7 +381,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hf_pbc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -414,7 +414,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hf_memory_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

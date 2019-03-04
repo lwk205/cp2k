@@ -12,17 +12,17 @@
 ! **************************************************************************************************
 MODULE cp_external_control
 
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE global_types,                    ONLY: global_environment_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_walltime
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_probe
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE global_types, ONLY: global_environment_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_walltime
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_probe
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -57,7 +57,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: in_scf_energy_message_tag, in_exit_tag
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'set_external_comm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(in_external_master_id .GE. 0)
 
@@ -94,7 +94,7 @@ CONTAINS
       REAL(dp), OPTIONAL                                 :: target_time, start_time
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'external_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: exit_fname, exit_fname_level, &
                                                             exit_gname, exit_gname_level
@@ -129,7 +129,7 @@ CONTAINS
          ! however, if should_stop has been true, we should always check
          ! (at each level scf, md, ... the file must be there to guarantee termination)
          t1 = m_walltime()
-         IF (t1 > t_last_file_check+20.0_dp .OR. t1 <= t_last_file_check .OR. check_always) THEN
+         IF (t1 > t_last_file_check + 20.0_dp .OR. t1 <= t_last_file_check .OR. check_always) THEN
 
             t_last_file_check = t1
             ! allows for halting execution for a while
@@ -147,7 +147,7 @@ CONTAINS
                   t1 = m_walltime()
                   DO I = 1, 100000000
                      t2 = m_walltime()
-                     IF (t2-t1 > 1.0_dp) EXIT
+                     IF (t2 - t1 > 1.0_dp) EXIT
                   ENDDO
                   ! and ask again
                   INQUIRE (FILE="WAIT", EXIST=should_wait)
@@ -207,7 +207,7 @@ CONTAINS
 
          IF ((.NOT. should_stop) .AND. (my_target_time > 0.0_dp)) THEN
             ! Check for execution time
-            time_check = m_walltime()-my_start_time
+            time_check = m_walltime() - my_start_time
             IF (time_check .GT. my_target_time) THEN
                should_stop = .TRUE.
                WRITE (UNIT=cp_logger_get_default_unit_nr(logger), FMT="(/,T2,A,f12.3,A)") &

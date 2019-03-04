@@ -8,62 +8,62 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE qs_dftb_coulomb
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set,&
-                                              is_hydrogen
-   USE atprop_types,                    ONLY: atprop_array_init,&
-                                              atprop_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_iterator_blocks_left,&
-                                              dbcsr_iterator_next_block,&
-                                              dbcsr_iterator_start,&
-                                              dbcsr_iterator_stop,&
-                                              dbcsr_iterator_type,&
-                                              dbcsr_p_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE ewald_environment_types,         ONLY: ewald_env_get,&
-                                              ewald_environment_type
-   USE ewald_methods_tb,                ONLY: tb_ewald_overlap,&
-                                              tb_spme_evaluate
-   USE ewald_pw_types,                  ONLY: ewald_pw_type
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE mathconstants,                   ONLY: oorootpi,&
-                                              pi
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE pw_poisson_types,                ONLY: do_ewald_ewald,&
-                                              do_ewald_none,&
-                                              do_ewald_pme,&
-                                              do_ewald_spme
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type
-   USE qs_dftb3_methods,                ONLY: build_dftb3_diagonal
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type,&
-                                              qs_dftb_pairpot_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set, &
+                                is_hydrogen
+   USE atprop_types, ONLY: atprop_array_init, &
+                           atprop_type
+   USE cell_types, ONLY: cell_type, &
+                         get_cell, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_get_block_p, &
+                        dbcsr_iterator_blocks_left, &
+                        dbcsr_iterator_next_block, &
+                        dbcsr_iterator_start, &
+                        dbcsr_iterator_stop, &
+                        dbcsr_iterator_type, &
+                        dbcsr_p_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE ewald_environment_types, ONLY: ewald_env_get, &
+                                      ewald_environment_type
+   USE ewald_methods_tb, ONLY: tb_ewald_overlap, &
+                               tb_spme_evaluate
+   USE ewald_pw_types, ONLY: ewald_pw_type
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE mathconstants, ONLY: oorootpi, &
+                            pi
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE pw_poisson_types, ONLY: do_ewald_ewald, &
+                               do_ewald_none, &
+                               do_ewald_pme, &
+                               do_ewald_spme
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type
+   USE qs_dftb3_methods, ONLY: build_dftb3_diagonal
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type, &
+                            qs_dftb_pairpot_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -102,10 +102,10 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb_coulomb', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_i, atom_j, blk, ewald_type, handle, i, ia, iatom, ic, icol, ikind, img, &
-         irow, is, jatom, jkind, natom, natorb_a, natorb_b, nimg, nmat
+                 irow, is, jatom, jkind, natom, natorb_a, natorb_b, nimg, nmat
       INTEGER, DIMENSION(3)                              :: cellind, periodic
       INTEGER, DIMENSION(:), POINTER                     :: atom_of_kind, kind_of
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
@@ -204,19 +204,19 @@ CONTAINS
          gb = eta_b(0)
          dr = SQRT(SUM(rij(:)**2))
          gmat = gamma_rab_sr(dr, ga, gb, hb_para)
-         gmcharge(jatom, 1) = gmcharge(jatom, 1)+gmat*mcharge(iatom)
+         gmcharge(jatom, 1) = gmcharge(jatom, 1) + gmat*mcharge(iatom)
          IF (iatom /= jatom) THEN
-            gmcharge(iatom, 1) = gmcharge(iatom, 1)+gmat*mcharge(jatom)
+            gmcharge(iatom, 1) = gmcharge(iatom, 1) + gmat*mcharge(jatom)
          END IF
          IF (calculate_forces .AND. (iatom /= jatom .OR. dr > 0.001_dp)) THEN
             ddr = 0.1_dp*dftb_potential(ikind, jkind)%dgrd
-            drp = dr+ddr
-            drm = dr-ddr
-            dgam = 0.5_dp*(gamma_rab_sr(drp, ga, gb, hb_para)-gamma_rab_sr(drm, ga, gb, hb_para))/ddr
+            drp = dr + ddr
+            drm = dr - ddr
+            dgam = 0.5_dp*(gamma_rab_sr(drp, ga, gb, hb_para) - gamma_rab_sr(drm, ga, gb, hb_para))/ddr
             DO i = 1, 3
-               gmcharge(jatom, i+1) = gmcharge(jatom, i+1)-dgam*mcharge(iatom)*rij(i)/dr
+               gmcharge(jatom, i + 1) = gmcharge(jatom, i + 1) - dgam*mcharge(iatom)*rij(i)/dr
                IF (dr > 0.001_dp) THEN
-                  gmcharge(iatom, i+1) = gmcharge(iatom, i+1)+dgam*mcharge(jatom)*rij(i)/dr
+                  gmcharge(iatom, i + 1) = gmcharge(iatom, i + 1) + dgam*mcharge(jatom)*rij(i)/dr
                END IF
                IF (use_virial) THEN
                   fij(i) = -mcharge(iatom)*mcharge(jatom)*dgam*rij(i)/dr
@@ -271,15 +271,15 @@ CONTAINS
          DO ikind = 1, SIZE(local_particles%n_el)
             DO ia = 1, local_particles%n_el(ikind)
                iatom = local_particles%list(ikind)%array(ia)
-               DO jatom = 1, iatom-1
-                  rij = particle_set(iatom)%r-particle_set(jatom)%r
+               DO jatom = 1, iatom - 1
+                  rij = particle_set(iatom)%r - particle_set(jatom)%r
                   rij = pbc(rij, cell)
                   dr = SQRT(SUM(rij(:)**2))
-                  gmcharge(iatom, 1) = gmcharge(iatom, 1)+mcharge(jatom)/dr
-                  gmcharge(jatom, 1) = gmcharge(jatom, 1)+mcharge(iatom)/dr
+                  gmcharge(iatom, 1) = gmcharge(iatom, 1) + mcharge(jatom)/dr
+                  gmcharge(jatom, 1) = gmcharge(jatom, 1) + mcharge(iatom)/dr
                   DO i = 2, nmat
-                     gmcharge(iatom, i) = gmcharge(iatom, i)+rij(i-1)*mcharge(jatom)/dr**3
-                     gmcharge(jatom, i) = gmcharge(jatom, i)-rij(i-1)*mcharge(iatom)/dr**3
+                     gmcharge(iatom, i) = gmcharge(iatom, i) + rij(i - 1)*mcharge(jatom)/dr**3
+                     gmcharge(jatom, i) = gmcharge(jatom, i) - rij(i - 1)*mcharge(iatom)/dr**3
                   END DO
                END DO
             END DO
@@ -291,13 +291,13 @@ CONTAINS
 
       IF (do_ewald) THEN
          ! add self charge interaction and background charge contribution
-         gmcharge(:, 1) = gmcharge(:, 1)-2._dp*alpha*oorootpi*mcharge(:)
+         gmcharge(:, 1) = gmcharge(:, 1) - 2._dp*alpha*oorootpi*mcharge(:)
          IF (ANY(periodic(:) == 1)) THEN
-            gmcharge(:, 1) = gmcharge(:, 1)-pi/alpha**2/deth
+            gmcharge(:, 1) = gmcharge(:, 1) - pi/alpha**2/deth
          END IF
       END IF
 
-      energy%hartree = energy%hartree+0.5_dp*SUM(mcharge(:)*gmcharge(:, 1))
+      energy%hartree = energy%hartree + 0.5_dp*SUM(mcharge(:)*gmcharge(:, 1))
       IF (atprop%energy) THEN
          CALL get_qs_env(qs_env=qs_env, &
                          local_particles=local_particles)
@@ -306,7 +306,7 @@ CONTAINS
             CALL get_dftb_atom_param(dftb_kind, zeff=zeff)
             DO ia = 1, local_particles%n_el(ikind)
                iatom = local_particles%list(ikind)%array(ia)
-               atprop%atecoul(iatom) = atprop%atecoul(iatom)+ &
+               atprop%atecoul(iatom) = atprop%atecoul(iatom) + &
                                        0.5_dp*zeff*gmcharge(iatom, 1)
             END DO
          END DO
@@ -325,9 +325,9 @@ CONTAINS
          DO iatom = 1, natom
             ikind = kind_of(iatom)
             atom_i = atom_of_kind(iatom)
-            force(ikind)%rho_elec(1, atom_i) = force(ikind)%rho_elec(1, atom_i)-gmcharge(iatom, 2)
-            force(ikind)%rho_elec(2, atom_i) = force(ikind)%rho_elec(2, atom_i)-gmcharge(iatom, 3)
-            force(ikind)%rho_elec(3, atom_i) = force(ikind)%rho_elec(3, atom_i)-gmcharge(iatom, 4)
+            force(ikind)%rho_elec(1, atom_i) = force(ikind)%rho_elec(1, atom_i) - gmcharge(iatom, 2)
+            force(ikind)%rho_elec(2, atom_i) = force(ikind)%rho_elec(2, atom_i) - gmcharge(iatom, 3)
+            force(ikind)%rho_elec(3, atom_i) = force(ikind)%rho_elec(3, atom_i) - gmcharge(iatom, 4)
          END DO
       END IF
 
@@ -355,13 +355,13 @@ CONTAINS
             CALL dbcsr_iterator_start(iter, matrix_s(1, 1)%matrix)
             DO WHILE (dbcsr_iterator_blocks_left(iter))
                CALL dbcsr_iterator_next_block(iter, irow, icol, sblock, blk)
-               gmij = 0.5_dp*(gmcharge(irow, 1)+gmcharge(icol, 1))
+               gmij = 0.5_dp*(gmcharge(irow, 1) + gmcharge(icol, 1))
                DO is = 1, SIZE(ks_matrix, 1)
                   NULLIFY (ksblock)
                   CALL dbcsr_get_block_p(matrix=ks_matrix(is, 1)%matrix, &
                                          row=irow, col=icol, block=ksblock, found=found)
                   CPASSERT(found)
-                  ksblock = ksblock-gmij*sblock
+                  ksblock = ksblock - gmij*sblock
                END DO
                IF (calculate_forces) THEN
                   ikind = kind_of(irow)
@@ -374,17 +374,17 @@ CONTAINS
                   CPASSERT(found)
                   DO i = 1, 3
                      NULLIFY (dsblock)
-                     CALL dbcsr_get_block_p(matrix=matrix_s(1+i, 1)%matrix, &
+                     CALL dbcsr_get_block_p(matrix=matrix_s(1 + i, 1)%matrix, &
                                             row=irow, col=icol, block=dsblock, found=found)
                      CPASSERT(found)
                      fi = -2.0_dp*gmij*SUM(pblock*dsblock)
-                     force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i)+fi
-                     force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j)-fi
+                     force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i) + fi
+                     force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j) - fi
                      fij(i) = fi
                   END DO
                   ! I think this is only accurate (correct) if we have a MIC case
                   IF (use_virial) THEN
-                     rij = particle_set(irow)%r-particle_set(icol)%r
+                     rij = particle_set(irow)%r - particle_set(icol)%r
                      rij = pbc(rij, cell)
                      CALL virial_pair_force(virial%pv_virial, -1._dp, fij, rij)
                      IF (atprop%stress) THEN
@@ -408,7 +408,7 @@ CONTAINS
                ic = cell_to_index(cellind(1), cellind(2), cellind(3))
                CPASSERT(ic > 0)
 
-               gmij = 0.5_dp*(gmcharge(iatom, 1)+gmcharge(jatom, 1))
+               gmij = 0.5_dp*(gmcharge(iatom, 1) + gmcharge(jatom, 1))
 
                NULLIFY (sblock)
                CALL dbcsr_get_block_p(matrix=matrix_s(1, ic)%matrix, &
@@ -419,7 +419,7 @@ CONTAINS
                   CALL dbcsr_get_block_p(matrix=ks_matrix(is, ic)%matrix, &
                                          row=irow, col=icol, block=ksblock, found=found)
                   CPASSERT(found)
-                  ksblock = ksblock-gmij*sblock
+                  ksblock = ksblock - gmij*sblock
                END DO
 
                IF (calculate_forces) THEN
@@ -434,12 +434,12 @@ CONTAINS
                   CPASSERT(found)
                   DO i = 1, 3
                      NULLIFY (dsblock)
-                     CALL dbcsr_get_block_p(matrix=matrix_s(1+i, ic)%matrix, &
+                     CALL dbcsr_get_block_p(matrix=matrix_s(1 + i, ic)%matrix, &
                                             row=irow, col=icol, block=dsblock, found=found)
                      CPASSERT(found)
                      fi = -2.0_dp*gmij*SUM(pblock*dsblock)
-                     force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i)+fi
-                     force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j)-fi
+                     force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i) + fi
+                     force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j) - fi
                      fij(i) = fi
                   END DO
                   IF (use_virial) THEN
@@ -507,25 +507,25 @@ CONTAINS
       gamma = 0.0_dp
       a = 3.2_dp*ga ! 3.2 = 16/5 in Eq. 18 and ff.
       b = 3.2_dp*gb
-      g_sum = a+b
+      g_sum = a + b
       IF (g_sum < tol_gamma) RETURN ! hardness screening
       IF (r < rtiny) THEN ! This is for short distances but non-onsite terms
          ! This gives also correct diagonal elements (a=b, r=0)
-         gamma = 0.5_dp*(a*b/g_sum+(a*b)**2/g_sum**3)
+         gamma = 0.5_dp*(a*b/g_sum + (a*b)**2/g_sum**3)
          RETURN
       END IF
       !
       ! distinguish two cases: Gamma's are very close, e.g. for the same atom type,
       !                        and Gamma's are different
       !
-      IF (ABS(a-b) < rtiny) THEN
-         fac = 1.6_dp*r*a*b/g_sum*(1.0_dp+a*b/g_sum**2)
-         gamma = -(48.0_dp+33._dp*fac+(9.0_dp+fac)*fac**2)*EXP(-fac)/(48._dp*r)
+      IF (ABS(a - b) < rtiny) THEN
+         fac = 1.6_dp*r*a*b/g_sum*(1.0_dp + a*b/g_sum**2)
+         gamma = -(48.0_dp + 33._dp*fac + (9.0_dp + fac)*fac**2)*EXP(-fac)/(48._dp*r)
       ELSE
-         gamma = -EXP(-a*r)*(0.5_dp*a*b**4/(a**2-b**2)**2- &
-                             (b**6-3._dp*a**2*b**4)/(r*(a**2-b**2)**3))- & ! a-> b
-                 EXP(-b*r)*(0.5_dp*b*a**4/(b**2-a**2)**2- &
-                            (a**6-3._dp*b**2*a**4)/(r*(b**2-a**2)**3)) ! b-> a
+         gamma = -EXP(-a*r)*(0.5_dp*a*b**4/(a**2 - b**2)**2 - &
+                             (b**6 - 3._dp*a**2*b**4)/(r*(a**2 - b**2)**3)) - & ! a-> b
+                 EXP(-b*r)*(0.5_dp*b*a**4/(b**2 - a**2)**2 - &
+                            (a**6 - 3._dp*b**2*a**4)/(r*(b**2 - a**2)**3)) ! b-> a
       END IF
       !
       ! damping function for better short range hydrogen bonds.
@@ -533,7 +533,7 @@ CONTAINS
       ! according to Elstner M, Theor. Chem. Acc. 2006, 116, 316-325,
       ! this should only be applied to a-b pairs involving hydrogen.
       IF (hb_para > 0.0_dp) THEN
-         gamma = gamma*EXP(-(0.5_dp*(ga+gb))**hb_para*r*r)
+         gamma = gamma*EXP(-(0.5_dp*(ga + gb))**hb_para*r*r)
       END IF
    END FUNCTION gamma_rab_sr
 
@@ -558,7 +558,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb_coulomb_qmqm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_i, atom_j, blk, ewald_type, handle, &
                                                             i, ia, iatom, ikind, jatom, jkind, &
@@ -632,28 +632,28 @@ CONTAINS
       DO ikind = 1, SIZE(local_particles%n_el)
          DO ia = 1, local_particles%n_el(ikind)
             iatom = local_particles%list(ikind)%array(ia)
-            DO jatom = 1, iatom-1
-               rij = particle_set(iatom)%r-particle_set(jatom)%r
+            DO jatom = 1, iatom - 1
+               rij = particle_set(iatom)%r - particle_set(jatom)%r
                ! no pbc(rij,mm_cell) at this point, we assume that QM particles are
                ! inside QM box and QM box << MM box
                dr = SQRT(SUM(rij(:)**2))
                ! local (unit cell) correction 1/R
-               gmcharge(iatom, 1) = gmcharge(iatom, 1)-mcharge(jatom)/dr
-               gmcharge(jatom, 1) = gmcharge(jatom, 1)-mcharge(iatom)/dr
+               gmcharge(iatom, 1) = gmcharge(iatom, 1) - mcharge(jatom)/dr
+               gmcharge(jatom, 1) = gmcharge(jatom, 1) - mcharge(iatom)/dr
                DO i = 2, nmat
-                  gmcharge(iatom, i) = gmcharge(iatom, i)-rij(i-1)*mcharge(jatom)/dr**3
-                  gmcharge(jatom, i) = gmcharge(jatom, i)+rij(i-1)*mcharge(iatom)/dr**3
+                  gmcharge(iatom, i) = gmcharge(iatom, i) - rij(i - 1)*mcharge(jatom)/dr**3
+                  gmcharge(jatom, i) = gmcharge(jatom, i) + rij(i - 1)*mcharge(iatom)/dr**3
                END DO
                ! overlap correction
                fr = erfc(alpha*dr)/dr
-               gmcharge(iatom, 1) = gmcharge(iatom, 1)+mcharge(jatom)*fr
-               gmcharge(jatom, 1) = gmcharge(jatom, 1)+mcharge(iatom)*fr
+               gmcharge(iatom, 1) = gmcharge(iatom, 1) + mcharge(jatom)*fr
+               gmcharge(jatom, 1) = gmcharge(jatom, 1) + mcharge(iatom)*fr
                IF (nmat > 1) THEN
-                  dfr = -2._dp*alpha*EXP(-alpha*alpha*dr*dr)*oorootpi/dr-fr/dr
+                  dfr = -2._dp*alpha*EXP(-alpha*alpha*dr*dr)*oorootpi/dr - fr/dr
                   dfr = -dfr/dr
                   DO i = 2, nmat
-                     gmcharge(iatom, i) = gmcharge(iatom, i)-rij(i-1)*mcharge(jatom)*dfr
-                     gmcharge(jatom, i) = gmcharge(jatom, i)+rij(i-1)*mcharge(iatom)*dfr
+                     gmcharge(iatom, i) = gmcharge(iatom, i) - rij(i - 1)*mcharge(jatom)*dfr
+                     gmcharge(jatom, i) = gmcharge(jatom, i) + rij(i - 1)*mcharge(iatom)*dfr
                   END DO
                END IF
             END DO
@@ -677,12 +677,12 @@ CONTAINS
       CALL mp_sum(gmcharge(:, 1), para_env%group)
       !
       ! add self charge interaction and background charge contribution
-      gmcharge(:, 1) = gmcharge(:, 1)-2._dp*alpha*oorootpi*mcharge(:)
+      gmcharge(:, 1) = gmcharge(:, 1) - 2._dp*alpha*oorootpi*mcharge(:)
       IF (ANY(periodic(:) == 1)) THEN
-         gmcharge(:, 1) = gmcharge(:, 1)-pi/alpha**2/deth
+         gmcharge(:, 1) = gmcharge(:, 1) - pi/alpha**2/deth
       END IF
       !
-      energy%qmmm_el = energy%qmmm_el+0.5_dp*SUM(mcharge(:)*gmcharge(:, 1))
+      energy%qmmm_el = energy%qmmm_el + 0.5_dp*SUM(mcharge(:)*gmcharge(:, 1))
       !
       IF (calculate_forces) THEN
          ALLOCATE (atom_of_kind(natom), kind_of(natom))
@@ -710,9 +710,9 @@ CONTAINS
             END IF
             CALL dbcsr_get_block_p(matrix=matrix_s(1)%matrix, &
                                    row=iatom, col=jatom, block=sblock, found=found)
-            gmij = 0.5_dp*(gmcharge(iatom, 1)+gmcharge(jatom, 1))
-            ksblock = ksblock-gmij*sblock
-            IF (SIZE(ks_matrix, 1) > 1) ksblock_2 = ksblock_2-gmij*sblock
+            gmij = 0.5_dp*(gmcharge(iatom, 1) + gmcharge(jatom, 1))
+            ksblock = ksblock - gmij*sblock
+            IF (SIZE(ks_matrix, 1) > 1) ksblock_2 = ksblock_2 - gmij*sblock
             IF (calculate_forces) THEN
                ikind = kind_of(iatom)
                atom_i = atom_of_kind(iatom)
@@ -723,11 +723,11 @@ CONTAINS
                                       row=iatom, col=jatom, block=pblock, found=found)
                DO i = 1, 3
                   NULLIFY (dsblock)
-                  CALL dbcsr_get_block_p(matrix=matrix_s(1+i)%matrix, &
+                  CALL dbcsr_get_block_p(matrix=matrix_s(1 + i)%matrix, &
                                          row=iatom, col=jatom, block=dsblock, found=found)
                   fi = -2.0_dp*gmij*SUM(pblock*dsblock)
-                  force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i)+fi
-                  force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j)-fi
+                  force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i) + fi
+                  force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j) - fi
                   fij(i) = fi
                END DO
             END IF

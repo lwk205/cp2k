@@ -17,22 +17,22 @@
 !> \author Dorothea Golze
 ! **************************************************************************************************
 MODULE generic_shg_integrals
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE constants_operator,              ONLY: operator_coulomb,&
-                                              operator_gauss,&
-                                              operator_verf,&
-                                              operator_verfc,&
-                                              operator_vgauss
-   USE construct_shg,                   ONLY: &
-        construct_dev_shg_ab, construct_int_shg_ab, construct_overlap_shg_aba, &
-        construct_overlap_shg_abb, dev_overlap_shg_aba, dev_overlap_shg_abb, get_W_matrix, &
-        get_dW_matrix, get_real_scaled_solid_harmonic
-   USE kinds,                           ONLY: dp
-   USE orbital_pointers,                ONLY: nsoset
-   USE s_contract_shg,                  ONLY: &
-        contract_s_overlap_aba, contract_s_overlap_abb, contract_s_ra2m_ab, &
-        contract_sint_ab_chigh, contract_sint_ab_clow, s_coulomb_ab, s_gauss_ab, s_overlap_ab, &
-        s_overlap_abb, s_ra2m_ab, s_verf_ab, s_verfc_ab, s_vgauss_ab
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE constants_operator, ONLY: operator_coulomb, &
+                                 operator_gauss, &
+                                 operator_verf, &
+                                 operator_verfc, &
+                                 operator_vgauss
+   USE construct_shg, ONLY: &
+      construct_dev_shg_ab, construct_int_shg_ab, construct_overlap_shg_aba, &
+      construct_overlap_shg_abb, dev_overlap_shg_aba, dev_overlap_shg_abb, get_W_matrix, &
+      get_dW_matrix, get_real_scaled_solid_harmonic
+   USE kinds, ONLY: dp
+   USE orbital_pointers, ONLY: nsoset
+   USE s_contract_shg, ONLY: &
+      contract_s_overlap_aba, contract_s_overlap_abb, contract_s_ra2m_ab, &
+      contract_sint_ab_chigh, contract_sint_ab_clow, s_coulomb_ab, s_gauss_ab, s_overlap_ab, &
+      s_overlap_abb, s_ra2m_ab, s_verf_ab, s_verfc_ab, s_vgauss_ab
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -64,14 +64,14 @@ MODULE generic_shg_integrals
 ! **************************************************************************************************
       SUBROUTINE ab_sint_shg(la_max, npgfa, zeta, lb_max, npgfb, zetb, omega, rab, v, calculate_forces)
          USE kinds, ONLY: dp
-      INTEGER, INTENT(IN)                                :: la_max, npgfa
-      REAL(KIND=dp), DIMENSION(:), INTENT(IN)            :: zeta
-      INTEGER, INTENT(IN)                                :: lb_max, npgfb
-      REAL(KIND=dp), DIMENSION(:), INTENT(IN)            :: zetb
-      REAL(KIND=dp), INTENT(IN)                          :: omega
-      REAL(KIND=dp), DIMENSION(3), INTENT(IN)            :: rab
-      REAL(KIND=dp), DIMENSION(:, :, :), INTENT(INOUT)   :: v
-      LOGICAL, INTENT(IN)                                :: calculate_forces
+         INTEGER, INTENT(IN)                                :: la_max, npgfa
+         REAL(KIND=dp), DIMENSION(:), INTENT(IN)            :: zeta
+         INTEGER, INTENT(IN)                                :: lb_max, npgfb
+         REAL(KIND=dp), DIMENSION(:), INTENT(IN)            :: zetb
+         REAL(KIND=dp), INTENT(IN)                          :: omega
+         REAL(KIND=dp), DIMENSION(3), INTENT(IN)            :: rab
+         REAL(KIND=dp), DIMENSION(:, :, :), INTENT(INOUT)   :: v
+         LOGICAL, INTENT(IN)                                :: calculate_forces
 
       END SUBROUTINE ab_sint_shg
    END INTERFACE
@@ -106,7 +106,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_operators_r12_ab_shg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: la_max, lb_max
       REAL(KIND=dp)                                      :: my_omega
@@ -173,7 +173,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_overlap_ab_shg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: la_max, lb_max
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: Waux_mat
@@ -216,7 +216,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_ra2m_ab_shg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: la_max, lb_max
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: Waux_mat
@@ -270,13 +270,13 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_overlap_aba_shg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: laa_max, lb_max
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: Waux_mat
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :, :)  :: dWaux_mat
 
-      laa_max = MAXVAL(oba%lmax)+MAXVAL(fba%lmax)
+      laa_max = MAXVAL(oba%lmax) + MAXVAL(fba%lmax)
       lb_max = MAXVAL(obb%lmax)
 
       saba = 0.0_dp
@@ -329,14 +329,14 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_overlap_abb_shg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: la_max, lbb_max
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: Waux_mat
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :, :)  :: dWaux_mat
 
       la_max = MAXVAL(oba%lmax)
-      lbb_max = MAXVAL(obb%lmax)+MAXVAL(fbb%lmax)
+      lbb_max = MAXVAL(obb%lmax) + MAXVAL(fbb%lmax)
 
       sabb = 0.0_dp
       IF (calculate_forces) dsabb = 0.0_dp
@@ -371,7 +371,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(len=*), PARAMETER :: routineN = 'precalc_angular_shg_part', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: lmax, mdim(3)
       INTEGER, DIMENSION(:), POINTER                     :: la_max_all
@@ -379,16 +379,16 @@ CONTAINS
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: Rc, Rs
 
       NULLIFY (la_max_all)
-      rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+      rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
       lmax = MAX(la_max, lb_max)
 
       ALLOCATE (la_max_all(0:lb_max))
       ALLOCATE (Rc(0:lmax, -2*lmax:2*lmax), Rs(0:lmax, -2*lmax:2*lmax))
       Rc = 0._dp
       Rs = 0._dp
-      mdim(1) = MIN(la_max, lb_max)+1
-      mdim(2) = nsoset(la_max)+1
-      mdim(3) = nsoset(lb_max)+1
+      mdim(1) = MIN(la_max, lb_max) + 1
+      mdim(2) = nsoset(la_max) + 1
+      mdim(3) = nsoset(lb_max) + 1
       ALLOCATE (Waux_mat(mdim(1), mdim(2), mdim(3)))
       ALLOCATE (dWaux_mat(3, mdim(1), mdim(2), mdim(3)))
 
@@ -485,7 +485,7 @@ CONTAINS
       nsgfb_set = MAXVAL(nsgfb)
       ndev = 0
       IF (calculate_forces) ndev = 1
-      nds_max = la_max_set+lb_max_set+ndev+1
+      nds_max = la_max_set + lb_max_set + ndev + 1
       ALLOCATE (swork(npgfa_set, npgfb_set, nds_max))
       ALLOCATE (swork_cont(nds_max, nshella_set, nshellb_set))
 
@@ -496,7 +496,7 @@ CONTAINS
 
          DO jset = 1, nsetb
 
-            nds = la_max(iset)+lb_max(jset)+ndev+1
+            nds = la_max(iset) + lb_max(jset) + ndev + 1
             swork(1:npgfa(iset), 1:npgfb(jset), 1:nds) = 0.0_dp
             CALL s_operator_ab(la_max(iset), npgfa(iset), zeta(:, iset), &
                                lb_max(jset), npgfb(jset), zetb(:, jset), &
@@ -553,7 +553,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: contraction_high
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_overlap_ab_shg_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iset, jset, la_max_set, lb_max_set, &
                                                             ndev, nds, nds_max, npgfa_set, &
@@ -602,7 +602,7 @@ CONTAINS
       nshellb_set = MAXVAL(nshellb)
       ndev = 0
       IF (calculate_forces) ndev = 1
-      nds_max = la_max_set+lb_max_set+ndev+1
+      nds_max = la_max_set + lb_max_set + ndev + 1
       ALLOCATE (swork(npgfa_set, npgfb_set, nds_max))
       ALLOCATE (swork_cont(nds_max, nshella_set, nshellb_set))
 
@@ -616,9 +616,9 @@ CONTAINS
 
          DO jset = 1, nsetb
 
-            IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+            IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
 
-            nds = la_max(iset)+lb_max(jset)+ndev+1
+            nds = la_max(iset) + lb_max(jset) + ndev + 1
             swork(1:npgfa(iset), 1:npgfb(jset), 1:nds) = 0.0_dp
             CALL s_overlap_ab(la_max(iset), npgfa(iset), zeta(:, iset), &
                               lb_max(jset), npgfb(jset), zetb(:, jset), &
@@ -684,7 +684,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_ra2m_ab_shg_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iset, jset, la_max_set, lb_max_set, &
                                                             ndev, nds, nds_max, npgfa_set, &
@@ -731,8 +731,8 @@ CONTAINS
       nshellb_set = MAXVAL(nshellb)
       ndev = 0
       IF (calculate_forces) ndev = 1
-      nds_max = la_max_set+lb_max_set+ndev+1
-      ALLOCATE (swork(npgfa_set, npgfb_set, 1:m+1, nds_max))
+      nds_max = la_max_set + lb_max_set + ndev + 1
+      ALLOCATE (swork(npgfa_set, npgfb_set, 1:m + 1, nds_max))
       ALLOCATE (swork_cont(nds_max, nshella_set, nshellb_set))
 
       vab = 0.0_dp
@@ -742,16 +742,16 @@ CONTAINS
 
          DO jset = 1, nsetb
 
-            nds = la_max(iset)+lb_max(jset)+ndev+1
-            swork(1:npgfa(iset), 1:npgfb(jset), 1:m+1, 1:nds) = 0.0_dp
+            nds = la_max(iset) + lb_max(jset) + ndev + 1
+            swork(1:npgfa(iset), 1:npgfb(jset), 1:m + 1, 1:nds) = 0.0_dp
             CALL s_ra2m_ab(la_max(iset), npgfa(iset), zeta(:, iset), &
                            lb_max(jset), npgfb(jset), zetb(:, jset), &
                            m, rab, swork, calculate_forces)
             CALL contract_s_ra2m_ab(npgfa(iset), nshella(iset), &
-                                    scon_ra2m(1:npgfa(iset), 1:m+1, 1:nshella(iset), iset), &
+                                    scon_ra2m(1:npgfa(iset), 1:m + 1, 1:nshella(iset), iset), &
                                     npgfb(jset), nshellb(jset), &
                                     sconb_shg(1:npgfb(jset), 1:nshellb(jset), jset), &
-                                    swork(1:npgfa(iset), 1:npgfb(jset), 1:m+1, 1:nds), &
+                                    swork(1:npgfa(iset), 1:npgfb(jset), 1:m + 1, 1:nds), &
                                     swork_cont(1:nds, 1:nshella(iset), 1:nshellb(jset)), &
                                     m, nds)
             CALL construct_int_shg_ab(la(:, iset), first_sgfa(:, iset), nshella(iset), &
@@ -810,11 +810,11 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_ints, calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_overlap_abb_shg_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: iset, jset, kset, la_max_set, lb_max_set, lbb_max, lbb_max_set, lcb_max_set, na, &
-         nb, ncb, ndev, nds, nds_max, nl, nl_set, npgfa_set, npgfb_set, npgfcb_set, nseta, nsetb, &
-         nsetcb, nshella_set, nshellb_set, nshellcb_set, sgfa, sgfb, sgfcb
+                 nb, ncb, ndev, nds, nds_max, nl, nl_set, npgfa_set, npgfb_set, npgfcb_set, nseta, nsetb, &
+                 nsetcb, nshella_set, nshellb_set, nshellcb_set, sgfa, sgfb, sgfcb
       INTEGER, DIMENSION(:), POINTER                     :: la_max, lb_max, lcb_max, npgfa, npgfb, &
                                                             npgfcb, nsgfa, nsgfb, nsgfcb, nshella, &
                                                             nshellb, nshellcb
@@ -863,7 +863,7 @@ CONTAINS
       zetcb => fbb%zet
 
       dab = SQRT(SUM(rab**2))
-      rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+      rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
 
       la_max_set = MAXVAL(la_max)
       lb_max_set = MAXVAL(lb_max)
@@ -878,27 +878,27 @@ CONTAINS
       ndev = 0
       IF (calculate_forces) ndev = 1
 
-      lbb_max_set = lb_max_set+lcb_max_set
+      lbb_max_set = lb_max_set + lcb_max_set
 
       ! allocate some work storage....
-      nds_max = la_max_set+lbb_max_set+ndev+1
+      nds_max = la_max_set + lbb_max_set + ndev + 1
       nl_set = INT((lbb_max_set)/2)
-      ALLOCATE (swork(npgfa_set, npgfb_set, npgfcb_set, nl_set+1, nds_max))
+      ALLOCATE (swork(npgfa_set, npgfb_set, npgfcb_set, nl_set + 1, nds_max))
       ALLOCATE (swork_cont(nds_max, 0:nl_set, nshella_set, nshellb_set, nshellcb_set))
 
       DO iset = 1, nseta
 
          DO jset = 1, nsetb
 
-            IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+            IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
 
             DO kset = 1, nsetcb
 
-               IF (set_radius_a(iset)+set_radius_cb(kset) < dab) CYCLE
+               IF (set_radius_a(iset) + set_radius_cb(kset) < dab) CYCLE
 
-               lbb_max = lb_max(jset)+lcb_max(kset)
-               nds = la_max(iset)+lbb_max+ndev+1
-               nl = INT((lbb_max)/2)+1
+               lbb_max = lb_max(jset) + lcb_max(kset)
+               nds = la_max(iset) + lbb_max + ndev + 1
+               nl = INT((lbb_max)/2) + 1
                swork(1:npgfa(iset), 1:npgfb(jset), 1:npgfcb(kset), 1:nl, 1:nds) = 0.0_dp
                CALL s_overlap_abb(la_max(iset), npgfa(iset), zeta(:, iset), &
                                   lb_max(jset), npgfb(jset), zetb(:, jset), &
@@ -930,11 +930,11 @@ CONTAINS
                ENDIF
                ! max value of integrals in this set triple
                sgfa = first_sgfa(1, iset)
-               na = sgfa+nsgfa(iset)-1
+               na = sgfa + nsgfa(iset) - 1
                sgfb = first_sgfb(1, jset)
-               nb = sgfb+nsgfb(jset)-1
+               nb = sgfb + nsgfb(jset) - 1
                sgfcb = first_sgfcb(1, kset)
-               ncb = sgfcb+nsgfcb(kset)-1
+               ncb = sgfcb + nsgfcb(kset) - 1
             END DO
          END DO
       END DO
@@ -972,11 +972,11 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_ints, calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_abb_same_kind', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: i, iend, iset, isgfa, ishella, istart, jend, jset, jsgfa, jshella, jstart, kend, &
-         kset, ksgfa, kshella, kstart, lai, laj, lak, nseta, nsetca, nsgfa, nsgfca, sgfa_end, &
-         sgfa_start
+                 kset, ksgfa, kshella, kstart, lai, laj, lak, nseta, nsetca, nsgfa, nsgfca, sgfa_end, &
+                 sgfa_start
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: lai_set, laj_set, lak_set
       INTEGER, DIMENSION(:), POINTER                     :: nsgfa_set, nsgfca_set, nshella, nshellca
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgfa, first_sgfca, la, lca
@@ -1013,41 +1013,41 @@ CONTAINS
 
          DO ishella = 1, nshella(iset)
             sgfa_start = first_sgfa(ishella, iset)
-            sgfa_end = sgfa_start+2*la(ishella, iset)
+            sgfa_end = sgfa_start + 2*la(ishella, iset)
             lai_set(sgfa_start:sgfa_end) = la(ishella, iset)
          ENDDO
          istart = first_sgfa(1, iset)
-         iend = istart+nsgfa_set(iset)-1
+         iend = istart + nsgfa_set(iset) - 1
 
          DO jset = 1, nseta
 
-            IF (set_radius_a(iset)+set_radius_a(jset) < dab) CYCLE
+            IF (set_radius_a(iset) + set_radius_a(jset) < dab) CYCLE
             DO jshella = 1, nshella(jset)
                sgfa_start = first_sgfa(jshella, jset)
-               sgfa_end = sgfa_start+2*la(jshella, jset)
+               sgfa_end = sgfa_start + 2*la(jshella, jset)
                laj_set(sgfa_start:sgfa_end) = la(jshella, jset)
             ENDDO
             jstart = first_sgfa(1, jset)
-            jend = jstart+nsgfa_set(jset)-1
+            jend = jstart + nsgfa_set(jset) - 1
 
             DO kset = 1, nsetca
 
-               IF (set_radius_a(iset)+set_radius_ca(kset) < dab) CYCLE
+               IF (set_radius_a(iset) + set_radius_ca(kset) < dab) CYCLE
 
                DO kshella = 1, nshellca(kset)
                   sgfa_start = first_sgfca(kshella, kset)
-                  sgfa_end = sgfa_start+2*lca(kshella, kset)
+                  sgfa_end = sgfa_start + 2*lca(kshella, kset)
                   lak_set(sgfa_start:sgfa_end) = lca(kshella, kset)
                ENDDO
                kstart = first_sgfca(1, kset)
-               kend = kstart+nsgfca_set(kset)-1
+               kend = kstart + nsgfca_set(kset) - 1
                DO ksgfa = kstart, kend
                   lak = lak_set(ksgfa)
                   DO jsgfa = jstart, jend
                      laj = laj_set(jsgfa)
                      DO isgfa = istart, iend
                         lai = lai_set(isgfa)
-                        IF (MODULO((lai+laj+lak), 2) /= 0) THEN
+                        IF (MODULO((lai + laj + lak), 2) /= 0) THEN
                            IF (calculate_ints) THEN
                               abbint(isgfa, jsgfa, ksgfa) = &
                                  -abaint(jsgfa, isgfa, ksgfa)
@@ -1122,11 +1122,11 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_ints, calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'int_overlap_aba_shg_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: iset, jset, kset, la_max_set, laa_max, laa_max_set, lb_max_set, lca_max_set, na, &
-         nb, nca, ndev, nds, nds_max, nl, nl_set, npgfa_set, npgfb_set, npgfca_set, nseta, nsetb, &
-         nsetca, nshella_set, nshellb_set, nshellca_set, sgfa, sgfb, sgfca
+                 nb, nca, ndev, nds, nds_max, nl, nl_set, npgfa_set, npgfb_set, npgfca_set, nseta, nsetb, &
+                 nsetca, nshella_set, nshellb_set, nshellca_set, sgfa, sgfb, sgfca
       INTEGER, DIMENSION(:), POINTER                     :: la_max, lb_max, lca_max, npgfa, npgfb, &
                                                             npgfca, nsgfa, nsgfb, nsgfca, nshella, &
                                                             nshellb, nshellca
@@ -1175,7 +1175,7 @@ CONTAINS
       zetca => fba%zet
 
       dab = SQRT(SUM(rab**2))
-      rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+      rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
 
       la_max_set = MAXVAL(la_max)
       lb_max_set = MAXVAL(lb_max)
@@ -1190,28 +1190,28 @@ CONTAINS
       ndev = 0
       IF (calculate_forces) ndev = 1
 
-      laa_max_set = la_max_set+lca_max_set
+      laa_max_set = la_max_set + lca_max_set
 
       ! allocate some work storage....
-      nds_max = laa_max_set+lb_max_set+ndev+1
+      nds_max = laa_max_set + lb_max_set + ndev + 1
       nl_set = INT((laa_max_set)/2)
-      ALLOCATE (swork(npgfb_set, npgfa_set, npgfca_set, nl_set+1, nds_max))
+      ALLOCATE (swork(npgfb_set, npgfa_set, npgfca_set, nl_set + 1, nds_max))
       ALLOCATE (swork_cont(nds_max, 0:nl_set, nshella_set, nshellb_set, nshellca_set))
 
       DO iset = 1, nseta
 
          DO jset = 1, nsetb
 
-            IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+            IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
 
             DO kset = 1, nsetca
 
-               IF (set_radius_b(jset)+set_radius_ca(kset) < dab) CYCLE
+               IF (set_radius_b(jset) + set_radius_ca(kset) < dab) CYCLE
 
                !*** calculate s_baa here
-               laa_max = la_max(iset)+lca_max(kset)
-               nds = laa_max+lb_max(jset)+ndev+1
-               nl = INT(laa_max/2)+1
+               laa_max = la_max(iset) + lca_max(kset)
+               nds = laa_max + lb_max(jset) + ndev + 1
+               nl = INT(laa_max/2) + 1
                swork(1:npgfb(jset), 1:npgfa(iset), 1:npgfca(kset), 1:nl, 1:nds) = 0.0_dp
                CALL s_overlap_abb(lb_max(jset), npgfb(jset), zetb(:, jset), &
                                   la_max(iset), npgfa(iset), zeta(:, iset), &
@@ -1242,11 +1242,11 @@ CONTAINS
                ENDIF
                ! max value of integrals in this set triple
                sgfa = first_sgfa(1, iset)
-               na = sgfa+nsgfa(iset)-1
+               na = sgfa + nsgfa(iset) - 1
                sgfb = first_sgfb(1, jset)
-               nb = sgfb+nsgfb(jset)-1
+               nb = sgfb + nsgfb(jset) - 1
                sgfca = first_sgfca(1, kset)
-               nca = sgfca+nsgfca(kset)-1
+               nca = sgfca + nsgfca(kset) - 1
 
             END DO
          END DO
@@ -1281,7 +1281,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(len=*), PARAMETER :: routineN = 'lri_precalc_angular_shg_part', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, isize, j, k, la_max, laa_max, lb_max, &
                                                             lbb_max, lca_max, lcb_max, li_max, &
@@ -1291,7 +1291,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: rab2
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: Rc, Rs
 
-      rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+      rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
 
       !*** 1 Waux_mat of size (li_max,lj_max) for elements
       !                    i        j
@@ -1305,8 +1305,8 @@ CONTAINS
       lca_max = MAXVAL(fba%lmax)
       lcb_max = MAXVAL(fbb%lmax)
 
-      laa_max = la_max+lca_max
-      lbb_max = lb_max+lcb_max
+      laa_max = la_max + lca_max
+      lbb_max = lb_max + lcb_max
       li_max = MAX(laa_max, lbb_max)
       lj_max = MAX(la_max, lb_max, lcb_max)
       lmax = li_max
@@ -1315,9 +1315,9 @@ CONTAINS
       ALLOCATE (Rc(0:lmax, -2*lmax:2*lmax), Rs(0:lmax, -2*lmax:2*lmax))
       Rc = 0._dp
       Rs = 0._dp
-      mdim(1) = li_max+lj_max+1
-      mdim(2) = nsoset(li_max)+1
-      mdim(3) = nsoset(lj_max)+1
+      mdim(1) = li_max + lj_max + 1
+      mdim(2) = nsoset(li_max) + 1
+      mdim(3) = nsoset(lj_max) + 1
       ALLOCATE (Waux_mat(mdim(1), mdim(2), mdim(3)))
       ALLOCATE (dWaux_mat(3, mdim(1), mdim(2), mdim(3)))
       !Waux_mat = 0._dp !.. takes time

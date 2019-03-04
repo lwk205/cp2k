@@ -12,15 +12,15 @@
 ! **************************************************************************************************
 MODULE distribution_2d_types
 
-   USE cp_array_utils,                  ONLY: cp_1d_i_p_type,&
-                                              cp_1d_i_write
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type,&
-                                              cp_blacs_env_write
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE machine,                         ONLY: m_flush
+   USE cp_array_utils, ONLY: cp_1d_i_p_type, &
+                             cp_1d_i_write
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type, &
+                           cp_blacs_env_write
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE machine, ONLY: m_flush
 #include "base/base_uses.f90"
 
    IMPLICIT NONE
@@ -115,7 +115,7 @@ CONTAINS
       INTEGER, INTENT(in), OPTIONAL                      :: n_row_distribution, n_col_distribution
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_2d_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -124,7 +124,7 @@ CONTAINS
 
       ALLOCATE (distribution_2d)
       distribution_2d%ref_count = 1
-      last_distribution_2d_id = last_distribution_2d_id+1
+      last_distribution_2d_id = last_distribution_2d_id + 1
       distribution_2d%id_nr = last_distribution_2d_id
 
       NULLIFY (distribution_2d%col_distribution, distribution_2d%row_distribution, &
@@ -226,11 +226,11 @@ CONTAINS
       TYPE(distribution_2d_type), POINTER                :: distribution_2d
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_2d_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(distribution_2d))
       CPASSERT(distribution_2d%ref_count > 0)
-      distribution_2d%ref_count = distribution_2d%ref_count+1
+      distribution_2d%ref_count = distribution_2d%ref_count + 1
    END SUBROUTINE distribution_2d_retain
 
 ! **************************************************************************************************
@@ -241,13 +241,13 @@ CONTAINS
       TYPE(distribution_2d_type), POINTER                :: distribution_2d
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_2d_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
       IF (ASSOCIATED(distribution_2d)) THEN
          CPASSERT(distribution_2d%ref_count > 0)
-         distribution_2d%ref_count = distribution_2d%ref_count-1
+         distribution_2d%ref_count = distribution_2d%ref_count - 1
          IF (distribution_2d%ref_count == 0) THEN
             CALL cp_blacs_env_release(distribution_2d%blacs_env)
             IF (ASSOCIATED(distribution_2d%col_distribution)) THEN
@@ -304,7 +304,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: local, long_description
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_2d_write', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       LOGICAL                                            :: my_local, my_long_description
@@ -508,7 +508,7 @@ CONTAINS
       INTEGER, INTENT(out), OPTIONAL                     :: id_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribution_2d_get', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iblock_atomic, iblock_min, ikind, &
                                                             ikind_min
@@ -544,7 +544,7 @@ CONTAINS
                CPASSERT(ikind_min > 0)
                distribution_2d%flat_local_rows(iblock_atomic) = &
                   distribution_2d%local_rows(ikind_min)%array(multiindex(ikind_min))
-               multiindex(ikind_min) = multiindex(ikind_min)+1
+               multiindex(ikind_min) = multiindex(ikind_min) + 1
             END DO
             DEALLOCATE (multiindex)
          END IF
@@ -570,7 +570,7 @@ CONTAINS
                CPASSERT(ikind_min > 0)
                distribution_2d%flat_local_cols(iblock_atomic) = &
                   distribution_2d%local_cols(ikind_min)%array(multiindex(ikind_min))
-               multiindex(ikind_min) = multiindex(ikind_min)+1
+               multiindex(ikind_min) = multiindex(ikind_min) + 1
             END DO
             DEALLOCATE (multiindex)
          END IF

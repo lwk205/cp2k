@@ -10,21 +10,21 @@
 !> \author MK (29.10.2002)
 ! **************************************************************************************************
 MODULE qs_energy
-   USE almo_scf,                        ONLY: almo_entry_scf
-   USE cp_control_types,                ONLY: dft_control_type
-   USE dm_ls_scf,                       ONLY: ls_scf
-   USE kg_energy_corrections,           ONLY: kg_energy_correction
-   USE lri_environment_methods,         ONLY: lri_print_stat
-   USE qs_energy_init,                  ONLY: qs_energies_init
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_energy_utils,                 ONLY: qs_energies_compute_matrix_w,&
-                                              qs_energies_mp2,&
-                                              qs_energies_properties
-   USE qs_environment_methods,          ONLY: qs_env_rebuild_pw_env
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_methods,                   ONLY: qs_ks_update_qs_env
-   USE qs_scf,                          ONLY: scf
+   USE almo_scf, ONLY: almo_entry_scf
+   USE cp_control_types, ONLY: dft_control_type
+   USE dm_ls_scf, ONLY: ls_scf
+   USE kg_energy_corrections, ONLY: kg_energy_correction
+   USE lri_environment_methods, ONLY: lri_print_stat
+   USE qs_energy_init, ONLY: qs_energies_init
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_energy_utils, ONLY: qs_energies_compute_matrix_w, &
+                              qs_energies_mp2, &
+                              qs_energies_properties
+   USE qs_environment_methods, ONLY: qs_env_rebuild_pw_env
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_methods, ONLY: qs_ks_update_qs_env
+   USE qs_scf, ONLY: scf
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -103,7 +103,7 @@ CONTAINS
                CALL qs_ks_update_qs_env(qs_env, calculate_forces=.FALSE., just_energy=.TRUE.)
                ! add MP2 energy if necessary
                IF (ASSOCIATED(qs_env%mp2_env)) THEN
-                  energy%total = energy%total+energy%mp2
+                  energy%total = energy%total + energy%mp2
                END IF
             END IF
          END IF

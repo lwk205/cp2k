@@ -10,17 +10,17 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE fp_types
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_release,&
-                                              section_vals_retain,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_release, &
+                                  section_vals_retain, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -97,7 +97,7 @@ CONTAINS
 
       IF (ASSOCIATED(fp_env)) THEN
          CPASSERT(fp_env%ref_count > 0)
-         fp_env%ref_count = fp_env%ref_count-1
+         fp_env%ref_count = fp_env%ref_count - 1
          IF (fp_env%ref_count == 0) THEN
             IF (ASSOCIATED(fp_env%inner_atoms)) DEALLOCATE (fp_env%inner_atoms)
             IF (ASSOCIATED(fp_env%outer_atoms)) DEALLOCATE (fp_env%outer_atoms)
@@ -120,7 +120,7 @@ CONTAINS
       CHARACTER(len=*), PARAMETER :: routineN = 'fp_env_retain', routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(fp_env))
-      fp_env%ref_count = fp_env%ref_count+1
+      fp_env%ref_count = fp_env%ref_count + 1
 
    END SUBROUTINE fp_env_retain
 

@@ -11,40 +11,40 @@
 !> \author Joost VandeVondele (09.2002)
 ! **************************************************************************************************
 MODULE preconditioner
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: cholesky_reduce,&
-                                              ot_precond_full_all,&
-                                              ot_precond_full_kinetic,&
-                                              ot_precond_full_single,&
-                                              ot_precond_full_single_inverse,&
-                                              ot_precond_none,&
-                                              ot_precond_s_inverse,&
-                                              ot_precond_solver_update
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE preconditioner_apply,            ONLY: apply_preconditioner_dbcsr,&
-                                              apply_preconditioner_fm
-   USE preconditioner_makes,            ONLY: make_preconditioner_matrix
-   USE preconditioner_solvers,          ONLY: solve_preconditioner,&
-                                              transfer_dbcsr_to_fm,&
-                                              transfer_fm_to_dbcsr
-   USE preconditioner_types,            ONLY: destroy_preconditioner,&
-                                              init_preconditioner,&
-                                              preconditioner_p_type,&
-                                              preconditioner_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_mo_methods,                   ONLY: calculate_subspace_eigenvalues
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type, &
+                        dbcsr_type
+   USE input_constants, ONLY: cholesky_reduce, &
+                              ot_precond_full_all, &
+                              ot_precond_full_kinetic, &
+                              ot_precond_full_single, &
+                              ot_precond_full_single_inverse, &
+                              ot_precond_none, &
+                              ot_precond_s_inverse, &
+                              ot_precond_solver_update
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE preconditioner_apply, ONLY: apply_preconditioner_dbcsr, &
+                                   apply_preconditioner_fm
+   USE preconditioner_makes, ONLY: make_preconditioner_matrix
+   USE preconditioner_solvers, ONLY: solve_preconditioner, &
+                                     transfer_dbcsr_to_fm, &
+                                     transfer_fm_to_dbcsr
+   USE preconditioner_types, ONLY: destroy_preconditioner, &
+                                   init_preconditioner, &
+                                   preconditioner_p_type, &
+                                   preconditioner_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_mo_methods, ONLY: calculate_subspace_eigenvalues
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -104,7 +104,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: chol_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, k, my_solver_type
       LOGICAL                                            :: my_convert_precond_to_dbcsr, &
@@ -229,7 +229,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: prec_type, nspins
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'restart_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
@@ -302,7 +302,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: chol_type
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'prepare_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: msg
       INTEGER                                            :: handle, icall, ispin, n_loops

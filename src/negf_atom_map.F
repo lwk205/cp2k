@@ -9,16 +9,16 @@
 ! **************************************************************************************************
 
 MODULE negf_atom_map
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              real_to_scaled
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE particle_types,                  ONLY: particle_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         real_to_scaled
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE particle_types, ONLY: particle_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -78,7 +78,7 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: eps_geometry
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_map_atomic_indices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=2)                                   :: element_device
       CHARACTER(len=default_string_length)               :: atom_str
@@ -117,11 +117,11 @@ CONTAINS
 
                ! loop over matching atoms
                DO iatom_kind = 1, kind_groups_contact(ikind_contact)%natoms
-                  coords(1:3) = particle_set_device(atom_index_device)%r(1:3)- &
+                  coords(1:3) = particle_set_device(atom_index_device)%r(1:3) - &
                                 kind_groups_contact(ikind_contact)%r(1:3, iatom_kind)
 
                   CALL real_to_scaled(coords_scaled, coords, cell_contact)
-                  coords_error = coords_scaled-REAL(NINT(coords_scaled), kind=dp)
+                  coords_error = coords_scaled - REAL(NINT(coords_scaled), kind=dp)
 
                   IF (SQRT(DOT_PRODUCT(coords_error, coords_error)) < eps_geometry) THEN
                      atom_map(iatom)%iatom = kind_groups_contact(ikind_contact)%atom_list(iatom_kind)
@@ -163,7 +163,7 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_kind_groups_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iatom, ikind, natoms, nkinds
 
@@ -186,7 +186,7 @@ CONTAINS
 
       DO iatom = 1, natoms
          CALL get_atomic_kind(particle_set(iatom)%atomic_kind, kind_number=ikind)
-         kind_groups(ikind)%natoms = kind_groups(ikind)%natoms+1
+         kind_groups(ikind)%natoms = kind_groups(ikind)%natoms + 1
       END DO
 
       DO ikind = 1, nkinds
@@ -198,7 +198,7 @@ CONTAINS
 
       DO iatom = 1, natoms
          CALL get_atomic_kind(particle_set(iatom)%atomic_kind, kind_number=ikind)
-         kind_groups(ikind)%natoms = kind_groups(ikind)%natoms+1
+         kind_groups(ikind)%natoms = kind_groups(ikind)%natoms + 1
 
          kind_groups(ikind)%atom_list(kind_groups(ikind)%natoms) = iatom
          kind_groups(ikind)%r(1:3, kind_groups(ikind)%natoms) = particle_set(iatom)%r(1:3)
@@ -218,7 +218,7 @@ CONTAINS
          DIMENSION(:), INTENT(inout)                     :: kind_groups
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_kind_groups_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind
 

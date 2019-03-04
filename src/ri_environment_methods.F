@@ -14,50 +14,50 @@
 !>          Dorothea Golze
 ! **************************************************************************************************
 MODULE ri_environment_methods
-   USE arnoldi_api,                     ONLY: arnoldi_conjugate_gradient
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_diag,                   ONLY: cp_dbcsr_syevd
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_create, dbcsr_get_info, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_scale_by_vector, dbcsr_set, &
-        dbcsr_trace, dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry, &
-        dbcsr_type_symmetric
-   USE iterate_matrix,                  ONLY: invert_Hotelling
-   USE kinds,                           ONLY: dp
-   USE lri_environment_types,           ONLY: allocate_lri_coefs,&
-                                              lri_density_create,&
-                                              lri_density_release,&
-                                              lri_density_type,&
-                                              lri_environment_type,&
-                                              lri_kind_type
-   USE message_passing,                 ONLY: mp_sum
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_lri_rho_elec
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_o3c_methods,                  ONLY: calculate_o3c_integrals,&
-                                              contract12_o3c
-   USE qs_o3c_types,                    ONLY: get_o3c_iterator_info,&
-                                              init_o3c_container,&
-                                              o3c_container_type,&
-                                              o3c_iterate,&
-                                              o3c_iterator_create,&
-                                              o3c_iterator_release,&
-                                              o3c_iterator_type,&
-                                              release_o3c_container
-   USE qs_overlap,                      ONLY: build_overlap_matrix
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE util,                            ONLY: get_limit
+   USE arnoldi_api, ONLY: arnoldi_conjugate_gradient
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_diag, ONLY: cp_dbcsr_syevd
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_create, dbcsr_get_info, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_scale_by_vector, dbcsr_set, &
+      dbcsr_trace, dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry, &
+      dbcsr_type_symmetric
+   USE iterate_matrix, ONLY: invert_Hotelling
+   USE kinds, ONLY: dp
+   USE lri_environment_types, ONLY: allocate_lri_coefs, &
+                                    lri_density_create, &
+                                    lri_density_release, &
+                                    lri_density_type, &
+                                    lri_environment_type, &
+                                    lri_kind_type
+   USE message_passing, ONLY: mp_sum
+   USE pw_types, ONLY: pw_p_type
+   USE qs_collocate_density, ONLY: calculate_lri_rho_elec
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_o3c_methods, ONLY: calculate_o3c_integrals, &
+                             contract12_o3c
+   USE qs_o3c_types, ONLY: get_o3c_iterator_info, &
+                           init_o3c_container, &
+                           o3c_container_type, &
+                           o3c_iterate, &
+                           o3c_iterator_create, &
+                           o3c_iterator_release, &
+                           o3c_iterator_type, &
+                           release_o3c_container
+   USE qs_overlap, ONLY: build_overlap_matrix
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE util, ONLY: get_limit
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num
 #include "./base/base_uses.f90"
@@ -89,7 +89,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_ri_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CALL calculate_ri_integrals(lri_env, qs_env, calculate_forces)
 
@@ -109,7 +109,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_ri_integrals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), DIMENSION(2), PARAMETER             :: fx = (/0.0_dp, 1.0_dp/)
 
       INTEGER                                            :: handle, i, i1, i2, iatom, ispin, izero, &
@@ -180,20 +180,20 @@ CONTAINS
             IF (iatom <= jatom) THEN
                DO ispin = 1, dft_control%nspins
                   DO j = j1, j2
-                     m = j-j1+1
+                     m = j - j1 + 1
                      DO i = i1, i2
-                        n = i-i1+1
-                        fblk(n, m) = fblk(n, m)+fout(i, ispin)*avec(j, ispin)+avec(i, ispin)*fout(j, ispin)
+                        n = i - i1 + 1
+                        fblk(n, m) = fblk(n, m) + fout(i, ispin)*avec(j, ispin) + avec(i, ispin)*fout(j, ispin)
                      END DO
                   END DO
                END DO
             ELSE
                DO ispin = 1, dft_control%nspins
                   DO i = i1, i2
-                     n = i-i1+1
+                     n = i - i1 + 1
                      DO j = j1, j2
-                        m = j-j1+1
-                        fblk(m, n) = fblk(m, n)+fout(i, ispin)*avec(j, ispin)+avec(i, ispin)*fout(j, ispin)
+                        m = j - j1 + 1
+                        fblk(m, n) = fblk(m, n) + fout(i, ispin)*avec(j, ispin) + avec(i, ispin)*fout(j, ispin)
                      END DO
                   END DO
                END DO
@@ -233,7 +233,7 @@ CONTAINS
          DO i = 1, nbas
             IF (eval(i) < 1.0e-10_dp) THEN
                eval(i) = 0.0_dp
-               izero = izero+1
+               izero = izero + 1
             ELSE
                eval(i) = SQRT(1.0_dp/eval(i))
             ENDIF
@@ -297,7 +297,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), INTENT(IN)               :: ptr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ri_metric_solver', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, max_iter, n
       LOGICAL                                            :: converged
@@ -331,7 +331,7 @@ CONTAINS
          n = SIZE(vecr)
          ALLOCATE (vect(n))
          CALL ri_matvec(mat, vecx, vect, ptr)
-         vect(:) = vect(:)-vecr(:)
+         vect(:) = vect(:) - vecr(:)
          rerror = MAXVAL(ABS(vect(:)))
          DEALLOCATE (vect)
          IF (rerror > threshold) THEN
@@ -367,7 +367,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_ri_densities', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, handle, i1, i2, iatom, ikind, &
                                                             ispin, n, natom, nspin
@@ -404,7 +404,7 @@ CONTAINS
             atom_a = atom_of_kind(iatom)
             i1 = bas_ptr(1, iatom)
             i2 = bas_ptr(2, iatom)
-            n = i2-i1+1
+            n = i2 - i1 + 1
             lri_coef(ikind)%acoef(atom_a, 1:n) = avec(i1:i2, ispin)
          END DO
       END DO
@@ -435,7 +435,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_tvec_ri', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: msweep = 32
 
       INTEGER                                            :: handle, i1, i2, ibl, ibu, il, ispin, &
@@ -465,18 +465,18 @@ CONTAINS
 
       nlimit = 0
       DO isweep = 1, nsweep
-         nlimit(1:2, isweep) = get_limit(natom, nsweep, isweep-1)
+         nlimit(1:2, isweep) = get_limit(natom, nsweep, isweep - 1)
       END DO
 
       DO ispin = 1, nspin
          DO isweep = 1, nsweep
             il = nlimit(1, isweep)
             iu = nlimit(2, isweep)
-            ma = iu-il+1
+            ma = iu - il + 1
             IF (ma < 1) CYCLE
             ibl = bas_ptr(1, il)
             ibu = bas_ptr(2, iu)
-            mba = ibu-ibl+1
+            mba = ibu - ibl + 1
             ALLOCATE (ta(mba, nthread))
             ta = 0.0_dp
 
@@ -492,17 +492,17 @@ CONTAINS
             DO WHILE (o3c_iterate(o3c_iterator, mepos=mepos) == 0)
                CALL get_o3c_iterator_info(o3c_iterator, mepos=mepos, katom=katom, tvec=tvl)
                IF (katom < il .OR. katom > iu) CYCLE
-               i1 = bas_ptr(1, katom)-ibl+1
-               i2 = bas_ptr(2, katom)-ibl+1
-               m = i2-i1+1
-               ta(i1:i2, mepos+1) = ta(i1:i2, mepos+1)+tvl(1:m, ispin)
+               i1 = bas_ptr(1, katom) - ibl + 1
+               i2 = bas_ptr(2, katom) - ibl + 1
+               m = i2 - i1 + 1
+               ta(i1:i2, mepos + 1) = ta(i1:i2, mepos + 1) + tvl(1:m, ispin)
             END DO
 !$OMP END PARALLEL
             CALL o3c_iterator_release(o3c_iterator)
 
             ! sum over threads
             DO it = 1, nthread
-               tvec(ibl:ibu, ispin) = tvec(ibl:ibu, ispin)+ta(1:mba, it)
+               tvec(ibl:ibu, ispin) = tvec(ibl:ibu, ispin) + ta(1:mba, it)
             END DO
             DEALLOCATE (ta)
          END DO
@@ -538,7 +538,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: pmatrix
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_avec_ri', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspin
       REAL(KIND=dp)                                      :: etr, nelec, nrm1t
@@ -566,13 +566,13 @@ CONTAINS
       DO ispin = 1, nspin
          nelec = lri_env%ri_fit%echarge(ispin)
          nrm1t = SUM(nvec(:)*rm1t(:, ispin))
-         lri_env%ri_fit%lambda(ispin) = 2.0_dp*(nrm1t-nelec)/lri_env%ri_fit%ntrm1n
+         lri_env%ri_fit%lambda(ispin) = 2.0_dp*(nrm1t - nelec)/lri_env%ri_fit%ntrm1n
       END DO
 
       ! calculate avec = rm1t - lambda/2 * rm1n
       avec => lri_env%ri_fit%avec
       DO ispin = 1, nspin
-         avec(:, ispin) = rm1t(:, ispin)-0.5_dp*lri_env%ri_fit%lambda(ispin)*rm1n(:)
+         avec(:, ispin) = rm1t(:, ispin) - 0.5_dp*lri_env%ri_fit%lambda(ispin)*rm1n(:)
       END DO
 
       CALL timestop(handle)
@@ -623,15 +623,15 @@ CONTAINS
          CALL dbcsr_iterator_next_block(iter, iatom, jatom, block)
          n1 = ptr(1, iatom)
          n2 = ptr(2, iatom)
-         nb = n2-n1+1
+         nb = n2 - n1 + 1
          m1 = ptr(1, jatom)
          m2 = ptr(2, jatom)
-         mb = m2-m1+1
+         mb = m2 - m1 + 1
          CPASSERT(nb == SIZE(block, 1))
          CPASSERT(mb == SIZE(block, 2))
-         vo(n1:n2) = vo(n1:n2)+MATMUL(block, vi(m1:m2))
+         vo(n1:n2) = vo(n1:n2) + MATMUL(block, vi(m1:m2))
          IF (symm .AND. (iatom /= jatom)) THEN
-            vo(m1:m2) = vo(m1:m2)+MATMUL(TRANSPOSE(block), vi(n1:n2))
+            vo(m1:m2) = vo(m1:m2) + MATMUL(TRANSPOSE(block), vi(n1:n2))
          END IF
       END DO
       CALL dbcsr_iterator_stop(iter)

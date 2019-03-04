@@ -11,25 +11,25 @@
 !> \author Joost VandeVondele (06.2002)
 ! **************************************************************************************************
 MODULE qs_ot
-   USE arnoldi_api,                     ONLY: arnoldi_extremal
-   USE cp_dbcsr_cholesky,               ONLY: cp_dbcsr_cholesky_decompose,&
-                                              cp_dbcsr_cholesky_invert,&
-                                              cp_dbcsr_cholesky_restore
-   USE cp_dbcsr_diag,                   ONLY: cp_dbcsr_heevd,&
-                                              cp_dbcsr_syevd
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_distribution_type, dbcsr_filter, &
-        dbcsr_frobenius_norm, dbcsr_gershgorin_norm, dbcsr_get_block_p, dbcsr_get_info, &
-        dbcsr_get_occupation, dbcsr_hadamard_product, dbcsr_init_p, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_release, dbcsr_release_p, dbcsr_scale, dbcsr_scale_by_vector, &
-        dbcsr_set, dbcsr_transposed, dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE preconditioner,                  ONLY: apply_preconditioner
-   USE preconditioner_types,            ONLY: preconditioner_type
-   USE qs_ot_types,                     ONLY: qs_ot_type
+   USE arnoldi_api, ONLY: arnoldi_extremal
+   USE cp_dbcsr_cholesky, ONLY: cp_dbcsr_cholesky_decompose, &
+                                cp_dbcsr_cholesky_invert, &
+                                cp_dbcsr_cholesky_restore
+   USE cp_dbcsr_diag, ONLY: cp_dbcsr_heevd, &
+                            cp_dbcsr_syevd
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_distribution_type, dbcsr_filter, &
+      dbcsr_frobenius_norm, dbcsr_gershgorin_norm, dbcsr_get_block_p, dbcsr_get_info, &
+      dbcsr_get_occupation, dbcsr_hadamard_product, dbcsr_init_p, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_release, dbcsr_release_p, dbcsr_scale, dbcsr_scale_by_vector, &
+      dbcsr_set, dbcsr_transposed, dbcsr_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE preconditioner, ONLY: apply_preconditioner
+   USE preconditioner_types, ONLY: preconditioner_type
+   USE qs_ot_types, ONLY: qs_ot_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -70,7 +70,7 @@ CONTAINS
       TYPE(preconditioner_type), POINTER                 :: preconditioner
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_new_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ncoef
 
@@ -112,7 +112,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: C_NEW, SC, G_OLD, D
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_on_the_fly_localize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: taylor_order = 50
       REAL(KIND=dp), PARAMETER                           :: alpha = 0.1_dp, f2_eps = 0.01_dp
 
@@ -147,8 +147,8 @@ CONTAINS
                                         row_size=row_size, col_size=col_size)
          DO p = 1, col_size ! p
          DO i = 1, row_size ! i
-            tmp = SQRT(DATA(i, p)**2+f2_eps)
-            f2 = f2+tmp
+            tmp = SQRT(DATA(i, p)**2 + f2_eps)
+            f2 = f2 + tmp
             DATA(i, p) = DATA(i, p)/tmp
          ENDDO
          ENDDO
@@ -489,7 +489,7 @@ CONTAINS
       LOGICAL                                            :: update
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_ref_update', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       update = .FALSE.
       SELECT CASE (qs_ot_env1%settings%ot_method)
@@ -545,7 +545,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_get_orbitals_ref', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=4)                                   :: ortho_irac
       INTEGER                                            :: handle, k, n
@@ -760,7 +760,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_get_derivative_ref', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, k, n
       REAL(dp)                                           :: occ_in, occ_out
@@ -862,7 +862,7 @@ CONTAINS
       TYPE(qs_ot_type)                                   :: qs_ot_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_generate_rotation', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       COMPLEX(KIND=dp), PARAMETER                        :: cone = (1.0_dp, 0.0_dp), &
                                                             czero = (0.0_dp, 0.0_dp)
 
@@ -979,8 +979,8 @@ CONTAINS
                                            row_offset=row_offset, col_offset=col_offset)
             DO j = 1, col_size
             DO i = 1, row_size
-               e1 = qs_ot_env%rot_mat_evals(row_offset+i-1)
-               e2 = qs_ot_env%rot_mat_evals(col_offset+j-1)
+               e1 = qs_ot_env%rot_mat_evals(row_offset + i - 1)
+               e2 = qs_ot_env%rot_mat_evals(col_offset + j - 1)
                data_z(i, j) = data_z(i, j)*cint(e1, e2)
             ENDDO
             ENDDO
@@ -1013,22 +1013,22 @@ CONTAINS
 !> \return ...
 ! **************************************************************************************************
       FUNCTION cint(e1, e2)
-      REAL(KIND=dp)                                      :: e1, e2
-      COMPLEX(KIND=dp)                                   :: cint
+         REAL(KIND=dp)                                      :: e1, e2
+         COMPLEX(KIND=dp)                                   :: cint
 
-      COMPLEX(KIND=dp)                                   :: l1, l2, x
-      INTEGER                                            :: I
+         COMPLEX(KIND=dp)                                   :: l1, l2, x
+         INTEGER                                            :: I
 
          l1 = (0.0_dp, -1.0_dp)*e1
          l2 = (0.0_dp, -1.0_dp)*e2
-         IF (ABS(l1-l2) .GT. 0.5_dp) THEN
-            cint = (EXP(l1)-EXP(l2))/(l1-l2)
+         IF (ABS(l1 - l2) .GT. 0.5_dp) THEN
+            cint = (EXP(l1) - EXP(l2))/(l1 - l2)
          ELSE
             x = 1.0_dp
             cint = 0.0_dp
             DO I = 1, 16
-               cint = cint+x
-               x = x*(l1-l2)/REAL(I+1, KIND=dp)
+               cint = cint + x
+               x = x*(l1 - l2)/REAL(I + 1, KIND=dp)
             ENDDO
             cint = cint*EXP(l2)
          ENDIF
@@ -1057,8 +1057,8 @@ CONTAINS
       N = 0
       num_error = qs_ot_env%largest_eval_upper_bound/(2.0_dp)
       DO WHILE (num_error > qs_ot_env%settings%eps_taylor .AND. N <= qs_ot_env%settings%max_taylor)
-         N = N+1
-         num_error = num_error*qs_ot_env%largest_eval_upper_bound/REAL((2*N+1)*(2*N+2), KIND=dp)
+         N = N + 1
+         num_error = num_error*qs_ot_env%largest_eval_upper_bound/REAL((2*N + 1)*(2*N + 2), KIND=dp)
       END DO
       qs_ot_env%taylor_order = N
       IF (qs_ot_env%taylor_order <= qs_ot_env%settings%max_taylor) THEN
@@ -1082,7 +1082,7 @@ CONTAINS
       TYPE(qs_ot_type)                                   :: qs_ot_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_get_orbitals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, k, n
@@ -1138,7 +1138,7 @@ CONTAINS
       TYPE(qs_ot_type)                                   :: qs_ot_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_get_derivative', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, k, n, ortho_k
@@ -1230,7 +1230,7 @@ CONTAINS
       TYPE(qs_ot_type)                                   :: qs_ot_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_get_derivative_diag', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, k, n
@@ -1306,7 +1306,7 @@ CONTAINS
       TYPE(qs_ot_type)                                   :: qs_ot_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_get_derivative_taylor', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, i, k, n
@@ -1354,7 +1354,7 @@ CONTAINS
       ! OOM+OMO+MOO
       !   ...
       DO i = 2, qs_ot_env%taylor_order
-         sinfactor = sinfactor*(-1.0_dp)/REAL(2*i*(2*i+1), KIND=dp)
+         sinfactor = sinfactor*(-1.0_dp)/REAL(2*i*(2*i + 1), KIND=dp)
          CALL dbcsr_multiply('N', 'N', rone, qs_ot_env%matrix_p, matrix_left, rzero, qs_ot_env%matrix_buf1)
          CALL dbcsr_multiply('N', 'N', rone, matrix_right, qs_ot_env%matrix_p, rzero, matrix_left)
          CALL dbcsr_copy(matrix_right, matrix_left)
@@ -1383,7 +1383,7 @@ CONTAINS
       ! OOM+OMO+MOO
       !   ...
       DO i = 2, qs_ot_env%taylor_order
-         cosfactor = cosfactor*(-1.0_dp)/REAL(2*i*(2*i-1), KIND=dp)
+         cosfactor = cosfactor*(-1.0_dp)/REAL(2*i*(2*i - 1), KIND=dp)
          CALL dbcsr_multiply('N', 'N', rone, qs_ot_env%matrix_p, matrix_left, rzero, qs_ot_env%matrix_buf1)
          CALL dbcsr_multiply('N', 'N', rone, matrix_right, qs_ot_env%matrix_p, rzero, matrix_left)
          CALL dbcsr_copy(matrix_right, matrix_left)
@@ -1408,7 +1408,7 @@ CONTAINS
       TYPE(qs_ot_type)                                   :: qs_ot_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ot_p2m_taylor', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, i, k
@@ -1447,8 +1447,8 @@ CONTAINS
                              rzero, qs_ot_env%matrix_buf1)
          CALL dbcsr_copy(qs_ot_env%matrix_r, qs_ot_env%matrix_buf1)
          ! add to the taylor expansion so far
-         cosfactor = cosfactor*(-1.0_dp)/REAL(2*i*(2*i-1), KIND=dp)
-         sinfactor = sinfactor*(-1.0_dp)/REAL(2*i*(2*i+1), KIND=dp)
+         cosfactor = cosfactor*(-1.0_dp)/REAL(2*i*(2*i - 1), KIND=dp)
+         sinfactor = sinfactor*(-1.0_dp)/REAL(2*i*(2*i + 1), KIND=dp)
          CALL dbcsr_add(qs_ot_env%matrix_cosp, qs_ot_env%matrix_r, &
                         alpha_scalar=1.0_dp, beta_scalar=cosfactor)
          CALL dbcsr_add(qs_ot_env%matrix_sinp, qs_ot_env%matrix_r, &
@@ -1517,10 +1517,10 @@ CONTAINS
                                         row_offset=row_offset, col_offset=col_offset)
          DO j = 1, col_size
          DO i = 1, row_size
-            a = (SQRT(qs_ot_env%evals(row_offset+i-1)) &
-                 -SQRT(qs_ot_env%evals(col_offset+j-1)))/2.0_dp
-            b = (SQRT(qs_ot_env%evals(row_offset+i-1)) &
-                 +SQRT(qs_ot_env%evals(col_offset+j-1)))/2.0_dp
+            a = (SQRT(qs_ot_env%evals(row_offset + i - 1)) &
+                 - SQRT(qs_ot_env%evals(col_offset + j - 1)))/2.0_dp
+            b = (SQRT(qs_ot_env%evals(row_offset + i - 1)) &
+                 + SQRT(qs_ot_env%evals(col_offset + j - 1)))/2.0_dp
             DATA(i, j) = -0.5_dp*qs_ot_sinc(a)*qs_ot_sinc(b)
          ENDDO
          ENDDO
@@ -1535,8 +1535,8 @@ CONTAINS
                                         row_offset=row_offset, col_offset=col_offset)
          DO j = 1, col_size
          DO i = 1, row_size
-            a = SQRT(qs_ot_env%evals(row_offset+i-1))
-            b = SQRT(qs_ot_env%evals(col_offset+j-1))
+            a = SQRT(qs_ot_env%evals(row_offset + i - 1))
+            b = SQRT(qs_ot_env%evals(col_offset + j - 1))
             DATA(i, j) = qs_ot_sincf(a, b)
          ENDDO
          ENDDO
@@ -1559,9 +1559,9 @@ CONTAINS
       REAL(KIND=dp)                                      :: qs_ot_sinc
 
       REAL(KIND=dp), PARAMETER :: q1 = 1.0_dp, q2 = -q1/(2.0_dp*3.0_dp), q3 = -q2/(4.0_dp*5.0_dp), &
-         q4 = -q3/(6.0_dp*7.0_dp), q5 = -q4/(8.0_dp*9.0_dp), q6 = -q5/(10.0_dp*11.0_dp), &
-         q7 = -q6/(12.0_dp*13.0_dp), q8 = -q7/(14.0_dp*15.0_dp), q9 = -q8/(16.0_dp*17.0_dp), &
-         q10 = -q9/(18.0_dp*19.0_dp)
+                                  q4 = -q3/(6.0_dp*7.0_dp), q5 = -q4/(8.0_dp*9.0_dp), q6 = -q5/(10.0_dp*11.0_dp), &
+                                  q7 = -q6/(12.0_dp*13.0_dp), q8 = -q7/(14.0_dp*15.0_dp), q9 = -q8/(16.0_dp*17.0_dp), &
+                                  q10 = -q9/(18.0_dp*19.0_dp)
 
       REAL(KIND=dp)                                      :: y
 
@@ -1569,7 +1569,7 @@ CONTAINS
          qs_ot_sinc = SIN(x)/x
       ELSE
          y = x*x
-         qs_ot_sinc = q1+y*(q2+y*(q3+y*(q4+y*(q5+y*(q6+y*(q7+y*(q8+y*(q9+y*(q10)))))))))
+         qs_ot_sinc = q1 + y*(q2 + y*(q3 + y*(q4 + y*(q5 + y*(q6 + y*(q7 + y*(q8 + y*(q9 + y*(q10)))))))))
       ENDIF
    END FUNCTION qs_ot_sinc
    ! computes (1/(x^2-y^2))*(sinc(x)-sinc(y)) for all positive values of the arguments
@@ -1611,27 +1611,27 @@ CONTAINS
             ybx = 0.0_dp
          ENDIF
 
-         sf = -1.0_dp/((1.0_dp+ybx)*6.0_dp)
+         sf = -1.0_dp/((1.0_dp + ybx)*6.0_dp)
          rs = 1.0_dp
          ybxs = ybx
          xs = 1.0_dp
 
          DO i = 1, 10
-            qs_ot_sincf = qs_ot_sincf+sf*rs*xs*(1.0_dp+ybxs)
-            sf = -sf/(REAL((2*i+2), dp)*REAL((2*i+3), dp))
-            rs = rs+ybxs
+            qs_ot_sincf = qs_ot_sincf + sf*rs*xs*(1.0_dp + ybxs)
+            sf = -sf/(REAL((2*i + 2), dp)*REAL((2*i + 3), dp))
+            rs = rs + ybxs
             ybxs = ybxs*ybx
             xs = xs*x*x
          ENDDO
 
       ELSE ! no series expansion
-         IF (x-y .GT. 0.1_dp) THEN ! safe to use the normal form
-            qs_ot_sincf = (qs_ot_sinc(x)-qs_ot_sinc(y))/((x+y)*(x-y))
+         IF (x - y .GT. 0.1_dp) THEN ! safe to use the normal form
+            qs_ot_sincf = (qs_ot_sinc(x) - qs_ot_sinc(y))/((x + y)*(x - y))
          ELSE
-            a = (x+y)/2.0_dp
-            b = (x-y)/2.0_dp ! might be close to zero
+            a = (x + y)/2.0_dp
+            b = (x - y)/2.0_dp ! might be close to zero
             ! y (=(a-b)) can not be close to zero since it is close to x>0.5
-            qs_ot_sincf = (qs_ot_sinc(b)*COS(a)-qs_ot_sinc(a)*COS(b))/(2*x*y)
+            qs_ot_sincf = (qs_ot_sinc(b)*COS(a) - qs_ot_sinc(a)*COS(b))/(2*x*y)
          ENDIF
       ENDIF
 

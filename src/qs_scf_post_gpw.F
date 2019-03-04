@@ -11,207 +11,207 @@
 !> \author Joost VandeVondele (10.2003)
 ! **************************************************************************************************
 MODULE qs_scf_post_gpw
-   USE admm_types,                      ONLY: admm_type
-   USE admm_utils,                      ONLY: admm_correct_for_eigenvalues,&
-                                              admm_uncorrect_for_eigenvalues
-   USE ai_onecenter,                    ONLY: sg_overlap
-   USE atom_kind_orbitals,              ONLY: calculate_atomic_density
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_array_utils,                  ONLY: cp_1d_r_p_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix
-   USE cp_ddapc_util,                   ONLY: get_ddapc
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_trace
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_init_random,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_iter_string,&
-                                              cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE cp_result_methods,               ONLY: cp_results_erase,&
-                                              get_results,&
-                                              put_results
-   USE cp_result_types,                 ONLY: cp_result_type
-   USE dbcsr_api,                       ONLY: &
-        convert_dbcsr_to_csr, csr_create_from_dbcsr, csr_dbcsr_blkrow_dist, csr_destroy, csr_type, &
-        csr_write, dbcsr_add, dbcsr_copy, dbcsr_copy_into_existing, dbcsr_create, &
-        dbcsr_desymmetrize, dbcsr_frobenius_norm, dbcsr_get_info, dbcsr_has_symmetry, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_type
-   USE dct,                             ONLY: pw_shrink
-   USE et_coupling_types,               ONLY: set_et_coupling_type
-   USE hirshfeld_methods,               ONLY: comp_hirshfeld_charges,&
-                                              comp_hirshfeld_i_charges,&
-                                              create_shape_function,&
-                                              write_hirshfeld_charges
-   USE hirshfeld_types,                 ONLY: create_hirshfeld_type,&
-                                              hirshfeld_type,&
-                                              release_hirshfeld_type,&
-                                              set_hirshfeld_info
-   USE input_constants,                 ONLY: do_loc_both,&
-                                              do_loc_homo,&
-                                              do_loc_lumo,&
-                                              ot_precond_full_all,&
-                                              radius_covalent,&
-                                              radius_user,&
-                                              ref_charge_atomic,&
-                                              ref_charge_mulliken
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_get_ivals,&
-                                              section_get_lval,&
-                                              section_get_rval,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE iterate_matrix,                  ONLY: matrix_sqrt_Newton_Schulz
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE lapack,                          ONLY: lapack_sgesv
-   USE mao_wfn_analysis,                ONLY: mao_analysis
-   USE mathconstants,                   ONLY: pi,&
-                                              twopi
-   USE memory_utilities,                ONLY: reallocate
-   USE message_passing,                 ONLY: mp_sum
-   USE minbas_wfn_analysis,             ONLY: minbas_analysis
-   USE molden_utils,                    ONLY: write_mos_molden
-   USE molecular_states,                ONLY: construct_molecular_states
-   USE molecule_types,                  ONLY: molecule_type
-   USE moments_utils,                   ONLY: get_reference_point
-   USE mulliken,                        ONLY: mulliken_charges
-   USE orbital_pointers,                ONLY: indso
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: angstrom,&
-                                              debye,&
-                                              evolt
-   USE population_analyses,             ONLY: lowdin_population_analysis,&
-                                              mulliken_population_analysis
-   USE preconditioner_types,            ONLY: preconditioner_type
-   USE ps_implicit_types,               ONLY: MIXED_BC,&
-                                              MIXED_PERIODIC_BC,&
-                                              NEUMANN_BC,&
-                                              PERIODIC_BC
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_grids,                        ONLY: get_pw_grid_info
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_derive,&
-                                              pw_integrate_function,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_implicit,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_active_space_methods,         ONLY: active_space_main
-   USE qs_collocate_density,            ONLY: calculate_rho_elec,&
-                                              calculate_wavefunction
-   USE qs_commutators,                  ONLY: build_com_hr_matrix
-   USE qs_core_energies,                ONLY: calculate_ptrace
-   USE qs_electric_field_gradient,      ONLY: qs_efg_calc
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_epr_hyp,                      ONLY: qs_epr_hyp_calc
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_integral_utils,               ONLY: basis_set_list_setup
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_methods,                   ONLY: calc_rho_tot_gspace,&
-                                              qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_did_change,&
-                                              qs_ks_env_type
-   USE qs_loc_methods,                  ONLY: qs_loc_driver
-   USE qs_loc_molecules,                ONLY: wfc_to_molecule
-   USE qs_loc_types,                    ONLY: qs_loc_env_create,&
-                                              qs_loc_env_destroy,&
-                                              qs_loc_env_new_type
-   USE qs_loc_utils,                    ONLY: loc_write_restart,&
-                                              qs_loc_control_init,&
-                                              qs_loc_env_init,&
-                                              qs_loc_init,&
-                                              retain_history
-   USE qs_mo_io,                        ONLY: write_dm_binary_restart,&
-                                              write_mo_set
-   USE qs_mo_methods,                   ONLY: calculate_subspace_eigenvalues,&
-                                              make_mo_eig
-   USE qs_mo_occupation,                ONLY: set_mo_occupation
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_moments,                      ONLY: qs_moment_berry_phase,&
-                                              qs_moment_locop
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              get_neighbor_list_set_p,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_ot_eigensolver,               ONLY: ot_eigensolver
-   USE qs_pdos,                         ONLY: calculate_projected_dos
-   USE qs_resp,                         ONLY: resp_fit
-   USE qs_rho0_types,                   ONLY: get_rho0_mpole,&
-                                              mpole_rho_atom,&
-                                              rho0_mpole_type
-   USE qs_rho_atom_types,               ONLY: rho_atom_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_types,                    ONLY: ot_method_nr,&
-                                              qs_scf_env_type
-   USE qs_scf_wfn_mix,                  ONLY: wfn_mix
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE qs_wannier90,                    ONLY: wannier90_interface
-   USE s_square_methods,                ONLY: compute_s_square
-   USE scf_control_types,               ONLY: scf_control_type
-   USE stm_images,                      ONLY: th_stm_image
-   USE transport,                       ONLY: qs_scf_post_transport
-   USE virial_types,                    ONLY: virial_type
-   USE wannier_states,                  ONLY: construct_wannier_states
-   USE wannier_states_types,            ONLY: wannier_centres_type
-   USE xray_diffraction,                ONLY: calculate_rhotot_elec_gspace,&
-                                              xray_diffraction_spectrum
+   USE admm_types, ONLY: admm_type
+   USE admm_utils, ONLY: admm_correct_for_eigenvalues, &
+                         admm_uncorrect_for_eigenvalues
+   USE ai_onecenter, ONLY: sg_overlap
+   USE atom_kind_orbitals, ONLY: calculate_atomic_density
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_array_utils, ONLY: cp_1d_r_p_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix
+   USE cp_ddapc_util, ONLY: get_ddapc
+   USE cp_fm_basic_linalg, ONLY: cp_fm_trace
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_init_random, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_iter_string, &
+                                 cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE cp_result_methods, ONLY: cp_results_erase, &
+                                get_results, &
+                                put_results
+   USE cp_result_types, ONLY: cp_result_type
+   USE dbcsr_api, ONLY: &
+      convert_dbcsr_to_csr, csr_create_from_dbcsr, csr_dbcsr_blkrow_dist, csr_destroy, csr_type, &
+      csr_write, dbcsr_add, dbcsr_copy, dbcsr_copy_into_existing, dbcsr_create, &
+      dbcsr_desymmetrize, dbcsr_frobenius_norm, dbcsr_get_info, dbcsr_has_symmetry, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_type
+   USE dct, ONLY: pw_shrink
+   USE et_coupling_types, ONLY: set_et_coupling_type
+   USE hirshfeld_methods, ONLY: comp_hirshfeld_charges, &
+                                comp_hirshfeld_i_charges, &
+                                create_shape_function, &
+                                write_hirshfeld_charges
+   USE hirshfeld_types, ONLY: create_hirshfeld_type, &
+                              hirshfeld_type, &
+                              release_hirshfeld_type, &
+                              set_hirshfeld_info
+   USE input_constants, ONLY: do_loc_both, &
+                              do_loc_homo, &
+                              do_loc_lumo, &
+                              ot_precond_full_all, &
+                              radius_covalent, &
+                              radius_user, &
+                              ref_charge_atomic, &
+                              ref_charge_mulliken
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_get_ivals, &
+                                  section_get_lval, &
+                                  section_get_rval, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE iterate_matrix, ONLY: matrix_sqrt_Newton_Schulz
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE kpoint_types, ONLY: kpoint_type
+   USE lapack, ONLY: lapack_sgesv
+   USE mao_wfn_analysis, ONLY: mao_analysis
+   USE mathconstants, ONLY: pi, &
+                            twopi
+   USE memory_utilities, ONLY: reallocate
+   USE message_passing, ONLY: mp_sum
+   USE minbas_wfn_analysis, ONLY: minbas_analysis
+   USE molden_utils, ONLY: write_mos_molden
+   USE molecular_states, ONLY: construct_molecular_states
+   USE molecule_types, ONLY: molecule_type
+   USE moments_utils, ONLY: get_reference_point
+   USE mulliken, ONLY: mulliken_charges
+   USE orbital_pointers, ONLY: indso
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: angstrom, &
+                      debye, &
+                      evolt
+   USE population_analyses, ONLY: lowdin_population_analysis, &
+                                  mulliken_population_analysis
+   USE preconditioner_types, ONLY: preconditioner_type
+   USE ps_implicit_types, ONLY: MIXED_BC, &
+                                MIXED_PERIODIC_BC, &
+                                NEUMANN_BC, &
+                                PERIODIC_BC
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_grids, ONLY: get_pw_grid_info
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_derive, &
+                         pw_integrate_function, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_implicit, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_active_space_methods, ONLY: active_space_main
+   USE qs_collocate_density, ONLY: calculate_rho_elec, &
+                                   calculate_wavefunction
+   USE qs_commutators, ONLY: build_com_hr_matrix
+   USE qs_core_energies, ONLY: calculate_ptrace
+   USE qs_electric_field_gradient, ONLY: qs_efg_calc
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_epr_hyp, ONLY: qs_epr_hyp_calc
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_integral_utils, ONLY: basis_set_list_setup
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_methods, ONLY: calc_rho_tot_gspace, &
+                            qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: qs_ks_did_change, &
+                          qs_ks_env_type
+   USE qs_loc_methods, ONLY: qs_loc_driver
+   USE qs_loc_molecules, ONLY: wfc_to_molecule
+   USE qs_loc_types, ONLY: qs_loc_env_create, &
+                           qs_loc_env_destroy, &
+                           qs_loc_env_new_type
+   USE qs_loc_utils, ONLY: loc_write_restart, &
+                           qs_loc_control_init, &
+                           qs_loc_env_init, &
+                           qs_loc_init, &
+                           retain_history
+   USE qs_mo_io, ONLY: write_dm_binary_restart, &
+                       write_mo_set
+   USE qs_mo_methods, ONLY: calculate_subspace_eigenvalues, &
+                            make_mo_eig
+   USE qs_mo_occupation, ONLY: set_mo_occupation
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_moments, ONLY: qs_moment_berry_phase, &
+                         qs_moment_locop
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     get_neighbor_list_set_p, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_ot_eigensolver, ONLY: ot_eigensolver
+   USE qs_pdos, ONLY: calculate_projected_dos
+   USE qs_resp, ONLY: resp_fit
+   USE qs_rho0_types, ONLY: get_rho0_mpole, &
+                            mpole_rho_atom, &
+                            rho0_mpole_type
+   USE qs_rho_atom_types, ONLY: rho_atom_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_types, ONLY: ot_method_nr, &
+                           qs_scf_env_type
+   USE qs_scf_wfn_mix, ONLY: wfn_mix
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE qs_wannier90, ONLY: wannier90_interface
+   USE s_square_methods, ONLY: compute_s_square
+   USE scf_control_types, ONLY: scf_control_type
+   USE stm_images, ONLY: th_stm_image
+   USE transport, ONLY: qs_scf_post_transport
+   USE virial_types, ONLY: virial_type
+   USE wannier_states, ONLY: construct_wannier_states
+   USE wannier_states_types, ONLY: wannier_centres_type
+   USE xray_diffraction, ONLY: calculate_rhotot_elec_gspace, &
+                               xray_diffraction_spectrum
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -255,15 +255,15 @@ CONTAINS
       CHARACTER(6), OPTIONAL                             :: wf_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_post_calculation_gpw', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, ispin, min_lumos, n_rep, &
                                                             nhomo, nlumo, nlumo_stm, nlumo_tddft, &
                                                             nlumos, nmo, output_unit, unit_nr
       INTEGER, DIMENSION(:, :, :), POINTER               :: marked_states
       LOGICAL :: check_write, compute_lumos, do_homo, do_kpoints, do_mo_cubes, do_stm, &
-         do_wannier_cubes, has_homo, has_lumo, loc_explicit, loc_print_explicit, my_localized_wfn, &
-         p_loc, p_loc_homo, p_loc_lumo
+                 do_wannier_cubes, has_homo, has_lumo, loc_explicit, loc_print_explicit, my_localized_wfn, &
+                 p_loc, p_loc_homo, p_loc_lumo
       REAL(dp)                                           :: e_kin
       REAL(KIND=dp)                                      :: gap, homo_lumo(2, 2)
       REAL(KIND=dp), DIMENSION(:), POINTER               :: mo_eigenvalues
@@ -272,7 +272,7 @@ CONTAINS
       TYPE(cp_1d_r_p_type), DIMENSION(:), POINTER        :: occupied_evals, unoccupied_evals, &
                                                             unoccupied_evals_stm
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER :: homo_localized, lumo_localized, lumo_ptr, &
-         mo_loc_history, occupied_orbs, unoccupied_orbs, unoccupied_orbs_stm
+                                                   mo_loc_history, occupied_orbs, unoccupied_orbs, unoccupied_orbs_stm
       TYPE(cp_fm_type), POINTER                          :: mo_coeff
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: ks_rmpv, matrix_s, mo_derivs
@@ -563,21 +563,21 @@ CONTAINS
             DO ispin = 1, dft_control%nspins
 
                CALL get_mo_set(mo_set=mos(ispin)%mo_set, homo=homo, nmo=nmo, eigenvalues=mo_eigenvalues)
-               IF (nlumo > nmo-homo) THEN
+               IF (nlumo > nmo - homo) THEN
                   ! this case not yet implemented
                ELSE
                   IF (nlumo .EQ. -1) THEN
-                     nlumo = nmo-homo
+                     nlumo = nmo - homo
                   END IF
                   IF (output_unit > 0) WRITE (output_unit, *) " "
                   IF (output_unit > 0) WRITE (output_unit, *) " Lowest eigenvalues of the unoccupied subspace spin ", ispin
                   IF (output_unit > 0) WRITE (output_unit, *) "---------------------------------------------"
-                  IF (output_unit > 0) WRITE (output_unit, '(4(1X,1F16.8))') mo_eigenvalues(homo+1:homo+nlumo)
+                  IF (output_unit > 0) WRITE (output_unit, '(4(1X,1F16.8))') mo_eigenvalues(homo + 1:homo + nlumo)
 
                   ! Prints the cube files of UNOCCUPIED ORBITALS
                   CALL get_mo_set(mo_set=mos(ispin)%mo_set, mo_coeff=mo_coeff)
                   CALL qs_scf_post_unocc_cubes(input, dft_section, dft_control, logger, qs_env, &
-                                               mo_coeff, wf_g, wf_r, particles, nlumo, homo, ispin, lumo=homo+1)
+                                               mo_coeff, wf_g, wf_r, particles, nlumo, homo, ispin, lumo=homo + 1)
                END IF
             END DO
 
@@ -643,7 +643,7 @@ CONTAINS
             IF (output_unit > 0) WRITE (output_unit, *) " "
             DO ispin = 1, dft_control%nspins
                IF (.NOT. scf_control%smear%do_smear) THEN
-                  gap = homo_lumo(ispin, 2)-homo_lumo(ispin, 1)
+                  gap = homo_lumo(ispin, 2) - homo_lumo(ispin, 1)
                   IF (output_unit > 0) WRITE (output_unit, '(T2,A,F12.6)') &
                      "HOMO - LUMO gap [eV] :", gap*evolt
                END IF
@@ -772,7 +772,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :, :), POINTER               :: marked_states
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_localization_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, mystate, ns, output_unit
       INTEGER, DIMENSION(:), POINTER                     :: lstates, marked_states_spin
@@ -842,7 +842,7 @@ CONTAINS
                   ALLOCATE (wc(ispin)%centres(3, ns))
                ENDIF
 
-               wc(ispin)%centres(:, :) = scenter(1+(ispin-1)*3:ispin*3, :)
+               wc(ispin)%centres(:, :) = scenter(1 + (ispin - 1)*3:ispin*3, :)
                lstates => qs_loc_env%localized_wfn_control%loc_states(:, ispin)
                CALL construct_wannier_states(mo_local(ispin)%matrix, &
                                              ks_rmpv(ispin)%matrix, qs_env, loc_print_section=loc_print_section, &
@@ -936,8 +936,8 @@ CONTAINS
          IF (output_unit > 0) WRITE (output_unit, FMT='(1X,A)') "-----------------------------------------------------"
          CALL get_mo_set(mo_set=mos(ispin)%mo_set, mo_coeff=mo_coeff, homo=homo, nao=nao, nmo=nmo)
          CALL cp_fm_get_info(mo_coeff, nrow_global=n)
-         nlumos = MAX(1, MIN(nlumo, nao-nmo))
-         IF (nlumo == -1) nlumos = nao-nmo
+         nlumos = MAX(1, MIN(nlumo, nao - nmo))
+         IF (nlumo == -1) nlumos = nao - nmo
          ALLOCATE (unoccupied_evals(ispin)%array(nlumos))
          CALL cp_fm_struct_create(fm_struct_tmp, para_env=para_env, context=blacs_env, &
                                   nrow_global=n, ncol_global=nlumos)
@@ -994,7 +994,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, print_level, unit_nr
       LOGICAL                                            :: do_kpoints, print_it
@@ -1057,7 +1057,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_loc_dip', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: description, descriptionThisDip, iter
       COMPLEX(KIND=dp)                                   :: zeta
@@ -1119,7 +1119,7 @@ CONTAINS
 
             ! Charges of the wfc involved
             ! Warning, this assumes the same occupation for all states
-            zwfc = 3.0_dp-REAL(dft_control%nspins, dp)
+            zwfc = 3.0_dp - REAL(dft_control%nspins, dp)
 
             DO ispins = 1, dft_control%nspins
                DO i = 1, SIZE(qs_loc_env%localized_wfn_control%centers_set(ispins)%array, 2)
@@ -1143,18 +1143,18 @@ CONTAINS
                IF (.NOT. ghost .AND. .NOT. floating) THEN
                   CALL get_qs_kind(qs_kind_set(ikind), core_charge=zeff)
                   ria = pbc(particle_set(i)%r, cell)
-                  dipole = dipole+zeff*(ria-rcc)
+                  dipole = dipole + zeff*(ria - rcc)
                END IF
             END DO
 
             ! Charges of the wfc involved
             ! Warning, this assumes the same occupation for all states
-            zwfc = 3.0_dp-REAL(dft_control%nspins, dp)
+            zwfc = 3.0_dp - REAL(dft_control%nspins, dp)
 
             DO ispins = 1, dft_control%nspins
                DO i = 1, SIZE(qs_loc_env%localized_wfn_control%centers_set(ispins)%array, 2)
                   ria = pbc(qs_loc_env%localized_wfn_control%centers_set(ispins)%array(1:3, i), cell)
-                  dipole = dipole-zwfc*(ria-rcc)
+                  dipole = dipole - zwfc*(ria - rcc)
                ENDDO
             ENDDO
          END IF
@@ -1178,10 +1178,10 @@ CONTAINS
             END IF
             IF (do_berry) THEN
                WRITE (unit=unit_nr, fmt="(a,9(es18.8))") &
-                  iter(1:15), dipole, dipole*debye, pbc(dipole-dipole_old, cell)
+                  iter(1:15), dipole, dipole*debye, pbc(dipole - dipole_old, cell)
             ELSE
                WRITE (unit=unit_nr, fmt="(a,9(es18.8))") &
-                  iter(1:15), dipole, dipole*debye, (dipole-dipole_old)
+                  iter(1:15), dipole, dipole*debye, (dipole - dipole_old)
             END IF
          END IF
          CALL cp_print_key_finished_output(unit_nr, logger, print_key)
@@ -1221,7 +1221,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: homo, ispin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_occ_cubes', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename, my_pos_cube, title
       INTEGER                                            :: handle, i, ir, ivector, n_rep, nhomo, &
@@ -1254,20 +1254,20 @@ CONTAINS
                CALL section_vals_val_get(dft_section, "PRINT%MO_CUBES%HOMO_LIST", i_rep_val=ir, &
                                          i_vals=list)
                IF (ASSOCIATED(list)) THEN
-                  CALL reallocate(list_index, 1, nlist+SIZE(list))
+                  CALL reallocate(list_index, 1, nlist + SIZE(list))
                   DO i = 1, SIZE(list)
-                     list_index(i+nlist) = list(i)
+                     list_index(i + nlist) = list(i)
                   END DO
-                  nlist = nlist+SIZE(list)
+                  nlist = nlist + SIZE(list)
                END IF
             END DO
          ELSE
 
             IF (nhomo == -1) nhomo = homo
-            nlist = homo-MAX(1, homo-nhomo+1)+1
+            nlist = homo - MAX(1, homo - nhomo + 1) + 1
             ALLOCATE (list_index(nlist))
             DO i = 1, nlist
-               list_index(i) = MAX(1, homo-nhomo+1)+i-1
+               list_index(i) = MAX(1, homo - nhomo + 1) + i - 1
             END DO
          END IF
          DO i = 1, nlist
@@ -1285,7 +1285,7 @@ CONTAINS
             unit_nr = cp_print_key_unit_nr(logger, input, "DFT%PRINT%MO_CUBES", extension=".cube", &
                                            middle_name=TRIM(filename), file_position=my_pos_cube, log_filename=.FALSE., &
                                            mpi_io=mpi_io)
-            WRITE (title, *) "WAVEFUNCTION ", ivector, " spin ", ispin, " i.e. HOMO - ", ivector-homo
+            WRITE (title, *) "WAVEFUNCTION ", ivector, " spin ", ispin, " i.e. HOMO - ", ivector - homo
             CALL cp_pw_to_cube(wf_r%pw, unit_nr, title, particles=particles, &
                                stride=section_get_ivals(dft_section, "PRINT%MO_CUBES%STRIDE"), mpi_io=mpi_io)
             CALL cp_print_key_finished_output(unit_nr, logger, input, "DFT%PRINT%MO_CUBES", mpi_io=mpi_io)
@@ -1326,7 +1326,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: lumo
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_unocc_cubes', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename, my_pos_cube, title
       INTEGER                                            :: handle, ifirst, index_mo, ivector, &
@@ -1350,7 +1350,7 @@ CONTAINS
          END IF
          ifirst = 1
          IF (PRESENT(lumo)) ifirst = lumo
-         DO ivector = ifirst, ifirst+nlumos-1
+         DO ivector = ifirst, ifirst + nlumos - 1
             CALL get_qs_env(qs_env=qs_env, &
                             atomic_kind_set=atomic_kind_set, &
                             qs_kind_set=qs_kind_set, &
@@ -1361,7 +1361,7 @@ CONTAINS
                                         qs_kind_set, cell, dft_control, particle_set, pw_env)
 
             IF (ifirst == 1) THEN
-               index_mo = homo+ivector
+               index_mo = homo + ivector
             ELSE
                index_mo = ivector
             END IF
@@ -1371,7 +1371,7 @@ CONTAINS
             unit_nr = cp_print_key_unit_nr(logger, input, "DFT%PRINT%MO_CUBES", extension=".cube", &
                                            middle_name=TRIM(filename), file_position=my_pos_cube, log_filename=.FALSE., &
                                            mpi_io=mpi_io)
-            WRITE (title, *) "WAVEFUNCTION ", index_mo, " spin ", ispin, " i.e. LUMO + ", ifirst+ivector-2
+            WRITE (title, *) "WAVEFUNCTION ", index_mo, " spin ", ispin, " i.e. LUMO + ", ifirst + ivector - 2
             CALL cp_pw_to_cube(wf_r%pw, unit_nr, title, particles=particles, &
                                stride=section_get_ivals(dft_section, "PRINT%MO_CUBES%STRIDE"), mpi_io=mpi_io)
             CALL cp_print_key_finished_output(unit_nr, logger, input, "DFT%PRINT%MO_CUBES", mpi_io=mpi_io)
@@ -1396,7 +1396,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_moments', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       INTEGER                                            :: handle, maxmom, reference, unit_nr
@@ -1472,7 +1472,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_scf_post_xray', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       INTEGER                                            :: handle, unit_nr
@@ -1528,7 +1528,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_efg', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(section_vals_type), POINTER                   :: print_key
@@ -1606,7 +1606,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_elf', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename, mpi_filename, my_pos_cube, &
                                                             title
@@ -1785,7 +1785,7 @@ CONTAINS
 
          IF (drho_r_valid) THEN
             DO idir = 1, 3
-               drho_r(3*(ispin-1)+idir)%pw => drho_struct_r(3*(ispin-1)+idir)%pw
+               drho_r(3*(ispin - 1) + idir)%pw => drho_struct_r(3*(ispin - 1) + idir)%pw
             END DO
          ELSE
             deriv_pw = .FALSE.
@@ -1796,25 +1796,25 @@ CONTAINS
                                       use_data=COMPLEXDATA1D, in_space=RECIPROCALSPACE)
                udvol = 1.0_dp/rho_struct_r(ispin)%pw%pw_grid%dvol
                DO idir = 1, 3
-                  CALL pw_pool_create_pw(auxbas_pw_pool, drho_r(3*(ispin-1)+idir)%pw, &
+                  CALL pw_pool_create_pw(auxbas_pw_pool, drho_r(3*(ispin - 1) + idir)%pw, &
                                          use_data=REALDATA3D, in_space=REALSPACE)
                   CALL pw_transfer(rho_struct_r(ispin)%pw, tmp_g)
                   CALL pw_derive(tmp_g, nd(:, idir))
-                  CALL pw_transfer(tmp_g, drho_r(3*(ispin-1)+idir)%pw)
+                  CALL pw_transfer(tmp_g, drho_r(3*(ispin - 1) + idir)%pw)
 !              CALL pw_scale(drho_r(3*(ispin-1)+idir)%pw,udvol)
 
                END DO
 
             ELSE
                DO idir = 1, 3
-                  CALL pw_pool_create_pw(auxbas_pw_pool, drho_r(3*(ispin-1)+idir)%pw, &
+                  CALL pw_pool_create_pw(auxbas_pw_pool, drho_r(3*(ispin - 1) + idir)%pw, &
                                          use_data=REALDATA3D, in_space=REALSPACE)
-                  CALL pw_pool_create_pw(auxbas_pw_pool, drho_g(3*(ispin-1)+idir)%pw, &
+                  CALL pw_pool_create_pw(auxbas_pw_pool, drho_g(3*(ispin - 1) + idir)%pw, &
                                          use_data=COMPLEXDATA1D, in_space=RECIPROCALSPACE)
                   rho_ao => rho_struct_ao(ispin, :)
                   CALL calculate_rho_elec(matrix_p_kp=rho_ao, &
-                                          rho=drho_r(3*(ispin-1)+idir), &
-                                          rho_gspace=drho_g(3*(ispin-1)+idir), &
+                                          rho=drho_r(3*(ispin - 1) + idir), &
+                                          rho_gspace=drho_g(3*(ispin - 1) + idir), &
                                           total_rho=dum, &
                                           ks_env=ks_env, soft_valid=.FALSE., &
                                           compute_tau=.FALSE., compute_grad=.TRUE., idir=idir)
@@ -1829,14 +1829,14 @@ CONTAINS
          DO k = bo(1, 3), bo(2, 3)
             DO j = bo(1, 2), bo(2, 2)
                DO i = bo(1, 1), bo(2, 1)
-                  norm_drho = drho_r(3*(ispin-1)+1)%pw%cr3d(i, j, k)**2+ &
-                              drho_r(3*(ispin-1)+2)%pw%cr3d(i, j, k)**2+ &
-                              drho_r(3*(ispin-1)+3)%pw%cr3d(i, j, k)**2
+                  norm_drho = drho_r(3*(ispin - 1) + 1)%pw%cr3d(i, j, k)**2 + &
+                              drho_r(3*(ispin - 1) + 2)%pw%cr3d(i, j, k)**2 + &
+                              drho_r(3*(ispin - 1) + 3)%pw%cr3d(i, j, k)**2
                   norm_drho = norm_drho/MAX(rho_r(ispin)%pw%cr3d(i, j, k), rho_cutoff)
                   rho_53 = cfermi*MAX(rho_r(ispin)%pw%cr3d(i, j, k), rho_cutoff)**f53
-                  elf_kernel = (tau_r(ispin)%pw%cr3d(i, j, k)-f18*norm_drho)+2.87E-5_dp
+                  elf_kernel = (tau_r(ispin)%pw%cr3d(i, j, k) - f18*norm_drho) + 2.87E-5_dp
                   elf_kernel = (elf_kernel/rho_53)**2
-                  elf_r(ispin)%pw%cr3d(i, j, k) = 1.0_dp/(1.0_dp+elf_kernel)
+                  elf_r(ispin)%pw%cr3d(i, j, k) = 1.0_dp/(1.0_dp + elf_kernel)
                   IF (elf_r(ispin)%pw%cr3d(i, j, k) < ELFCUT) elf_r(ispin)%pw%cr3d(i, j, k) = 0.0_dp
                END DO
             END DO
@@ -1850,12 +1850,12 @@ CONTAINS
             IF (deriv_pw) THEN
                CALL pw_pool_give_back_pw(auxbas_pw_pool, tmp_g)
                DO idir = 1, 3
-                  CALL pw_pool_give_back_pw(auxbas_pw_pool, drho_r(3*(ispin-1)+idir)%pw)
+                  CALL pw_pool_give_back_pw(auxbas_pw_pool, drho_r(3*(ispin - 1) + idir)%pw)
                END DO
             ELSE
                DO idir = 1, 3
-                  CALL pw_pool_give_back_pw(auxbas_pw_pool, drho_r(3*(ispin-1)+idir)%pw)
-                  CALL pw_pool_give_back_pw(auxbas_pw_pool, drho_g(3*(ispin-1)+idir)%pw)
+                  CALL pw_pool_give_back_pw(auxbas_pw_pool, drho_r(3*(ispin - 1) + idir)%pw)
+                  CALL pw_pool_give_back_pw(auxbas_pw_pool, drho_g(3*(ispin - 1) + idir)%pw)
                END DO
             END IF
          END IF
@@ -1887,7 +1887,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_molopt', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao, unit_nr
       REAL(KIND=dp)                                      :: S_cond_number
@@ -1959,7 +1959,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_epr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(section_vals_type), POINTER                   :: print_key
@@ -1989,7 +1989,7 @@ CONTAINS
       TYPE(qs_scf_env_type), OPTIONAL, POINTER           :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_available_results', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -2017,7 +2017,7 @@ CONTAINS
       TYPE(qs_scf_env_type), OPTIONAL, POINTER           :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_mo_dependent_results', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, ik, ispin, nmo, output_unit
       LOGICAL                                            :: all_equal, do_kpoints
@@ -2200,7 +2200,7 @@ CONTAINS
                IF (nmo > 0) THEN
                   all_equal = all_equal .AND. &
                               (ALL(occupation_numbers(1:homo) == maxocc) .AND. &
-                               ALL(occupation_numbers(homo+1:nmo) == 0.0_dp))
+                               ALL(occupation_numbers(homo + 1:nmo) == 0.0_dp))
                END IF
             END DO
             IF (.NOT. all_equal) THEN
@@ -2232,7 +2232,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_mo_free_results', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       CHARACTER(len=1), DIMENSION(3), PARAMETER          :: cdir = (/"x", "y", "z"/)
 
       CHARACTER(LEN=2)                                   :: element_symbol
@@ -2243,7 +2243,7 @@ CONTAINS
                                                             nkind, np, nr, output_unit, &
                                                             print_level, unit_nr
       LOGICAL :: append_cube, do_kpoints, mpi_io, omit_headers, print_it, print_total_density, &
-         rho_r_valid, write_ks, write_xc, xrd_interface
+                 rho_r_valid, write_ks, write_xc, xrd_interface
       REAL(KIND=dp)                                      :: q_max, rho_hard, rho_soft, rho_total, &
                                                             rho_total_rspace, udvol, volume
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: bfun
@@ -2396,7 +2396,7 @@ CONTAINS
                ccdens(:, 2, ikind) = 0._dp
                CALL project_function_a(ccdens(1:ngto, 2, ikind), ccdens(1:ngto, 1, ikind), &
                                        ppdens(1:ngto, 2, ikind), ppdens(1:ngto, 1, ikind), 0)
-               ccdens(:, 2, ikind) = aedens(:, 2, ikind)-ccdens(:, 2, ikind)
+               ccdens(:, 2, ikind) = aedens(:, 2, ikind) - ccdens(:, 2, ikind)
                IF (unit_nr > 0) THEN
                   WRITE (unit_nr, FMT="(I6,A10,A20)") ikind, TRIM(element_symbol), TRIM(name)
                   WRITE (unit_nr, FMT="(I6)") ngto
@@ -2433,7 +2433,7 @@ CONTAINS
                   bfun = 0._dp
                   DO ispin = 1, dft_control%nspins
                      IF (ASSOCIATED(rho_atom%rho_rad_h(1)%r_coef)) THEN
-                        bfun(:, :) = bfun+rho_atom%rho_rad_h(ispin)%r_coef-rho_atom%rho_rad_s(ispin)%r_coef
+                        bfun(:, :) = bfun + rho_atom%rho_rad_h(ispin)%r_coef - rho_atom%rho_rad_s(ispin)%r_coef
                      END IF
                   END DO
                   CALL mp_sum(bfun, para_env%group)
@@ -2498,7 +2498,7 @@ CONTAINS
                                               q_max=q_max, &
                                               rho_hard=rho_hard, &
                                               rho_soft=rho_soft)
-            rho_total = rho_hard+rho_soft
+            rho_total = rho_hard + rho_soft
             CALL get_pw_grid_info(pw_grid=rho_elec_gspace%pw%pw_grid, &
                                   vol=volume)
             CALL pw_transfer(rho_elec_gspace%pw, rho_elec_rspace%pw, debug=.FALSE.)
@@ -2541,7 +2541,7 @@ CONTAINS
                                                  rho_hard=rho_hard, &
                                                  rho_soft=rho_soft, &
                                                  fsign=-1.0_dp)
-               rho_total = rho_hard+rho_soft
+               rho_total = rho_hard + rho_soft
                CALL pw_transfer(rho_elec_gspace%pw, rho_elec_rspace%pw, debug=.FALSE.)
                rho_total_rspace = pw_integrate_function(rho_elec_rspace%pw, isign=-1)/volume
                filename = "TOTAL_SPIN_DENSITY"
@@ -2939,7 +2939,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'hirshfeld_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iat, ikind, natom, nkind, nspin, &
                                                             radius_type, refc, shapef
@@ -3032,7 +3032,7 @@ CONTAINS
             CALL get_atomic_kind(atomic_kind, kind_number=ikind)
             CALL get_qs_kind(qs_kind_set(ikind), paw_atom=paw_atom)
             IF (paw_atom) THEN
-               charges(iat, 1:nspin) = charges(iat, 1:nspin)+mp_rho(iat)%q0(1:nspin)
+               charges(iat, 1:nspin) = charges(iat, 1:nspin) + mp_rho(iat)%q0(1:nspin)
             END IF
          END DO
       END IF
@@ -3062,7 +3062,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: l
 
       CHARACTER(len=*), PARAMETER :: routineN = 'project_function_a', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: info, n
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: ipiv
@@ -3098,7 +3098,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: l
 
       CHARACTER(len=*), PARAMETER :: routineN = 'project_function_b', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, info, n, nr
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: ipiv
@@ -3137,13 +3137,13 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_post_ps_implicit', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename, my_pos_cube
       INTEGER                                            :: boundary_condition, handle, i, j, &
                                                             n_cstr, n_tiles, unit_nr
       LOGICAL :: append_cube, do_cstr_charge_cube, do_dielectric_cube, do_dirichlet_bc_cube, &
-         has_dirichlet_bc, has_implicit_ps, mpi_io, tile_cubes
+                 has_dirichlet_bc, has_implicit_ps, mpi_io, tile_cubes
       TYPE(particle_list_type), POINTER                  :: particles
       TYPE(pw_env_type), POINTER                         :: pw_env
       TYPE(pw_p_type)                                    :: aux_r
@@ -3349,14 +3349,14 @@ CONTAINS
       INTEGER, DIMENSION(:), POINTER                     :: stride(:)
       LOGICAL                                            :: mpi_io, print_cube, restrict_range
       REAL(KIND=dp) :: bin_width, density_ewindow_total, density_total, energy_range, fermi_level, &
-         filter_eps, frob_norm, lanzcos_threshold, lower_bound, occupation, total_rho, upper_bound
+                       filter_eps, frob_norm, lanzcos_threshold, lower_bound, occupation, total_rho, upper_bound
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: eigenvalues, P_eigenvalues, &
                                                             window_eigenvalues
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
       TYPE(cp_fm_struct_type), POINTER                   :: ao_ao_fmstruct, window_fm_struct
       TYPE(cp_fm_type), POINTER :: eigenvectors, eigenvectors_nonorth, matrix_ks_fm, &
-         P_eigenvectors, P_window_fm, rho_ao_ortho_fm, S_minus_half_fm, tmp_fm, &
-         window_eigenvectors, window_fm
+                                   P_eigenvectors, P_window_fm, rho_ao_ortho_fm, S_minus_half_fm, tmp_fm, &
+                                   window_eigenvectors, window_fm
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks, matrix_s, rho_ao
       TYPE(dbcsr_type)                                   :: matrix_ks_nosym, S_half, S_minus_half, &
@@ -3437,10 +3437,10 @@ CONTAINS
 
       !diagonalize the full ks matrix
       CALL choose_eigv_solver(matrix_ks_fm, eigenvectors, eigenvalues)
-      fermi_level = eigenvalues((nelectron_total+MOD(nelectron_total, 2))/2)
+      fermi_level = eigenvalues((nelectron_total + MOD(nelectron_total, 2))/2)
       IF (restrict_range) THEN
-         lower_bound = MAX(fermi_level-energy_range, eigenvalues(1))
-         upper_bound = MIN(fermi_level+energy_range, eigenvalues(SIZE(eigenvalues)))
+         lower_bound = MAX(fermi_level - energy_range, eigenvalues(1))
+         upper_bound = MIN(fermi_level + energy_range, eigenvalues(SIZE(eigenvalues)))
       ELSE
          lower_bound = eigenvalues(1)
          upper_bound = eigenvalues(SIZE(eigenvalues))
@@ -3490,7 +3490,7 @@ CONTAINS
          CALL choose_eigv_solver(P_window_fm, window_eigenvectors, window_eigenvalues)
          DO i = 1, nao
             IF (unit_nr > 0) THEN
-               WRITE (unit_nr, *) i, "H:", eigenvalues(i), "P:", P_eigenvalues(nao-i+1), "Pnew:", window_eigenvalues(nao-i+1)
+              WRITE (unit_nr, *) i, "H:", eigenvalues(i), "P:", P_eigenvalues(nao - i + 1), "Pnew:", window_eigenvalues(nao - i + 1)
             ENDIF
          END DO
          DEALLOCATE (P_eigenvalues)
@@ -3502,28 +3502,28 @@ CONTAINS
       END IF
 
       !create energy windows
-      bin_width = (upper_bound-lower_bound)/nwindows
+      bin_width = (upper_bound - lower_bound)/nwindows
       next = 0
 
       DO i = 1, nwindows
-         DO WHILE (eigenvalues(next+1) < lower_bound)
-            next = next+1
+         DO WHILE (eigenvalues(next + 1) < lower_bound)
+            next = next + 1
          END DO
          last = next
-         DO WHILE (eigenvalues(next+1) < lower_bound+i*bin_width)
-            next = next+1
+         DO WHILE (eigenvalues(next + 1) < lower_bound + i*bin_width)
+            next = next + 1
             IF (next == SIZE(eigenvalues)) EXIT
          END DO
          !calculate the occupation
-         CALL cp_fm_struct_create(fmstruct=window_fm_struct, context=blacs_env, nrow_global=nao, ncol_global=next-last) !not sure how bad this is now load balanced due to using the same blacs_env
+         CALL cp_fm_struct_create(fmstruct=window_fm_struct, context=blacs_env, nrow_global=nao, ncol_global=next - last) !not sure how bad this is now load balanced due to using the same blacs_env
          CALL cp_fm_create(window_fm, window_fm_struct)
-         CALL cp_fm_to_fm(eigenvectors, window_fm, next-last, last+1, 1) !copy the mos in the energy window into a separate matrix
-         CALL cp_gemm("N", "T", nao, nao, next-last, one, window_fm, window_fm, zero, P_window_fm)
+         CALL cp_fm_to_fm(eigenvectors, window_fm, next - last, last + 1, 1) !copy the mos in the energy window into a separate matrix
+         CALL cp_gemm("N", "T", nao, nao, next - last, one, window_fm, window_fm, zero, P_window_fm)
          CALL cp_fm_trace(P_window_fm, rho_ao_ortho_fm, occupation)
          IF (print_cube) THEN
-            CALL cp_fm_to_fm(eigenvectors_nonorth, window_fm, next-last, last+1, 1)
+            CALL cp_fm_to_fm(eigenvectors_nonorth, window_fm, next - last, last + 1, 1)
             !print the energy window to a cube file
-            CALL cp_gemm("N", "T", nao, nao, next-last, one, window_fm, window_fm, zero, P_window_fm) !calculate the density caused by the mos in the energy window
+            CALL cp_gemm("N", "T", nao, nao, next - last, one, window_fm, window_fm, zero, P_window_fm) !calculate the density caused by the mos in the energy window
             CALL copy_fm_to_dbcsr(P_window_fm, tmp)
             !ensure the correct sparsity
             CALL dbcsr_copy(window, matrix_ks(1)%matrix)
@@ -3544,12 +3544,12 @@ CONTAINS
                                               "PRINT%ENERGY_WINDOWS", mpi_io=mpi_io)
             density_ewindow_total = pw_integrate_function(rho_r%pw)
             IF (unit_nr > 0) WRITE (unit_nr, "(A,F16.10,A,I5,A,F20.14,A,F20.14)") " Energy Level: ", &
-               lower_bound+(i-0.5_dp)*bin_width, " Number of states: ", next-last, " Occupation: ", &
+               lower_bound + (i - 0.5_dp)*bin_width, " Number of states: ", next - last, " Occupation: ", &
                occupation, " Grid Density ", density_ewindow_total
          ELSE
             IF (unit_nr > 0) THEN
-               WRITE (unit_nr, "(A,F16.10,A,I5,A,F20.14)") " Energy Level: ", lower_bound+(i-0.5_dp)*bin_width, &
-                  " Number of states: ", next-last, " Occupation: ", occupation
+               WRITE (unit_nr, "(A,F16.10,A,I5,A,F20.14)") " Energy Level: ", lower_bound + (i - 0.5_dp)*bin_width, &
+                  " Number of states: ", next - last, " Occupation: ", occupation
             END IF
          END IF
          CALL cp_fm_release(window_fm)
@@ -3592,7 +3592,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_ks_matrix_csr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, fileformat
       INTEGER                                            :: handle, ispin, output_unit, unit_nr
@@ -3669,7 +3669,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_s_matrix_csr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, fileformat
       INTEGER                                            :: handle, ispin, output_unit, unit_nr
@@ -3746,7 +3746,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_adjacency_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: adjm_size, colind, handle, iatom, ikind, &
                                                             ind, jatom, jkind, k, natom, nkind, &
@@ -3789,7 +3789,7 @@ CONTAINS
          CALL basis_set_list_setup(basis_set_list_a, "ORB", qs_kind_set)
          CALL basis_set_list_setup(basis_set_list_b, "ORB", qs_kind_set)
 
-         adjm_size = ((natom+1)*natom)/2
+         adjm_size = ((natom + 1)*natom)/2
          ALLOCATE (interact_adjm(4*adjm_size))
          interact_adjm = 0
 
@@ -3813,19 +3813,19 @@ CONTAINS
                rowind = jatom
                colind = iatom
                ! swap the kinds too
-               ikind = ikind+jkind
-               jkind = ikind-jkind
-               ikind = ikind-jkind
+               ikind = ikind + jkind
+               jkind = ikind - jkind
+               ikind = ikind - jkind
             END IF
 
             ! indexing upper triangular matrix
-            ind = adjm_size-(natom-rowind+1)*((natom-rowind+1)+1)/2+colind-rowind+1
+            ind = adjm_size - (natom - rowind + 1)*((natom - rowind + 1) + 1)/2 + colind - rowind + 1
             ! convert the upper triangular matrix into a adjm_size x 4 matrix
             ! columns are: iatom, jatom, ikind, jkind
-            interact_adjm((ind-1)*4+1) = rowind
-            interact_adjm((ind-1)*4+2) = colind
-            interact_adjm((ind-1)*4+3) = ikind
-            interact_adjm((ind-1)*4+4) = jkind
+            interact_adjm((ind - 1)*4 + 1) = rowind
+            interact_adjm((ind - 1)*4 + 2) = colind
+            interact_adjm((ind - 1)*4 + 3) = ikind
+            interact_adjm((ind - 1)*4 + 4) = jkind
          ENDDO
 
          CALL mp_sum(interact_adjm, para_env%group)
@@ -3837,8 +3837,8 @@ CONTAINS
             WRITE (unit_nr, "(1A,2X,1A,5X,1A,4X,A5,3X,A5)") "#", "iatom", "jatom", "ikind", "jkind"
             DO k = 1, 4*adjm_size, 4
                ! print only the interacting atoms
-               IF (interact_adjm(k) .GT. 0 .AND. interact_adjm(k+1) .GT. 0) THEN
-                  WRITE (unit_nr, "(I8,2X,I8,3X,I6,2X,I6)") interact_adjm(k:k+3)
+               IF (interact_adjm(k) .GT. 0 .AND. interact_adjm(k + 1) .GT. 0) THEN
+                  WRITE (unit_nr, "(I8,2X,I8,3X,I6,2X,I6)") interact_adjm(k:k + 3)
                END IF
             END DO
          END IF

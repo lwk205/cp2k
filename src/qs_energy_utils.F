@@ -10,52 +10,52 @@
 !> \author MK (29.10.2002)
 ! **************************************************************************************************
 MODULE qs_energy_utils
-   USE atprop_types,                    ONLY: atprop_array_add,&
-                                              atprop_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_control_utils,                ONLY: read_ddapc_section
-   USE cp_external_control,             ONLY: external_control
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_p_type, dbcsr_set, dbcsr_type
-   USE et_coupling,                     ONLY: calc_et_coupling
-   USE et_coupling_proj,                ONLY: calc_et_coupling_proj
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE kpoint_methods,                  ONLY: kpoint_density_matrices,&
-                                              kpoint_density_transform
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE mp2,                             ONLY: mp2_main
-   USE pw_env_types,                    ONLY: pw_env_type
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integrate_potential,          ONLY: integrate_v_core_rspace
-   USE qs_ks_methods,                   ONLY: calculate_w_matrix,&
-                                              calculate_w_matrix_ot,&
-                                              qs_ks_update_qs_env
-   USE qs_linres_module,                ONLY: linres_calculation_low
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf,                          ONLY: scf
-   USE qs_tddfpt2_methods,              ONLY: tddfpt
-   USE scf_control_types,               ONLY: scf_control_type
-   USE xas_methods,                     ONLY: xas
+   USE atprop_types, ONLY: atprop_array_add, &
+                           atprop_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_control_utils, ONLY: read_ddapc_section
+   USE cp_external_control, ONLY: external_control
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_p_type, dbcsr_set, dbcsr_type
+   USE et_coupling, ONLY: calc_et_coupling
+   USE et_coupling_proj, ONLY: calc_et_coupling_proj
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE kpoint_methods, ONLY: kpoint_density_matrices, &
+                             kpoint_density_transform
+   USE kpoint_types, ONLY: kpoint_type
+   USE mp2, ONLY: mp2_main
+   USE pw_env_types, ONLY: pw_env_type
+   USE pw_types, ONLY: pw_p_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integrate_potential, ONLY: integrate_v_core_rspace
+   USE qs_ks_methods, ONLY: calculate_w_matrix, &
+                            calculate_w_matrix_ot, &
+                            qs_ks_update_qs_env
+   USE qs_linres_module, ONLY: linres_calculation_low
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf, ONLY: scf
+   USE qs_tddfpt2_methods, ONLY: tddfpt
+   USE scf_control_types, ONLY: scf_control_type
+   USE xas_methods, ONLY: xas
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -86,7 +86,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calc_forces
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_energies_compute_matrix_w', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, is, ispin, nao, nspin
       LOGICAL                                            :: do_kpoints, has_unit_metric
@@ -212,7 +212,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_energies_properties', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: do_et, do_et_proj
@@ -313,7 +313,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_energies_mulliken', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       TYPE(atprop_type), POINTER                         :: atprop
@@ -381,8 +381,8 @@ CONTAINS
             mult = 1.0_dp
          ENDIF
          btr = factor*mult*SUM(a_block*b_block)
-         atrace(iblock_row) = atrace(iblock_row)+btr
-         atrace(iblock_col) = atrace(iblock_col)+btr
+         atrace(iblock_row) = atrace(iblock_row) + btr
+         atrace(iblock_col) = atrace(iblock_col) + btr
 
       ENDDO
       CALL dbcsr_iterator_stop(iter)
@@ -400,7 +400,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calc_forces
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_energies_mp2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: should_stop
 

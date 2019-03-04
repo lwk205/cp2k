@@ -11,47 +11,47 @@
 !> \author Florian Schiffmann
 ! **************************************************************************************************
 MODULE rtp_admm_methods
-   USE admm_types,                      ONLY: admm_env_create,&
-                                              admm_type
-   USE cp_control_types,                ONLY: admm_control_type,&
-                                              dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_plus_fm_fm_t
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_upper_to_full
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_invert
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, dbcsr_desymmetrize, &
-        dbcsr_get_info, dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry
-   USE hfx_admm_utils,                  ONLY: create_admm_xc_section
-   USE input_constants,                 ONLY: do_admm_basis_projection,&
-                                              do_admm_purify_none
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: one,&
-                                              zero
-   USE particle_types,                  ONLY: particle_type
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_set,&
-                                              qs_rho_type
-   USE rt_propagation_types,            ONLY: get_rtp,&
-                                              rt_prop_type
+   USE admm_types, ONLY: admm_env_create, &
+                         admm_type
+   USE cp_control_types, ONLY: admm_control_type, &
+                               dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_plus_fm_fm_t
+   USE cp_fm_basic_linalg, ONLY: cp_fm_upper_to_full
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_invert
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, dbcsr_desymmetrize, &
+      dbcsr_get_info, dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry
+   USE hfx_admm_utils, ONLY: create_admm_xc_section
+   USE input_constants, ONLY: do_admm_basis_projection, &
+                              do_admm_purify_none
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: one, &
+                            zero
+   USE particle_types, ONLY: particle_type
+   USE pw_types, ONLY: pw_p_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_set, &
+                           qs_rho_type
+   USE rt_propagation_types, ONLY: get_rtp, &
+                                   rt_prop_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -76,7 +76,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rtp_admm_calc_rho_aux', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
       LOGICAL                                            :: s_mstruct_changed
@@ -164,7 +164,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: ispin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rtp_admm_calculate_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -210,7 +210,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: geometry_did_change
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rtp_admm_fit_mo_coeffs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, natoms
       LOGICAL                                            :: recalc_S
@@ -281,7 +281,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: geometry_did_change
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rtp_fit_mo_coeffs_none', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao_aux_fit, nao_orb, &
                                                             natoms, nmo, nmo_mos, nspins
@@ -340,13 +340,13 @@ CONTAINS
                          occupation_numbers=occ_num_aux)
 
          CALL cp_gemm('N', 'N', nao_aux_fit, nmo, nao_orb, &
-                      1.0_dp, admm_env%A, mos_new(2*ispin-1)%matrix, 0.0_dp, &
-                      rtp_coeff_aux_fit(2*ispin-1)%matrix)
+                      1.0_dp, admm_env%A, mos_new(2*ispin - 1)%matrix, 0.0_dp, &
+                      rtp_coeff_aux_fit(2*ispin - 1)%matrix)
          CALL cp_gemm('N', 'N', nao_aux_fit, nmo, nao_orb, &
                       1.0_dp, admm_env%A, mos_new(2*ispin)%matrix, 0.0_dp, &
                       rtp_coeff_aux_fit(2*ispin)%matrix)
 
-         CALL cp_fm_to_fm(rtp_coeff_aux_fit(2*ispin-1)%matrix, mo_coeff_aux_fit)
+         CALL cp_fm_to_fm(rtp_coeff_aux_fit(2*ispin - 1)%matrix, mo_coeff_aux_fit)
       END DO
 
       CALL timestop(handle)
@@ -368,7 +368,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: ispin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_rtp_admm_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: handle, im, ncol, re
@@ -376,8 +376,8 @@ CONTAINS
 
       CALL timeset(routineN, handle)
 
-      re = 2*ispin-1; im = 2*ispin
-      alpha = 3*one-REAL(SIZE(rtp_coeff_aux_fit)/2, dp)
+      re = 2*ispin - 1; im = 2*ispin
+      alpha = 3*one - REAL(SIZE(rtp_coeff_aux_fit)/2, dp)
       CALL dbcsr_set(density_matrix_aux, zero)
       CALL cp_fm_get_info(rtp_coeff_aux_fit(re)%matrix, ncol_global=ncol)
       CALL cp_dbcsr_plus_fm_fm_t(sparse_matrix=density_matrix_aux, &
@@ -419,7 +419,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rtp_admm_merge_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       TYPE(admm_type), POINTER                           :: admm_env
@@ -470,7 +470,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks, matrix_ks_aux_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rt_merge_ks_matrix_none', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER                                          :: matrix_type_fit
       INTEGER                                            :: handle, nao_aux_fit, nao_orb, nmo
@@ -480,7 +480,7 @@ CONTAINS
 
       CALL timeset(routineN, handle)
 
-      counter = counter+1
+      counter = counter + 1
       nao_aux_fit = admm_env%nao_aux_fit
       nao_orb = admm_env%nao_orb
       nmo = admm_env%nmo(ispin)

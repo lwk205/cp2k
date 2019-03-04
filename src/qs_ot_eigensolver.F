@@ -9,32 +9,32 @@
 !> \author Joost VandeVondele (25.08.2002)
 ! **************************************************************************************************
 MODULE qs_ot_eigensolver
-   USE cp_dbcsr_cholesky,               ONLY: cp_dbcsr_cholesky_decompose,&
-                                              cp_dbcsr_cholesky_invert
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_m_by_n_from_template,&
-                                              cp_fm_to_dbcsr_row_template,&
-                                              dbcsr_copy_columns_hack
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_init_p, dbcsr_multiply, dbcsr_p_type, dbcsr_release_p, dbcsr_scale, &
-        dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry
-   USE kinds,                           ONLY: dp
-   USE preconditioner_types,            ONLY: preconditioner_in_use,&
-                                              preconditioner_type
-   USE qs_mo_methods,                   ONLY: make_basis_sv
-   USE qs_ot,                           ONLY: qs_ot_get_orbitals,&
-                                              qs_ot_get_p,&
-                                              qs_ot_new_preconditioner
-   USE qs_ot_minimizer,                 ONLY: ot_mini
-   USE qs_ot_types,                     ONLY: qs_ot_allocate,&
-                                              qs_ot_destroy,&
-                                              qs_ot_init,&
-                                              qs_ot_settings_init,&
-                                              qs_ot_settings_type,&
-                                              qs_ot_type
+   USE cp_dbcsr_cholesky, ONLY: cp_dbcsr_cholesky_decompose, &
+                                cp_dbcsr_cholesky_invert
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_m_by_n_from_template, &
+                                  cp_fm_to_dbcsr_row_template, &
+                                  dbcsr_copy_columns_hack
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_init_p, dbcsr_multiply, dbcsr_p_type, dbcsr_release_p, dbcsr_scale, &
+      dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry
+   USE kinds, ONLY: dp
+   USE preconditioner_types, ONLY: preconditioner_in_use, &
+                                   preconditioner_type
+   USE qs_mo_methods, ONLY: make_basis_sv
+   USE qs_ot, ONLY: qs_ot_get_orbitals, &
+                    qs_ot_get_p, &
+                    qs_ot_new_preconditioner
+   USE qs_ot_minimizer, ONLY: ot_mini
+   USE qs_ot_types, ONLY: qs_ot_allocate, &
+                          qs_ot_destroy, &
+                          qs_ot_init, &
+                          qs_ot_settings_init, &
+                          qs_ot_settings_type, &
+                          qs_ot_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -146,7 +146,7 @@ CONTAINS
             CALL cp_fm_get_info(matrix_orthogonal_space_fm, ncol_global=ortho_space_k)
 
             IF (PRESENT(size_ortho_space)) ortho_space_k = size_ortho_space
-            ortho_k = ortho_space_k+k
+            ortho_k = ortho_space_k + k
          ELSE
             ortho_k = k
          ENDIF
@@ -203,7 +203,7 @@ CONTAINS
             CALL dbcsr_copy_columns_hack(qs_ot_env(1)%matrix_sc0, matrix_s_ortho, ortho_space_k, 1, 1, &
                                          para_env=qs_ot_env(1)%para_env, blacs_env=qs_ot_env(1)%blacs_env)
             !CALL dbcsr_copy_columns(qs_ot_env(1)%matrix_sc0,matrix_c,k,1,ortho_space_k+1)
-            CALL dbcsr_copy_columns_hack(qs_ot_env(1)%matrix_sc0, matrix_c, k, 1, ortho_space_k+1, &
+            CALL dbcsr_copy_columns_hack(qs_ot_env(1)%matrix_sc0, matrix_c, k, 1, ortho_space_k + 1, &
                                          para_env=qs_ot_env(1)%para_env, blacs_env=qs_ot_env(1)%blacs_env)
 
             CALL dbcsr_release_p(matrix_buf1_ortho)
@@ -250,8 +250,8 @@ CONTAINS
          ieigensolver = 0
          eigensolver_loop: DO
 
-            ieigensolver = ieigensolver+1
-            iter_total = iter_total+1
+            ieigensolver = ieigensolver + 1
+            iter_total = iter_total + 1
 
             ! the energy is cHc, the gradient is 2*H*c
             CALL dbcsr_multiply('N', 'N', 1.0_dp, matrix_h, matrix_c, &

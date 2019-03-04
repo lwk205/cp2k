@@ -14,57 +14,57 @@
 !> \author CJM & JGH
 ! **************************************************************************************************
 MODULE force_env_types
-   USE cell_types,                      ONLY: cell_type
-   USE cp_log_handling,                 ONLY: cp_add_default_logger,&
-                                              cp_logger_type,&
-                                              cp_rm_default_logger
-   USE cp_para_env,                     ONLY: cp_para_env_release
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type,&
-                                              pack_subsys_particles
-   USE eip_environment_types,           ONLY: eip_env_get,&
-                                              eip_env_release,&
-                                              eip_environment_type
-   USE embed_types,                     ONLY: embed_env_release,&
-                                              embed_env_type,&
-                                              get_embed_env
-   USE fist_energy_types,               ONLY: fist_energy_type
-   USE fist_environment_types,          ONLY: fist_env_get,&
-                                              fist_env_release,&
-                                              fist_environment_type
-   USE fp_types,                        ONLY: fp_env_release,&
-                                              fp_env_retain,&
-                                              fp_type
-   USE global_types,                    ONLY: global_environment_type,&
-                                              globenv_release
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_release,&
-                                              section_vals_retain,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE metadynamics_types,              ONLY: meta_env_release,&
-                                              meta_env_retain,&
-                                              meta_env_type
-   USE mixed_energy_types,              ONLY: mixed_energy_type
-   USE mixed_environment_types,         ONLY: get_mixed_env,&
-                                              mixed_env_release,&
-                                              mixed_environment_type
-   USE pwdft_environment_types,         ONLY: pwdft_energy_type,&
-                                              pwdft_env_get,&
-                                              pwdft_env_release,&
-                                              pwdft_environment_type
-   USE qmmm_types,                      ONLY: qmmm_env_get,&
-                                              qmmm_env_release,&
-                                              qmmm_env_type
-   USE qmmmx_types,                     ONLY: qmmmx_env_get,&
-                                              qmmmx_env_release,&
-                                              qmmmx_env_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_env_release,&
-                                              qs_environment_type
+   USE cell_types, ONLY: cell_type
+   USE cp_log_handling, ONLY: cp_add_default_logger, &
+                              cp_logger_type, &
+                              cp_rm_default_logger
+   USE cp_para_env, ONLY: cp_para_env_release
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type, &
+                              pack_subsys_particles
+   USE eip_environment_types, ONLY: eip_env_get, &
+                                    eip_env_release, &
+                                    eip_environment_type
+   USE embed_types, ONLY: embed_env_release, &
+                          embed_env_type, &
+                          get_embed_env
+   USE fist_energy_types, ONLY: fist_energy_type
+   USE fist_environment_types, ONLY: fist_env_get, &
+                                     fist_env_release, &
+                                     fist_environment_type
+   USE fp_types, ONLY: fp_env_release, &
+                       fp_env_retain, &
+                       fp_type
+   USE global_types, ONLY: global_environment_type, &
+                           globenv_release
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_release, &
+                                  section_vals_retain, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE metadynamics_types, ONLY: meta_env_release, &
+                                 meta_env_retain, &
+                                 meta_env_type
+   USE mixed_energy_types, ONLY: mixed_energy_type
+   USE mixed_environment_types, ONLY: get_mixed_env, &
+                                      mixed_env_release, &
+                                      mixed_environment_type
+   USE pwdft_environment_types, ONLY: pwdft_energy_type, &
+                                      pwdft_env_get, &
+                                      pwdft_env_release, &
+                                      pwdft_environment_type
+   USE qmmm_types, ONLY: qmmm_env_get, &
+                         qmmm_env_release, &
+                         qmmm_env_type
+   USE qmmmx_types, ONLY: qmmmx_env_get, &
+                          qmmmx_env_release, &
+                          qmmmx_env_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_env_release, &
+                                   qs_environment_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -178,11 +178,11 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'force_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(force_env))
       CPASSERT(force_env%ref_count > 0)
-      force_env%ref_count = force_env%ref_count+1
+      force_env%ref_count = force_env%ref_count + 1
    END SUBROUTINE force_env_retain
 
 ! **************************************************************************************************
@@ -198,14 +198,14 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'force_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, my_group
       TYPE(cp_logger_type), POINTER                      :: my_logger
 
       IF (ASSOCIATED(force_env)) THEN
          CPASSERT(force_env%ref_count > 0)
-         force_env%ref_count = force_env%ref_count-1
+         force_env%ref_count = force_env%ref_count - 1
          IF (force_env%ref_count == 0) THEN
             ! Deallocate SUB_FORCE_ENV
             IF (ASSOCIATED(force_env%sub_force_env)) THEN
@@ -214,13 +214,13 @@ CONTAINS
                   ! Use the proper logger to deallocate..
                   IF (force_env%in_use == use_mixed_force) THEN
                      my_group = force_env%mixed_env%group_distribution(force_env%para_env%mepos)
-                     my_logger => force_env%mixed_env%sub_logger(my_group+1)%p
+                     my_logger => force_env%mixed_env%sub_logger(my_group + 1)%p
                      CALL cp_add_default_logger(my_logger)
                   END IF
                   ! The same for embedding
                   IF (force_env%in_use == use_embed) THEN
                      my_group = force_env%embed_env%group_distribution(force_env%para_env%mepos)
-                     my_logger => force_env%embed_env%sub_logger(my_group+1)%p
+                     my_logger => force_env%embed_env%sub_logger(my_group + 1)%p
                      CALL cp_add_default_logger(my_logger)
                   END IF
                   CALL force_env_release(force_env%sub_force_env(i)%force_env)
@@ -434,23 +434,23 @@ CONTAINS
       ! adjust the total energy for the metadynamics
       IF (ASSOCIATED(force_env%meta_env)) THEN
          IF (PRESENT(potential_energy)) THEN
-            potential_energy = potential_energy+ &
-                               force_env%meta_env%epot_s+ &
-                               force_env%meta_env%epot_walls+ &
+            potential_energy = potential_energy + &
+                               force_env%meta_env%epot_s + &
+                               force_env%meta_env%epot_walls + &
                                force_env%meta_env%hills_env%energy
          END IF
          IF (PRESENT(kinetic_energy)) THEN
-            kinetic_energy = kinetic_energy+force_env%meta_env%ekin_s
+            kinetic_energy = kinetic_energy + force_env%meta_env%ekin_s
          END IF
       END IF
       ! adjust the total energy for the flexible partitioning
       IF (ASSOCIATED(force_env%fp_env) .AND. PRESENT(potential_energy)) THEN
          IF (force_env%fp_env%use_fp) THEN
-            potential_energy = potential_energy+force_env%fp_env%energy
+            potential_energy = potential_energy + force_env%fp_env%energy
          ENDIF
       ENDIF
       IF (PRESENT(potential_energy)) THEN
-         potential_energy = potential_energy+force_env%additional_potential
+         potential_energy = potential_energy + force_env%additional_potential
       END IF
       IF (PRESENT(additional_potential)) THEN
          additional_potential = force_env%additional_potential
@@ -484,7 +484,7 @@ CONTAINS
       INTEGER                                            :: n_atom
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'force_env_get_natom', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_subsys_type), POINTER                      :: subsys
 
@@ -508,7 +508,7 @@ CONTAINS
       INTEGER                                            :: n_particle
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'force_env_get_nparticle', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_subsys_type), POINTER                      :: subsys
 
@@ -534,7 +534,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'force_env_get_frc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(cp_subsys_type), POINTER                      :: subsys
@@ -563,7 +563,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'force_env_get_pos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(cp_subsys_type), POINTER                      :: subsys
@@ -592,7 +592,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'force_env_get_vel', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(cp_subsys_type), POINTER                      :: subsys
@@ -675,7 +675,7 @@ CONTAINS
       INTEGER                                            :: nforce_eval
 
       CHARACTER(len=*), PARAMETER :: routineN = 'multiple_fe_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iforce_eval, main_force_eval
       INTEGER, DIMENSION(:), POINTER                     :: my_i_force_eval
@@ -691,7 +691,7 @@ CONTAINS
             i_force_eval = my_i_force_eval
          ELSE
             ! The difference in the amount of defined force_env MUST be one..
-            CPASSERT(nforce_eval-SIZE(my_i_force_eval) == 1)
+            CPASSERT(nforce_eval - SIZE(my_i_force_eval) == 1)
             DO iforce_eval = 1, nforce_eval
                IF (ANY(my_i_force_eval == iforce_eval)) CYCLE
                main_force_eval = iforce_eval

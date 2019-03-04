@@ -12,49 +12,49 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE dm_ls_scf_create
-   USE bibliography,                    ONLY: Lin2009,&
-                                              Lin2013,&
-                                              Niklasson2003,&
-                                              Niklasson2014,&
-                                              Shao2003,&
-                                              VandeVondele2012,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_env,                     ONLY: cp_para_env_retain
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE dm_ls_scf_types,                 ONLY: ls_scf_env_type
-   USE input_constants,                 ONLY: &
-        ls_cluster_atomic, ls_cluster_molecular, ls_s_inversion_hotelling, ls_s_inversion_none, &
-        ls_s_inversion_sign_sqrt, ls_s_preconditioner_atomic, ls_s_preconditioner_molecular, &
-        ls_s_preconditioner_none, ls_scf_ns, ls_scf_pexsi, ls_scf_tc2, ls_scf_trs4
-   USE input_enumeration_types,         ONLY: enum_i2c,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_get,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_get_keyword,&
-                                              section_release,&
-                                              section_type,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_retain,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_flush
-   USE molecule_types,                  ONLY: molecule_of_atom,&
-                                              molecule_type
-   USE pao_main,                        ONLY: pao_init
-   USE particle_types,                  ONLY: particle_type
-   USE pexsi_methods,                   ONLY: pexsi_init_read_input
-   USE pexsi_types,                     ONLY: lib_pexsi_init
-   USE qs_density_mixing_types,         ONLY: create_mixing_section,&
-                                              mixing_storage_create
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
+   USE bibliography, ONLY: Lin2009, &
+                           Lin2013, &
+                           Niklasson2003, &
+                           Niklasson2014, &
+                           Shao2003, &
+                           VandeVondele2012, &
+                           cite_reference
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_env, ONLY: cp_para_env_retain
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE dm_ls_scf_types, ONLY: ls_scf_env_type
+   USE input_constants, ONLY: &
+      ls_cluster_atomic, ls_cluster_molecular, ls_s_inversion_hotelling, ls_s_inversion_none, &
+      ls_s_inversion_sign_sqrt, ls_s_preconditioner_atomic, ls_s_preconditioner_molecular, &
+      ls_s_preconditioner_none, ls_scf_ns, ls_scf_pexsi, ls_scf_tc2, ls_scf_trs4
+   USE input_enumeration_types, ONLY: enum_i2c, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_get, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_get_keyword, &
+                                  section_release, &
+                                  section_type, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_retain, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_flush
+   USE molecule_types, ONLY: molecule_of_atom, &
+                             molecule_type
+   USE pao_main, ONLY: pao_init
+   USE particle_types, ONLY: particle_type
+   USE pexsi_methods, ONLY: pexsi_init_read_input
+   USE pexsi_types, ONLY: lib_pexsi_init
+   USE qs_density_mixing_types, ONLY: create_mixing_section, &
+                                      mixing_storage_create
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -171,7 +171,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ls_scf_init_read_write_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: mu

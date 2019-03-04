@@ -11,18 +11,18 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_blacs_env
-   USE cp_array_utils,                  ONLY: cp_2d_i_write
-   USE cp_blacs_calls,                  ONLY: cp_blacs_gridexit,&
-                                              cp_blacs_gridinfo,&
-                                              cp_blacs_gridinit,&
-                                              cp_blacs_set
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_flush
-   USE mathlib,                         ONLY: gcd
-   USE message_passing,                 ONLY: mp_sum
+   USE cp_array_utils, ONLY: cp_2d_i_write
+   USE cp_blacs_calls, ONLY: cp_blacs_gridexit, &
+                             cp_blacs_gridinfo, &
+                             cp_blacs_gridinit, &
+                             cp_blacs_set
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_flush
+   USE mathlib, ONLY: gcd
+   USE message_passing, ONLY: mp_sum
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -93,7 +93,7 @@ CONTAINS
                              para_env, blacs2mpi, mpi2blacs)
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
       INTEGER, INTENT(OUT), OPTIONAL :: my_process_row, my_process_column, my_process_number, &
-         number_of_process_rows, number_of_process_columns, number_of_processes
+                                        number_of_process_rows, number_of_process_columns, number_of_processes
       TYPE(cp_para_env_type), OPTIONAL, POINTER          :: para_env
       INTEGER, DIMENSION(:, :), OPTIONAL, POINTER        :: blacs2mpi, mpi2blacs
 
@@ -236,16 +236,16 @@ CONTAINS
 #endif
 
       ! generate the mappings blacs2mpi and mpi2blacs
-      ALLOCATE (blacs_env%blacs2mpi(0:blacs_env%num_pe(1)-1, 0:blacs_env%num_pe(2)-1), &
+      ALLOCATE (blacs_env%blacs2mpi(0:blacs_env%num_pe(1) - 1, 0:blacs_env%num_pe(2) - 1), &
                 stat=stat)
       CPASSERT(stat == 0)
       blacs_env%blacs2mpi = 0
       blacs_env%blacs2mpi(blacs_env%mepos(1), blacs_env%mepos(2)) = para_env%mepos
       CALL mp_sum(blacs_env%blacs2mpi, para_env%group)
-      ALLOCATE (blacs_env%mpi2blacs(2, 0:para_env%num_pe-1))
+      ALLOCATE (blacs_env%mpi2blacs(2, 0:para_env%num_pe - 1))
       blacs_env%mpi2blacs = -1
-      DO ipcol = 0, blacs_env%num_pe(2)-1
-         DO iprow = 0, blacs_env%num_pe(1)-1
+      DO ipcol = 0, blacs_env%num_pe(2) - 1
+         DO iprow = 0, blacs_env%num_pe(1) - 1
             blacs_env%mpi2blacs(1, blacs_env%blacs2mpi(iprow, ipcol)) = iprow
             blacs_env%mpi2blacs(2, blacs_env%blacs2mpi(iprow, ipcol)) = ipcol
          END DO
@@ -263,11 +263,11 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_blacs_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(blacs_env))
       CPASSERT(blacs_env%ref_count > 0)
-      blacs_env%ref_count = blacs_env%ref_count+1
+      blacs_env%ref_count = blacs_env%ref_count + 1
    END SUBROUTINE cp_blacs_env_retain
 
 ! **************************************************************************************************
@@ -281,11 +281,11 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_blacs_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(blacs_env)) THEN
          CPASSERT(blacs_env%ref_count > 0)
-         blacs_env%ref_count = blacs_env%ref_count-1
+         blacs_env%ref_count = blacs_env%ref_count - 1
          IF (blacs_env%ref_count < 1) THEN
             CALL cp_blacs_gridexit(blacs_env%group)
             CALL cp_para_env_release(blacs_env%para_env)
@@ -311,7 +311,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_blacs_env_write', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iostat
 

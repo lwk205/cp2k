@@ -11,18 +11,18 @@
 ! **************************************************************************************************
 
 MODULE tmc_tree_search
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE kinds,                           ONLY: dp
-   USE tmc_stati,                       ONLY: TMC_STATUS_WAIT_FOR_NEW_TASK
-   USE tmc_tree_references,             ONLY: add_to_references,&
-                                              search_and_remove_reference_in_list
-   USE tmc_tree_types,                  ONLY: &
-        elem_array_type, global_tree_type, status_accepted, status_accepted_result, &
-        status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
-        status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
-        status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
-        status_deleted_result, status_rejected, status_rejected_result, tree_type
-   USE tmc_types,                       ONLY: tmc_env_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE kinds, ONLY: dp
+   USE tmc_stati, ONLY: TMC_STATUS_WAIT_FOR_NEW_TASK
+   USE tmc_tree_references, ONLY: add_to_references, &
+                                  search_and_remove_reference_in_list
+   USE tmc_tree_types, ONLY: &
+      elem_array_type, global_tree_type, status_accepted, status_accepted_result, &
+      status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
+      status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
+      status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
+      status_deleted_result, status_rejected, status_rejected_result, tree_type
+   USE tmc_types, ONLY: tmc_env_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -162,7 +162,7 @@ CONTAINS
                END IF
                !-- do probability multiplication
                !    (in logscale because of realy small probabilities)
-               prob_n_acc = prob_n_acc+LOG(global_tree_elem%prob_acc)
+               prob_n_acc = prob_n_acc + LOG(global_tree_elem%prob_acc)
             ELSE
                ! prob of going in acc or rej direction is
                !   calculated in parent element
@@ -188,11 +188,11 @@ CONTAINS
                END IF
                !-- do probability multiplication
                !     (in logscale because of realy small probabilities)
-               prob_n_nacc = prob_n_nacc+LOG(1-global_tree_elem%prob_acc)
+               prob_n_nacc = prob_n_nacc + LOG(1 - global_tree_elem%prob_acc)
             ELSE
                ! prob of going in acc or rej direction is
                !   calculated in parent element
-               prob_n_nacc = LOG(1-global_tree_elem%prob_acc)
+               prob_n_nacc = LOG(1 - global_tree_elem%prob_acc)
                IF (PRESENT(search_energy_node)) prob_n_nacc = -100000
                ptr_nacc => global_tree_elem
                tmp_nacc = .FALSE.
@@ -228,7 +228,7 @@ CONTAINS
       INTEGER                                            :: stat, react_count
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_next_energy_calc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: flag
@@ -256,7 +256,7 @@ CONTAINS
          IF (new_gt_elem%conf(new_gt_elem%mv_conf)%elem%stat .EQ. &
              status_canceled_ener) THEN
             CALL add_to_references(gt_elem=new_gt_elem)
-            react_count = react_count+1
+            react_count = react_count + 1
             new_gt_elem%conf(new_gt_elem%mv_conf)%elem%stat = status_created
          END IF
          ! if elem status is not status_created
@@ -279,7 +279,7 @@ CONTAINS
       TYPE(tree_type), POINTER                           :: current, parent
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_parent_element', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -314,7 +314,7 @@ CONTAINS
       LOGICAL                                            :: found
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_next_gt_element_to_check', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -369,7 +369,7 @@ CONTAINS
       TYPE(tree_type), INTENT(OUT), POINTER              :: elem1, elem2
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_subtree_elements_to_check', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -388,10 +388,10 @@ CONTAINS
             elem1 => search_parent_element(gt_act_elem%conf(gt_act_elem%mv_conf)%elem)
          END IF
          ! second element
-         IF (gt_act_elem%conf_n_acc(gt_act_elem%conf(gt_act_elem%mv_conf+1)%elem%sub_tree_nr)) THEN
-            elem2 => gt_act_elem%conf(gt_act_elem%mv_conf+1)%elem
+         IF (gt_act_elem%conf_n_acc(gt_act_elem%conf(gt_act_elem%mv_conf + 1)%elem%sub_tree_nr)) THEN
+            elem2 => gt_act_elem%conf(gt_act_elem%mv_conf + 1)%elem
          ELSE
-            elem2 => search_parent_element(gt_act_elem%conf(gt_act_elem%mv_conf+1)%elem)
+            elem2 => search_parent_element(gt_act_elem%conf(gt_act_elem%mv_conf + 1)%elem)
          END IF
       ELSE
          elem1 => gt_act_elem%conf(gt_act_elem%mv_conf)%elem
@@ -418,7 +418,7 @@ CONTAINS
       TYPE(global_tree_type), POINTER                    :: last_acc, tree_ptr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_end_of_clean_g_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -471,7 +471,7 @@ CONTAINS
       TYPE(tree_type), INTENT(IN), POINTER               :: last_acc
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_end_of_clean_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -512,7 +512,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_canceling_elements', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: ready
@@ -530,7 +530,7 @@ CONTAINS
       IF (PRESENT(prob)) THEN
          IF (prob .LT. 1.0E-10 .AND. ASSOCIATED(pt_elem_in%acc)) THEN
             pt_elem => pt_elem_in%acc
-         ELSE IF (prob .GT. (1.0_dp-1.0E-10) .AND. ASSOCIATED(pt_elem_in%nacc)) THEN
+         ELSE IF (prob .GT. (1.0_dp - 1.0E-10) .AND. ASSOCIATED(pt_elem_in%nacc)) THEN
             pt_elem => pt_elem_in%nacc
          ELSE
             ready = .FALSE.
@@ -541,7 +541,7 @@ CONTAINS
 
       IF (ready) THEN
          IF (ASSOCIATED(pt_elem%conf(pt_elem%mv_conf)%elem)) THEN
-            SELECT CASE (pt_elem%conf (pt_elem%mv_conf)%elem%stat)
+            SELECT CASE (pt_elem%conf(pt_elem%mv_conf)%elem%stat)
             CASE (status_accepted_result, status_accepted, status_rejected_result, &
                   status_rejected, status_created, status_cancel_nmc, &
                   status_cancel_ener, status_canceled_nmc, status_canceled_ener, &
@@ -585,7 +585,7 @@ CONTAINS
       INTEGER, DIMENSION(:), POINTER                     :: counters
 
       CHARACTER(len=*), PARAMETER :: routineN = 'count_prepared_nodes_in_trees', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
       TYPE(tree_type), POINTER                           :: begin_ptr
@@ -622,7 +622,7 @@ CONTAINS
       INTEGER                                            :: counter
 
       CHARACTER(len=*), PARAMETER :: routineN = 'count_prepared_nodes_in_subtree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(tree_type), POINTER                           :: tmp_ptr
 
@@ -643,7 +643,7 @@ CONTAINS
          END IF
       CASE (status_created, status_calculate_MD, status_calculate_NMC_steps, &
             status_calc_approx_ener, status_calculated, status_calculate_energy)
-         IF (tree_ptr%stat .EQ. status_created) counter = counter+1
+         IF (tree_ptr%stat .EQ. status_created) counter = counter + 1
          IF (ASSOCIATED(tree_ptr%acc)) THEN
             tmp_ptr => tree_ptr%acc
             CALL count_prepared_nodes_in_subtree(tmp_ptr, counter)
@@ -679,7 +679,7 @@ CONTAINS
       INTEGER, DIMENSION(:), POINTER                     :: counters, head_elements_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'count_nodes_in_trees', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
       TYPE(global_tree_type), POINTER                    :: begin_gt_ptr
@@ -728,11 +728,11 @@ CONTAINS
       INTEGER, INTENT(INOUT)                             :: counter
 
       CHARACTER(len=*), PARAMETER :: routineN = 'count_nodes_in_global_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ptr))
 
-      counter = counter+1
+      counter = counter + 1
 
       IF (ASSOCIATED(ptr%acc)) &
          CALL count_nodes_in_global_tree(ptr%acc, counter)
@@ -751,11 +751,11 @@ CONTAINS
       INTEGER                                            :: counter
 
       CHARACTER(len=*), PARAMETER :: routineN = 'count_nodes_in_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ptr))
 
-      counter = counter+1
+      counter = counter + 1
 
       IF (ASSOCIATED(ptr%acc)) &
          CALL count_nodes_in_tree(ptr%acc, counter)

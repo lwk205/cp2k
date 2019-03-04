@@ -8,33 +8,33 @@
 !> \author Teodoro Laino
 ! **************************************************************************************************
 MODULE cp_ddapc_types
-   USE cell_methods,                    ONLY: read_cell
-   USE cell_types,                      ONLY: cell_release,&
-                                              cell_type
-   USE cp_ddapc_methods,                ONLY: ddapc_eval_AmI,&
-                                              ddapc_eval_gfunc,&
-                                              ewald_ddapc_pot,&
-                                              solvation_ddapc_pot
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_printkey_is_on
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE ewald_spline_util,               ONLY: Setup_Ewald_Spline
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE particle_types,                  ONLY: particle_type
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_release
-   USE pw_poisson_types,                ONLY: pw_poisson_multipole
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_pw,&
-                                              pw_pool_release,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: pw_type
+   USE cell_methods, ONLY: read_cell
+   USE cell_types, ONLY: cell_release, &
+                         cell_type
+   USE cp_ddapc_methods, ONLY: ddapc_eval_AmI, &
+                               ddapc_eval_gfunc, &
+                               ewald_ddapc_pot, &
+                               solvation_ddapc_pot
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_printkey_is_on
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE ewald_spline_util, ONLY: Setup_Ewald_Spline
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE particle_types, ONLY: particle_type
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_grids, ONLY: pw_grid_release
+   USE pw_poisson_types, ONLY: pw_poisson_multipole
+   USE pw_pool_types, ONLY: pw_pool_give_back_pw, &
+                            pw_pool_release, &
+                            pw_pool_type
+   USE pw_types, ONLY: pw_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -109,7 +109,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: force_env_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(section_vals_type), POINTER                   :: param_section, solvation_section
@@ -117,7 +117,7 @@ CONTAINS
       CALL timeset(routineN, handle)
       ALLOCATE (cp_ddapc_env)
       cp_ddapc_env%ref_count = 1
-      last_cp_ddapc_id = last_cp_ddapc_id+1
+      last_cp_ddapc_id = last_cp_ddapc_id + 1
       cp_ddapc_env%id_nr = last_cp_ddapc_id
       NULLIFY (cp_ddapc_env%AmI, &
                cp_ddapc_env%Md, &
@@ -162,7 +162,7 @@ CONTAINS
                !NB parallelized ewald_ddapc_pot() needs cp_para_env
                CALL ewald_ddapc_pot(cp_para_env, cp_ddapc_ewald%coeff_mm, -1.0_dp, super_cell, param_section, &
                                     particle_set, cp_ddapc_env%Mr, radii)
-               cp_ddapc_env%Mt = cp_ddapc_env%Md+cp_ddapc_env%Mr
+               cp_ddapc_env%Mt = cp_ddapc_env%Md + cp_ddapc_env%Mr
             END IF
          END IF
       END IF
@@ -186,11 +186,11 @@ CONTAINS
       TYPE(cp_ddapc_type), POINTER                       :: cp_ddapc_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(cp_ddapc_env))
       CPASSERT(cp_ddapc_env%ref_count > 0)
-      cp_ddapc_env%ref_count = cp_ddapc_env%ref_count+1
+      cp_ddapc_env%ref_count = cp_ddapc_env%ref_count + 1
    END SUBROUTINE cp_ddapc_retain
 
 ! **************************************************************************************************
@@ -204,11 +204,11 @@ CONTAINS
       TYPE(cp_ddapc_type), POINTER                       :: cp_ddapc_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(cp_ddapc_env)) THEN
          CPASSERT(cp_ddapc_env%ref_count > 0)
-         cp_ddapc_env%ref_count = cp_ddapc_env%ref_count-1
+         cp_ddapc_env%ref_count = cp_ddapc_env%ref_count - 1
          IF (cp_ddapc_env%ref_count == 0) THEN
             IF (ASSOCIATED(cp_ddapc_env%AmI)) THEN
                DEALLOCATE (cp_ddapc_env%AmI)
@@ -257,7 +257,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_ewald_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: my_val, npts(3), output_unit
       INTEGER, DIMENSION(:), POINTER                     :: ngrids
@@ -269,8 +269,8 @@ CONTAINS
       TYPE(cell_type), POINTER                           :: dummy_cell, mm_cell
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(section_vals_type), POINTER :: cell_section, grid_print_section, multipole_section, &
-         poisson_section, printC_section, qmmm_per_section, restraint_section, restraint_sectionB, &
-         solvation_section
+                                         poisson_section, printC_section, qmmm_per_section, restraint_section, restraint_sectionB, &
+                                          solvation_section
 
       logger => cp_get_default_logger()
       output_unit = cp_logger_get_default_io_unit(logger)
@@ -402,12 +402,12 @@ CONTAINS
       alpha = SQRT(ABS(LOG(eps*rcut*tol)))/rcut
       galpha = 1.0_dp/(4.0_dp*alpha*alpha)
       tol1 = SQRT(-LOG(eps*rcut*(2.0_dp*tol*alpha)**2))
-      nmax1 = NINT(0.25_dp+hmat(1, 1)*alpha*tol1/pi)
-      nmax2 = NINT(0.25_dp+hmat(2, 2)*alpha*tol1/pi)
-      nmax3 = NINT(0.25_dp+hmat(3, 3)*alpha*tol1/pi)
+      nmax1 = NINT(0.25_dp + hmat(1, 1)*alpha*tol1/pi)
+      nmax2 = NINT(0.25_dp + hmat(2, 2)*alpha*tol1/pi)
+      nmax3 = NINT(0.25_dp + hmat(3, 3)*alpha*tol1/pi)
       fac = 1.e0_dp/deth
       fvec = 2.0_dp*pi/(/hmat(1, 1), hmat(2, 2), hmat(3, 3)/)
-      ndim = (nmax1+1)*(2*nmax2+1)*(2*nmax3+1)-1
+      ndim = (nmax1 + 1)*(2*nmax2 + 1)*(2*nmax3 + 1) - 1
       ALLOCATE (LG(ndim))
       ALLOCATE (gx(ndim))
       ALLOCATE (gy(ndim))
@@ -418,12 +418,12 @@ CONTAINS
          DO k2 = -nmax2, nmax2
             DO k3 = -nmax3, nmax3
                IF (k1 == 0 .AND. k2 == 0 .AND. k3 == 0) CYCLE
-               i = i+1
+               i = i + 1
                fs = 2.0_dp; IF (k1 == 0) fs = 1.0_dp
                gx(i) = fvec(1)*REAL(k1, KIND=dp)
                gy(i) = fvec(2)*REAL(k2, KIND=dp)
                gz(i) = fvec(3)*REAL(k3, KIND=dp)
-               gsq = gx(i)*gx(i)+gy(i)*gy(i)+gz(i)*gz(i)
+               gsq = gx(i)*gx(i) + gy(i)*gy(i) + gz(i)*gz(i)
                gsqi = fs/gsq
                LG(i) = fac*gsqi*EXP(-galpha*gsq)
             END DO
@@ -443,7 +443,7 @@ CONTAINS
       TYPE(cp_ddapc_ewald_type), POINTER                 :: cp_ddapc_ewald
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_ewald_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(cp_ddapc_ewald)) THEN
          IF (ASSOCIATED(cp_ddapc_ewald%coeff_qm)) THEN

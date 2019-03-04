@@ -10,46 +10,46 @@
 !> \author Joost VandeVondele (2003-08)
 ! **************************************************************************************************
 MODULE qs_mo_methods
-   USE admm_types,                      ONLY: admm_type
-   USE admm_utils,                      ONLY: admm_correct_for_eigenvalues,&
-                                              admm_uncorrect_for_eigenvalues
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_dbcsr_diag,                   ONLY: cp_dbcsr_syevd,&
-                                              cp_dbcsr_syevx
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_m_by_n_from_template,&
-                                              cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_syrk,&
-                                              cp_fm_triangular_multiply
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver,&
-                                              cp_fm_power,&
-                                              cp_fm_syevx
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_get_info, dbcsr_init_p, dbcsr_multiply, dbcsr_p_type, dbcsr_release, &
-        dbcsr_release_p, dbcsr_scale_by_vector, dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_max
-   USE physcon,                         ONLY: evolt
-   USE qs_mo_occupation,                ONLY: set_mo_occupation
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE admm_types, ONLY: admm_type
+   USE admm_utils, ONLY: admm_correct_for_eigenvalues, &
+                         admm_uncorrect_for_eigenvalues
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_dbcsr_diag, ONLY: cp_dbcsr_syevd, &
+                            cp_dbcsr_syevx
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_m_by_n_from_template, &
+                                  cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_syrk, &
+                                 cp_fm_triangular_multiply
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_diag, ONLY: choose_eigv_solver, &
+                         cp_fm_power, &
+                         cp_fm_syevx
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_get_info, dbcsr_init_p, dbcsr_multiply, dbcsr_p_type, dbcsr_release, &
+      dbcsr_release_p, dbcsr_scale_by_vector, dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_max
+   USE physcon, ONLY: evolt
+   USE qs_mo_occupation, ONLY: set_mo_occupation
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -139,7 +139,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: svmatrix
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'make_basis_sv_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, n, ncol_global
@@ -188,7 +188,7 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'make_basis_sv_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, n, ncol_global
@@ -253,7 +253,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: ortho
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'make_basis_cholesky', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, n, ncol_global
@@ -305,7 +305,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_s
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'make_basis_lowdin', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, n, ncol_global, ndep
@@ -359,7 +359,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ncol
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'make_basis_simple', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rone = 1.0_dp, rzero = 0.0_dp
 
       INTEGER                                            :: handle, n, ncol_global
@@ -410,7 +410,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: use_dbcsr, retain_sparsity
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_dm_sparse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: my_retain_sparsity, my_use_dbcsr
@@ -503,7 +503,7 @@ CONTAINS
       TYPE(dbcsr_type), OPTIONAL, POINTER                :: co_rotate_dbcsr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'subspace_eigenvalues_ks_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, ncol_global, nrow_global
       LOGICAL                                            :: compute_evecs, do_rotation_local
@@ -592,16 +592,16 @@ CONTAINS
             IF (.NOT. PRESENT(scr)) CPABORT("SCR?")
             IF (ionode) THEN
                DO i = 1, ncol_global, 4
-                  j = MIN(3, ncol_global-i)
+                  j = MIN(3, ncol_global - i)
                   SELECT CASE (j)
                   CASE (3)
-                     WRITE (scr, '(1X,4F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,4F16.8)') evals(i:i + j)
                   CASE (2)
-                     WRITE (scr, '(1X,3F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,3F16.8)') evals(i:i + j)
                   CASE (1)
-                     WRITE (scr, '(1X,2F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,2F16.8)') evals(i:i + j)
                   CASE (0)
-                     WRITE (scr, '(1X,1F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,1F16.8)') evals(i:i + j)
                   END SELECT
                ENDDO
             ENDIF
@@ -646,7 +646,7 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'subspace_eigenvalues_ks_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, ncol_global, nrow_global
       LOGICAL                                            :: compute_evecs, do_rotation_local
@@ -742,16 +742,16 @@ CONTAINS
             IF (.NOT. PRESENT(scr)) CPABORT("SCR?")
             IF (ionode) THEN
                DO i = 1, ncol_global, 4
-                  j = MIN(3, ncol_global-i)
+                  j = MIN(3, ncol_global - i)
                   SELECT CASE (j)
                   CASE (3)
-                     WRITE (scr, '(1X,4F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,4F16.8)') evals(i:i + j)
                   CASE (2)
-                     WRITE (scr, '(1X,3F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,3F16.8)') evals(i:i + j)
                   CASE (1)
-                     WRITE (scr, '(1X,2F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,2F16.8)') evals(i:i + j)
                   CASE (0)
-                     WRITE (scr, '(1X,1F16.8)') evals(i:i+j)
+                     WRITE (scr, '(1X,1F16.8)') evals(i:i + j)
                   END SELECT
                ENDDO
             ENDIF
@@ -788,7 +788,7 @@ CONTAINS
       TYPE(dbcsr_type), OPTIONAL, POINTER                :: matrix_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_orthonormality', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ispin, j, k, n, ncol_local, &
                                                             nrow_local, nspin
@@ -838,7 +838,7 @@ CONTAINS
          DO i = 1, nrow_local
             DO j = 1, ncol_local
                alpha = overlap%local_data(i, j)
-               IF (row_indices(i) .EQ. col_indices(j)) alpha = alpha-1.0_dp
+               IF (row_indices(i) .EQ. col_indices(j)) alpha = alpha - 1.0_dp
                max_alpha = MAX(max_alpha, ABS(alpha))
             ENDDO
          ENDDO
@@ -867,7 +867,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: mo_mag_min, mo_mag_max
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_magnitude', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, k, n, nspin
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: evals

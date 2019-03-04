@@ -11,47 +11,47 @@
 !> \author Teodoro Laino
 ! **************************************************************************************************
 MODULE cp_ddapc
-   USE bibliography,                    ONLY: Blochl1995,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: ddapc_restraint_type,&
-                                              dft_control_type
-   USE cp_ddapc_forces,                 ONLY: ewald_ddapc_force,&
-                                              reset_ch_pulay,&
-                                              restraint_functional_force,&
-                                              solvation_ddapc_force
-   USE cp_ddapc_util,                   ONLY: get_ddapc,&
-                                              modify_hartree_pot,&
-                                              restraint_functional_potential
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set
-   USE input_constants,                 ONLY: do_spin_density
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE particle_types,                  ONLY: particle_type
-   USE pw_methods,                      ONLY: pw_integral_ab,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace
+   USE bibliography, ONLY: Blochl1995, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: ddapc_restraint_type, &
+                               dft_control_type
+   USE cp_ddapc_forces, ONLY: ewald_ddapc_force, &
+                              reset_ch_pulay, &
+                              restraint_functional_force, &
+                              solvation_ddapc_force
+   USE cp_ddapc_util, ONLY: get_ddapc, &
+                            modify_hartree_pot, &
+                            restraint_functional_potential
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_p_type, &
+                        dbcsr_set
+   USE input_constants, ONLY: do_spin_density
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE particle_types, ONLY: particle_type
+   USE pw_methods, ONLY: pw_integral_ab, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -235,7 +235,7 @@ CONTAINS
       CHARACTER(LEN=*)                                   :: Itype_of_density
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_apply_CD', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iw
       LOGICAL                                            :: apply_decpl, need_f
@@ -369,7 +369,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: calculate_forces
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_apply_RS', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iw, my_id
       LOGICAL                                            :: apply_restrain, need_f
@@ -475,7 +475,7 @@ CONTAINS
       CHARACTER(LEN=*)                                   :: Itype_of_density
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_ddapc_apply_RF', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iw
       LOGICAL                                            :: apply_solvation, need_f

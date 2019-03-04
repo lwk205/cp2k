@@ -39,18 +39,18 @@
 ! **************************************************************************************************
 MODULE semi_empirical_parameters
 
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_mndod, do_method_pchg, do_method_pdg, do_method_pm3, &
-        do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
-   USE kinds,                           ONLY: dp
-   USE periodic_table,                  ONLY: ptable
-   USE physcon,                         ONLY: angstrom,&
-                                              evolt,&
-                                              kcalmol
-   USE semi_empirical_par_utils,        ONLY: calpar,&
-                                              convert_param_to_cp2k,&
-                                              valence_electrons
-   USE semi_empirical_types,            ONLY: semi_empirical_type
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_mndod, do_method_pchg, do_method_pdg, do_method_pm3, &
+      do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
+   USE kinds, ONLY: dp
+   USE periodic_table, ONLY: ptable
+   USE physcon, ONLY: angstrom, &
+                      evolt, &
+                      kcalmol
+   USE semi_empirical_par_utils, ONLY: calpar, &
+                                       convert_param_to_cp2k, &
+                                       valence_electrons
+   USE semi_empirical_types, ONLY: semi_empirical_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -85,7 +85,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pcharge_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_pchg
       sep%name = "CLASSICAL"
@@ -107,7 +107,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: z, itype
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mndo_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = itype
       sep%name = ptable(z)%name
@@ -702,7 +702,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pnnl_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: Ang = 0.529167_dp, eV = 27.21_dp
 
       sep%typ = do_method_pnnl
@@ -779,7 +779,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mndod_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       SELECT CASE (z)
       CASE (11)
@@ -1028,7 +1028,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'am1_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_am1
       sep%name = ptable(z)%name
@@ -1510,7 +1510,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rm1_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_rm1
       sep%name = ptable(z)%name
@@ -1721,7 +1721,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pm3_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_pm3
       sep%name = ptable(z)%name
@@ -2515,7 +2515,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pm6_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_pm6
       sep%name = ptable(z)%name
@@ -3872,7 +3872,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pm6fm_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_pm6fm
       sep%name = ptable(z)%name
@@ -5229,7 +5229,7 @@ CONTAINS
       INTEGER                                            :: z
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pdg_default_parameter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       sep%typ = do_method_pdg
       sep%name = ptable(z)%name
@@ -5595,7 +5595,7 @@ CONTAINS
    SUBROUTINE init_pm6_pair_params()
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_pm6_pair_params', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
       INTEGER, SAVE                                      :: init = 0
@@ -7465,11 +7465,11 @@ CONTAINS
       aab_pm6(83, 83) = 1.0740640163_dp
 
       DO i = 0, nelem
-         DO j = i+1, nelem
-            xab = xab_pm6(i, j)+xab_pm6(j, i)
+         DO j = i + 1, nelem
+            xab = xab_pm6(i, j) + xab_pm6(j, i)
             xab_pm6(i, j) = xab
             xab_pm6(j, i) = xab
-            aab = aab_pm6(i, j)+aab_pm6(j, i)
+            aab = aab_pm6(i, j) + aab_pm6(j, i)
             aab_pm6(i, j) = aab
             aab_pm6(j, i) = aab
          END DO
@@ -7485,7 +7485,7 @@ CONTAINS
    SUBROUTINE init_pm6fm_pair_params()
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_pm6fm_pair_params', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
       INTEGER, SAVE                                      :: init = 0
@@ -9355,11 +9355,11 @@ CONTAINS
       aab_pm6fm(83, 83) = 1.0740640163_dp
 
       DO i = 0, nelem
-         DO j = i+1, nelem
-            xab = xab_pm6fm(i, j)+xab_pm6fm(j, i)
+         DO j = i + 1, nelem
+            xab = xab_pm6fm(i, j) + xab_pm6fm(j, i)
             xab_pm6fm(i, j) = xab
             xab_pm6fm(j, i) = xab
-            aab = aab_pm6fm(i, j)+aab_pm6fm(j, i)
+            aab = aab_pm6fm(i, j) + aab_pm6fm(j, i)
             aab_pm6fm(i, j) = aab
             aab_pm6fm(j, i) = aab
          END DO

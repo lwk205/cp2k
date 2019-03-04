@@ -3,66 +3,66 @@
 !   Copyright (C) 2000 - 2019  CP2K developers group                                               !
 !--------------------------------------------------------------------------------------------------!
 MODULE optbas_fenv_manipulation
-   USE admm_types,                      ONLY: admm_env_create,&
-                                              admm_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_container_types,       ONLY: get_basis_from_container
-   USE basis_set_types,                 ONLY: gto_basis_set_type,&
-                                              init_orb_basis_set
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_upper_to_full
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_invert
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE cp_output_handling,              ONLY: debug_print_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_get_info,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: do_admm_basis_projection,&
-                                              do_admm_purify_mo_diag
-   USE input_section_types,             ONLY: section_vals_add_values,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: default_string_length
-   USE optimize_basis_types,            ONLY: basis_optimization_type,&
-                                              flex_basis_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_energy_init,                  ONLY: qs_energies_init
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_interactions,                 ONLY: init_interaction_radii
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_methods,                   ONLY: qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_did_change,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_matrix_pools,                 ONLY: mpools_get
-   USE qs_mo_io,                        ONLY: read_mo_set
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix
-   USE qs_mo_types,                     ONLY: init_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_overlap,                      ONLY: build_overlap_matrix
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE scf_control_types,               ONLY: scf_control_type
-   USE string_utilities,                ONLY: uppercase
+   USE admm_types, ONLY: admm_env_create, &
+                         admm_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_container_types, ONLY: get_basis_from_container
+   USE basis_set_types, ONLY: gto_basis_set_type, &
+                              init_orb_basis_set
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_basic_linalg, ONLY: cp_fm_upper_to_full
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_invert
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE cp_output_handling, ONLY: debug_print_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_get_info, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE input_constants, ONLY: do_admm_basis_projection, &
+                              do_admm_purify_mo_diag
+   USE input_section_types, ONLY: section_vals_add_values, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: default_string_length
+   USE optimize_basis_types, ONLY: basis_optimization_type, &
+                                   flex_basis_type
+   USE particle_types, ONLY: particle_type
+   USE qs_energy_init, ONLY: qs_energies_init
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_interactions, ONLY: init_interaction_radii
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_methods, ONLY: qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_did_change, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_matrix_pools, ONLY: mpools_get
+   USE qs_mo_io, ONLY: read_mo_set
+   USE qs_mo_methods, ONLY: calculate_density_matrix
+   USE qs_mo_types, ONLY: init_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_overlap, ONLY: build_overlap_matrix
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE scf_control_types, ONLY: scf_control_type
+   USE string_utilities, ONLY: uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -94,7 +94,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input_file
 
       CHARACTER(len=*), PARAMETER :: routineN = 'modify_input_settings', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: atom
       CHARACTER(LEN=default_string_length), &
@@ -123,7 +123,7 @@ CONTAINS
 
       ! add the new basis file containing the templates to the basis file list
       CALL section_vals_val_get(dft_section, "BASIS_SET_FILE_NAME", n_rep_val=nbasis)
-      CALL section_vals_val_set(dft_section, "BASIS_SET_FILE_NAME", i_rep_val=nbasis+1, &
+      CALL section_vals_val_set(dft_section, "BASIS_SET_FILE_NAME", i_rep_val=nbasis + 1, &
                                 c_val=basis_optimization%work_basis_file)
 
       ! Set the auxilarry basis in the kind sections
@@ -176,7 +176,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_mo_sets', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       INTEGER, DIMENSION(2)                              :: nelectron_spin
@@ -239,7 +239,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: rho_ao
@@ -279,7 +279,7 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: context
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_overlap_inverse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nao
       TYPE(cp_fm_struct_type), POINTER                   :: fm_struct_tmp
@@ -311,7 +311,7 @@ CONTAINS
       CHARACTER(LEN=*)                                   :: S_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_overlap', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_s, matrix_s_aux_fit, &
                                                             matrix_s_aux_fit_vs_orb
@@ -358,7 +358,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_opt_admm_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: natoms
       TYPE(admm_type), POINTER                           :: admm_env
@@ -393,7 +393,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'update_basis_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(default_string_length)                   :: elem
       INTEGER                                            :: ibasis, ikind, jkind
@@ -432,7 +432,7 @@ CONTAINS
       TYPE(flex_basis_type)                              :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'transfer_data_to_gto', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ipgf, iset, ishell
 

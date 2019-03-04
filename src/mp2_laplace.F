@@ -10,20 +10,20 @@
 ! **************************************************************************************************
 MODULE mp2_laplace
 !
-   USE cp_fm_types,                     ONLY: cp_fm_get_info,&
-                                              cp_fm_set_all,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE message_passing,                 ONLY: mp_sum
-   USE minimax_exp,                     ONLY: get_exp_minimax_coeff
-   USE mp2_types,                       ONLY: integ_mat_buffer_type
-   USE rpa_communication,               ONLY: fm_redistribute,&
-                                              initialize_buffer,&
-                                              release_buffer
+   USE cp_fm_types, ONLY: cp_fm_get_info, &
+                          cp_fm_set_all, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE message_passing, ONLY: mp_sum
+   USE minimax_exp, ONLY: get_exp_minimax_coeff
+   USE mp2_types, ONLY: integ_mat_buffer_type
+   USE rpa_communication, ONLY: fm_redistribute, &
+                                initialize_buffer, &
+                                release_buffer
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -80,11 +80,11 @@ CONTAINS
                                                             fm_mat_Q_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'laplace_minimax_approx', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: avirt, handle, i_global, iiB, iocc, j_global, jjB, jquad, my_num_dgemm_call, &
-         ncol_local, nrow_local, number_of_rec, number_of_rec_beta, number_of_send, &
-         number_of_send_beta
+                 ncol_local, nrow_local, number_of_rec, number_of_rec_beta, number_of_send, &
+                 number_of_send_beta
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: map_rec_size, map_rec_size_beta, &
                                                             map_send_size, map_send_size_beta, &
                                                             RPA_proc_map
@@ -92,7 +92,7 @@ CONTAINS
       INTEGER, DIMENSION(:), POINTER                     :: col_indices, row_indices
       LOGICAL                                            :: first_cycle, my_open_shell
       REAL(KIND=dp) :: actual_flop_rate, alpha_old, E_Range, Emax, Emax_beta, Emin, Emin_beta, &
-         laplace_transf, my_flop_rate, t_end, t_start, trace_XX, w_old
+                       laplace_transf, my_flop_rate, t_end, t_start, trace_XX, w_old
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: aj, awj, wj
       TYPE(integ_mat_buffer_type), ALLOCATABLE, &
          DIMENSION(:)                                    :: buffer_rec, buffer_rec_beta, &
@@ -113,12 +113,12 @@ CONTAINS
       ALLOCATE (awj(2*num_integ_points))
       awj = 0.0_dp
 
-      Emin = 2.0_dp*(Eigenval(homo+1)-Eigenval(homo))
-      Emax = 2.0_dp*(MAXVAL(Eigenval)-MINVAL(Eigenval))
+      Emin = 2.0_dp*(Eigenval(homo + 1) - Eigenval(homo))
+      Emax = 2.0_dp*(MAXVAL(Eigenval) - MINVAL(Eigenval))
       IF (my_open_shell) THEN
          IF (homo_beta > 0) THEN
-            Emin_beta = 2.0_dp*(Eigenval_beta(homo_beta+1)-Eigenval_beta(homo_beta))
-            Emax_beta = 2.0_dp*(MAXVAL(Eigenval_beta)-MINVAL(Eigenval_beta))
+            Emin_beta = 2.0_dp*(Eigenval_beta(homo_beta + 1) - Eigenval_beta(homo_beta))
+            Emax_beta = 2.0_dp*(MAXVAL(Eigenval_beta) - MINVAL(Eigenval_beta))
             Emin = MIN(Emin, Emin_beta)
             Emax = MAX(Emax, Emax_beta)
          END IF
@@ -135,7 +135,7 @@ CONTAINS
 
       DO jquad = 1, num_integ_points
          aj(jquad) = awj(jquad)
-         wj(jquad) = awj(jquad+num_integ_points)
+         wj(jquad) = awj(jquad + num_integ_points)
       END DO
 
       DEALLOCATE (awj)
@@ -198,10 +198,10 @@ CONTAINS
                DO iiB = 1, nrow_local
                   i_global = row_indices(iiB)
 
-                  iocc = MAX(1, i_global-1)/virtual+1
-                  avirt = i_global-(iocc-1)*virtual
+                  iocc = MAX(1, i_global - 1)/virtual + 1
+                  avirt = i_global - (iocc - 1)*virtual
 
-                  laplace_transf = SQRT(wj(jquad))*EXP(Eigenval(iocc)*aj(jquad))*EXP(-Eigenval(avirt+homo)*aj(jquad))
+                  laplace_transf = SQRT(wj(jquad))*EXP(Eigenval(iocc)*aj(jquad))*EXP(-Eigenval(avirt + homo)*aj(jquad))
                   laplace_transf = SQRT(laplace_transf)
 
                   fm_mat_S%local_data(iiB, jjB) = fm_mat_S%local_data(iiB, jjB)*laplace_transf
@@ -214,11 +214,11 @@ CONTAINS
                DO iiB = 1, nrow_local
                   i_global = row_indices(iiB)
 
-                  iocc = MAX(1, i_global-1)/virtual+1
-                  avirt = i_global-(iocc-1)*virtual
+                  iocc = MAX(1, i_global - 1)/virtual + 1
+                  avirt = i_global - (iocc - 1)*virtual
 
                   laplace_transf = SQRT(wj(jquad)/w_old)* &
-                                   EXP(Eigenval(iocc)*(aj(jquad)-alpha_old))*EXP(-Eigenval(avirt+homo)*(aj(jquad)-alpha_old))
+                                   EXP(Eigenval(iocc)*(aj(jquad) - alpha_old))*EXP(-Eigenval(avirt + homo)*(aj(jquad) - alpha_old))
                   laplace_transf = SQRT(laplace_transf)
 
                   fm_mat_S%local_data(iiB, jjB) = fm_mat_S%local_data(iiB, jjB)*laplace_transf
@@ -232,9 +232,9 @@ CONTAINS
                       matrix_a=fm_mat_S, matrix_b=fm_mat_S, beta=0.0_dp, &
                       matrix_c=fm_mat_Q_gemm)
          t_end = m_walltime()
-         actual_flop_rate = 2.0_dp*REAL(dimen_ia, KIND=dp)*dimen_RI*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end-t_start))
-         IF (para_env_RPA%mepos == 0) my_flop_rate = my_flop_rate+actual_flop_rate
-         my_num_dgemm_call = my_num_dgemm_call+1
+         actual_flop_rate = 2.0_dp*REAL(dimen_ia, KIND=dp)*dimen_RI*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end - t_start))
+         IF (para_env_RPA%mepos == 0) my_flop_rate = my_flop_rate + actual_flop_rate
+         my_num_dgemm_call = my_num_dgemm_call + 1
 
          ! copy/redistribute fm_mat_Q_gemm to fm_mat_Q
          CALL cp_fm_set_all(matrix=fm_mat_Q, alpha=0.0_dp)
@@ -267,11 +267,11 @@ CONTAINS
                   DO iiB = 1, nrow_local
                      i_global = row_indices(iiB)
 
-                     iocc = MAX(1, i_global-1)/virtual_beta+1
-                     avirt = i_global-(iocc-1)*virtual_beta
+                     iocc = MAX(1, i_global - 1)/virtual_beta + 1
+                     avirt = i_global - (iocc - 1)*virtual_beta
 
                      laplace_transf = SQRT(wj(jquad))*EXP(Eigenval_beta(iocc)*aj(jquad))* &
-                                      EXP(-Eigenval_beta(avirt+homo_beta)*aj(jquad))
+                                      EXP(-Eigenval_beta(avirt + homo_beta)*aj(jquad))
                      laplace_transf = SQRT(laplace_transf)
 
                      fm_mat_S_beta%local_data(iiB, jjB) = fm_mat_S_beta%local_data(iiB, jjB)*laplace_transf
@@ -284,12 +284,12 @@ CONTAINS
                   DO iiB = 1, nrow_local
                      i_global = row_indices(iiB)
 
-                     iocc = MAX(1, i_global-1)/virtual_beta+1
-                     avirt = i_global-(iocc-1)*virtual_beta
+                     iocc = MAX(1, i_global - 1)/virtual_beta + 1
+                     avirt = i_global - (iocc - 1)*virtual_beta
 
                      laplace_transf = SQRT(wj(jquad)/w_old)* &
-                                      EXP(Eigenval_beta(iocc)*(aj(jquad)-alpha_old))* &
-                                      EXP(-Eigenval_beta(avirt+homo_beta)*(aj(jquad)-alpha_old))
+                                      EXP(Eigenval_beta(iocc)*(aj(jquad) - alpha_old))* &
+                                      EXP(-Eigenval_beta(avirt + homo_beta)*(aj(jquad) - alpha_old))
                      laplace_transf = SQRT(laplace_transf)
 
                      fm_mat_S_beta%local_data(iiB, jjB) = fm_mat_S_beta%local_data(iiB, jjB)*laplace_transf
@@ -303,9 +303,9 @@ CONTAINS
                          matrix_a=fm_mat_S_beta, matrix_b=fm_mat_S_beta, beta=0.0_dp, &
                          matrix_c=fm_mat_Q_gemm_beta)
             t_end = m_walltime()
-            actual_flop_rate = 2.0_dp*REAL(dimen_ia_beta, KIND=dp)*dimen_RI*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end-t_start))
-            IF (para_env_RPA%mepos == 0) my_flop_rate = my_flop_rate+actual_flop_rate
-            my_num_dgemm_call = my_num_dgemm_call+1
+            actual_flop_rate = 2.0_dp*REAL(dimen_ia_beta, KIND=dp)*dimen_RI*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end - t_start))
+            IF (para_env_RPA%mepos == 0) my_flop_rate = my_flop_rate + actual_flop_rate
+            my_num_dgemm_call = my_num_dgemm_call + 1
 
             ! copy/redistribute fm_mat_Q_gemm to fm_mat_Q
             CALL cp_fm_set_all(matrix=fm_mat_Q_beta, alpha=0.0_dp)
@@ -329,14 +329,14 @@ CONTAINS
             DO iiB = 1, nrow_local
                i_global = row_indices(iiB)
                IF (my_open_shell) THEN
-                  trace_XX = trace_XX+fm_mat_Q%local_data(iiB, jjB)*fm_mat_Q_beta%local_data(iiB, jjB)
+                  trace_XX = trace_XX + fm_mat_Q%local_data(iiB, jjB)*fm_mat_Q_beta%local_data(iiB, jjB)
                ELSE
-                  trace_XX = trace_XX+fm_mat_Q%local_data(iiB, jjB)*fm_mat_Q%local_data(iiB, jjB)
+                  trace_XX = trace_XX + fm_mat_Q%local_data(iiB, jjB)*fm_mat_Q%local_data(iiB, jjB)
                END IF
             END DO
          END DO
 
-         Emp2 = Emp2-trace_XX
+         Emp2 = Emp2 - trace_XX
 
          ! save alpha, w and reset the first_cycle flag
          first_cycle = .FALSE.

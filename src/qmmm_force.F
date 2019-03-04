@@ -10,44 +10,44 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE qmmm_force
-   USE cell_types,                      ONLY: cell_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_iter_string,&
-                                              cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_result_methods,               ONLY: cp_results_erase,&
-                                              get_results,&
-                                              put_results
-   USE cp_result_types,                 ONLY: cp_result_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE fist_energy_types,               ONLY: fist_energy_type
-   USE fist_environment_types,          ONLY: fist_env_get
-   USE fist_force,                      ONLY: fist_calc_energy_force
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: debye
-   USE qmmm_gpw_energy,                 ONLY: qmmm_el_coupling
-   USE qmmm_gpw_forces,                 ONLY: qmmm_forces
-   USE qmmm_links_methods,              ONLY: qmmm_added_chrg_coord,&
-                                              qmmm_added_chrg_forces,&
-                                              qmmm_link_Imomm_coord,&
-                                              qmmm_link_Imomm_forces
-   USE qmmm_types,                      ONLY: qmmm_env_type
-   USE qmmm_types_low,                  ONLY: qmmm_links_type
-   USE qmmm_util,                       ONLY: apply_qmmm_translate,&
-                                              apply_qmmm_walls
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env
-   USE qs_force,                        ONLY: qs_calc_energy_force
-   USE qs_ks_qmmm_methods,              ONLY: ks_qmmm_env_rebuild
+   USE cell_types, ONLY: cell_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_iter_string, &
+                                 cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_result_methods, ONLY: cp_results_erase, &
+                                get_results, &
+                                put_results
+   USE cp_result_types, ONLY: cp_result_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE fist_energy_types, ONLY: fist_energy_type
+   USE fist_environment_types, ONLY: fist_env_get
+   USE fist_force, ONLY: fist_calc_energy_force
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: debye
+   USE qmmm_gpw_energy, ONLY: qmmm_el_coupling
+   USE qmmm_gpw_forces, ONLY: qmmm_forces
+   USE qmmm_links_methods, ONLY: qmmm_added_chrg_coord, &
+                                 qmmm_added_chrg_forces, &
+                                 qmmm_link_Imomm_coord, &
+                                 qmmm_link_Imomm_forces
+   USE qmmm_types, ONLY: qmmm_env_type
+   USE qmmm_types_low, ONLY: qmmm_links_type
+   USE qmmm_util, ONLY: apply_qmmm_translate, &
+                        apply_qmmm_walls
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env
+   USE qs_force, ONLY: qs_calc_energy_force
+   USE qs_ks_qmmm_methods, ONLY: ks_qmmm_env_rebuild
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -75,7 +75,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calc_force, consistent_energies, linres
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_calc_energy_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: description, iter
       INTEGER                                            :: ip, j, nres, output_unit
@@ -192,7 +192,7 @@ CONTAINS
          IF (qmmm_link_imomm) CALL qmmm_link_Imomm_forces(qmmm_links, particles_qm, qm_atom_index)
          particles_mm => subsys_mm%particles%els
          DO ip = 1, SIZE(qm_atom_index)
-            particles_mm(qm_atom_index(ip))%f = particles_mm(qm_atom_index(ip))%f+particles_qm(ip)%f
+            particles_mm(qm_atom_index(ip))%f = particles_mm(qm_atom_index(ip))%f + particles_qm(ip)%f
          END DO
          ! If add charges get rid of their derivatives right NOW!
          IF (qmmm_added_chrg) CALL qmmm_added_chrg_forces(qmmm_env%qm, particles_mm)
@@ -224,7 +224,7 @@ CONTAINS
          CPASSERT(nres <= 1)
          CALL get_results(results=results_qm, description=description, values=dip_qm)
          CALL get_results(results=results_mm, description=description, values=dip_mm)
-         dip_qmmm = dip_qm+dip_mm
+         dip_qmmm = dip_qm + dip_mm
          CALL cp_results_erase(results=results_qmmm, description=description)
          CALL put_results(results=results_qmmm, description=description, values=dip_qmmm)
 

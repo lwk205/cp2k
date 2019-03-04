@@ -15,8 +15,8 @@
 ! **************************************************************************************************
 MODULE cp_result_types
 
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
+   USE kinds, ONLY: default_string_length, &
+                    dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -94,7 +94,7 @@ CONTAINS
       TYPE(cp_result_type), POINTER                      :: results
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -119,14 +119,14 @@ CONTAINS
       TYPE(cp_result_type), POINTER                      :: results
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
       CALL timeset(routineN, handle)
       IF (ASSOCIATED(results)) THEN
          CPASSERT(results%ref_count > 0)
-         results%ref_count = results%ref_count-1
+         results%ref_count = results%ref_count - 1
          IF (results%ref_count == 0) THEN
             ! Description
             IF (ASSOCIATED(results%result_label)) THEN
@@ -154,7 +154,7 @@ CONTAINS
       TYPE(cp_result_type), POINTER                      :: results
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_clean', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -186,11 +186,11 @@ CONTAINS
       TYPE(cp_result_type), POINTER                      :: results
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(results))
       CPASSERT(results%ref_count > 0)
-      results%ref_count = results%ref_count+1
+      results%ref_count = results%ref_count + 1
    END SUBROUTINE cp_result_retain
 
 ! **************************************************************************************************
@@ -202,7 +202,7 @@ CONTAINS
       TYPE(cp_result_value_type), POINTER                :: value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_value_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -227,7 +227,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: type_in_use, size_value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_value_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -257,7 +257,7 @@ CONTAINS
       TYPE(cp_result_value_type), POINTER                :: value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_value_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -334,7 +334,7 @@ CONTAINS
       TYPE(cp_result_value_type), POINTER                :: value_out, value_in
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_value_copy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, isize
 
@@ -375,7 +375,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: istart, iend
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_result_value_p_reallocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, lb_size, ub_size
       TYPE(cp_result_value_p_type), DIMENSION(:), &

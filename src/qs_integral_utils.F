@@ -11,12 +11,12 @@
 ! **************************************************************************************************
 MODULE qs_integral_utils
 
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE orbital_pointers,                ONLY: init_orbital_pointers
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE orbital_pointers, ONLY: init_orbital_pointers
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -53,7 +53,7 @@ CONTAINS
       INTEGER                                            :: ldmem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_memory_usage_a', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: maxc, maxl, maxs
 
@@ -62,7 +62,7 @@ CONTAINS
                            basis_type=basis_type_a)
       ldmem = MAX(maxc, maxs)
 
-      CALL init_orbital_pointers(maxl+2)
+      CALL init_orbital_pointers(maxl + 2)
 
    END FUNCTION get_memory_usage_a
 
@@ -80,7 +80,7 @@ CONTAINS
       INTEGER                                            :: ldmem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_memory_usage_ab', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: lda, ldb
 
@@ -106,7 +106,7 @@ CONTAINS
       INTEGER                                            :: ldmem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_memory_usage_abc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: lda, ldb, ldc
 
@@ -135,7 +135,7 @@ CONTAINS
       INTEGER                                            :: ldmem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_memory_usage_abcd', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: lda, ldb, ldc, ldd
 
@@ -162,7 +162,7 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'basis_set_list_setup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
       TYPE(gto_basis_set_type), POINTER                  :: basis_set

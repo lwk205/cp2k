@@ -20,34 +20,34 @@
 !> \author apsi
 ! **************************************************************************************************
 MODULE pw_methods
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit,&
-                                              cp_to_string
-   USE fast,                            ONLY: copy_cr,&
-                                              copy_rc,&
-                                              zero_c
-   USE fft_tools,                       ONLY: BWFFT,&
-                                              FWFFT,&
-                                              fft3d
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_memory
-   USE message_passing,                 ONLY: mp_sum
-   USE pw_cuda,                         ONLY: pw_cuda_c1dr3d_3d,&
-                                              pw_cuda_c1dr3d_3d_ps,&
-                                              pw_cuda_r3dc1d_3d,&
-                                              pw_cuda_r3dc1d_3d_ps
-   USE pw_grid_types,                   ONLY: HALFSPACE,&
-                                              PW_MODE_DISTRIBUTED,&
-                                              PW_MODE_LOCAL,&
-                                              pw_grid_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              COMPLEXDATA3D,&
-                                              NOSPACE,&
-                                              REALDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_type
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit, &
+                              cp_to_string
+   USE fast, ONLY: copy_cr, &
+                   copy_rc, &
+                   zero_c
+   USE fft_tools, ONLY: BWFFT, &
+                        FWFFT, &
+                        fft3d
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_memory
+   USE message_passing, ONLY: mp_sum
+   USE pw_cuda, ONLY: pw_cuda_c1dr3d_3d, &
+                      pw_cuda_c1dr3d_3d_ps, &
+                      pw_cuda_r3dc1d_3d, &
+                      pw_cuda_r3dc1d_3d_ps
+   USE pw_grid_types, ONLY: HALFSPACE, &
+                            PW_MODE_DISTRIBUTED, &
+                            PW_MODE_LOCAL, &
+                            pw_grid_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       COMPLEXDATA3D, &
+                       NOSPACE, &
+                       REALDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -157,7 +157,7 @@ CONTAINS
                   END DO
                   IF (ng2 > ng) THEN
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(ng,ng2,pw2)
-                     DO i = ng+1, ng2
+                     DO i = ng + 1, ng2
                         pw2%cc(i) = CMPLX(0.0_dp, 0.0_dp, KIND=dp)
                      END DO
                   END IF
@@ -372,49 +372,49 @@ CONTAINS
             DO i = 1, cnt
                pw%cc(i) = pw%cc(i)*pw%pw_grid%g(1, i)
             END DO
-            flop = flop+6*cnt
+            flop = flop + 6*cnt
          ELSE IF (n(1) > 1) THEN
 !$OMP PARALLEL DO PRIVATE (i) DEFAULT(NONE) SHARED(cnt, pw,n)
             DO i = 1, cnt
                pw%cc(i) = pw%cc(i)*(pw%pw_grid%g(1, i)**n(1))
             END DO
-            flop = flop+7*cnt
+            flop = flop + 7*cnt
          END IF
          IF (n(2) == 1) THEN
 !$OMP PARALLEL DO PRIVATE (i) DEFAULT(NONE) SHARED(pw, cnt)
             DO i = 1, cnt
                pw%cc(i) = pw%cc(i)*pw%pw_grid%g(2, i)
             END DO
-            flop = flop+6*cnt
+            flop = flop + 6*cnt
          ELSE IF (n(2) > 1) THEN
 !$OMP PARALLEL DO PRIVATE (i) DEFAULT(NONE) SHARED(pw, cnt,n)
             DO i = 1, cnt
                pw%cc(i) = pw%cc(i)*(pw%pw_grid%g(2, i)**n(2))
             END DO
-            flop = flop+7*cnt
+            flop = flop + 7*cnt
          END IF
          IF (n(3) == 1) THEN
 !$OMP PARALLEL DO PRIVATE (i) DEFAULT(NONE) SHARED(pw,cnt)
             DO i = 1, cnt
                pw%cc(i) = pw%cc(i)*pw%pw_grid%g(3, i)
             END DO
-            flop = flop+6*cnt
+            flop = flop + 6*cnt
          ELSE IF (n(3) > 1) THEN
 !$OMP PARALLEL DO PRIVATE (i) DEFAULT(NONE) SHARED(pw,cnt,n)
             DO i = 1, cnt
                pw%cc(i) = pw%cc(i)*(pw%pw_grid%g(3, i)**n(3))
             END DO
-            flop = flop+7*cnt
+            flop = flop + 7*cnt
          END IF
 
          ! im can take the values 1, -1, i, -i
          ! skip this if im == 1
-         IF (ABS(REAL(im, KIND=dp)-1.0_dp) > 1.e-10) THEN
+         IF (ABS(REAL(im, KIND=dp) - 1.0_dp) > 1.e-10) THEN
 !$OMP PARALLEL DO PRIVATE (i) DEFAULT(NONE) SHARED(pw,cnt,im)
             DO i = 1, cnt
                pw%cc(i) = im*pw%cc(i)
             END DO
-            flop = flop+6*cnt
+            flop = flop + 6*cnt
          END IF
 
       ELSE
@@ -465,16 +465,16 @@ CONTAINS
          IF (i == j) THEN
 !$OMP PARALLEL DO DEFAULT(NONE) PRIVATE(ig,gg) SHARED(i,o3,pw,pwdr2,cnt)
             DO ig = 1, cnt
-               gg = pw%pw_grid%g(i, ig)**2-o3*pw%pw_grid%gsq(ig)
+               gg = pw%pw_grid%g(i, ig)**2 - o3*pw%pw_grid%gsq(ig)
                pwdr2%cc(ig) = gg*pw%cc(ig)
             END DO
-            flop = flop+5*cnt
+            flop = flop + 5*cnt
          ELSE
 !$OMP PARALLEL DO PRIVATE (ig) DEFAULT(NONE) SHARED(pwdr2,pw,i,j,cnt)
             DO ig = 1, cnt
                pwdr2%cc(ig) = pw%cc(ig)*(pw%pw_grid%g(i, ig)*pw%pw_grid%g(j, ig))
             END DO
-            flop = flop+4*cnt
+            flop = flop + 4*cnt
          END IF
 
       ELSE
@@ -526,17 +526,17 @@ CONTAINS
          IF (i == j) THEN
 !$OMP PARALLEL DO PRIVATE (ig) DEFAULT(NONE) PRIVATE(gg) SHARED(cnt,pw,o3,pwdr2_gg,i)
             DO ig = pw%pw_grid%first_gne0, cnt
-               gg = pw%pw_grid%g(i, ig)**2-o3*pw%pw_grid%gsq(ig)
+               gg = pw%pw_grid%g(i, ig)**2 - o3*pw%pw_grid%gsq(ig)
                pwdr2_gg%cc(ig) = gg*pw%cc(ig)/pw%pw_grid%gsq(ig)
             END DO
-            flop = flop+6*cnt
+            flop = flop + 6*cnt
          ELSE
 !$OMP PARALLEL DO PRIVATE (ig) DEFAULT(NONE) SHARED(pwdr2_gg,pw,i,j,cnt)
             DO ig = pw%pw_grid%first_gne0, cnt
                pwdr2_gg%cc(ig) = pw%cc(ig)*(pw%pw_grid%g(i, ig)*pw%pw_grid%g(j, ig)) &
                                  /pw%pw_grid%gsq(ig)
             END DO
-            flop = flop+5*cnt
+            flop = flop + 5*cnt
          END IF
 
          IF (pw%pw_grid%have_g0) pwdr2_gg%cc(1) = 0.0_dp
@@ -586,11 +586,11 @@ CONTAINS
 
 !$OMP PARALLEL DO DEFAULT(NONE) PRIVATE(ig,arg,f) SHARED(sigma,ecut,pw,cnt)
          DO ig = 1, cnt
-            arg = (ecut-pw%pw_grid%gsq(ig))/sigma
-            f = EXP(arg)/(1+EXP(arg))
+            arg = (ecut - pw%pw_grid%gsq(ig))/sigma
+            f = EXP(arg)/(1 + EXP(arg))
             pw%cc(ig) = f*pw%cc(ig)
          END DO
-         flop = flop+6*cnt
+         flop = flop + 6*cnt
 
       ELSE
 
@@ -708,13 +708,13 @@ CONTAINS
             IF (my_alpha == 1.0_dp) THEN
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(pw2,pw1)
                DO i = 1, SIZE(pw2%cr)
-                  pw2%cr(i) = pw2%cr(i)+pw1%cr(i)
+                  pw2%cr(i) = pw2%cr(i) + pw1%cr(i)
                END DO
                flop = REAL(SIZE(pw2%cr), KIND=dp)
             ELSE
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(pw2,pw1,my_alpha)
                DO i = 1, SIZE(pw2%cr)
-                  pw2%cr(i) = pw2%cr(i)+my_alpha*pw1%cr(i)
+                  pw2%cr(i) = pw2%cr(i) + my_alpha*pw1%cr(i)
                END DO
                flop = REAL(2*SIZE(pw2%cr), KIND=dp)
             END IF
@@ -723,13 +723,13 @@ CONTAINS
             IF (my_alpha == 1.0_dp) THEN
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(pw2,pw1)
                DO i = 1, SIZE(pw2%cc)
-                  pw2%cc(i) = pw2%cc(i)+pw1%cc(i)
+                  pw2%cc(i) = pw2%cc(i) + pw1%cc(i)
                END DO
                flop = REAL(2*SIZE(pw2%cc), KIND=dp)
             ELSE
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(pw2,my_alpha,pw1)
                DO i = 1, SIZE(pw2%cc)
-                  pw2%cc(i) = pw2%cc(i)+my_alpha*pw1%cc(i)
+                  pw2%cc(i) = pw2%cc(i) + my_alpha*pw1%cc(i)
                END DO
                flop = REAL(4*SIZE(pw2%cc), KIND=dp)
             END IF
@@ -771,12 +771,12 @@ CONTAINS
                IF (my_alpha == 1.0_dp) THEN
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(pw2,pw1,ng)
                   DO i = 1, ng
-                     pw2%cc(i) = pw2%cc(i)+pw1%cc(i)
+                     pw2%cc(i) = pw2%cc(i) + pw1%cc(i)
                   END DO
                ELSE
 !$OMP PARALLEL DO PRIVATE(i) DEFAULT(NONE) SHARED(pw2,pw1,my_alpha,ng)
                   DO i = 1, ng
-                     pw2%cc(i) = pw2%cc(i)+my_alpha*pw1%cc(i)
+                     pw2%cc(i) = pw2%cc(i) + my_alpha*pw1%cc(i)
                   END DO
                END IF
 
@@ -787,13 +787,13 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,ng2)
                      DO i = 1, ng2
                         j = pw2%pw_grid%gidx(i)
-                        pw2%cc(i) = pw2%cc(i)+pw1%cc(j)
+                        pw2%cc(i) = pw2%cc(i) + pw1%cc(j)
                      END DO
                   ELSE
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,ng1)
                      DO i = 1, ng1
                         j = pw2%pw_grid%gidx(i)
-                        pw2%cc(j) = pw2%cc(j)+pw1%cc(i)
+                        pw2%cc(j) = pw2%cc(j) + pw1%cc(i)
                      END DO
                   END IF
                ELSE
@@ -801,13 +801,13 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,my_alpha,ng2)
                      DO i = 1, ng2
                         j = pw2%pw_grid%gidx(i)
-                        pw2%cc(i) = pw2%cc(i)+my_alpha*pw1%cc(j)
+                        pw2%cc(i) = pw2%cc(i) + my_alpha*pw1%cc(j)
                      END DO
                   ELSE
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,my_alpha,ng1)
                      DO i = 1, ng1
                         j = pw2%pw_grid%gidx(i)
-                        pw2%cc(j) = pw2%cc(j)+my_alpha*pw1%cc(i)
+                        pw2%cc(j) = pw2%cc(j) + my_alpha*pw1%cc(i)
                      END DO
                   END IF
                END IF
@@ -818,13 +818,13 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,ng2)
                      DO i = 1, ng2
                         j = pw1%pw_grid%gidx(i)
-                        pw2%cc(i) = pw2%cc(i)+pw1%cc(j)
+                        pw2%cc(i) = pw2%cc(i) + pw1%cc(j)
                      END DO
                   ELSE
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,ng1)
                      DO i = 1, ng1
                         j = pw1%pw_grid%gidx(i)
-                        pw2%cc(j) = pw2%cc(j)+pw1%cc(i)
+                        pw2%cc(j) = pw2%cc(j) + pw1%cc(i)
                      END DO
                   END IF
                ELSE
@@ -832,13 +832,13 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,my_alpha,ng2)
                      DO i = 1, ng2
                         j = pw1%pw_grid%gidx(i)
-                        pw2%cc(i) = pw2%cc(i)+my_alpha*pw1%cc(j)
+                        pw2%cc(i) = pw2%cc(i) + my_alpha*pw1%cc(j)
                      END DO
                   ELSE
 !$OMP PARALLEL DO PRIVATE(i,j) DEFAULT(NONE) SHARED(pw2,pw1,my_alpha,ng1)
                      DO i = 1, ng1
                         j = pw1%pw_grid%gidx(i)
-                        pw2%cc(j) = pw2%cc(j)+my_alpha*pw1%cc(i)
+                        pw2%cc(j) = pw2%cc(j) + my_alpha*pw1%cc(i)
                      END DO
                   END IF
                END IF
@@ -926,9 +926,9 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(gpt,l,m,n) DEFAULT(NONE) SHARED(ngpts, mapl,mapm,mapn,ghat,scale,pw,c)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             pw%cc(gpt) = scale*c(l, m, n)
 
          END DO
@@ -938,9 +938,9 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(gpt,l,m,n) DEFAULT(NONE) SHARED(ngpts, mapl,mapm,mapn,ghat,pw,c)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             pw%cc(gpt) = c(l, m, n)
 
          END DO
@@ -1000,9 +1000,9 @@ CONTAINS
 !$OMP             SHARED(ngpts,mapl,mapm,mapn,ghat,yzq,pw,c,scale)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             mn = yzq(m, n)
             pw%cc(gpt) = scale*c(l, mn)
 
@@ -1014,9 +1014,9 @@ CONTAINS
 !$OMP             SHARED(ngpts,mapl,mapm,mapn,ghat,yzq,pw,c)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             mn = yzq(m, n)
             pw%cc(gpt) = c(l, mn)
 
@@ -1079,9 +1079,9 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(gpt,l,m,n) DEFAULT(NONE) SHARED(ngpts, mapl,mapm,mapn,ghat,scale,pw,c)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             c(l, m, n) = scale*pw%cc(gpt)
 
          END DO
@@ -1091,9 +1091,9 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(gpt,l,m,n) DEFAULT(NONE) SHARED(ngpts, mapl,mapm,mapn,ghat,pw,c)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             c(l, m, n) = pw%cc(gpt)
 
          END DO
@@ -1111,9 +1111,9 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(gpt,l,m,n) DEFAULT(NONE) SHARED(ngpts, mapl,mapm,mapn,ghat,scale,pw,c)
             DO gpt = 1, ngpts
 
-               l = mapl(ghat(1, gpt))+1
-               m = mapm(ghat(2, gpt))+1
-               n = mapn(ghat(3, gpt))+1
+               l = mapl(ghat(1, gpt)) + 1
+               m = mapm(ghat(2, gpt)) + 1
+               n = mapn(ghat(3, gpt)) + 1
                c(l, m, n) = scale*CONJG(pw%cc(gpt))
 
             END DO
@@ -1123,9 +1123,9 @@ CONTAINS
 !$OMP PARALLEL DO PRIVATE(gpt,l,m,n) DEFAULT(NONE) SHARED(ngpts, mapl,mapm,mapn,ghat,pw,c)
             DO gpt = 1, ngpts
 
-               l = mapl(ghat(1, gpt))+1
-               m = mapm(ghat(2, gpt))+1
-               n = mapn(ghat(3, gpt))+1
+               l = mapl(ghat(1, gpt)) + 1
+               m = mapm(ghat(2, gpt)) + 1
+               n = mapn(ghat(3, gpt)) + 1
                c(l, m, n) = CONJG(pw%cc(gpt))
 
             END DO
@@ -1190,9 +1190,9 @@ CONTAINS
 !$OMP             SHARED(ngpts,mapl,mapm,mapn,ghat,yzq,pw,c,scale)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             mn = yzq(m, n)
             c(l, mn) = scale*pw%cc(gpt)
 
@@ -1204,9 +1204,9 @@ CONTAINS
 !$OMP             SHARED(ngpts,mapl,mapm,mapn,ghat,yzq,pw,c)
          DO gpt = 1, ngpts
 
-            l = mapl(ghat(1, gpt))+1
-            m = mapm(ghat(2, gpt))+1
-            n = mapn(ghat(3, gpt))+1
+            l = mapl(ghat(1, gpt)) + 1
+            m = mapm(ghat(2, gpt)) + 1
+            n = mapn(ghat(3, gpt)) + 1
             mn = yzq(m, n)
             c(l, mn) = pw%cc(gpt)
 
@@ -1226,9 +1226,9 @@ CONTAINS
 !$OMP             SHARED(ngpts,mapl,mapm,mapn,ghat,yzq,pw,c,scale)
             DO gpt = 1, ngpts
 
-               l = mapl(ghat(1, gpt))+1
-               m = mapm(ghat(2, gpt))+1
-               n = mapn(ghat(3, gpt))+1
+               l = mapl(ghat(1, gpt)) + 1
+               m = mapm(ghat(2, gpt)) + 1
+               n = mapn(ghat(3, gpt)) + 1
                mn = yzq(m, n)
                c(l, mn) = scale*CONJG(pw%cc(gpt))
 
@@ -1240,9 +1240,9 @@ CONTAINS
 !$OMP             SHARED(ngpts,mapl,mapm,mapn,ghat,yzq,pw,c)
             DO gpt = 1, ngpts
 
-               l = mapl(ghat(1, gpt))+1
-               m = mapm(ghat(2, gpt))+1
-               n = mapn(ghat(3, gpt))+1
+               l = mapl(ghat(1, gpt)) + 1
+               m = mapm(ghat(2, gpt)) + 1
+               n = mapn(ghat(3, gpt)) + 1
                mn = yzq(m, n)
                c(l, mn) = CONJG(pw%cc(gpt))
 
@@ -1277,7 +1277,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: debug
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fft_wrap_pw1pw2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=9)                                   :: mode
       COMPLEX(KIND=dp), DIMENSION(:, :), POINTER         :: grays
@@ -1777,7 +1777,7 @@ CONTAINS
       IF (pw1%in_use == COMPLEXDATA1D) THEN
          IF (pw1%pw_grid%grid_span == HALFSPACE) THEN
             integral_value = 2.0_dp*integral_value
-            IF (pw1%pw_grid%have_g0) integral_value = integral_value- &
+            IF (pw1%pw_grid%have_g0) integral_value = integral_value - &
                                                       REAL(CONJG(pw1%cc(1))*pw2%cc(1), KIND=dp)
          END IF
       END IF
@@ -1799,7 +1799,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: integral_value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_integral_a2b', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (pw1%pw_grid%id_nr /= pw2%pw_grid%id_nr) THEN
          CPABORT("Grids incompatible")
@@ -1846,7 +1846,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), INTENT(in)            :: r
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_structure_factor', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: cnt, handle, ig
       REAL(KIND=dp)                                      :: arg, flop
@@ -1865,7 +1865,7 @@ CONTAINS
             arg = DOT_PRODUCT(sf%pw_grid%g(:, ig), r)
             sf%cc(ig) = CMPLX(COS(arg), -SIN(arg), KIND=dp)
          END DO
-         flop = flop+7*cnt
+         flop = flop + 7*cnt
       ELSE
 
          CPABORT("No suitable data field")
@@ -1892,7 +1892,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: total_fun
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_integrate_function', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iop
 

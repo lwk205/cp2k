@@ -8,18 +8,18 @@
 ! **************************************************************************************************
 MODULE xc_write_output
 
-   USE input_constants,                 ONLY: xc_none
-   USE input_cp2k_check,                ONLY: xc_functionals_expand
-   USE input_section_types,             ONLY: section_vals_duplicate,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_get_subs_vals2,&
-                                              section_vals_release,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length
-   USE xc_derivatives,                  ONLY: xc_functional_get_info
-   USE xc_libxc,                        ONLY: libxc_version_info
+   USE input_constants, ONLY: xc_none
+   USE input_cp2k_check, ONLY: xc_functionals_expand
+   USE input_section_types, ONLY: section_vals_duplicate, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_get_subs_vals2, &
+                                  section_vals_release, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length
+   USE xc_derivatives, ONLY: xc_functional_get_info
+   USE xc_libxc, ONLY: libxc_version_info
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -64,7 +64,7 @@ CONTAINS
             CALL xc_functionals_expand(xc_fun_section, xc_section)
             ifun = 0
             DO
-               ifun = ifun+1
+               ifun = ifun + 1
                xc_fun => section_vals_get_subs_vals2(xc_fun_section, i_section=ifun)
                IF (.NOT. ASSOCIATED(xc_fun)) EXIT
                IF (TRIM(xc_fun%section%name) /= "LIBXC") THEN

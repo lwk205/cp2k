@@ -11,42 +11,42 @@
 !> \author Juerg Hutter
 ! **************************************************************************************************
 MODULE qs_kinetic
-   USE ai_contraction,                  ONLY: block_add,&
-                                              contraction,&
-                                              decontraction,&
-                                              force_trace
-   USE ai_kinetic,                      ONLY: kinetic
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE dbcsr_api,                       ONLY: dbcsr_filter,&
-                                              dbcsr_finalize,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE orbital_pointers,                ONLY: ncoset
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_integral_utils,               ONLY: basis_set_list_setup,&
-                                              get_memory_usage
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              get_neighbor_list_set_p,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_overlap,                      ONLY: create_sab_matrix
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE ai_contraction, ONLY: block_add, &
+                             contraction, &
+                             decontraction, &
+                             force_trace
+   USE ai_kinetic, ONLY: kinetic
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE dbcsr_api, ONLY: dbcsr_filter, &
+                        dbcsr_finalize, &
+                        dbcsr_get_block_p, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE orbital_pointers, ONLY: ncoset
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_integral_utils, ONLY: basis_set_list_setup, &
+                                get_memory_usage
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     get_neighbor_list_set_p, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_overlap, ONLY: create_sab_matrix
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num
 #include "./base/base_uses.f90"
@@ -106,10 +106,10 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: eps_filter
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_kinetic_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_a, atom_b, handle, iatom, ic, icol, ikind, irow, iset, jatom, jkind, jset, &
-         ldsab, mepos, natom, ncoa, ncob, nimg, nkind, nseta, nsetb, nthread, sgfa, sgfb
+                 ldsab, mepos, natom, ncoa, ncob, nimg, nkind, nseta, nsetb, nthread, sgfa, sgfb
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind
       INTEGER, DIMENSION(3)                              :: cell
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, npgfa, &
@@ -301,20 +301,20 @@ CONTAINS
             END IF
          END IF
 
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
          tab = SQRT(rab2)
          trans = do_symmetric .AND. (iatom > jatom)
 
          DO iset = 1, nseta
 
-            ncoa = npgfa(iset)*(ncoset(la_max(iset))-ncoset(la_min(iset)-1))
+            ncoa = npgfa(iset)*(ncoset(la_max(iset)) - ncoset(la_min(iset) - 1))
             sgfa = first_sgfa(1, iset)
 
             DO jset = 1, nsetb
 
-               IF (set_radius_a(iset)+set_radius_b(jset) < tab) CYCLE
+               IF (set_radius_a(iset) + set_radius_b(jset) < tab) CYCLE
 
-               ncob = npgfb(jset)*(ncoset(lb_max(jset))-ncoset(lb_min(jset)-1))
+               ncob = npgfb(jset)*(ncoset(lb_max(jset)) - ncoset(lb_min(jset) - 1))
                sgfb = first_sgfb(1, jset)
 
                IF (do_forces .AND. ASSOCIATED(p_block) .AND. ((iatom /= jatom) .OR. use_virial)) THEN
@@ -329,8 +329,8 @@ CONTAINS
                                rab, kab, dab)
                   CALL force_trace(force_a, dab, pab, ncoa, ncob, 3)
 !$OMP CRITICAL(forceupate)
-                  force(ikind)%kinetic(:, atom_a) = force(ikind)%kinetic(:, atom_a)+ff*force_a(:)
-                  force(jkind)%kinetic(:, atom_b) = force(jkind)%kinetic(:, atom_b)-ff*force_a(:)
+                  force(ikind)%kinetic(:, atom_a) = force(ikind)%kinetic(:, atom_a) + ff*force_a(:)
+                  force(jkind)%kinetic(:, atom_b) = force(jkind)%kinetic(:, atom_b) - ff*force_a(:)
                   IF (use_virial) THEN
                      CALL virial_pair_force(virial%pv_virial, f0, force_a, rab)
                   END IF

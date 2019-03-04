@@ -69,11 +69,11 @@ CONTAINS
       TYPE(fb_trial_fns_obj), INTENT(IN)                 :: trial_fns
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(trial_fns%obj))
       CPASSERT(trial_fns%obj%ref_count > 0)
-      trial_fns%obj%ref_count = trial_fns%obj%ref_count+1
+      trial_fns%obj%ref_count = trial_fns%obj%ref_count + 1
    END SUBROUTINE fb_trial_fns_retain
 
 ! **************************************************************************************************
@@ -86,11 +86,11 @@ CONTAINS
       TYPE(fb_trial_fns_obj), INTENT(INOUT)              :: trial_fns
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(trial_fns%obj)) THEN
          CPASSERT(trial_fns%obj%ref_count > 0)
-         trial_fns%obj%ref_count = trial_fns%obj%ref_count-1
+         trial_fns%obj%ref_count = trial_fns%obj%ref_count - 1
          IF (trial_fns%obj%ref_count == 0) THEN
             trial_fns%obj%ref_count = 1
             IF (ASSOCIATED(trial_fns%obj%nfunctions)) THEN
@@ -116,7 +116,7 @@ CONTAINS
       TYPE(fb_trial_fns_obj), INTENT(INOUT)              :: trial_fns
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_nullify', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       NULLIFY (trial_fns%obj)
    END SUBROUTINE fb_trial_fns_nullify
@@ -133,7 +133,7 @@ CONTAINS
       TYPE(fb_trial_fns_obj), INTENT(IN)                 :: b
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_associate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       a%obj => b%obj
    END SUBROUTINE fb_trial_fns_associate
@@ -149,7 +149,7 @@ CONTAINS
       LOGICAL                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_has_data', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       res = ASSOCIATED(trial_fns%obj)
    END FUNCTION fb_trial_fns_has_data
@@ -163,14 +163,14 @@ CONTAINS
       TYPE(fb_trial_fns_obj), INTENT(INOUT)              :: trial_fns
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(trial_fns%obj))
       ALLOCATE (trial_fns%obj)
       NULLIFY (trial_fns%obj%nfunctions)
       NULLIFY (trial_fns%obj%functions)
       trial_fns%obj%ref_count = 1
-      trial_fns%obj%id_nr = last_fb_trial_fns_id+1
+      trial_fns%obj%id_nr = last_fb_trial_fns_id + 1
       last_fb_trial_fns_id = trial_fns%obj%id_nr
    END SUBROUTINE fb_trial_fns_create
 
@@ -183,7 +183,7 @@ CONTAINS
       TYPE(fb_trial_fns_obj), INTENT(INOUT)              :: trial_fns
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(trial_fns%obj))
       ! if halo_atoms are associated, then deallocate and de-associate
@@ -210,7 +210,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), OPTIONAL, POINTER        :: functions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_get', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(trial_fns%obj))
       IF (PRESENT(nfunctions)) nfunctions => trial_fns%obj%nfunctions
@@ -232,7 +232,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), OPTIONAL, POINTER        :: functions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fb_trial_fns_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(trial_fns%obj))
       IF (PRESENT(nfunctions)) THEN

@@ -8,19 +8,19 @@
 !>      - none
 ! **************************************************************************************************
 MODULE qs_o3c_methods
-   USE ai_contraction_sphi,             ONLY: abc_contract
-   USE ai_overlap3,                     ONLY: overlap3
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE dbcsr_api,                       ONLY: dbcsr_get_block_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE orbital_pointers,                ONLY: ncoset
-   USE qs_o3c_types,                    ONLY: &
-        get_o3c_container, get_o3c_iterator_info, get_o3c_vec, o3c_container_type, o3c_iterate, &
-        o3c_iterator_create, o3c_iterator_release, o3c_iterator_type, o3c_vec_type, &
-        set_o3c_container
+   USE ai_contraction_sphi, ONLY: abc_contract
+   USE ai_overlap3, ONLY: overlap3
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE dbcsr_api, ONLY: dbcsr_get_block_p, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
+   USE orbital_pointers, ONLY: ncoset
+   USE qs_o3c_types, ONLY: &
+      get_o3c_container, get_o3c_iterator_info, get_o3c_vec, o3c_container_type, o3c_iterate, &
+      o3c_iterator_create, o3c_iterator_release, o3c_iterator_type, o3c_vec_type, &
+      set_o3c_container
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num
 #include "./base/base_uses.f90"
@@ -48,11 +48,11 @@ CONTAINS
          POINTER                                         :: matrix_p
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_o3c_integrals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: egfa, egfb, egfc, handle, i, iatom, icol, ikind, irow, iset, ispin, j, jatom, &
-         jkind, jset, katom, kkind, kset, mepos, ncoa, ncob, ncoc, ni, nj, nk, nseta, nsetb, &
-         nsetc, nspin, nthread, sgfa, sgfb, sgfc
+                 jkind, jset, katom, kkind, kset, mepos, ncoa, ncob, ncoc, ni, nj, nk, nseta, nsetb, &
+                 nsetc, nspin, nthread, sgfa, sgfb, sgfc
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, lc_max, &
                                                             lc_min, npgfa, npgfb, npgfc, nsgfa, &
                                                             nsgfb, nsgfc
@@ -171,17 +171,17 @@ CONTAINS
          ALLOCATE (tvec(nk, nspin))
          tvec(:, :) = 0.0_dp
 
-         rjk(1:3) = rik(1:3)-rij(1:3)
+         rjk(1:3) = rik(1:3) - rij(1:3)
          dij = SQRT(SUM(rij**2))
          dik = SQRT(SUM(rik**2))
          djk = SQRT(SUM(rjk**2))
 
          DO iset = 1, nseta
             DO jset = 1, nsetb
-               IF (set_radius_a(iset)+set_radius_b(jset) < dij) CYCLE
+               IF (set_radius_a(iset) + set_radius_b(jset) < dij) CYCLE
                DO kset = 1, nsetc
-                  IF (set_radius_a(iset)+set_radius_c(kset) < dik) CYCLE
-                  IF (set_radius_b(jset)+set_radius_c(kset) < djk) CYCLE
+                  IF (set_radius_a(iset) + set_radius_c(kset) < dik) CYCLE
+                  IF (set_radius_b(jset) + set_radius_c(kset) < djk) CYCLE
 
                   ncoa = npgfa(iset)*ncoset(la_max(iset))
                   ncob = npgfb(jset)*ncoset(lb_max(jset))
@@ -191,9 +191,9 @@ CONTAINS
                   sgfb = first_sgfb(1, jset)
                   sgfc = first_sgfc(1, kset)
 
-                  egfa = sgfa+nsgfa(iset)-1
-                  egfb = sgfb+nsgfb(jset)-1
-                  egfc = sgfc+nsgfc(kset)-1
+                  egfa = sgfa + nsgfa(iset) - 1
+                  egfb = sgfb + nsgfb(jset) - 1
+                  egfc = sgfc + nsgfc(kset) - 1
 
                   IF (ncoa*ncob*ncoc > 0) THEN
                      ALLOCATE (sabc(ncoa, ncob, ncoc))
@@ -246,7 +246,7 @@ CONTAINS
          END DO
          IF (do_force) THEN
             ! translational invariance
-            iadbc(:, :, :, :) = -idabc(:, :, :, :)-iabdc(:, :, :, :)
+            iadbc(:, :, :, :) = -idabc(:, :, :, :) - iabdc(:, :, :, :)
             !
             ! get the atom indices
             CALL get_o3c_iterator_info(o3c_iterator, mepos=mepos, &
@@ -274,9 +274,9 @@ CONTAINS
                                       row=irow, col=icol, BLOCK=pblock, found=found)
                IF (found) THEN
                   IF (trans) THEN
-                     pmat(:, :) = pmat(:, :)+TRANSPOSE(pblock(:, :))
+                     pmat(:, :) = pmat(:, :) + TRANSPOSE(pblock(:, :))
                   ELSE
-                     pmat(:, :) = pmat(:, :)+pblock(:, :)
+                     pmat(:, :) = pmat(:, :) + pblock(:, :)
                   END IF
                END IF
             END DO
@@ -444,11 +444,11 @@ CONTAINS
          IF (found) THEN
             IF (trans) THEN
                DO ik = 1, nk
-                  pblock(:, :) = pblock(:, :)+v(ik)*TRANSPOSE(iabc(:, :, ik))
+                  pblock(:, :) = pblock(:, :) + v(ik)*TRANSPOSE(iabc(:, :, ik))
                END DO
             ELSE
                DO ik = 1, nk
-                  pblock(:, :) = pblock(:, :)+v(ik)*iabc(:, :, ik)
+                  pblock(:, :) = pblock(:, :) + v(ik)*iabc(:, :, ik)
                END DO
             END IF
          END IF

@@ -14,11 +14,11 @@
 ! **************************************************************************************************
 MODULE eigenvalueproblems
 
-   USE kinds,                           ONLY: dp
-   USE lapack,                          ONLY: lapack_cgesvd,&
-                                              lapack_chpev,&
-                                              lapack_sgesvd,&
-                                              lapack_ssyev
+   USE kinds, ONLY: dp
+   USE lapack, ONLY: lapack_cgesvd, &
+                     lapack_chpev, &
+                     lapack_sgesvd, &
+                     lapack_ssyev
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -58,12 +58,12 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT)                         :: eigenvalues(:), eigenvectors(:, :)
 
       CHARACTER(len=*), PARAMETER :: routineN = 'diagonalise_ssyev', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       CHARACTER, PARAMETER                               :: jobz = "V"
 
       CHARACTER                                          :: uplo
       INTEGER                                            :: info, lda, lwork
-      REAL(KIND=dp)                                      :: work(3*mysize-1)
+      REAL(KIND=dp)                                      :: work(3*mysize - 1)
 
       IF (storageform(1:5) == "Lower" .OR. &
           storageform(1:5) == "LOWER" .OR. &
@@ -78,7 +78,7 @@ CONTAINS
       END IF
 
       lda = SIZE(matrix, 1)
-      lwork = 3*mysize-1
+      lwork = 3*mysize - 1
 
       eigenvectors = matrix
 
@@ -108,13 +108,13 @@ CONTAINS
       COMPLEX(KIND=dp), INTENT(OUT)                      :: eigenvectors(:, :)
 
       CHARACTER(len=*), PARAMETER :: routineN = 'diagonalise_chpev', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       CHARACTER, PARAMETER                               :: jobz = "V"
 
       CHARACTER                                          :: uplo
       INTEGER                                            :: info
-      COMPLEX(KIND=dp)                                   :: work(2*mysize-1)
-      REAL(KIND=dp)                                      :: rwork(3*mysize-2)
+      COMPLEX(KIND=dp)                                   :: work(2*mysize - 1)
+      REAL(KIND=dp)                                      :: rwork(3*mysize - 2)
 
       IF (storageform(1:5) == "Lower" .OR. &
           storageform(1:5) == "LOWER" .OR. &
@@ -156,9 +156,9 @@ CONTAINS
       CHARACTER, PARAMETER                               :: jobu = "A", jobvt = "A"
 
       INTEGER                                            :: info, lda, ldu, ldvt, lwork
-      REAL(KIND=dp)                                      :: work(25*(mrow+ncol))
+      REAL(KIND=dp)                                      :: work(25*(mrow + ncol))
 
-      lwork = 25*(mrow+ncol)
+      lwork = 25*(mrow + ncol)
       lda = SIZE(matrix, 1)
       ldu = SIZE(uvec, 1)
       ldvt = SIZE(vtvec, 1)
@@ -191,10 +191,10 @@ CONTAINS
       CHARACTER, PARAMETER                               :: jobu = "A", jobvt = "A"
 
       INTEGER                                            :: info, lda, ldu, ldvt, lwork
-      COMPLEX(KIND=dp)                                   :: work(25*(mrow+ncol))
-      REAL(KIND=dp)                                      :: rwork(25*(mrow+ncol))
+      COMPLEX(KIND=dp)                                   :: work(25*(mrow + ncol))
+      REAL(KIND=dp)                                      :: rwork(25*(mrow + ncol))
 
-      lwork = 25*(mrow+ncol)
+      lwork = 25*(mrow + ncol)
       lda = SIZE(matrix, 1)
       ldu = SIZE(uvec, 1)
       ldvt = SIZE(vtvec, 1)

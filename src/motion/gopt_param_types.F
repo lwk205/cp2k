@@ -11,16 +11,16 @@
 ! **************************************************************************************************
 MODULE gopt_param_types
 
-   USE input_constants,                 ONLY: default_bfgs_method_id,&
-                                              default_cell_method_id,&
-                                              default_cg_method_id,&
-                                              default_lbfgs_method_id,&
-                                              default_minimization_method_id,&
-                                              default_ts_method_id,&
-                                              none_ts_method_id
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
+   USE input_constants, ONLY: default_bfgs_method_id, &
+                              default_cell_method_id, &
+                              default_cg_method_id, &
+                              default_lbfgs_method_id, &
+                              default_minimization_method_id, &
+                              default_ts_method_id, &
+                              none_ts_method_id
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -80,11 +80,11 @@ CONTAINS
       TYPE(gopt_param_type), POINTER                     :: gopt_param
 
       CHARACTER(len=*), PARAMETER :: routineN = 'gopt_param_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (gopt_param)
 
-      last_gopt_param_id = last_gopt_param_id+1
+      last_gopt_param_id = last_gopt_param_id + 1
       gopt_param%id_nr = last_gopt_param_id
       gopt_param%ref_count = 1
    END SUBROUTINE gopt_param_create
@@ -104,7 +104,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: type_id
 
       CHARACTER(len=*), PARAMETER :: routineN = 'gopt_param_read', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(gopt_param))
       CPASSERT(ASSOCIATED(gopt_section))
@@ -172,11 +172,11 @@ CONTAINS
       TYPE(gopt_param_type), POINTER                     :: gopt_param
 
       CHARACTER(len=*), PARAMETER :: routineN = 'gopt_param_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(gopt_param))
       CPASSERT(gopt_param%ref_count > 0)
-      gopt_param%ref_count = gopt_param%ref_count+1
+      gopt_param%ref_count = gopt_param%ref_count + 1
    END SUBROUTINE gopt_param_retain
 
 ! **************************************************************************************************
@@ -189,11 +189,11 @@ CONTAINS
       TYPE(gopt_param_type), POINTER                     :: gopt_param
 
       CHARACTER(len=*), PARAMETER :: routineN = 'gopt_param_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(gopt_param)) THEN
          CPASSERT(gopt_param%ref_count > 0)
-         gopt_param%ref_count = gopt_param%ref_count-1
+         gopt_param%ref_count = gopt_param%ref_count - 1
          IF (gopt_param%ref_count == 0) THEN
             DEALLOCATE (gopt_param)
          END IF

@@ -19,17 +19,17 @@
 !> - 08.2014 moevd qs-related stuff into new qs_kind_types.F [Ole Schuett]
 ! **************************************************************************************************
 MODULE atomic_kind_types
-   USE damping_dipole_types,            ONLY: damping_p_release,&
-                                              damping_p_type
-   USE external_potential_types,        ONLY: deallocate_potential,&
-                                              fist_potential_type,&
-                                              get_potential
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE periodic_table,                  ONLY: get_ptable_info
-   USE shell_potential_types,           ONLY: shell_kind_type,&
-                                              shell_release,&
-                                              shell_retain
+   USE damping_dipole_types, ONLY: damping_p_release, &
+                                   damping_p_type
+   USE external_potential_types, ONLY: deallocate_potential, &
+                                       fist_potential_type, &
+                                       get_potential
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE periodic_table, ONLY: get_ptable_info
+   USE shell_potential_types, ONLY: shell_kind_type, &
+                                    shell_release, &
+                                    shell_retain
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -87,7 +87,7 @@ CONTAINS
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_atomic_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nkind
 
@@ -157,7 +157,7 @@ CONTAINS
       TYPE(damping_p_type), OPTIONAL, POINTER            :: damping
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_atomic_kind', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(fist_potential)) fist_potential => atomic_kind%fist_potential
       IF (PRESENT(element_symbol)) element_symbol = atomic_kind%element_symbol
@@ -243,7 +243,7 @@ CONTAINS
                                                             damping_present
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_atomic_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, iatom, ikind, nkind
       TYPE(atomic_kind_type), POINTER                    :: atomic_kind
@@ -275,7 +275,7 @@ CONTAINS
                maxatom = MAX(maxatom, atomic_kind%natom)
             END IF
             IF (PRESENT(natom)) THEN
-               natom = natom+atomic_kind_set(ikind)%natom
+               natom = natom + atomic_kind_set(ikind)%natom
             END IF
             IF (PRESENT(fist_potential_present)) THEN
                IF (ASSOCIATED(fist_potential)) THEN
@@ -350,7 +350,7 @@ CONTAINS
       TYPE(damping_p_type), OPTIONAL, POINTER            :: damping
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_atomic_kind', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: n
 

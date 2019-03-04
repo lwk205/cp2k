@@ -14,48 +14,48 @@
 !> \author Rustam Z Khaliullin
 ! **************************************************************************************************
 MODULE mscfg_methods
-   USE almo_scf_types,                  ONLY: almo_scf_env_type
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE cell_types,                      ONLY: cell_type
-   USE cp_dbcsr_operations,             ONLY: copy_fm_to_dbcsr
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_methods,               ONLY: create_small_subsys
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_release,&
-                                              cp_subsys_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_create,&
-                                              dbcsr_type_no_symmetry
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: almo_frz_crystal,&
-                                              almo_frz_none,&
-                                              do_qs,&
-                                              molecular_guess
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: default_string_length
-   USE molecule_types,                  ONLY: get_molecule_set_info,&
-                                              molecule_type
-   USE mscfg_types,                     ONLY: molecular_scf_guess_env_init,&
-                                              molecular_scf_guess_env_type,&
-                                              mscfg_max_moset_size
-   USE particle_list_types,             ONLY: particle_list_type
-   USE qs_energy,                       ONLY: qs_energies
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment,                  ONLY: qs_init
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_env_create,&
-                                              qs_env_release,&
-                                              qs_environment_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE almo_scf_types, ONLY: almo_scf_env_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE cell_types, ONLY: cell_type
+   USE cp_dbcsr_operations, ONLY: copy_fm_to_dbcsr
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_methods, ONLY: create_small_subsys
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_release, &
+                              cp_subsys_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_create, &
+                        dbcsr_type_no_symmetry
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: almo_frz_crystal, &
+                              almo_frz_none, &
+                              do_qs, &
+                              molecular_guess
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: default_string_length
+   USE molecule_types, ONLY: get_molecule_set_info, &
+                             molecule_type
+   USE mscfg_types, ONLY: molecular_scf_guess_env_init, &
+                          molecular_scf_guess_env_type, &
+                          mscfg_max_moset_size
+   USE particle_list_types, ONLY: particle_list_type
+   USE qs_energy, ONLY: qs_energies
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment, ONLY: qs_init
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_env_create, &
+                                   qs_env_release, &
+                                   qs_environment_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -81,7 +81,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'loop_over_molecules', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nmols
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: charge_of_frag, first_atom_of_frag, &
@@ -142,14 +142,14 @@ CONTAINS
                                                             charge_of_frag, multip_of_frag
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calcs_on_isolated_molecules', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: name
       CHARACTER(LEN=default_string_length), &
          DIMENSION(:), POINTER                           :: atom_type
       INTEGER :: first_atom, force_method, global_charge, global_multpl, handle, i, ifrag, imo, &
-         isize, j, k, last_atom, my_targ, nb_eigenval_stored, nmo, nmo_of_frag, nmosets_of_frag, &
-         tot_added_mos, tot_isize
+                 isize, j, k, last_atom, my_targ, nb_eigenval_stored, nmo, nmo_of_frag, nmosets_of_frag, &
+                 tot_added_mos, tot_isize
       INTEGER, DIMENSION(:), POINTER                     :: atom_index, atom_list
       LOGICAL                                            :: global_almo_scf_keyword, smear_almo_scf
       TYPE(almo_scf_env_type), POINTER                   :: almo_scf_env
@@ -197,7 +197,7 @@ CONTAINS
          IF (smear_almo_scf) THEN
             scf_section => section_vals_get_subs_vals(dft_section, "SCF")
             CALL section_vals_val_get(scf_section, "added_mos", i_val=tot_added_mos) !! Get total number of added MOs
-            tot_isize = last_atom_of_frag(nfrags)-first_atom_of_frag(1)+1 !! Get total number of atoms (assume consecutive atoms)
+            tot_isize = last_atom_of_frag(nfrags) - first_atom_of_frag(1) + 1 !! Get total number of atoms (assume consecutive atoms)
             !! Check that number of added MOs matches the number of atoms
             !! (to ensure compatibility, since each fragment will be computed with such parameters)
             IF (tot_isize .NE. tot_added_mos) THEN
@@ -258,7 +258,7 @@ CONTAINS
          ! It is important to have a linear scaling procedure here
          first_atom = first_atom_of_frag(ifrag)
          last_atom = last_atom_of_frag(ifrag)
-         isize = last_atom-first_atom+1
+         isize = last_atom - first_atom + 1
          ALLOCATE (atom_index(isize))
          atom_index(1:isize) = (/(i, i=first_atom, last_atom)/)
          !
@@ -324,10 +324,10 @@ CONTAINS
                IF (smear_almo_scf) THEN
                   !! Store MOs energies for ALMO smearing purpose
                   nmo_of_frag = SIZE(mos_of_frag(imo)%mo_set%eigenvalues)
-                  almo_scf_env%mo_energies(nb_eigenval_stored+1:nb_eigenval_stored+nmo_of_frag, imo) &
+                  almo_scf_env%mo_energies(nb_eigenval_stored + 1:nb_eigenval_stored + nmo_of_frag, imo) &
                      = mos_of_frag(imo)%mo_set%eigenvalues(:)
                   !! update stored energies offset. Assumes nmosets_of_frag == 1 (general smearing ALMO assumption)
-                  nb_eigenval_stored = nb_eigenval_stored+nmo_of_frag
+                  nb_eigenval_stored = nb_eigenval_stored + nmo_of_frag
                END IF
             END IF !! ALMO
 
@@ -378,7 +378,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: frag, nfrags, charge, multpl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_frag_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=11)                                  :: charI
       INTEGER                                            :: i, iw

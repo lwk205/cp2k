@@ -10,23 +10,23 @@
 !> \author MDB
 ! **************************************************************************************************
 MODULE mp2_setup
-   USE cp_eri_mme_interface,            ONLY: cp_eri_mme_init_read_input
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_constants,                 ONLY: do_eri_mme
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE mp2_types,                       ONLY: mp2_method_direct,&
-                                              mp2_method_gpw,&
-                                              mp2_method_none,&
-                                              mp2_ri_optimize_basis,&
-                                              mp2_type,&
-                                              ri_mp2_laplace,&
-                                              ri_mp2_method_gpw,&
-                                              ri_rpa_method_gpw
+   USE cp_eri_mme_interface, ONLY: cp_eri_mme_init_read_input
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_constants, ONLY: do_eri_mme
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE mp2_types, ONLY: mp2_method_direct, &
+                        mp2_method_gpw, &
+                        mp2_method_none, &
+                        mp2_ri_optimize_basis, &
+                        mp2_type, &
+                        ri_mp2_laplace, &
+                        ri_mp2_method_gpw, &
+                        ri_rpa_method_gpw
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -49,7 +49,7 @@ CONTAINS
       TYPE(mp2_type), INTENT(INOUT)                      :: mp2_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_mp2_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ival, unit_nr
       INTEGER, DIMENSION(:), POINTER                     :: tmplist
@@ -300,10 +300,10 @@ CONTAINS
       CALL section_vals_val_get(mp2_section, "OPT_RI_BASIS%NUM_FUNC", &
                                 i_vals=tmplist)
       IF (tmplist(1) > 0) THEN
-         ALLOCATE (mp2_env%ri_opt_param%RI_nset_per_l(0:SIZE(tmplist)-1))
+         ALLOCATE (mp2_env%ri_opt_param%RI_nset_per_l(0:SIZE(tmplist) - 1))
          mp2_env%ri_opt_param%RI_nset_per_l = 0
          DO ival = 1, SIZE(tmplist)
-            mp2_env%ri_opt_param%RI_nset_per_l(ival-1) = tmplist(ival)
+            mp2_env%ri_opt_param%RI_nset_per_l(ival - 1) = tmplist(ival)
          END DO
       END IF
 

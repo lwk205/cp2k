@@ -5,7 +5,7 @@
 ! **************************************************************************************************
 MODULE qs_rho_atom_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -67,7 +67,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: natom
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_rho_atom_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iat
 
@@ -107,7 +107,7 @@ CONTAINS
       TYPE(rho_atom_type), DIMENSION(:), POINTER         :: rho_atom_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_rho_atom_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iat, j, n, natom
 

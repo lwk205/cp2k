@@ -9,59 +9,59 @@
 !> \author Teodoro Laino 04.2007 [created]
 ! **************************************************************************************************
 MODULE qmmm_se_energy
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_mndo, do_method_mndod, do_method_pchg, do_method_pdg, &
-        do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1, &
-        do_qmmm_coulomb, do_qmmm_gauss, do_qmmm_none, do_qmmm_pcharge, do_qmmm_swave
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE multipole_types,                 ONLY: do_multipole_none
-   USE particle_types,                  ONLY: particle_type
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type,&
-                                              qmmm_pot_p_type,&
-                                              qmmm_pot_type
-   USE qmmm_util,                       ONLY: spherical_cutoff_factor
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_qmmm_types,                ONLY: qs_ks_qmmm_env_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_neighbor_lists,               ONLY: build_qs_neighbor_lists
-   USE qs_overlap,                      ONLY: build_overlap_matrix
-   USE semi_empirical_int_arrays,       ONLY: se_orbital_pointer
-   USE semi_empirical_integrals,        ONLY: corecore,&
-                                              rotnuc
-   USE semi_empirical_types,            ONLY: get_se_param,&
-                                              se_int_control_type,&
-                                              se_taper_type,&
-                                              semi_empirical_create,&
-                                              semi_empirical_release,&
-                                              semi_empirical_type,&
-                                              setup_se_int_control_type
-   USE semi_empirical_utils,            ONLY: get_se_type,&
-                                              se_param_set_default
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_get_block_p, &
+                        dbcsr_p_type, &
+                        dbcsr_set
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_mndo, do_method_mndod, do_method_pchg, do_method_pdg, &
+      do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1, &
+      do_qmmm_coulomb, do_qmmm_gauss, do_qmmm_none, do_qmmm_pcharge, do_qmmm_swave
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE multipole_types, ONLY: do_multipole_none
+   USE particle_types, ONLY: particle_type
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type, &
+                             qmmm_pot_p_type, &
+                             qmmm_pot_type
+   USE qmmm_util, ONLY: spherical_cutoff_factor
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_qmmm_types, ONLY: qs_ks_qmmm_env_type
+   USE qs_ks_types, ONLY: qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_neighbor_lists, ONLY: build_qs_neighbor_lists
+   USE qs_overlap, ONLY: build_overlap_matrix
+   USE semi_empirical_int_arrays, ONLY: se_orbital_pointer
+   USE semi_empirical_integrals, ONLY: corecore, &
+                                       rotnuc
+   USE semi_empirical_types, ONLY: get_se_param, &
+                                   se_int_control_type, &
+                                   se_taper_type, &
+                                   semi_empirical_create, &
+                                   semi_empirical_release, &
+                                   semi_empirical_type, &
+                                   setup_se_int_control_type
+   USE semi_empirical_utils, ONLY: get_se_type, &
+                                   se_param_set_default
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -92,7 +92,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_se_qmmm_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iatom, ikind, itype, iw, &
                                                             natom, natorb_a, nkind
@@ -292,7 +292,7 @@ CONTAINS
       TYPE(particle_type), DIMENSION(:), POINTER         :: particles_qm
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_se_qmmm_matrix_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i1, i1L, i2, Imm, Imp, IndMM, &
                                                             Ipot, j1, j1L
@@ -310,7 +310,7 @@ CONTAINS
          LoopMM: DO Imp = 1, SIZE(Pot%mm_atom_index)
             Imm = Pot%mm_atom_index(Imp)
             IndMM = mm_atom_index(Imm)
-            r_pbc = pbc(particles_mm(IndMM)%r-particles_qm(IndQM)%r, mm_cell)
+            r_pbc = pbc(particles_mm(IndMM)%r - particles_qm(IndQM)%r, mm_cell)
             rt1 = r_pbc(1)
             rt2 = r_pbc(2)
             rt3 = r_pbc(3)
@@ -326,21 +326,21 @@ CONTAINS
                         se_int_control=se_int_control, se_taper=se_taper)
             CALL corecore(se_kind_a, se_kind_mm, rij, itype=itype, enuc=enuc, anag=anag, &
                           se_int_control=se_int_control, se_taper=se_taper)
-            enuclear = enuclear+enuc
+            enuclear = enuclear + enuc
             ! Contribution to the iatom block
             ! Computation of the QMMM core matrix
             i2 = 0
             DO i1L = 1, se_kind_a%natorb
                i1 = se_orbital_pointer(i1L)
-               DO j1L = 1, i1L-1
+               DO j1L = 1, i1L - 1
                   j1 = se_orbital_pointer(j1L)
-                  i2 = i2+1
-                  h_block_a(i1, j1) = h_block_a(i1, j1)+e1b(i2)
+                  i2 = i2 + 1
+                  h_block_a(i1, j1) = h_block_a(i1, j1) + e1b(i2)
                   h_block_a(j1, i1) = h_block_a(i1, j1)
                END DO
                j1 = se_orbital_pointer(j1L)
-               i2 = i2+1
-               h_block_a(i1, j1) = h_block_a(i1, j1)+e1b(i2)
+               i2 = i2 + 1
+               h_block_a(i1, j1) = h_block_a(i1, j1) + e1b(i2)
             END DO
          END DO LoopMM
       END DO MainLoopPot

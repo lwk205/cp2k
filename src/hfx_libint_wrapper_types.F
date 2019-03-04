@@ -11,8 +11,8 @@
 ! **************************************************************************************************
 MODULE hfx_libint_wrapper_types
 
-   USE ISO_C_BINDING,                   ONLY: C_DOUBLE,&
-                                              C_PTR
+   USE ISO_C_BINDING, ONLY: C_DOUBLE, &
+                            C_PTR
 
    IMPLICIT NONE
    PRIVATE
@@ -38,11 +38,11 @@ MODULE hfx_libint_wrapper_types
 
    INTEGER, PARAMETER :: libint_max_am = __LIBINT_MAX_AM
    INTEGER, PARAMETER :: libderiv_max_am1 = __LIBDERIV_MAX_AM1
-   INTEGER, PARAMETER :: prim_data_f_size = 4*(libint_max_am-1)+1
-   INTEGER, PARAMETER :: libint_vrr_classes_size = 2*(libint_max_am-1)+1
-   INTEGER, PARAMETER :: libint_dvrr_classes_size = 2*(libderiv_max_am1-1)+1
-   INTEGER, PARAMETER :: build_eri_size = libint_max_am-1
-   INTEGER, PARAMETER :: build_deriv1_eri_size = libderiv_max_am1-1
+   INTEGER, PARAMETER :: prim_data_f_size = 4*(libint_max_am - 1) + 1
+   INTEGER, PARAMETER :: libint_vrr_classes_size = 2*(libint_max_am - 1) + 1
+   INTEGER, PARAMETER :: libint_dvrr_classes_size = 2*(libderiv_max_am1 - 1) + 1
+   INTEGER, PARAMETER :: build_eri_size = libint_max_am - 1
+   INTEGER, PARAMETER :: build_deriv1_eri_size = libderiv_max_am1 - 1
 
    TYPE, BIND(C) :: prim_data
       REAL(C_DOUBLE) :: F(prim_data_f_size)

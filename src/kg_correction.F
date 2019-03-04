@@ -10,45 +10,45 @@
 !> \author Martin Haeufel and Florian Schiffmann
 ! **************************************************************************************************
 MODULE kg_correction
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_p_type,&
-                                              dbcsr_trace
-   USE input_constants,                 ONLY: kg_tnadd_atomic,&
-                                              kg_tnadd_embed,&
-                                              kg_tnadd_embed_ri,&
-                                              kg_tnadd_none
-   USE kg_environment_types,            ONLY: kg_environment_type
-   USE kinds,                           ONLY: dp
-   USE lri_environment_methods,         ONLY: calculate_lri_densities,&
-                                              lri_kg_rho_update
-   USE lri_environment_types,           ONLY: lri_density_type,&
-                                              lri_environment_type,&
-                                              lri_kind_type
-   USE lri_forces,                      ONLY: calculate_lri_forces
-   USE lri_ks_methods,                  ONLY: calculate_lri_ks_matrix
-   USE message_passing,                 ONLY: mp_sum
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace,&
-                                              integrate_v_rspace_one_center
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_rho_methods,                  ONLY: qs_rho_rebuild,&
-                                              qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_create,&
-                                              qs_rho_get,&
-                                              qs_rho_release,&
-                                              qs_rho_set,&
-                                              qs_rho_type
-   USE qs_vxc,                          ONLY: qs_vxc_create
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_p_type, &
+                        dbcsr_trace
+   USE input_constants, ONLY: kg_tnadd_atomic, &
+                              kg_tnadd_embed, &
+                              kg_tnadd_embed_ri, &
+                              kg_tnadd_none
+   USE kg_environment_types, ONLY: kg_environment_type
+   USE kinds, ONLY: dp
+   USE lri_environment_methods, ONLY: calculate_lri_densities, &
+                                      lri_kg_rho_update
+   USE lri_environment_types, ONLY: lri_density_type, &
+                                    lri_environment_type, &
+                                    lri_kind_type
+   USE lri_forces, ONLY: calculate_lri_forces
+   USE lri_ks_methods, ONLY: calculate_lri_ks_matrix
+   USE message_passing, ONLY: mp_sum
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: pw_p_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace, &
+                                     integrate_v_rspace_one_center
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_rho_methods, ONLY: qs_rho_rebuild, &
+                             qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_create, &
+                           qs_rho_get, &
+                           qs_rho_release, &
+                           qs_rho_set, &
+                           qs_rho_type
+   USE qs_vxc, ONLY: qs_vxc_create
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -182,7 +182,7 @@ CONTAINS
       DEALLOCATE (vxc_rho)
       ekin_mol = -ekin_imol
       xcvirial(1:3, 1:3) = 0.0_dp
-      IF (use_virial) xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3)-virial%pv_xc(1:3, 1:3)
+      IF (use_virial) xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3) - virial%pv_xc(1:3, 1:3)
 
       ! loop over all subsets
       DO isub = 1, kg_env%nsubsets
@@ -194,7 +194,7 @@ CONTAINS
          ! calc Hohenberg-Kohn kin. energy of the density corresp. to the remaining molecular block(s)
          CALL qs_vxc_create(ks_env=ks_env, rho_struct=rho_struct, xc_section=kg_env%xc_section_kg, &
                             vxc_rho=vxc_rho, vxc_tau=vxc_tau, exc=ekin_imol)
-         ekin_mol = ekin_mol+ekin_imol
+         ekin_mol = ekin_mol + ekin_imol
 
          DO ispin = 1, nspins
             vxc_rho(ispin)%pw%cr3d = -vxc_rho(ispin)%pw%cr3d*vxc_rho(ispin)%pw%pw_grid%dvol
@@ -210,7 +210,7 @@ CONTAINS
          DEALLOCATE (vxc_rho)
 
          IF (use_virial) THEN
-            xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3)+virial%pv_xc(1:3, 1:3)
+            xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3) + virial%pv_xc(1:3, 1:3)
          END IF
 
       END DO
@@ -243,7 +243,7 @@ CONTAINS
       LOGICAL                                            :: calc_force
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_ekin_embed_lri', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: color, handle, iatom, ikind, imol, &
                                                             ispin, isub, natom, nkind, nspins
@@ -330,7 +330,7 @@ CONTAINS
       DEALLOCATE (vxc_rho)
       ekin_mol = -ekin_imol
       xcvirial(1:3, 1:3) = 0.0_dp
-      IF (use_virial) xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3)-virial%pv_xc(1:3, 1:3)
+      IF (use_virial) xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3) - virial%pv_xc(1:3, 1:3)
 
       ! loop over all subsets
       DO isub = 1, kg_env%nsubsets
@@ -346,7 +346,7 @@ CONTAINS
          ! calc Hohenberg-Kohn kin. energy of the density corresp. to the remaining molecular block(s)
          CALL qs_vxc_create(ks_env=ks_env, rho_struct=rho_struct, xc_section=kg_env%xc_section_kg, &
                             vxc_rho=vxc_rho, vxc_tau=vxc_tau, exc=ekin_imol)
-         ekin_mol = ekin_mol+ekin_imol
+         ekin_mol = ekin_mol + ekin_imol
 
          DO ispin = 1, nspins
             vxc_rho(ispin)%pw%cr3d = -vxc_rho(ispin)%pw%cr3d*vxc_rho(ispin)%pw%pw_grid%dvol
@@ -360,7 +360,7 @@ CONTAINS
          DEALLOCATE (vxc_rho)
 
          IF (use_virial) THEN
-            xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3)+virial%pv_xc(1:3, 1:3)
+            xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3) + virial%pv_xc(1:3, 1:3)
          END IF
 
       END DO
@@ -409,7 +409,7 @@ CONTAINS
       LOGICAL                                            :: calc_force
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_ekin_ri_embed', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: color, handle, iatom, ikind, imol, &
                                                             ispin, isub, natom, nkind, nspins
@@ -485,7 +485,7 @@ CONTAINS
       DEALLOCATE (vxc_rho)
       ekin_mol = -ekin_imol
       xcvirial(1:3, 1:3) = 0.0_dp
-      IF (use_virial) xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3)-virial%pv_xc(1:3, 1:3)
+      IF (use_virial) xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3) - virial%pv_xc(1:3, 1:3)
 !deb
 !     WRITE(6,*) " E KIN (full)       ",-ekin_mol
 !deb
@@ -506,7 +506,7 @@ CONTAINS
          NULLIFY (vxc_rho, vxc_tau)
          CALL qs_vxc_create(ks_env=ks_env, rho_struct=rho_struct, xc_section=kg_env%xc_section_kg, &
                             vxc_rho=vxc_rho, vxc_tau=vxc_tau, exc=ekin_imol)
-         ekin_mol = ekin_mol+ekin_imol
+         ekin_mol = ekin_mol + ekin_imol
 !deb
 !     WRITE(6,*) " E KIN (molecule)    ",isub,ekin_imol
 !deb
@@ -523,7 +523,7 @@ CONTAINS
          DEALLOCATE (vxc_rho)
 
          IF (use_virial) THEN
-            xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3)+virial%pv_xc(1:3, 1:3)
+            xcvirial(1:3, 1:3) = xcvirial(1:3, 1:3) + virial%pv_xc(1:3, 1:3)
          END IF
 
       END DO

@@ -12,30 +12,30 @@
 ! **************************************************************************************************
 MODULE input_cp2k_binary_restarts
 
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_unit_nr,&
-                                              debug_print_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE extended_system_types,           ONLY: lnhc_parameters_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_bcast
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: angstrom
-   USE print_messages,                  ONLY: print_message
-   USE string_table,                    ONLY: id2str,&
-                                              s2s,&
-                                              str2id
-   USE topology_types,                  ONLY: atom_info_type,&
-                                              topology_parameters_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_unit_nr, &
+                                 debug_print_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE extended_system_types, ONLY: lnhc_parameters_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_bcast
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: angstrom
+   USE print_messages, ONLY: print_message
+   USE string_table, ONLY: id2str, &
+                           s2s, &
+                           str2id
+   USE topology_types, ONLY: atom_info_type, &
+                             topology_parameters_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -74,7 +74,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: binary_file_read
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_binary_coordinates', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: binary_restart_file_name
       CHARACTER(LEN=default_string_length)               :: string
@@ -301,7 +301,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: binary_file_read
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_binary_cs_coordinates', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: binary_restart_file_name, message
       CHARACTER(LEN=default_string_length)               :: section_label, section_name
@@ -500,7 +500,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: binary_file_read
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_binary_velocities', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: binary_restart_file_name, message
       CHARACTER(LEN=default_string_length)               :: section_label, section_name
@@ -684,7 +684,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_binary_thermostats_nose', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: section_label, section_name
       INTEGER                                            :: handle, i, idx, input_unit, istat, j, &
@@ -761,9 +761,9 @@ CONTAINS
          END IF
          CALL mp_bcast(rbuf, para_env%source, para_env%group)
          DO i = 1, SIZE(nhc%nvt, 2)
-            idx = (nhc%map_info%index(i)-1)*nhc%nhc_len
+            idx = (nhc%map_info%index(i) - 1)*nhc%nhc_len
             DO j = 1, SIZE(nhc%nvt, 1)
-               idx = idx+1
+               idx = idx + 1
                nhc%nvt(j, i)%eta = rbuf(idx)
             END DO
          END DO
@@ -781,9 +781,9 @@ CONTAINS
          END IF
          CALL mp_bcast(rbuf, para_env%source, para_env%group)
          DO i = 1, SIZE(nhc%nvt, 2)
-            idx = (nhc%map_info%index(i)-1)*nhc%nhc_len
+            idx = (nhc%map_info%index(i) - 1)*nhc%nhc_len
             DO j = 1, SIZE(nhc%nvt, 1)
-               idx = idx+1
+               idx = idx + 1
                nhc%nvt(j, i)%v = rbuf(idx)
             END DO
          END DO
@@ -801,9 +801,9 @@ CONTAINS
          END IF
          CALL mp_bcast(rbuf, para_env%source, para_env%group)
          DO i = 1, SIZE(nhc%nvt, 2)
-            idx = (nhc%map_info%index(i)-1)*nhc%nhc_len
+            idx = (nhc%map_info%index(i) - 1)*nhc%nhc_len
             DO j = 1, SIZE(nhc%nvt, 1)
-               idx = idx+1
+               idx = idx + 1
                nhc%nvt(j, i)%mass = rbuf(idx)
             END DO
          END DO
@@ -821,9 +821,9 @@ CONTAINS
          END IF
          CALL mp_bcast(rbuf, para_env%source, para_env%group)
          DO i = 1, SIZE(nhc%nvt, 2)
-            idx = (nhc%map_info%index(i)-1)*nhc%nhc_len
+            idx = (nhc%map_info%index(i) - 1)*nhc%nhc_len
             DO j = 1, SIZE(nhc%nvt, 1)
-               idx = idx+1
+               idx = idx + 1
                nhc%nvt(j, i)%f = rbuf(idx)
             END DO
          END DO

@@ -11,54 +11,54 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE qs_environment_methods
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_dist2d_to_dist
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_distribution_type
-   USE distribution_2d_types,           ONLY: distribution_2d_release,&
-                                              distribution_2d_type
-   USE distribution_methods,            ONLY: distribute_molecules_2d
-   USE ewald_environment_types,         ONLY: ewald_environment_type
-   USE ewald_pw_methods,                ONLY: ewald_pw_grid_update
-   USE ewald_pw_types,                  ONLY: ewald_pw_type
-   USE input_constants,                 ONLY: do_ppl_grid
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_methods,                  ONLY: pw_env_create,&
-                                              pw_env_rebuild
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_release,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_release,&
-                                              pw_type
-   USE qs_charges_types,                ONLY: qs_charges_create,&
-                                              qs_charges_release,&
-                                              qs_charges_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_kind_types,                   ONLY: get_qs_kind_set,&
-                                              has_nlcc,&
-                                              qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_matrix_pools,                 ONLY: mpools_rebuild_fm_pools
-   USE qs_outer_scf,                    ONLY: outer_loop_variables_count
-   USE qs_rho0_types,                   ONLY: rho0_mpole_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_dist2d_to_dist
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_distribution_type
+   USE distribution_2d_types, ONLY: distribution_2d_release, &
+                                    distribution_2d_type
+   USE distribution_methods, ONLY: distribute_molecules_2d
+   USE ewald_environment_types, ONLY: ewald_environment_type
+   USE ewald_pw_methods, ONLY: ewald_pw_grid_update
+   USE ewald_pw_types, ONLY: ewald_pw_type
+   USE input_constants, ONLY: do_ppl_grid
+   USE kinds, ONLY: dp
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: molecule_type
+   USE particle_types, ONLY: particle_type
+   USE pw_env_methods, ONLY: pw_env_create, &
+                             pw_env_rebuild
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_release, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_release, &
+                       pw_type
+   USE qs_charges_types, ONLY: qs_charges_create, &
+                               qs_charges_release, &
+                               qs_charges_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_kind_types, ONLY: get_qs_kind_set, &
+                            has_nlcc, &
+                            qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_matrix_pools, ONLY: mpools_rebuild_fm_pools
+   USE qs_outer_scf, ONLY: outer_loop_variables_count
+   USE qs_rho0_types, ONLY: rho0_mpole_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -206,7 +206,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_env_rebuild_pw_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: nlcc

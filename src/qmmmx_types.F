@@ -8,11 +8,11 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE qmmmx_types
-   USE cp_subsys_types,                 ONLY: cp_subsys_type
-   USE kinds,                           ONLY: dp
-   USE qmmm_types,                      ONLY: qmmm_env_get,&
-                                              qmmm_env_release,&
-                                              qmmm_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_type
+   USE kinds, ONLY: dp
+   USE qmmm_types, ONLY: qmmm_env_get, &
+                         qmmm_env_release, &
+                         qmmm_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,11 +65,11 @@ CONTAINS
       TYPE(qmmmx_env_type), POINTER                      :: qmmmx_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmmx_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(qmmmx_env))
       CPASSERT(qmmmx_env%ref_count > 0)
-      qmmmx_env%ref_count = qmmmx_env%ref_count+1
+      qmmmx_env%ref_count = qmmmx_env%ref_count + 1
    END SUBROUTINE qmmmx_env_retain
 
 ! **************************************************************************************************
@@ -81,11 +81,11 @@ CONTAINS
       TYPE(qmmmx_env_type), POINTER                      :: qmmmx_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmmx_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qmmmx_env)) THEN
          CPASSERT(qmmmx_env%ref_count > 0)
-         qmmmx_env%ref_count = qmmmx_env%ref_count-1
+         qmmmx_env%ref_count = qmmmx_env%ref_count - 1
          IF (qmmmx_env%ref_count == 0) THEN
             CALL qmmm_env_release(qmmmx_env%core)
             CALL qmmm_env_release(qmmmx_env%ext)

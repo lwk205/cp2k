@@ -10,41 +10,41 @@
 ! **************************************************************************************************
 MODULE motion_utils
 
-   USE cell_types,                      ONLY: cell_type
-   USE cp2k_info,                       ONLY: compile_revision,&
-                                              cp2k_version,&
-                                              r_datx,&
-                                              r_host_name,&
-                                              r_user_name
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_constants,                 ONLY: dump_atomic,&
-                                              dump_dcd,&
-                                              dump_dcd_aligned_cell,&
-                                              dump_pdb,&
-                                              dump_xmol
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              sp
-   USE machine,                         ONLY: m_flush
-   USE mathlib,                         ONLY: diamat_all
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: write_particle_coordinates
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: angstrom
-   USE virial_types,                    ONLY: virial_type
+   USE cell_types, ONLY: cell_type
+   USE cp2k_info, ONLY: compile_revision, &
+                        cp2k_version, &
+                        r_datx, &
+                        r_host_name, &
+                        r_user_name
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_constants, ONLY: dump_atomic, &
+                              dump_dcd, &
+                              dump_dcd_aligned_cell, &
+                              dump_pdb, &
+                              dump_xmol
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    sp
+   USE machine, ONLY: m_flush
+   USE mathlib, ONLY: diamat_all
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: write_particle_coordinates
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: angstrom
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -110,8 +110,8 @@ CONTAINS
             mass = 1.0_dp
             IF (mass_weighted) mass = particles(iparticle)%atomic_kind%mass
             CPASSERT(mass >= 0.0_dp)
-            masst = masst+mass
-            rcom = particles(iparticle)%r*mass+rcom
+            masst = masst + mass
+            rcom = particles(iparticle)%r*mass + rcom
          END DO
          CPASSERT(masst > 0.0_dp)
          rcom = rcom/masst
@@ -120,13 +120,13 @@ CONTAINS
          DO iparticle = 1, natoms
             mass = 1.0_dp
             IF (mass_weighted) mass = particles(iparticle)%atomic_kind%mass
-            rm = particles(iparticle)%r-rcom
-            Ip(1, 1) = Ip(1, 1)+mass*(rm(2)**2+rm(3)**2)
-            Ip(2, 2) = Ip(2, 2)+mass*(rm(1)**2+rm(3)**2)
-            Ip(3, 3) = Ip(3, 3)+mass*(rm(1)**2+rm(2)**2)
-            Ip(1, 2) = Ip(1, 2)-mass*(rm(1)*rm(2))
-            Ip(1, 3) = Ip(1, 3)-mass*(rm(1)*rm(3))
-            Ip(2, 3) = Ip(2, 3)-mass*(rm(2)*rm(3))
+            rm = particles(iparticle)%r - rcom
+            Ip(1, 1) = Ip(1, 1) + mass*(rm(2)**2 + rm(3)**2)
+            Ip(2, 2) = Ip(2, 2) + mass*(rm(1)**2 + rm(3)**2)
+            Ip(3, 3) = Ip(3, 3) + mass*(rm(1)**2 + rm(2)**2)
+            Ip(1, 2) = Ip(1, 2) - mass*(rm(1)*rm(2))
+            Ip(1, 3) = Ip(1, 3) - mass*(rm(1)*rm(3))
+            Ip(2, 3) = Ip(2, 3) - mass*(rm(2)*rm(3))
          END DO
          ! Diagonalize the Inertia Tensor
          CALL diamat_all(Ip, Ip_eigval)
@@ -162,7 +162,7 @@ CONTAINS
             mass = 1.0_dp
             IF (mass_weighted) mass = SQRT(particles(iparticle)%atomic_kind%mass)
             DO j = 1, 3
-               iseq = iseq+1
+               iseq = iseq + 1
                IF (j == k) Tr(iseq, k) = mass
             END DO
          END DO
@@ -180,22 +180,22 @@ CONTAINS
          DO iparticle = 1, natoms
             mass = 1.0_dp
             IF (mass_weighted) mass = SQRT(particles(iparticle)%atomic_kind%mass)
-            rm = particles(iparticle)%r-rcom
-            cp(1) = rm(1)*Ip(1, 1)+rm(2)*Ip(2, 1)+rm(3)*Ip(3, 1)
-            cp(2) = rm(1)*Ip(1, 2)+rm(2)*Ip(2, 2)+rm(3)*Ip(3, 2)
-            cp(3) = rm(1)*Ip(1, 3)+rm(2)*Ip(2, 3)+rm(3)*Ip(3, 3)
+            rm = particles(iparticle)%r - rcom
+            cp(1) = rm(1)*Ip(1, 1) + rm(2)*Ip(2, 1) + rm(3)*Ip(3, 1)
+            cp(2) = rm(1)*Ip(1, 2) + rm(2)*Ip(2, 2) + rm(3)*Ip(3, 2)
+            cp(3) = rm(1)*Ip(1, 3) + rm(2)*Ip(2, 3) + rm(3)*Ip(3, 3)
             ! X Rot
-            Rot((iparticle-1)*3+1, 1) = (cp(2)*Ip(1, 3)-Ip(1, 2)*cp(3))*mass
-            Rot((iparticle-1)*3+2, 1) = (cp(2)*Ip(2, 3)-Ip(2, 2)*cp(3))*mass
-            Rot((iparticle-1)*3+3, 1) = (cp(2)*Ip(3, 3)-Ip(3, 2)*cp(3))*mass
+            Rot((iparticle - 1)*3 + 1, 1) = (cp(2)*Ip(1, 3) - Ip(1, 2)*cp(3))*mass
+            Rot((iparticle - 1)*3 + 2, 1) = (cp(2)*Ip(2, 3) - Ip(2, 2)*cp(3))*mass
+            Rot((iparticle - 1)*3 + 3, 1) = (cp(2)*Ip(3, 3) - Ip(3, 2)*cp(3))*mass
             ! Y Rot
-            Rot((iparticle-1)*3+1, 2) = (cp(3)*Ip(1, 1)-Ip(1, 3)*cp(1))*mass
-            Rot((iparticle-1)*3+2, 2) = (cp(3)*Ip(2, 1)-Ip(2, 3)*cp(1))*mass
-            Rot((iparticle-1)*3+3, 2) = (cp(3)*Ip(3, 1)-Ip(3, 3)*cp(1))*mass
+            Rot((iparticle - 1)*3 + 1, 2) = (cp(3)*Ip(1, 1) - Ip(1, 3)*cp(1))*mass
+            Rot((iparticle - 1)*3 + 2, 2) = (cp(3)*Ip(2, 1) - Ip(2, 3)*cp(1))*mass
+            Rot((iparticle - 1)*3 + 3, 2) = (cp(3)*Ip(3, 1) - Ip(3, 3)*cp(1))*mass
             ! Z Rot
-            Rot((iparticle-1)*3+1, 3) = (cp(1)*Ip(1, 2)-Ip(1, 1)*cp(2))*mass
-            Rot((iparticle-1)*3+2, 3) = (cp(1)*Ip(2, 2)-Ip(2, 1)*cp(2))*mass
-            Rot((iparticle-1)*3+3, 3) = (cp(1)*Ip(3, 2)-Ip(3, 1)*cp(2))*mass
+            Rot((iparticle - 1)*3 + 1, 3) = (cp(1)*Ip(1, 2) - Ip(1, 1)*cp(2))*mass
+            Rot((iparticle - 1)*3 + 2, 3) = (cp(1)*Ip(2, 2) - Ip(2, 1)*cp(2))*mass
+            Rot((iparticle - 1)*3 + 3, 3) = (cp(1)*Ip(3, 2) - Ip(3, 1)*cp(2))*mass
          END DO
 
          ! Normalize Rotations and count the number of degree of freedom
@@ -210,13 +210,13 @@ CONTAINS
             ! Clean Rotational modes for spurious/numerical contamination
             IF (i < 3) THEN
                DO j = 1, i
-                  Rot(:, i+1) = Rot(:, i+1)-DOT_PRODUCT(Rot(:, i+1), Rot(:, j))*Rot(:, j)
+                  Rot(:, i + 1) = Rot(:, i + 1) - DOT_PRODUCT(Rot(:, i + 1), Rot(:, j))*Rot(:, j)
                END DO
             END IF
          END DO
       END IF
       IF (PRESENT(rot_dof)) rot_dof = COUNT(lrot == 1)
-      dof = dof+COUNT(lrot == 1)
+      dof = dof + COUNT(lrot == 1)
       iw = cp_print_key_unit_nr(logger, print_section, "ROTATIONAL_INFO", extension=".vibLog")
       IF (iw > 0) THEN
          WRITE (iw, '(T2,A,I6)') "ROT| Number of Rotovibrational vectors:", dof
@@ -231,8 +231,8 @@ CONTAINS
          DO i = 1, 3
             mat(:, i) = Tr(:, i)
             IF (lrot(i) == 1) THEN
-               iseq = iseq+1
-               mat(:, 3+iseq) = Rot(:, i)
+               iseq = iseq + 1
+               mat(:, 3 + iseq) = Rot(:, i)
             END IF
          END DO
       END IF
@@ -272,7 +272,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: extended_xmol_title
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_trajectory', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=4)                                   :: id_dcd
       CHARACTER(LEN=default_string_length)               :: id_label, id_wpc, my_act, my_ext, &
@@ -310,7 +310,7 @@ CONTAINS
       IF (PRESENT(act)) my_act = act
       IF (PRESENT(pk_name)) my_pk_name = pk_name
 
-      SELECT CASE (TRIM (my_pk_name))
+      SELECT CASE (TRIM(my_pk_name))
       CASE ("TRAJECTORY", "SHELL_TRAJECTORY", "CORE_TRAJECTORY")
          id_dcd = "CORD"
          id_wpc = "POS"
@@ -432,7 +432,7 @@ CONTAINS
                   DO i = 1, SIZE(force_mixing_indices)
                      ii = force_mixing_indices(i)
                      CPASSERT(ii <= SIZE(particle_set))
-                     fml_array((ii-1)*3+1:(ii-1)*3+3) = force_mixing_labels(i)
+                     fml_array((ii - 1)*3 + 1:(ii - 1)*3 + 3) = force_mixing_labels(i)
                   END DO
                ENDIF
             ENDIF
@@ -469,7 +469,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(OUT)                      :: my_form, my_ext
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_output_format', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: output_format
 
@@ -518,7 +518,7 @@ CONTAINS
          OPTIONAL                                        :: pos, act
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_stress_tensor', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: my_act, my_pos
       INTEGER                                            :: output_unit
@@ -592,7 +592,7 @@ CONTAINS
          OPTIONAL                                        :: pos, act
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_simulation_cell', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: my_act, my_pos
       INTEGER                                            :: output_unit

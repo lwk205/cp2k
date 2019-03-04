@@ -4,153 +4,153 @@
 !--------------------------------------------------------------------------------------------------!
 
 MODULE qs_tddfpt2_methods
-   USE admm_types,                      ONLY: admm_type
-   USE bibliography,                    ONLY: Iannuzzi2005,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type,&
-                                              get_blacs_info
-   USE cp_cfm_basic_linalg,             ONLY: cp_cfm_solve
-   USE cp_cfm_types,                    ONLY: cp_cfm_create,&
-                                              cp_cfm_p_type,&
-                                              cp_cfm_release,&
-                                              cp_cfm_set_all,&
-                                              cp_cfm_to_fm,&
-                                              cp_fm_to_cfm
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              tddfpt2_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_contracted_trace,&
-                                              cp_fm_scale,&
-                                              cp_fm_scale_and_add,&
-                                              cp_fm_trace,&
-                                              cp_fm_triangular_invert
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type,&
-                                              cp_fm_pool_type,&
-                                              fm_pool_create,&
-                                              fm_pool_create_fm,&
-                                              fm_pool_give_back_fm,&
-                                              fm_pool_release
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_p_type,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_copy_general, cp_fm_create, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_maxabsval, &
-        cp_fm_p_type, cp_fm_read_unformatted, cp_fm_release, cp_fm_set_all, cp_fm_set_submatrix, &
-        cp_fm_to_fm, cp_fm_type, cp_fm_write_unformatted
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_add_iter_level,&
-                                              cp_iterate,&
-                                              cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_generate_filename,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr,&
-                                              cp_rm_iter_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_deallocate_matrix, dbcsr_distribution_type, dbcsr_get_info, &
-        dbcsr_init_p, dbcsr_p_type, dbcsr_scale, dbcsr_set, dbcsr_type
-   USE hfx_admm_utils,                  ONLY: tddft_hfx_matrix
-   USE input_constants,                 ONLY: cholesky_dbcsr,&
-                                              cholesky_inverse,&
-                                              cholesky_off,&
-                                              cholesky_restore,&
-                                              tddfpt_dipole_berry,&
-                                              tddfpt_dipole_length,&
-                                              tddfpt_dipole_velocity
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_get_rval,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kahan_sum,                       ONLY: accurate_dot_product,&
-                                              accurate_sum
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp,&
-                                              int_8
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE mathconstants,                   ONLY: twopi,&
-                                              z_one,&
-                                              z_zero
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_irecv,&
-                                              mp_isend,&
-                                              mp_min,&
-                                              mp_sum,&
-                                              mp_wait
-   USE moments_utils,                   ONLY: get_reference_point
-   USE physcon,                         ONLY: evolt
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_mo_types,                     ONLY: allocate_mo_set,&
-                                              deallocate_mo_set,&
-                                              get_mo_set,&
-                                              init_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_moments,                      ONLY: build_berry_moment_matrix
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_operators_ao,                 ONLY: rRc_xyz_ao
-   USE qs_rho_methods,                  ONLY: qs_rho_rebuild,&
-                                              qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_create,&
-                                              qs_rho_get,&
-                                              qs_rho_release,&
-                                              qs_rho_set,&
-                                              qs_rho_type
-   USE qs_scf_methods,                  ONLY: eigensolver
-   USE qs_tddfpt2_subgroups,            ONLY: tddfpt_dbcsr_create_by_dist,&
-                                              tddfpt_sub_env_init,&
-                                              tddfpt_sub_env_release,&
-                                              tddfpt_subgroup_env_type
-   USE string_utilities,                ONLY: integer_to_string
-   USE util,                            ONLY: sort
-   USE xc,                              ONLY: xc_calc_2nd_deriv,&
-                                              xc_prep_2nd_deriv
-   USE xc_derivative_set_types,         ONLY: xc_derivative_set_type,&
-                                              xc_dset_release
-   USE xc_derivatives,                  ONLY: xc_functionals_get_needs
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_type
-   USE xc_rho_set_types,                ONLY: xc_rho_set_create,&
-                                              xc_rho_set_release,&
-                                              xc_rho_set_type,&
-                                              xc_rho_set_update
+   USE admm_types, ONLY: admm_type
+   USE bibliography, ONLY: Iannuzzi2005, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type, &
+                           get_blacs_info
+   USE cp_cfm_basic_linalg, ONLY: cp_cfm_solve
+   USE cp_cfm_types, ONLY: cp_cfm_create, &
+                           cp_cfm_p_type, &
+                           cp_cfm_release, &
+                           cp_cfm_set_all, &
+                           cp_cfm_to_fm, &
+                           cp_fm_to_cfm
+   USE cp_control_types, ONLY: dft_control_type, &
+                               tddfpt2_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_contracted_trace, &
+                                 cp_fm_scale, &
+                                 cp_fm_scale_and_add, &
+                                 cp_fm_trace, &
+                                 cp_fm_triangular_invert
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type, &
+                               cp_fm_pool_type, &
+                               fm_pool_create, &
+                               fm_pool_create_fm, &
+                               fm_pool_give_back_fm, &
+                               fm_pool_release
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_p_type, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_copy_general, cp_fm_create, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_maxabsval, &
+      cp_fm_p_type, cp_fm_read_unformatted, cp_fm_release, cp_fm_set_all, cp_fm_set_submatrix, &
+      cp_fm_to_fm, cp_fm_type, cp_fm_write_unformatted
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_add_iter_level, &
+                                 cp_iterate, &
+                                 cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_generate_filename, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr, &
+                                 cp_rm_iter_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_deallocate_matrix, dbcsr_distribution_type, dbcsr_get_info, &
+      dbcsr_init_p, dbcsr_p_type, dbcsr_scale, dbcsr_set, dbcsr_type
+   USE hfx_admm_utils, ONLY: tddft_hfx_matrix
+   USE input_constants, ONLY: cholesky_dbcsr, &
+                              cholesky_inverse, &
+                              cholesky_off, &
+                              cholesky_restore, &
+                              tddfpt_dipole_berry, &
+                              tddfpt_dipole_length, &
+                              tddfpt_dipole_velocity
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_get_rval, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kahan_sum, ONLY: accurate_dot_product, &
+                        accurate_sum
+   USE kinds, ONLY: default_path_length, &
+                    dp, &
+                    int_8
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE mathconstants, ONLY: twopi, &
+                            z_one, &
+                            z_zero
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_irecv, &
+                              mp_isend, &
+                              mp_min, &
+                              mp_sum, &
+                              mp_wait
+   USE moments_utils, ONLY: get_reference_point
+   USE physcon, ONLY: evolt
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_mo_types, ONLY: allocate_mo_set, &
+                          deallocate_mo_set, &
+                          get_mo_set, &
+                          init_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_moments, ONLY: build_berry_moment_matrix
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_operators_ao, ONLY: rRc_xyz_ao
+   USE qs_rho_methods, ONLY: qs_rho_rebuild, &
+                             qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_create, &
+                           qs_rho_get, &
+                           qs_rho_release, &
+                           qs_rho_set, &
+                           qs_rho_type
+   USE qs_scf_methods, ONLY: eigensolver
+   USE qs_tddfpt2_subgroups, ONLY: tddfpt_dbcsr_create_by_dist, &
+                                   tddfpt_sub_env_init, &
+                                   tddfpt_sub_env_release, &
+                                   tddfpt_subgroup_env_type
+   USE string_utilities, ONLY: integer_to_string
+   USE util, ONLY: sort
+   USE xc, ONLY: xc_calc_2nd_deriv, &
+                 xc_prep_2nd_deriv
+   USE xc_derivative_set_types, ONLY: xc_derivative_set_type, &
+                                      xc_dset_release
+   USE xc_derivatives, ONLY: xc_functionals_get_needs
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_type
+   USE xc_rho_set_types, ONLY: xc_rho_set_create, &
+                               xc_rho_set_release, &
+                               xc_rho_set_type, &
+                               xc_rho_set_update
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -390,7 +390,7 @@ CONTAINS
 
       ! multiplicity of molecular system
       IF (nspins > 1) THEN
-         mult = ABS(SIZE(gs_mos(1)%evals_occ)-SIZE(gs_mos(2)%evals_occ))+1
+         mult = ABS(SIZE(gs_mos(1)%evals_occ) - SIZE(gs_mos(2)%evals_occ)) + 1
          IF (mult > 2) &
             CALL cp_warn(__LOCATION__, "There is a convergence issue for multiplicity >= 3")
       ELSE
@@ -597,7 +597,7 @@ CONTAINS
       TYPE(tddfpt_subgroup_env_type), INTENT(in)         :: sub_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_create_work_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, igroup, ispin, istate, nao, &
                                                             nao_aux, ngroups, nspins
@@ -690,7 +690,7 @@ CONTAINS
          igroup = sub_env%group_distribution(para_env%mepos)
          ngroups = sub_env%ngroups
 
-         DO istate = ngroups-igroup, nstates, ngroups
+         DO istate = ngroups - igroup, nstates, ngroups
             DO ispin = 1, nspins
                CALL cp_fm_create(work_matrices%evects_sub(ispin, istate)%matrix, fm_struct_evects(ispin)%struct)
                CALL cp_fm_create(work_matrices%Aop_evects_sub(ispin, istate)%matrix, fm_struct_evects(ispin)%struct)
@@ -819,7 +819,7 @@ CONTAINS
       TYPE(tddfpt_subgroup_env_type), INTENT(in)         :: sub_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_release_work_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, istate
       TYPE(pw_pool_type), POINTER                        :: auxbas_pw_pool
@@ -916,7 +916,7 @@ CONTAINS
       TYPE(tddfpt_subgroup_env_type), INTENT(in)         :: sub_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_create_kernel_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao, nspins
       INTEGER, DIMENSION(maxspins)                       :: nmo_occ
@@ -1007,7 +1007,7 @@ CONTAINS
       TYPE(tddfpt_kernel_env_type), INTENT(inout)        :: kernel_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_release_kernel_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -1042,11 +1042,11 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_ks, matrix_s
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_init_ground_state_mos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(kind=dp), PARAMETER                           :: eps_dp = EPSILON(0.0_dp)
 
       INTEGER :: cholesky_method_inout, handle, icol_global, icol_local, imo, irow_global, &
-         irow_local, nao, ncol_local, nelectrons, nmo_occ, nmo_scf, nmo_virt, nrow_local, sign_int
+                 irow_local, nao, ncol_local, nelectrons, nmo_occ, nmo_scf, nmo_virt, nrow_local, sign_int
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: minrow_neg_array, minrow_pos_array, &
                                                             sum_sign_array
       INTEGER, DIMENSION(:), POINTER                     :: col_indices, row_indices
@@ -1069,7 +1069,7 @@ CONTAINS
       CALL get_mo_set(mo_set, nao=nao, nmo=nmo_scf, homo=nmo_occ, maxocc=maxocc, &
                       nelectron=nelectrons, occupation_numbers=mo_occ_scf)
 
-      nmo_virt = nao-nmo_occ
+      nmo_virt = nao - nmo_occ
 
       IF (nmo_virt <= 0) &
          CALL cp_abort(__LOCATION__, &
@@ -1112,7 +1112,7 @@ CONTAINS
       DO imo = 1, nmo_scf
          mo_occ_extended(imo) = mo_occ_scf(imo)
       END DO
-      mo_occ_extended(nmo_scf+1:) = 0.0_dp
+      mo_occ_extended(nmo_scf + 1:) = 0.0_dp
 
       ! ++ allocate temporary matrices
       NULLIFY (matrix_ks_fm, ortho_fm, work_fm)
@@ -1175,7 +1175,7 @@ CONTAINS
                sign_int = -1
             END IF
 
-            sum_sign_array(icol_global) = sum_sign_array(icol_global)+sign_int
+            sum_sign_array(icol_global) = sum_sign_array(icol_global) + sign_int
 
             irow_global = row_indices(irow_local)
             IF (sign_int > 0) THEN
@@ -1219,8 +1219,8 @@ CONTAINS
       CALL cp_fm_to_fm(mo_coeff_extended, gs_mos%mos_occ, ncol=nmo_occ, source_start=1, target_start=1)
       gs_mos%evals_occ(1:nmo_occ) = mo_evals_extended(1:nmo_occ)
 
-      CALL cp_fm_to_fm(mo_coeff_extended, gs_mos%mos_virt, ncol=nmo_virt, source_start=nmo_occ+1, target_start=1)
-      gs_mos%evals_virt(1:nmo_virt) = mo_evals_extended(nmo_occ+1:nmo_occ+nmo_virt)
+      CALL cp_fm_to_fm(mo_coeff_extended, gs_mos%mos_virt, ncol=nmo_virt, source_start=nmo_occ + 1, target_start=1)
+      gs_mos%evals_virt(1:nmo_virt) = mo_evals_extended(nmo_occ + 1:nmo_occ + nmo_virt)
 
       CALL deallocate_mo_set(mos_extended)
       CALL timestop(handle)
@@ -1236,7 +1236,7 @@ CONTAINS
       TYPE(tddfpt_ground_state_mos), INTENT(inout)       :: gs_mos
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_release_ground_state_mos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -1278,7 +1278,7 @@ CONTAINS
       nspins = SIZE(gs_mos)
 
       DO ispin = 1, nspins
-         nstates_total = nstates_total+ &
+         nstates_total = nstates_total + &
                          SIZE(gs_mos(ispin)%evals_occ, kind=int_8)* &
                          SIZE(gs_mos(ispin)%evals_virt, kind=int_8)
       END DO
@@ -1312,7 +1312,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: log_unit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_guess_vectors', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=5)                                   :: spin_label
       INTEGER                                            :: handle, imo_occ, imo_virt, ind, ispin, &
@@ -1359,11 +1359,11 @@ CONTAINS
       DO ispin = 1, nspins
          DO imo_occ = 1, nmo_occ_selected(ispin)
             ! Here imo_occ enumerate Occupied orbitals in inverse order (from the last to the first element)
-            e_occ = gs_mos(ispin)%evals_occ(nmo_occ_avail(ispin)-imo_occ+1)
+            e_occ = gs_mos(ispin)%evals_occ(nmo_occ_avail(ispin) - imo_occ + 1)
 
             DO imo_virt = 1, nmo_virt_selected(ispin)
-               istate = istate+1
-               e_virt_minus_occ(istate) = gs_mos(ispin)%evals_virt(imo_virt)-e_occ
+               istate = istate + 1
+               e_virt_minus_occ(istate) = gs_mos(ispin)%evals_virt(imo_virt) - e_occ
             END DO
          END DO
       END DO
@@ -1394,25 +1394,25 @@ CONTAINS
                WRITE (log_unit, '(1X,I8,11X,A19,8X,F14.5)') &
                istate, "***  restarted  ***", evals(istate)*evolt
          ELSE
-            ind = inds(istate)-1
+            ind = inds(istate) - 1
             IF (nspins > 1) THEN
                IF (ind < nstates_occ_virt_alpha) THEN
                   ispin = 1
                   spin_label = '(alp)'
                ELSE
                   ispin = 2
-                  ind = ind-nstates_occ_virt_alpha
+                  ind = ind - nstates_occ_virt_alpha
                   spin_label = '(bet)'
                END IF
             END IF
 
-            imo_occ = nmo_occ_avail(ispin)-ind/nmo_virt_selected(ispin)
-            imo_virt = MOD(ind, nmo_virt_selected(ispin))+1
+            imo_occ = nmo_occ_avail(ispin) - ind/nmo_virt_selected(ispin)
+            imo_virt = MOD(ind, nmo_virt_selected(ispin)) + 1
             evals(istate) = e_virt_minus_occ(istate)
 
             IF (log_unit > 0) &
                WRITE (log_unit, '(1X,I8,5X,I8,1X,A5,3X,I8,1X,A5,2X,F14.5)') &
-               istate, imo_occ, spin_label, nmo_occ_avail(ispin)+imo_virt, spin_label, e_virt_minus_occ(istate)*evolt
+               istate, imo_occ, spin_label, nmo_occ_avail(ispin) + imo_virt, spin_label, e_virt_minus_occ(istate)*evolt
 
             DO jspin = 1, nspins
                ! .NOT. ASSOCIATED(evects(jspin, istate)%matrix))
@@ -1456,7 +1456,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), INTENT(in)       :: S_C0_C0T, work_fm_ao_mo_occ
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_orthogonalize_psi1_psi0', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ivect, nao, nspins, nvects
       INTEGER, DIMENSION(maxspins)                       :: nmo_occ
@@ -1515,7 +1515,7 @@ CONTAINS
       LOGICAL                                            :: is_nonortho
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_is_nonorthogonal_psi1_psi0', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ivect, nao, nspins, nvects
       INTEGER, DIMENSION(maxspins)                       :: nmo_occ
@@ -1595,7 +1595,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_s
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_orthonormalize_psi1_psi1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ivect, jvect, nspins, &
                                                             nvects_old, nvects_total
@@ -1607,7 +1607,7 @@ CONTAINS
 
       nspins = SIZE(evects, 1)
       nvects_total = SIZE(evects, 2)
-      nvects_old = nvects_total-nvects_new
+      nvects_old = nvects_total - nvects_new
 
       IF (debug_this_module) THEN
          CPASSERT(SIZE(S_evects, 1) == nspins)
@@ -1619,9 +1619,9 @@ CONTAINS
          CALL cp_fm_get_info(matrix=evects(ispin, 1)%matrix, ncol_global=nmo_occ(ispin))
       END DO
 
-      DO jvect = nvects_old+1, nvects_total
+      DO jvect = nvects_old + 1, nvects_total
          ! <psi1_i | psi1_j>
-         DO ivect = 1, jvect-1
+         DO ivect = 1, jvect - 1
             CALL cp_fm_trace(evects(:, jvect), S_evects(:, ivect), weights(1:nspins))
             norm = accurate_sum(weights(1:nspins))
 
@@ -1676,7 +1676,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), INTENT(in)       :: work_fm_ao_mo_occ
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_apply_energy_diff', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ivect, nspins, nvects
       INTEGER, DIMENSION(maxspins)                       :: nmo_occ
@@ -1731,7 +1731,7 @@ CONTAINS
       TYPE(pw_p_type), INTENT(inout)                     :: work_v_gspace, work_v_rspace
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_apply_coulomb', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
       REAL(kind=dp)                                      :: alpha, pair_energy
@@ -1794,7 +1794,7 @@ CONTAINS
       TYPE(pw_p_type), DIMENSION(:), POINTER             :: work_v_xc
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_apply_xc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
       TYPE(pw_p_type), DIMENSION(:), POINTER             :: rho_ia_g, rho_ia_g2, rho_ia_r, &
@@ -1888,7 +1888,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: wfm_rho_orb
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_construct_ground_state_orb_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao, nspins
       INTEGER, DIMENSION(maxspins)                       :: nmo_occ
@@ -1948,7 +1948,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: wfm_rho_orb, wfm_rho_aux_fit, wfm_aux_orb
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_construct_aux_fit_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao, nao_aux, nspins
       REAL(kind=dp), DIMENSION(:), POINTER               :: tot_rho_aux_fit_r
@@ -2019,7 +2019,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: wfm_rho_orb
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_apply_hfx', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ivect, nao, nao_aux, &
                                                             nspins, nvects
@@ -2128,7 +2128,7 @@ CONTAINS
       TYPE(tddfpt_work_matrices), INTENT(inout)          :: work_matrices
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_compute_Aop_evects', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ivect, nao, nspins, nvects
       INTEGER, DIMENSION(maxspins)                       :: nmo_occ
@@ -2323,7 +2323,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:, :), INTENT(in)    :: krylov_vects, Aop_krylov
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_compute_ritz_vects', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikv, irv, ispin, nkvs, nrvs, &
                                                             nspins
@@ -2415,7 +2415,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), INTENT(in)       :: work_fm_ao_mo_occ, work_fm_mo_virt_mo_occ
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_compute_residual_vects', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(kind=dp), PARAMETER :: eref_scale = 0.99_dp, threshold = 16.0_dp*EPSILON(1.0_dp)
 
       INTEGER                                            :: handle, icol_local, irow_local, irv, &
@@ -2455,15 +2455,15 @@ CONTAINS
                             work_fm_ao_mo_occ(ispin)%matrix, 0.0_dp, work_fm_mo_virt_mo_occ(ispin)%matrix)
 
                DO icol_local = 1, ncols_local
-                  e_occ_plus_lambda = gs_mos(ispin)%evals_occ(col_indices_local(icol_local))+lambda
+                  e_occ_plus_lambda = gs_mos(ispin)%evals_occ(col_indices_local(icol_local)) + lambda
 
                   DO irow_local = 1, nrows_local
-                     eref = gs_mos(ispin)%evals_virt(row_indices_local(irow_local))-e_occ_plus_lambda
+                     eref = gs_mos(ispin)%evals_virt(row_indices_local(irow_local)) - e_occ_plus_lambda
 
                      ! eref = e_virt - e_occ - lambda = e_virt - e_occ - (eref_scale*lambda + (1-eref_scale)*lambda);
                      ! eref_new = e_virt - e_occ - eref_scale*lambda = eref + (1 - eref_scale)*lambda
                      IF (ABS(eref) < threshold) &
-                        eref = eref+(1.0_dp-eref_scale)*lambda
+                        eref = eref + (1.0_dp - eref_scale)*lambda
 
                      weights_ldata(irow_local, icol_local) = weights_ldata(irow_local, icol_local)/eref
                   END DO
@@ -2523,7 +2523,7 @@ CONTAINS
       REAL(kind=dp)                                      :: conv
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_davidson_solver', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, istate, iter, &
                                                             max_krylov_vects, nspins, nstates, &
@@ -2592,9 +2592,9 @@ CONTAINS
          ! davidson iteration
          CALL cp_iterate(logger%iter_info, iter_nr_out=iter)
 
-         CALL tddfpt_compute_Aop_evects(Aop_evects=Aop_krylov(:, nvects_exist+1:nvects_exist+nvects_new), &
-                                        evects=krylov_vects(:, nvects_exist+1:nvects_exist+nvects_new), &
-                                        S_evects=S_krylov(:, nvects_exist+1:nvects_exist+nvects_new), &
+         CALL tddfpt_compute_Aop_evects(Aop_evects=Aop_krylov(:, nvects_exist + 1:nvects_exist + nvects_new), &
+                                        evects=krylov_vects(:, nvects_exist + 1:nvects_exist + nvects_new), &
+                                        S_evects=S_krylov(:, nvects_exist + 1:nvects_exist + nvects_new), &
                                         gs_mos=gs_mos, is_rks_triplets=tddfpt_control%rks_triplets, &
                                         do_hfx=do_hfx, matrix_ks=matrix_ks, &
                                         qs_env=qs_env, kernel_env=kernel_env, &
@@ -2603,50 +2603,50 @@ CONTAINS
                                         work_matrices=work_matrices)
 
          CALL tddfpt_compute_ritz_vects(ritz_vects=evects, Aop_ritz=Aop_ritz, &
-                                        evals=evals_last(1:nvects_exist+nvects_new), &
-                                        krylov_vects=krylov_vects(:, 1:nvects_exist+nvects_new), &
-                                        Aop_krylov=Aop_krylov(:, 1:nvects_exist+nvects_new))
+                                        evals=evals_last(1:nvects_exist + nvects_new), &
+                                        krylov_vects=krylov_vects(:, 1:nvects_exist + nvects_new), &
+                                        Aop_krylov=Aop_krylov(:, 1:nvects_exist + nvects_new))
 
          CALL tddfpt_write_restart(evects=evects, evals=evals_last(1:nstates), gs_mos=gs_mos, &
                                    logger=logger, tddfpt_print_section=tddfpt_print_section)
 
-         conv = MAXVAL(ABS(evals_last(1:nstates)-evals(1:nstates)))
+         conv = MAXVAL(ABS(evals_last(1:nstates) - evals(1:nstates)))
 
-         nvects_exist = nvects_exist+nvects_new
-         IF (nvects_exist+nvects_new > max_krylov_vects) &
-            nvects_new = max_krylov_vects-nvects_exist
+         nvects_exist = nvects_exist + nvects_new
+         IF (nvects_exist + nvects_new > max_krylov_vects) &
+            nvects_new = max_krylov_vects - nvects_exist
          IF (iter >= tddfpt_control%niters) nvects_new = 0
 
          IF (conv > tddfpt_control%conv .AND. nvects_new > 0) THEN
             ! compute residual vectors for the next iteration
             DO istate = 1, nvects_new
                DO ispin = 1, nspins
-                  NULLIFY (Aop_krylov(ispin, nvects_exist+istate)%matrix, &
-                           krylov_vects(ispin, nvects_exist+istate)%matrix, &
-                           S_krylov(ispin, nvects_exist+istate)%matrix)
+                  NULLIFY (Aop_krylov(ispin, nvects_exist + istate)%matrix, &
+                           krylov_vects(ispin, nvects_exist + istate)%matrix, &
+                           S_krylov(ispin, nvects_exist + istate)%matrix)
                   CALL fm_pool_create_fm(work_matrices%fm_pool_ao_mo_occ(ispin)%pool, &
-                                         krylov_vects(ispin, nvects_exist+istate)%matrix)
+                                         krylov_vects(ispin, nvects_exist + istate)%matrix)
                   CALL fm_pool_create_fm(work_matrices%fm_pool_ao_mo_occ(ispin)%pool, &
-                                         S_krylov(ispin, nvects_exist+istate)%matrix)
+                                         S_krylov(ispin, nvects_exist + istate)%matrix)
                   CALL fm_pool_create_fm(work_matrices%fm_pool_ao_mo_occ(ispin)%pool, &
-                                         Aop_krylov(ispin, nvects_exist+istate)%matrix)
+                                         Aop_krylov(ispin, nvects_exist + istate)%matrix)
                END DO
             END DO
 
-            CALL tddfpt_compute_residual_vects(residual_vects=krylov_vects(:, nvects_exist+1:nvects_exist+nvects_new), &
+            CALL tddfpt_compute_residual_vects(residual_vects=krylov_vects(:, nvects_exist + 1:nvects_exist + nvects_new), &
                                                evals=evals_last(1:nvects_new), &
                                                ritz_vects=evects(:, 1:nvects_new), Aop_ritz=Aop_ritz(:, 1:nvects_new), &
                                                gs_mos=gs_mos, matrix_s=matrix_s(1)%matrix, &
                                                work_fm_ao_mo_occ=work_matrices%wfm_ao_mo_occ, &
                                                work_fm_mo_virt_mo_occ=work_matrices%wfm_mo_virt_mo_occ)
 
-            CALL tddfpt_orthogonalize_psi1_psi0(krylov_vects(:, nvects_exist+1:nvects_exist+nvects_new), &
+            CALL tddfpt_orthogonalize_psi1_psi0(krylov_vects(:, nvects_exist + 1:nvects_exist + nvects_new), &
                                                 work_matrices%S_C0_C0T, work_matrices%wfm_ao_mo_occ)
 
-            CALL tddfpt_orthonormalize_psi1_psi1(krylov_vects(:, 1:nvects_exist+nvects_new), nvects_new, &
-                                                 S_krylov(:, 1:nvects_exist+nvects_new), matrix_s(1)%matrix)
+            CALL tddfpt_orthonormalize_psi1_psi1(krylov_vects(:, 1:nvects_exist + nvects_new), nvects_new, &
+                                                 S_krylov(:, 1:nvects_exist + nvects_new), matrix_s(1)%matrix)
 
-            is_nonortho = tddfpt_is_nonorthogonal_psi1_psi0(krylov_vects(:, nvects_exist+1:nvects_exist+nvects_new), &
+            is_nonortho = tddfpt_is_nonorthogonal_psi1_psi0(krylov_vects(:, nvects_exist + 1:nvects_exist + nvects_new), &
                                                             work_matrices%S_C0, tddfpt_control%orthogonal_eps, &
                                                             work_matrices%wfm_mo_occ_mo_occ)
          ELSE
@@ -2660,7 +2660,7 @@ CONTAINS
             WRITE (energy_unit, '(/,4X,A,T14,A,T36,A)') "State", "Exc. energy (eV)", "Convergence (eV)"
             DO istate = 1, nstates
                WRITE (energy_unit, '(1X,I8,T12,F14.7,T38,ES11.4)') istate, &
-                  evals_last(istate)*evolt, (evals_last(istate)-evals(istate))*evolt
+                  evals_last(istate)*evolt, (evals_last(istate) - evals(istate))*evolt
             END DO
             WRITE (energy_unit, *)
             CALL m_flush(energy_unit)
@@ -2669,11 +2669,11 @@ CONTAINS
          IF (iter_unit > 0) THEN
             nstates_conv = 0
             DO istate = 1, nstates
-               IF (ABS(evals_last(istate)-evals(istate)) <= tddfpt_control%conv) &
-                  nstates_conv = nstates_conv+1
+               IF (ABS(evals_last(istate) - evals(istate)) <= tddfpt_control%conv) &
+                  nstates_conv = nstates_conv + 1
             END DO
 
-            WRITE (iter_unit, '(1X,I8,T12,F7.1,T24,ES11.4,T42,I8)') iter, t2-t1, conv, nstates_conv
+            WRITE (iter_unit, '(1X,I8,T12,F7.1,T24,ES11.4,T42,I8)') iter, t2 - t1, conv, nstates_conv
             CALL m_flush(iter_unit)
          END IF
 
@@ -2690,7 +2690,7 @@ CONTAINS
          END IF
       END DO
 
-      DO istate = nvects_exist+nvects_new, 1, -1
+      DO istate = nvects_exist + nvects_new, 1, -1
          DO ispin = nspins, 1, -1
             CALL fm_pool_give_back_fm(work_matrices%fm_pool_ao_mo_occ(ispin)%pool, Aop_krylov(ispin, istate)%matrix)
             CALL fm_pool_give_back_fm(work_matrices%fm_pool_ao_mo_occ(ispin)%pool, S_krylov(ispin, istate)%matrix)
@@ -2742,7 +2742,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_dipole_operator', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_cos_sin, icol, ideriv, irow, &
                                                             ispin, jderiv, nao, ncols_local, &
@@ -3012,7 +3012,7 @@ CONTAINS
          CALL dbcsr_deallocate_matrix_set(rRc_xyz)
 
       CASE (tddfpt_dipole_velocity)
-         IF (SIZE(matrix_s) < nderivs+1) THEN
+         IF (SIZE(matrix_s) < nderivs + 1) THEN
             CPABORT("Where is the derivative?")
          END IF
 
@@ -3037,13 +3037,13 @@ CONTAINS
                DO irow = 1, nrows_local
                   ! ediff_inv_weights(a, i) = 1.0 / (E_virt_a - E_occ_i)
                   ! imo_virt = row_indices(irow)
-                  local_data_ediff(irow, icol) = 1.0_dp/(gs_mos(ispin)%evals_virt(row_indices(irow))-eval_occ)
+                  local_data_ediff(irow, icol) = 1.0_dp/(gs_mos(ispin)%evals_virt(row_indices(irow)) - eval_occ)
                END DO
             END DO
 !$OMP       END PARALLEL DO
 
             DO ideriv = 1, nderivs
-               CALL cp_dbcsr_sm_fm_multiply(matrix_s(ideriv+1)%matrix, &
+               CALL cp_dbcsr_sm_fm_multiply(matrix_s(ideriv + 1)%matrix, &
                                             gs_mos(ispin)%mos_occ, &
                                             dipole_op_mos_occ(ideriv, ispin)%matrix, &
                                             ncol=nmo_occ(ispin), alpha=1.0_dp, beta=0.0_dp)
@@ -3117,7 +3117,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:, :), INTENT(in)    :: dipole_op_mos_occ
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_print_summary', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=1)                                   :: lsd_str
       CHARACTER(len=20)                                  :: mult_str
@@ -3162,7 +3162,7 @@ CONTAINS
          IF (nspins == 1) THEN
             trans_dipoles(:, :, 1) = SQRT(2.0_dp)*trans_dipoles(:, :, 1)
          ELSE
-            trans_dipoles(:, :, 1) = SQRT(trans_dipoles(:, :, 1)**2+trans_dipoles(:, :, 2)**2)
+            trans_dipoles(:, :, 1) = SQRT(trans_dipoles(:, :, 1)**2 + trans_dipoles(:, :, 2)**2)
          END IF
       END IF
 
@@ -3203,11 +3203,11 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: min_amplitude
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_print_excitation_analysis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=5)                                   :: spin_label
       INTEGER :: handle, icol, iproc, irow, ispin, istate, nao, ncols_local, nrows_local, nspins, &
-         nstates, send_handler, send_handler2, state_spin
+                 nstates, send_handler, send_handler2, state_spin
       INTEGER(kind=int_8)                                :: iexc, imo_occ, imo_virt, ind, nexcs, &
                                                             nexcs_local, nexcs_max_local, &
                                                             nmo_virt_occ, nmo_virt_occ_alpha
@@ -3279,7 +3279,7 @@ CONTAINS
          nexcs_max_local = 0
          DO ispin = 1, nspins
             CALL cp_fm_get_info(weights_fm(ispin)%matrix, nrow_local=nrows_local, ncol_local=ncols_local)
-            nexcs_max_local = nexcs_max_local+INT(nrows_local, int_8)*INT(ncols_local, int_8)
+            nexcs_max_local = nexcs_max_local + INT(nrows_local, int_8)*INT(ncols_local, int_8)
          END DO
 
          ALLOCATE (weights_local(nexcs_max_local), inds_local(nexcs_max_local))
@@ -3303,17 +3303,17 @@ CONTAINS
                   DO irow = 1, nrows_local
                      IF (ABS(local_data(irow, icol)) >= min_amplitude) THEN
                         ! number of non-negligible excitations
-                        nexcs_local = nexcs_local+1
+                        nexcs_local = nexcs_local + 1
                         ! excitation amplitude
                         weights_local(nexcs_local) = local_data(irow, icol)
                         ! index of single excitation (ivirt, iocc, ispin) in compressed form
-                        inds_local(nexcs_local) = nmo_virt_occ+INT(row_indices(irow), int_8)+ &
-                                                  INT(col_indices(icol)-1, int_8)*nmo_virt8(ispin)
+                        inds_local(nexcs_local) = nmo_virt_occ + INT(row_indices(irow), int_8) + &
+                                                  INT(col_indices(icol) - 1, int_8)*nmo_virt8(ispin)
                      END IF
                   END DO
                END DO
 
-               nmo_virt_occ = nmo_virt_occ+nmo_virt8(ispin)*nmo_occ8(ispin)
+               nmo_virt_occ = nmo_virt_occ + nmo_virt8(ispin)*nmo_occ8(ispin)
             END DO
 
             IF (para_env%mepos == para_env%source) THEN
@@ -3322,22 +3322,22 @@ CONTAINS
 
                ! collect number of non-negligible excitations from other nodes
                DO iproc = 1, para_env%num_pe
-                  IF (iproc-1 /= para_env%mepos) THEN
-                     CALL mp_irecv(nexcs_recv(iproc:iproc), iproc-1, para_env%group, recv_handlers(iproc), 0)
+                  IF (iproc - 1 /= para_env%mepos) THEN
+                     CALL mp_irecv(nexcs_recv(iproc:iproc), iproc - 1, para_env%group, recv_handlers(iproc), 0)
                   ELSE
                      nexcs_recv(iproc) = nexcs_local
                   END IF
                END DO
 
                DO iproc = 1, para_env%num_pe
-                  IF (iproc-1 /= para_env%mepos) &
+                  IF (iproc - 1 /= para_env%mepos) &
                      CALL mp_wait(recv_handlers(iproc))
                END DO
 
                ! compute total number of non-negligible excitations
                nexcs = 0
                DO iproc = 1, para_env%num_pe
-                  nexcs = nexcs+nexcs_recv(iproc)
+                  nexcs = nexcs + nexcs_recv(iproc)
                END DO
 
                ! receive indices and amplitudes of selected excitations
@@ -3347,25 +3347,25 @@ CONTAINS
                nmo_virt_occ = 0
                DO iproc = 1, para_env%num_pe
                   IF (nexcs_recv(iproc) > 0) THEN
-                     IF (iproc-1 /= para_env%mepos) THEN
+                     IF (iproc - 1 /= para_env%mepos) THEN
                         ! excitation amplitudes
-                        CALL mp_irecv(weights_recv(nmo_virt_occ+1:nmo_virt_occ+nexcs_recv(iproc)), &
-                                      iproc-1, para_env%group, recv_handlers(iproc), 1)
+                        CALL mp_irecv(weights_recv(nmo_virt_occ + 1:nmo_virt_occ + nexcs_recv(iproc)), &
+                                      iproc - 1, para_env%group, recv_handlers(iproc), 1)
                         ! compressed indices
-                        CALL mp_irecv(inds_recv(nmo_virt_occ+1:nmo_virt_occ+nexcs_recv(iproc)), &
-                                      iproc-1, para_env%group, recv_handlers2(iproc), 2)
+                        CALL mp_irecv(inds_recv(nmo_virt_occ + 1:nmo_virt_occ + nexcs_recv(iproc)), &
+                                      iproc - 1, para_env%group, recv_handlers2(iproc), 2)
                      ELSE
                         ! data on master node
-                        weights_recv(nmo_virt_occ+1:nmo_virt_occ+nexcs_recv(iproc)) = weights_local(1:nexcs_recv(iproc))
-                        inds_recv(nmo_virt_occ+1:nmo_virt_occ+nexcs_recv(iproc)) = inds_local(1:nexcs_recv(iproc))
+                        weights_recv(nmo_virt_occ + 1:nmo_virt_occ + nexcs_recv(iproc)) = weights_local(1:nexcs_recv(iproc))
+                        inds_recv(nmo_virt_occ + 1:nmo_virt_occ + nexcs_recv(iproc)) = inds_local(1:nexcs_recv(iproc))
                      END IF
 
-                     nmo_virt_occ = nmo_virt_occ+nexcs_recv(iproc)
+                     nmo_virt_occ = nmo_virt_occ + nexcs_recv(iproc)
                   END IF
                END DO
 
                DO iproc = 1, para_env%num_pe
-                  IF (iproc-1 /= para_env%mepos .AND. nexcs_recv(iproc) > 0) THEN
+                  IF (iproc - 1 /= para_env%mepos .AND. nexcs_recv(iproc) > 0) THEN
                      CALL mp_wait(recv_handlers(iproc))
                      CALL mp_wait(recv_handlers2(iproc))
                   END IF
@@ -3398,23 +3398,23 @@ CONTAINS
                WRITE (log_unit, '(1X,I8)') istate
 
                DO iexc = 1, nexcs
-                  ind = inds_recv(inds(iexc))-1
+                  ind = inds_recv(inds(iexc)) - 1
                   IF (nspins > 1) THEN
                      IF (ind < nmo_virt_occ_alpha) THEN
                         state_spin = 1
                         spin_label = '(alp)'
                      ELSE
                         state_spin = 2
-                        ind = ind-nmo_virt_occ_alpha
+                        ind = ind - nmo_virt_occ_alpha
                         spin_label = '(bet)'
                      END IF
                   END IF
 
-                  imo_occ = ind/nmo_virt8(state_spin)+1
-                  imo_virt = MOD(ind, nmo_virt8(state_spin))+1
+                  imo_occ = ind/nmo_virt8(state_spin) + 1
+                  imo_virt = MOD(ind, nmo_virt8(state_spin)) + 1
 
                   WRITE (log_unit, '(T14,I8,1X,A5,T30,I8,1X,A5,T50,F9.6)') imo_occ, spin_label, &
-                     nmo_occ8(state_spin)+imo_virt, spin_label, weights_recv(inds(iexc))
+                     nmo_occ8(state_spin) + imo_virt, spin_label, weights_recv(inds(iexc))
                END DO
             END IF
 
@@ -3455,7 +3455,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: tddfpt_print_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_write_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, istate, nao, nspins, &
                                                             nstates, ounit
@@ -3543,7 +3543,7 @@ CONTAINS
       INTEGER                                            :: nstates_read
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_read_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=20)                                  :: read_str, ref_str
       CHARACTER(LEN=default_path_length)                 :: filename

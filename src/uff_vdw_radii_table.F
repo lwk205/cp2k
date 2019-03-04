@@ -12,7 +12,7 @@
 ! **************************************************************************************************
 MODULE uff_vdw_radii_table
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "base/base_uses.f90"
 
    IMPLICIT NONE
@@ -163,7 +163,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: found
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_uff_vdw_radius', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (uff_vdw_radius(z) == NAN) THEN
          radius = 0.0_dp

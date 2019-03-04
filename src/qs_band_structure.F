@@ -10,52 +10,52 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE qs_band_structure
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type
-   USE cp_fm_types,                     ONLY: cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_para_env,                     ONLY: cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE kpoint_methods,                  ONLY: kpoint_env_initialize,&
-                                              kpoint_init_cell_index,&
-                                              kpoint_initialize_mos
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_create,&
-                                              kpoint_env_type,&
-                                              kpoint_release,&
-                                              kpoint_sym_create,&
-                                              kpoint_type
-   USE machine,                         ONLY: m_walltime
-   USE mathconstants,                   ONLY: twopi
-   USE message_passing,                 ONLY: mp_sum
-   USE physcon,                         ONLY: angstrom,&
-                                              evolt
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_env_release,&
-                                              qs_environment_type
-   USE qs_gamma2kp,                     ONLY: create_kp_from_gamma
-   USE qs_matrix_pools,                 ONLY: mpools_get
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              init_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_scf_diagonalization,          ONLY: do_general_diag_kp
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE scf_control_types,               ONLY: scf_control_type
-   USE string_utilities,                ONLY: uppercase
+   USE cell_types, ONLY: cell_type, &
+                         get_cell
+   USE cp_blacs_env, ONLY: cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type
+   USE cp_fm_types, ONLY: cp_fm_type
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_para_env, ONLY: cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE kpoint_methods, ONLY: kpoint_env_initialize, &
+                             kpoint_init_cell_index, &
+                             kpoint_initialize_mos
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_create, &
+                           kpoint_env_type, &
+                           kpoint_release, &
+                           kpoint_sym_create, &
+                           kpoint_type
+   USE machine, ONLY: m_walltime
+   USE mathconstants, ONLY: twopi
+   USE message_passing, ONLY: mp_sum
+   USE physcon, ONLY: angstrom, &
+                      evolt
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_env_release, &
+                                   qs_environment_type
+   USE qs_gamma2kp, ONLY: create_kp_from_gamma
+   USE qs_matrix_pools, ONLY: mpools_get
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          init_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_scf_diagonalization, ONLY: do_general_diag_kp
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE scf_control_types, ONLY: scf_control_type
+   USE string_utilities, ONLY: uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -79,7 +79,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_band_structure', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: do_kpoints, explicit
       TYPE(qs_environment_type), POINTER                 :: qs_env_kp
@@ -110,7 +110,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'do_calculate_band_structure', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: filename, ustr
       CHARACTER(LEN=default_string_length), &
@@ -188,18 +188,18 @@ CONTAINS
                CASE ("B_VECTOR")
                   kspecial(1:3, ip) = kpptr(1:3)
                CASE ("CART_ANGSTROM")
-                  kspecial(1:3, ip) = (kpptr(1)*cell%hmat(1, 1:3)+ &
-                                       kpptr(2)*cell%hmat(2, 1:3)+ &
+                  kspecial(1:3, ip) = (kpptr(1)*cell%hmat(1, 1:3) + &
+                                       kpptr(2)*cell%hmat(2, 1:3) + &
                                        kpptr(3)*cell%hmat(3, 1:3))/twopi*angstrom
                CASE ("CART_BOHR")
-                  kspecial(1:3, ip) = (kpptr(1)*cell%hmat(1, 1:3)+ &
-                                       kpptr(2)*cell%hmat(2, 1:3)+ &
+                  kspecial(1:3, ip) = (kpptr(1)*cell%hmat(1, 1:3) + &
+                                       kpptr(2)*cell%hmat(2, 1:3) + &
                                        kpptr(3)*cell%hmat(3, 1:3))/twopi
                CASE DEFAULT
                   CPABORT("Unknown Unit for kpoint definition")
                END SELECT
             END DO
-            npoints = (n_ptr-1)*npline+1
+            npoints = (n_ptr - 1)*npline + 1
             !
             CPASSERT(npoints >= 1)
             IF (unit_nr > 0) THEN
@@ -223,10 +223,10 @@ CONTAINS
             ikk = 1
             DO ik = 2, n_ptr
                DO ip = 1, npline
-                  ikk = ikk+1
-                  kpgeneral(1:3, ikk) = kspecial(1:3, ik-1)+ &
+                  ikk = ikk + 1
+                  kpgeneral(1:3, ikk) = kspecial(1:3, ik - 1) + &
                                         REAL(ip, KIND=dp)/REAL(npline, KIND=dp)* &
-                                        (kspecial(1:3, ik)-kspecial(1:3, ik-1))
+                                        (kspecial(1:3, ik) - kspecial(1:3, ik - 1))
                END DO
             END DO
             NULLIFY (kpoint)
@@ -243,7 +243,7 @@ CONTAINS
                my_kpgrp = (ik >= kp_range(1) .AND. ik <= kp_range(2))
                DO ispin = 1, nspins
                   IF (my_kpgrp) THEN
-                     ikpgr = ik-kp_range(1)+1
+                     ikpgr = ik - kp_range(1) + 1
                      kp => kpoint%kp_env(ikpgr)%kpoint_env
                      CALL get_mo_set(kp%mos(1, ispin)%mo_set, eigenvalues=eigenvalues)
                      eigval(1:nmo) = eigenvalues(1:nmo)
@@ -266,7 +266,7 @@ CONTAINS
             CALL kpoint_release(kpoint)
             t2 = m_walltime()
             IF (unit_nr > 0) THEN
-               WRITE (unit_nr, FMT="(T2,A,T67,F14.3)") "KPOINTS| Time for K-Point Line ", t2-t1
+               WRITE (unit_nr, FMT="(T2,A,T67,F14.3)") "KPOINTS| Time for K-Point Line ", t2 - t1
             END IF
          END DO
          ! close output file
@@ -301,7 +301,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: group_size_ext
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_kp_orbitals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ic, ik, ikk, ispin, ix, iy, iz, &
                                                             npoints
@@ -359,10 +359,10 @@ CONTAINS
          DO ix = 1, mp_grid(1)
             DO iy = 1, mp_grid(2)
                DO iz = 1, mp_grid(3)
-                  i = i+1
-                  kpt_latt(1) = REAL(2*ix-mp_grid(1)-1, KIND=dp)/(2._dp*REAL(mp_grid(1), KIND=dp))
-                  kpt_latt(2) = REAL(2*iy-mp_grid(2)-1, KIND=dp)/(2._dp*REAL(mp_grid(2), KIND=dp))
-                  kpt_latt(3) = REAL(2*iz-mp_grid(3)-1, KIND=dp)/(2._dp*REAL(mp_grid(3), KIND=dp))
+                  i = i + 1
+                  kpt_latt(1) = REAL(2*ix - mp_grid(1) - 1, KIND=dp)/(2._dp*REAL(mp_grid(1), KIND=dp))
+                  kpt_latt(2) = REAL(2*iy - mp_grid(2) - 1, KIND=dp)/(2._dp*REAL(mp_grid(2), KIND=dp))
+                  kpt_latt(3) = REAL(2*iz - mp_grid(3) - 1, KIND=dp)/(2._dp*REAL(mp_grid(3), KIND=dp))
                   kpoint%xkp(1:3, i) = MATMUL(TRANSPOSE(h_inv), kpt_latt(:))
                END DO
             END DO
@@ -403,7 +403,7 @@ CONTAINS
       DO ik = 1, SIZE(kpoint%kp_env)
          CALL mpools_get(kpoint%mpools, ao_mo_fm_pools=ao_mo_fm_pools)
          mos => kpoint%kp_env(ik)%kpoint_env%mos
-         ikk = kpoint%kp_range(1)+ik-1
+         ikk = kpoint%kp_range(1) + ik - 1
          CPASSERT(ASSOCIATED(mos))
          DO ispin = 1, SIZE(mos, 2)
             DO ic = 1, SIZE(mos, 1)

@@ -7,22 +7,22 @@
 !> \author teo
 ! **************************************************************************************************
 MODULE qmmm_topology_util
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: get_molecule,&
-                                              molecule_type
-   USE qmmm_types_low,                  ONLY: qmmm_env_mm_type
-   USE string_table,                    ONLY: id2str,&
-                                              s2s,&
-                                              str2id
-   USE string_utilities,                ONLY: compress
-   USE topology_types,                  ONLY: topology_parameters_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: get_molecule, &
+                             molecule_type
+   USE qmmm_types_low, ONLY: qmmm_env_mm_type
+   USE string_table, ONLY: id2str, &
+                           s2s, &
+                           str2id
+   USE string_utilities, ONLY: compress
+   USE topology_types, ONLY: topology_parameters_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -50,7 +50,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_coordinate_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: prefix_lnk
       INTEGER                                            :: handle, iatm, iw
@@ -114,7 +114,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_connectivity_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: first_atom, handle, i, imolecule, iw, &
                                                             last_atom, natom, output_unit, &
@@ -140,7 +140,7 @@ CONTAINS
          CALL get_molecule(molecule, molecule_kind=molecule_kind, &
                            first_atom=first_atom, last_atom=last_atom)
          IF (ANY(qm_atom_index >= first_atom .AND. qm_atom_index <= last_atom)) &
-            qm_mol_num = qm_mol_num+1
+            qm_mol_num = qm_mol_num + 1
       END DO
       !
       ALLOCATE (qm_molecule_index(qm_mol_num))
@@ -150,9 +150,9 @@ CONTAINS
          molecule => molecule_set(imolecule)
          CALL get_molecule(molecule, molecule_kind=molecule_kind, &
                            first_atom=first_atom, last_atom=last_atom)
-         natom = last_atom-first_atom+1
+         natom = last_atom - first_atom + 1
          IF (ANY(qm_atom_index >= first_atom .AND. qm_atom_index <= last_atom)) THEN
-            qm_mol_num = qm_mol_num+1
+            qm_mol_num = qm_mol_num + 1
             !
             ! Check if all atoms of the molecule are QM or if a QM/MM link scheme
             ! need to be used...

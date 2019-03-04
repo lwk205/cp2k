@@ -10,71 +10,71 @@
 !> \author Manuel Guidon
 ! **************************************************************************************************
 MODULE admm_methods
-   USE admm_types,                      ONLY: admm_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE bibliography,                    ONLY: Merlot2014,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_plus_fm_fm_t
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_scale,&
-                                              cp_fm_scale_and_add,&
-                                              cp_fm_schur_product,&
-                                              cp_fm_upper_to_full
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_invert,&
-                                              cp_fm_cholesky_reduce,&
-                                              cp_fm_cholesky_restore
-   USE cp_fm_diag,                      ONLY: cp_fm_syevd
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_set_all,&
-                                              cp_fm_set_element,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, dbcsr_desymmetrize, &
-        dbcsr_get_block_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_scale, &
-        dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric
-   USE input_constants,                 ONLY: do_admm_exch_scaling_merlot,&
-                                              do_admm_exch_scaling_none,&
-                                              do_admm_purify_cauchy,&
-                                              do_admm_purify_cauchy_subspace,&
-                                              do_admm_purify_mo_diag,&
-                                              do_admm_purify_mo_no_diag,&
-                                              do_admm_purify_none
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: add_qs_force,&
-                                              qs_force_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_overlap,                      ONLY: build_overlap_force
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_set,&
-                                              qs_rho_type
-   USE qs_vxc,                          ONLY: qs_vxc_create
+   USE admm_types, ONLY: admm_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE bibliography, ONLY: Merlot2014, &
+                           cite_reference
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_plus_fm_fm_t
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_scale, &
+                                 cp_fm_scale_and_add, &
+                                 cp_fm_schur_product, &
+                                 cp_fm_upper_to_full
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_invert, &
+                             cp_fm_cholesky_reduce, &
+                             cp_fm_cholesky_restore
+   USE cp_fm_diag, ONLY: cp_fm_syevd
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_set_all, &
+                          cp_fm_set_element, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, dbcsr_desymmetrize, &
+      dbcsr_get_block_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_scale, &
+      dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric
+   USE input_constants, ONLY: do_admm_exch_scaling_merlot, &
+                              do_admm_exch_scaling_none, &
+                              do_admm_purify_cauchy, &
+                              do_admm_purify_cauchy_subspace, &
+                              do_admm_purify_mo_diag, &
+                              do_admm_purify_mo_no_diag, &
+                              do_admm_purify_none
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE pw_types, ONLY: pw_p_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: add_qs_force, &
+                             qs_force_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_overlap, ONLY: build_overlap_force
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_set, &
+                           qs_rho_type
+   USE qs_vxc, ONLY: qs_vxc_create
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -101,7 +101,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'admm_mo_calc_rho_aux', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       LOGICAL                                            :: s_mstruct_changed
@@ -195,7 +195,7 @@ CONTAINS
       IF (dft_control%nspins == 1) THEN
          admm_env%gsi(3) = admm_env%gsi(1)
       ELSE
-         admm_env%gsi(3) = (admm_env%gsi(1)+admm_env%gsi(2))/2.0_dp
+         admm_env%gsi(3) = (admm_env%gsi(1) + admm_env%gsi(2))/2.0_dp
       END IF
 
       CALL qs_rho_set(rho_aux_fit, rho_r_valid=.TRUE., rho_g_valid=.TRUE.)
@@ -212,7 +212,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'admm_mo_merge_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(admm_type), POINTER                           :: admm_env
@@ -263,7 +263,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks_aux_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'admm_mo_merge_derivs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -305,7 +305,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: geometry_did_change
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'admm_fit_mo_coeffs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -434,7 +434,7 @@ CONTAINS
       TYPE(mo_set_p_type), DIMENSION(:), POINTER         :: mos, mos_aux_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'purify_mo_cholesky', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao_aux_fit, nao_orb, &
                                                             nmo, nspins
@@ -612,7 +612,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: blocked
 
       CHARACTER(len=*), PARAMETER :: routineN = 'purify_dm_cauchy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, nao_aux_fit, nao_orb, nmo, &
                                                             nspins
@@ -657,7 +657,7 @@ CONTAINS
       CALL cp_fm_set_all(admm_env%M_purify(ispin)%matrix, 0.0_dp)
       pole = 0.0_dp
       DO i = 1, nao_aux_fit
-         pole = Heaviside(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i)-0.5_dp)
+         pole = Heaviside(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i) - 0.5_dp)
          CALL cp_fm_set_element(admm_env%M_purify(ispin)%matrix, i, i, pole)
       END DO
       CALL cp_fm_upper_to_full(admm_env%M_purify(ispin)%matrix, admm_env%work_aux_aux)
@@ -696,7 +696,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'merge_ks_matrix_cauchy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, handle, i, iatom, ispin, j, jatom, &
                                                             nao_aux_fit, nao_orb, nmo
@@ -762,17 +762,17 @@ CONTAINS
          pole = 0.0_dp
          DO i = 1, nao_aux_fit
             DO j = i, nao_aux_fit
-               eig_diff = (admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i)- &
+               eig_diff = (admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i) - &
                            admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(j))
                ! *** two eigenvalues could be the degenerated. In that case use 2nd order formula for the poles
                IF (ABS(eig_diff) == 0.0_dp) THEN
-                  pole = delta(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i)-0.5_dp)
+                  pole = delta(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i) - 0.5_dp)
                   CALL cp_fm_set_element(admm_env%M_purify(ispin)%matrix, i, j, pole)
                ELSE
-                  pole = 1.0_dp/(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i)- &
+                  pole = 1.0_dp/(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i) - &
                                  admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(j))
-                  tmp = Heaviside(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i)-0.5_dp)
-                  tmp = tmp-Heaviside(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(j)-0.5_dp)
+                  tmp = Heaviside(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(i) - 0.5_dp)
+                  tmp = tmp - Heaviside(admm_env%eigvals_P_to_be_purified(ispin)%eigvals%data(j) - 0.5_dp)
                   pole = tmp*pole
                   CALL cp_fm_set_element(admm_env%M_purify(ispin)%matrix, i, j, pole)
                END IF
@@ -855,7 +855,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'merge_ks_matrix_cauchy_subspace', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao_aux_fit, nao_orb, nmo
       TYPE(admm_type), POINTER                           :: admm_env
@@ -1013,7 +1013,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks_aux_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'merge_mo_derivs_diag', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, nao_aux_fit, nao_orb, nmo
       REAL(dp)                                           :: eig_diff, pole, tmp32, tmp52, tmp72, &
@@ -1053,7 +1053,7 @@ CONTAINS
       pole = 0.0_dp
       DO i = 1, nmo
          DO j = i, nmo
-            eig_diff = (admm_env%eigvals_lambda(ispin)%eigvals%data(i)- &
+            eig_diff = (admm_env%eigvals_lambda(ispin)%eigvals%data(i) - &
                         admm_env%eigvals_lambda(ispin)%eigvals%data(j))
             ! *** two eigenvalues could be the degenerated. In that case use 2nd order formula for the poles
             IF (ABS(eig_diff) < 0.0001_dp) THEN
@@ -1062,12 +1062,12 @@ CONTAINS
                tmp72 = tmp52/admm_env%eigvals_lambda(ispin)%eigvals%data(j)*eig_diff
                tmp92 = tmp72/admm_env%eigvals_lambda(ispin)%eigvals%data(j)*eig_diff
 
-               pole = -0.5_dp*tmp32+3.0_dp/8.0_dp*tmp52-5.0_dp/16.0_dp*tmp72+35.0_dp/128.0_dp*tmp92
+               pole = -0.5_dp*tmp32 + 3.0_dp/8.0_dp*tmp52 - 5.0_dp/16.0_dp*tmp72 + 35.0_dp/128.0_dp*tmp92
                CALL cp_fm_set_element(admm_env%M(ispin)%matrix, i, j, pole)
             ELSE
                pole = 1.0_dp/SQRT(admm_env%eigvals_lambda(ispin)%eigvals%data(i))
-               pole = pole-1.0_dp/SQRT(admm_env%eigvals_lambda(ispin)%eigvals%data(j))
-               pole = pole/(admm_env%eigvals_lambda(ispin)%eigvals%data(i)- &
+               pole = pole - 1.0_dp/SQRT(admm_env%eigvals_lambda(ispin)%eigvals%data(j))
+               pole = pole/(admm_env%eigvals_lambda(ispin)%eigvals%data(i) - &
                             admm_env%eigvals_lambda(ispin)%eigvals%data(j))
                CALL cp_fm_set_element(admm_env%M(ispin)%matrix, i, j, pole)
             END IF
@@ -1148,7 +1148,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'merge_ks_matrix_none', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, handle, iatom, ispin, jatom, &
                                                             nao_aux_fit, nao_orb, nmo
@@ -1159,8 +1159,8 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
       TYPE(dbcsr_iterator_type)                          :: iter
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER :: matrix_ks, matrix_ks_aux_fit, &
-         matrix_ks_aux_fit_dft, matrix_ks_aux_fit_hfx, matrix_s, matrix_s_aux_fit, rho_ao, &
-         rho_ao_aux
+                                                 matrix_ks_aux_fit_dft, matrix_ks_aux_fit_hfx, matrix_s, matrix_s_aux_fit, rho_ao, &
+                                                   rho_ao_aux
       TYPE(dbcsr_type), POINTER                          :: matrix_k_tilde, &
                                                             matrix_ks_aux_fit_admms_tmp, &
                                                             matrix_TtsT
@@ -1279,11 +1279,11 @@ CONTAINS
                   CALL calc_spin_dep_aux_exch_ener(qs_env=qs_env, admm_env=admm_env, ener_k_ispin=ener_k(ispin), &
                                                    ener_x_ispin=ener_x(ispin), ispin=ispin)
                   admm_env%lambda_merlot(ispin) = 2.0_dp*(admm_env%gsi(ispin))**2* &
-                                                  (ener_k(ispin)+ener_x(ispin))/(admm_env%n_large_basis(ispin))
+                                                  (ener_k(ispin) + ener_x(ispin))/(admm_env%n_large_basis(ispin))
 
                ELSE
                   admm_env%lambda_merlot(ispin) = 2.0_dp*(admm_env%gsi(ispin))**2* &
-                                                  (energy%ex+energy%exc_aux_fit)/(admm_env%n_large_basis(ispin))
+                                                  (energy%ex + energy%exc_aux_fit)/(admm_env%n_large_basis(ispin))
                ENDIF
 
             ELSE IF (admm_env%charge_constrain .AND. &
@@ -1295,12 +1295,12 @@ CONTAINS
                   CALL calc_spin_dep_aux_exch_ener(qs_env=qs_env, admm_env=admm_env, ener_k_ispin=ener_k(ispin), &
                                                    ener_x_ispin=ener_x(ispin), ispin=ispin)
                   admm_env%lambda_merlot(ispin) = &
-                     (trace_tmp+2.0_dp/3.0_dp*((admm_env%gsi(ispin))**(2.0_dp/3.0_dp))*ener_x(ispin)- &
+                     (trace_tmp + 2.0_dp/3.0_dp*((admm_env%gsi(ispin))**(2.0_dp/3.0_dp))*ener_x(ispin) - &
                       ((admm_env%gsi(ispin))**(2.0_dp/3.0_dp))*trace_tmp_two)/(admm_env%n_large_basis(ispin))
 
                ELSE
-                  admm_env%lambda_merlot(ispin) = (trace_tmp+(admm_env%gsi(ispin))**(2.0_dp/3.0_dp)* &
-                                                   (2.0_dp/3.0_dp*energy%exc_aux_fit-trace_tmp_two))/ &
+                  admm_env%lambda_merlot(ispin) = (trace_tmp + (admm_env%gsi(ispin))**(2.0_dp/3.0_dp)* &
+                                                   (2.0_dp/3.0_dp*energy%exc_aux_fit - trace_tmp_two))/ &
                                                   (admm_env%n_large_basis(ispin))
                END IF
             END IF
@@ -1363,8 +1363,8 @@ CONTAINS
                energy%exc_aux_fit = 0.0_dp
                energy%ex = 0.0_dp
                DO ispin = 1, dft_control%nspins
-                  energy%exc_aux_fit = energy%exc_aux_fit+(admm_env%gsi(ispin))**2.0_dp*ener_x(ispin)
-                  energy%ex = energy%ex+(admm_env%gsi(ispin))**2.0_dp*ener_k(ispin)
+                  energy%exc_aux_fit = energy%exc_aux_fit + (admm_env%gsi(ispin))**2.0_dp*ener_x(ispin)
+                  energy%ex = energy%ex + (admm_env%gsi(ispin))**2.0_dp*ener_k(ispin)
                END DO
             ELSE
                energy%exc_aux_fit = (admm_env%gsi(1))**2.0_dp*energy%exc_aux_fit
@@ -1375,7 +1375,7 @@ CONTAINS
             IF (dft_control%nspins == 2) THEN
                energy%exc_aux_fit = 0.0_dp
                DO ispin = 1, dft_control%nspins
-                  energy%exc_aux_fit = energy%exc_aux_fit+(admm_env%gsi(ispin))**(2.0_dp/3.0_dp)*ener_x(ispin)
+                  energy%exc_aux_fit = energy%exc_aux_fit + (admm_env%gsi(ispin))**(2.0_dp/3.0_dp)*ener_x(ispin)
                END DO
             ELSE
                energy%exc_aux_fit = (admm_env%gsi(1))**(2.0_dp/3.0_dp)*energy%exc_aux_fit
@@ -1404,7 +1404,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ispin
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_spin_dep_aux_exch_ener', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, myspin
       REAL(KIND=dp), DIMENSION(:), POINTER               :: tot_rho_r
@@ -1546,7 +1546,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks_aux_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_aux_mo_derivs_none', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao_aux_fit, nao_orb, nmo
       REAL(dp), DIMENSION(:), POINTER                    :: occupation_numbers, scaling_factor
@@ -1599,7 +1599,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks_aux_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'merge_mo_derivs_no_diag', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao_aux_fit, nao_orb, nmo
       REAL(dp), DIMENSION(:), POINTER                    :: occupation_numbers, scaling_factor
@@ -1683,7 +1683,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_mixed_overlap_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, iw, nao_aux_fit, nao_orb, &
                                                             natom, neighbor_list_id, nmo
@@ -2022,7 +2022,7 @@ CONTAINS
       INTEGER                                            :: ispin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_dm_mo_no_diag', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao_aux_fit, nmo
       REAL(KIND=dp)                                      :: alpha, nel_tmp_aux
@@ -2071,7 +2071,7 @@ CONTAINS
          ! Calculate number of electrons in the original density matrix, transposing doesn't matter
          ! since both matrices are symmetric
          CALL dbcsr_trace(density_matrix_large, overlap_matrix_large, admm_env%n_large_basis(ispin))
-         admm_env%n_large_basis(3) = admm_env%n_large_basis(3)+admm_env%n_large_basis(ispin)
+         admm_env%n_large_basis(3) = admm_env%n_large_basis(3) + admm_env%n_large_basis(ispin)
          ! Calculate number of electrons in the auxiliary density matrix
          CALL dbcsr_trace(density_matrix, overlap_matrix, nel_tmp_aux)
          admm_env%gsi(ispin) = admm_env%n_large_basis(ispin)/nel_tmp_aux
@@ -2102,7 +2102,7 @@ CONTAINS
       INTEGER                                            :: ispin, nspins
 
       CHARACTER(len=*), PARAMETER :: routineN = 'blockify_density_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, handle, iatom, jatom
       LOGICAL                                            :: found

@@ -14,40 +14,40 @@
 ! **************************************************************************************************
 MODULE thermal_region_utils
 
-   USE bibliography,                    ONLY: Kantorovich2008,&
-                                              Kantorovich2008a,&
-                                              cite_reference
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_constants,                 ONLY: langevin_ensemble,&
-                                              npt_f_ensemble,&
-                                              npt_i_ensemble,&
-                                              nvt_ensemble
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_list_types,             ONLY: particle_list_type
-   USE physcon,                         ONLY: femtoseconds,&
-                                              kelvin
-   USE simpar_types,                    ONLY: simpar_type
-   USE string_utilities,                ONLY: integer_to_string
-   USE thermal_region_types,            ONLY: allocate_thermal_regions,&
-                                              release_thermal_regions,&
-                                              thermal_region_type,&
-                                              thermal_regions_type
+   USE bibliography, ONLY: Kantorovich2008, &
+                           Kantorovich2008a, &
+                           cite_reference
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_constants, ONLY: langevin_ensemble, &
+                              npt_f_ensemble, &
+                              npt_i_ensemble, &
+                              nvt_ensemble
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE particle_list_types, ONLY: particle_list_type
+   USE physcon, ONLY: femtoseconds, &
+                      kelvin
+   USE simpar_types, ONLY: simpar_type
+   USE string_utilities, ONLY: integer_to_string
+   USE thermal_region_types, ONLY: allocate_thermal_regions, &
+                                   release_thermal_regions, &
+                                   thermal_region_type, &
+                                   thermal_regions_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -78,7 +78,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_thermal_regions', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: my_region
       INTEGER                                            :: i, il, ipart, ireg, nlist, nregions
@@ -146,11 +146,11 @@ CONTAINS
                DO il = 1, nlist
                   CALL section_vals_val_get(region_sections, "LIST", i_rep_section=ireg, &
                                             i_rep_val=il, i_vals=tmplist)
-                  CALL reallocate(t_region%part_index, 1, t_region%npart+SIZE(tmplist))
+                  CALL reallocate(t_region%part_index, 1, t_region%npart + SIZE(tmplist))
                   DO i = 1, SIZE(tmplist)
                      ipart = tmplist(i)
                      CPASSERT(((ipart > 0) .AND. (ipart <= particles%n_els)))
-                     t_region%npart = t_region%npart+1
+                     t_region%npart = t_region%npart + 1
                      t_region%part_index(t_region%npart) = ipart
                      particles%els(ipart)%t_region_index = ireg
                      IF (simpar%ensemble == langevin_ensemble) THEN
@@ -218,7 +218,7 @@ CONTAINS
       CHARACTER(LEN=default_string_length)               :: pos, act
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_thermal_regions_temperature', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: fmd
       INTEGER                                            :: ireg, nregions, unit
@@ -248,7 +248,7 @@ CONTAINS
                DO ireg = 1, nregions
                   temp(ireg) = thermal_regions%thermal_region(ireg)%temperature
                END DO
-               fmd = "(I10,F20.3,"//TRIM(ADJUSTL(cp_to_string(nregions+1)))//"F20.6)"
+               fmd = "(I10,F20.3,"//TRIM(ADJUSTL(cp_to_string(nregions + 1)))//"F20.6)"
                fmd = TRIM(fmd)
                WRITE (UNIT=unit, FMT=fmd) itimes, time, temp(0:nregions)
                DEALLOCATE (temp)
@@ -276,7 +276,7 @@ CONTAINS
       CHARACTER(LEN=default_string_length)               :: pos, act
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_thermal_regions_langevin', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ipart, ipart_reg, ireg, natoms, &
                                                             print_unit

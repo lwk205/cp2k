@@ -8,32 +8,32 @@
 !> \author D. Varsano
 ! **************************************************************************************************
 MODULE qs_external_density
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE gaussian_gridlevels,             ONLY: gridlevel_info_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_recv,&
-                                              mp_send,&
-                                              mp_sync
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_integrate_function
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_p_type,&
-                                              realspace_grid_p_type,&
-                                              rs_grid_create,&
-                                              rs_grid_zero
-   USE rs_pw_interface,                 ONLY: density_rs2pw
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE gaussian_gridlevels, ONLY: gridlevel_info_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_recv, &
+                              mp_send, &
+                              mp_sync
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_integrate_function
+   USE pw_types, ONLY: pw_p_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE realspace_grid_types, ONLY: realspace_grid_desc_p_type, &
+                                   realspace_grid_p_type, &
+                                   rs_grid_create, &
+                                   rs_grid_zero
+   USE rs_pw_interface, ONLY: density_rs2pw
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -57,7 +57,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'external_read_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: filename
       INTEGER                                            :: extunit, gid, handle, i, igrid_level, &
@@ -108,7 +108,7 @@ CONTAINS
             CALL rs_grid_zero(rs_rho_ext(igrid_level)%rs_grid)
          ENDDO
 
-         igrid_level = igrid_level-1
+         igrid_level = igrid_level - 1
 
          ext_den_section => section_vals_get_subs_vals(input, "DFT%EXTERNAL_DENSITY")
          CALL section_vals_val_get(ext_den_section, "FILE_DENSITY", c_val=filename)
@@ -156,7 +156,7 @@ CONTAINS
                READ (extunit, *) nat, rdum
                DO i = 1, 3
                   READ (extunit, *) ndum, rdum
-                  IF (ndum /= npoints(i) .OR. (ABS(rdum(i)-dr(i)) > 1e-4)) THEN
+                  IF (ndum /= npoints(i) .OR. (ABS(rdum(i) - dr(i)) > 1e-4)) THEN
                      WRITE (*, *) "ZMP | ERROR! | CUBE FILE NOT COINCIDENT WITH INTERNAL GRID ", i
                      WRITE (*, *) "ZMP | ", ndum, " DIFFERS FROM ", npoints(i)
                      WRITE (*, *) "ZMP | ", rdum, " DIFFERS FROM ", dr(i)
@@ -172,7 +172,7 @@ CONTAINS
                   IF (my_rank .EQ. 0) THEN
                      READ (extunit, *) (buffer(k), k=lbounds(3), ubounds(3))
                      IF (num_pe .GT. 1) THEN
-                        DO ip = 1, num_pe-1
+                        DO ip = 1, num_pe - 1
                            CALL mp_send(buffer(lbounds(3):ubounds(3)), ip, tag, gid)
 !                  WRITE(*,*) my_rank," sending to : ",ip
                         ENDDO

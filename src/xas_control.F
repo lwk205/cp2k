@@ -9,23 +9,23 @@
 ! **************************************************************************************************
 MODULE xas_control
 
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_constants,                 ONLY: xas_1s_type,&
-                                              xas_dscf,&
-                                              xas_tp_fh,&
-                                              xas_tp_flex,&
-                                              xas_tp_hh,&
-                                              xas_tp_xfh,&
-                                              xas_tp_xhh,&
-                                              xes_tp_val
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE memory_utilities,                ONLY: reallocate
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_constants, ONLY: xas_1s_type, &
+                              xas_dscf, &
+                              xas_tp_fh, &
+                              xas_tp_flex, &
+                              xas_tp_hh, &
+                              xas_tp_xfh, &
+                              xas_tp_xhh, &
+                              xes_tp_val
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE memory_utilities, ONLY: reallocate
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -86,7 +86,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: xas_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_xas_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ir, n_rep, nex_at, nex_st
       INTEGER, DIMENSION(:), POINTER                     :: list
@@ -144,12 +144,12 @@ CONTAINS
                                          i_rep_val=ir, i_vals=list)
 
                IF (ASSOCIATED(list)) THEN
-                  CALL reallocate(xas_control%exc_atoms, 1, nex_at+SIZE(list))
+                  CALL reallocate(xas_control%exc_atoms, 1, nex_at + SIZE(list))
                   DO i = 1, SIZE(list)
-                     xas_control%exc_atoms(i+nex_at) = list(i)
+                     xas_control%exc_atoms(i + nex_at) = list(i)
                   END DO
-                  xas_control%nexc_atoms = nex_at+SIZE(list)
-                  nex_at = nex_at+SIZE(list)
+                  xas_control%nexc_atoms = nex_at + SIZE(list)
+                  nex_at = nex_at + SIZE(list)
                END IF
             END DO ! ir
          END IF
@@ -186,11 +186,11 @@ CONTAINS
                                       i_rep_val=ir, i_vals=list)
 
             IF (ASSOCIATED(list)) THEN
-               CALL reallocate(xas_control%orbital_list, 1, nex_st+SIZE(list))
+               CALL reallocate(xas_control%orbital_list, 1, nex_st + SIZE(list))
                DO i = 1, SIZE(list)
-                  xas_control%orbital_list(i+nex_st) = list(i)
+                  xas_control%orbital_list(i + nex_st) = list(i)
                END DO
-               nex_st = nex_st+SIZE(list)
+               nex_st = nex_st + SIZE(list)
             END IF
          END DO ! ir
       ELSE
@@ -214,7 +214,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_xas_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: output_unit
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -277,7 +277,7 @@ CONTAINS
       TYPE(xas_control_type), POINTER                    :: xas_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xas_control_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(xas_control))
       ALLOCATE (xas_control)
@@ -309,11 +309,11 @@ CONTAINS
       TYPE(xas_control_type), POINTER                    :: xas_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xas_control_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(xas_control)) THEN
          CPASSERT(xas_control%ref_count > 0)
-         xas_control%ref_count = xas_control%ref_count-1
+         xas_control%ref_count = xas_control%ref_count - 1
          IF (xas_control%ref_count == 0) THEN
             IF (ASSOCIATED(xas_control%exc_atoms)) THEN
                DEALLOCATE (xas_control%exc_atoms)
@@ -338,10 +338,10 @@ CONTAINS
       TYPE(xas_control_type), POINTER                    :: xas_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xas_control_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(xas_control))
-      xas_control%ref_count = xas_control%ref_count+1
+      xas_control%ref_count = xas_control%ref_count + 1
 
    END SUBROUTINE xas_control_retain
 

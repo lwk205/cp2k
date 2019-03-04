@@ -8,15 +8,15 @@
 !> \author Teodoro Laino - 09.2007 University of Zurich [tlaino]
 ! **************************************************************************************************
 MODULE al_system_types
-   USE bibliography,                    ONLY: Jones2011,&
-                                              cite_reference
-   USE extended_system_types,           ONLY: create_map_info_type,&
-                                              map_info_type,&
-                                              release_map_info_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE simpar_types,                    ONLY: simpar_type
+   USE bibliography, ONLY: Jones2011, &
+                           cite_reference
+   USE extended_system_types, ONLY: create_map_info_type, &
+                                    map_info_type, &
+                                    release_map_info_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE simpar_types, ONLY: simpar_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -86,7 +86,7 @@ CONTAINS
       TYPE(al_system_type), POINTER                      :: al
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'al_thermo_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: seed
@@ -130,7 +130,7 @@ CONTAINS
       TYPE(al_thermo_type), DIMENSION(:), POINTER        :: nvt
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'al_thermo_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(nvt)) THEN
          DEALLOCATE (nvt)

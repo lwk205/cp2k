@@ -11,25 +11,25 @@
 !> \author JGH (20.07.2006)
 ! **************************************************************************************************
 MODULE moments_utils
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE fist_environment_types,          ONLY: fist_env_get,&
-                                              fist_environment_type
-   USE input_constants,                 ONLY: use_mom_ref_coac,&
-                                              use_mom_ref_com,&
-                                              use_mom_ref_user,&
-                                              use_mom_ref_zero
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE fist_environment_types, ONLY: fist_env_get, &
+                                     fist_environment_type
+   USE input_constants, ONLY: use_mom_ref_coac, &
+                              use_mom_ref_com, &
+                              use_mom_ref_user, &
+                              use_mom_ref_zero
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -66,7 +66,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: ifirst, ilast
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_reference_point', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: akind, ia, iatom, ikind
       LOGICAL                                            :: do_molecule
@@ -112,12 +112,12 @@ CONTAINS
             ENDDO
             DO iatom = ifirst, ilast
                ria = particle_set(iatom)%r
-               ria = pbc(ria-center, cell)+center
+               ria = pbc(ria - center, cell) + center
                atomic_kind => particle_set(iatom)%atomic_kind
                CALL get_atomic_kind(atomic_kind=atomic_kind, mass=mass)
-               rpoint(:) = rpoint(:)+mass*ria(:)
-               IF (PRESENT(drpoint)) drpoint = drpoint+mass*particle_set(iatom)%v
-               mtot = mtot+mass
+               rpoint(:) = rpoint(:) + mass*ria(:)
+               IF (PRESENT(drpoint)) drpoint = drpoint + mass*particle_set(iatom)%v
+               mtot = mtot + mass
             END DO
          ELSE
             DO ikind = 1, SIZE(local_particles%n_el)
@@ -127,9 +127,9 @@ CONTAINS
                   ria = pbc(ria, cell)
                   atomic_kind => particle_set(iatom)%atomic_kind
                   CALL get_atomic_kind(atomic_kind=atomic_kind, mass=mass)
-                  rpoint(:) = rpoint(:)+mass*ria(:)
-                  IF (PRESENT(drpoint)) drpoint = drpoint+mass*particle_set(iatom)%v
-                  mtot = mtot+mass
+                  rpoint(:) = rpoint(:) + mass*ria(:)
+                  IF (PRESENT(drpoint)) drpoint = drpoint + mass*particle_set(iatom)%v
+                  mtot = mtot + mass
                END DO
             END DO
             CALL mp_sum(rpoint, para_env%group)
@@ -155,13 +155,13 @@ CONTAINS
             ENDDO
             DO iatom = ifirst, ilast
                ria = particle_set(iatom)%r
-               ria = pbc(ria-center, cell)+center
+               ria = pbc(ria - center, cell) + center
                atomic_kind => particle_set(iatom)%atomic_kind
                CALL get_atomic_kind(atomic_kind, kind_number=akind)
                CALL get_qs_kind(qs_kind_set(akind), core_charge=charge)
-               rpoint(:) = rpoint(:)+charge*ria(:)
-               IF (PRESENT(drpoint)) drpoint = drpoint+charge*particle_set(iatom)%v
-               ztot = ztot+charge
+               rpoint(:) = rpoint(:) + charge*ria(:)
+               IF (PRESENT(drpoint)) drpoint = drpoint + charge*particle_set(iatom)%v
+               ztot = ztot + charge
             END DO
          ELSE
             DO ikind = 1, SIZE(local_particles%n_el)
@@ -172,9 +172,9 @@ CONTAINS
                   atomic_kind => particle_set(iatom)%atomic_kind
                   CALL get_atomic_kind(atomic_kind, kind_number=akind)
                   CALL get_qs_kind(qs_kind_set(akind), core_charge=charge)
-                  rpoint(:) = rpoint(:)+charge*ria(:)
-                  IF (PRESENT(drpoint)) drpoint = drpoint+charge*particle_set(iatom)%v
-                  ztot = ztot+charge
+                  rpoint(:) = rpoint(:) + charge*ria(:)
+                  IF (PRESENT(drpoint)) drpoint = drpoint + charge*particle_set(iatom)%v
+                  ztot = ztot + charge
                END DO
             END DO
             CALL mp_sum(rpoint, para_env%group)

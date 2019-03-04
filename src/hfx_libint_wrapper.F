@@ -12,22 +12,22 @@
 ! **************************************************************************************************
 MODULE hfx_libint_wrapper
 
-   USE ISO_C_BINDING,                   ONLY: C_DOUBLE,&
-                                              C_F_POINTER,&
-                                              C_F_PROCPOINTER,&
-                                              C_INT,&
-                                              C_LOC,&
-                                              C_PTR,&
-                                              c_funptr
-   USE hfx_libint_wrapper_types,        ONLY: build_deriv1_eri_size,&
-                                              build_eri_size,&
-                                              lib_deriv,&
-                                              lib_int,&
-                                              libderiv_max_am1,&
-                                              libint_max_am,&
-                                              prim_data
-   USE kinds,                           ONLY: dp
-   USE orbital_pointers,                ONLY: nco
+   USE ISO_C_BINDING, ONLY: C_DOUBLE, &
+                            C_F_POINTER, &
+                            C_F_PROCPOINTER, &
+                            C_INT, &
+                            C_LOC, &
+                            C_PTR, &
+                            c_funptr
+   USE hfx_libint_wrapper_types, ONLY: build_deriv1_eri_size, &
+                                       build_eri_size, &
+                                       lib_deriv, &
+                                       lib_int, &
+                                       libderiv_max_am1, &
+                                       libint_max_am, &
+                                       prim_data
+   USE kinds, ONLY: dp
+   USE orbital_pointers, ONLY: nco
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -118,7 +118,7 @@ CONTAINS
       INTEGER                                            :: max_am
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'initialize_libint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       INTEGER(KIND=C_INT)                                :: lib_storage, max_am_local, max_prim
@@ -148,7 +148,7 @@ CONTAINS
       INTEGER                                            :: max_am
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'initialize_libderiv', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       INTEGER(KIND=C_INT)                                :: lib_deriv_storage, max_am_local, &
@@ -235,8 +235,8 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n_d, n_c, n_b, n_a
       TYPE(lib_deriv)                                    :: deriv
       TYPE(prim_data), TARGET                            :: prim
-      REAL(dp), DIMENSION(nco(n_a)*nco(n_b)*nco(n_c)*nco&
-         (n_d), 12)                                      :: work_forces
+      REAL(dp), DIMENSION(nco(n_a)*nco(n_b)*nco(n_c)*nco &
+                          (n_d), 12)                                      :: work_forces
       INTEGER                                            :: a_mysize(1)
 
       PROCEDURE(build_deriv1), POINTER         :: pbuild_deriv1
@@ -280,7 +280,7 @@ CONTAINS
       INTEGER                                            :: max_am
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'initialize_libint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       MARK_USED(lib)
       MARK_USED(max_am)
@@ -298,7 +298,7 @@ CONTAINS
       INTEGER                                            :: max_am
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'initialize_libderiv', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       MARK_USED(deriv)
       MARK_USED(max_am)
@@ -375,8 +375,8 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n_d, n_c, n_b, n_a
       TYPE(lib_deriv)                                    :: deriv
       TYPE(prim_data), TARGET                            :: prim
-      REAL(dp), DIMENSION(nco(n_a)*nco(n_b)*nco(n_c)*nco&
-         (n_d), 12)                                      :: work_forces
+      REAL(dp), DIMENSION(nco(n_a)*nco(n_b)*nco(n_c)*nco &
+                          (n_d), 12)                                      :: work_forces
       INTEGER                                            :: a_mysize(1)
 
       MARK_USED(n_a)

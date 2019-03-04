@@ -9,18 +9,18 @@
 ! **************************************************************************************************
 MODULE virial_methods
 
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -81,7 +81,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: igroup
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'virial_evaluate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iparticle, iparticle_kind, &
                                                             iparticle_local, j, nparticle_kind, &
@@ -102,7 +102,7 @@ CONTAINS
                   nparticle_local = local_particles%n_el(iparticle_kind)
                   DO iparticle_local = 1, nparticle_local
                      iparticle = local_particles%list(iparticle_kind)%array(iparticle_local)
-                     virial%pv_kinetic(i, j) = virial%pv_kinetic(i, j)+ &
+                     virial%pv_kinetic(i, j) = virial%pv_kinetic(i, j) + &
                                                mass*particle_set(iparticle)%v(i)*particle_set(iparticle)%v(j)
                   END DO
                END DO
@@ -113,7 +113,7 @@ CONTAINS
          CALL mp_sum(virial%pv_kinetic, igroup)
 
          ! total virial
-         virial%pv_total = virial%pv_virial+virial%pv_kinetic+virial%pv_constraint
+         virial%pv_total = virial%pv_virial + virial%pv_kinetic + virial%pv_constraint
 
          CALL timestop(handle)
       ENDIF
@@ -138,13 +138,13 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(3), INTENT(IN)            :: force, rab
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'virial_pair_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 
       DO i = 1, 3
          DO j = 1, 3
-            pv_virial(i, j) = pv_virial(i, j)+f0*force(i)*rab(j)
+            pv_virial(i, j) = pv_virial(i, j) + f0*force(i)*rab(j)
          END DO
       END DO
 

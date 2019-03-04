@@ -8,95 +8,95 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE qs_dftb_matrices
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE atprop_types,                    ONLY: atprop_array_init,&
-                                              atprop_type
-   USE block_p_types,                   ONLY: block_p_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              dftb_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_sparse_matrix
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        convert_offsets_to_sizes, dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_distribution_type, &
-        dbcsr_finalize, dbcsr_get_block_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_antisymmetric, &
-        dbcsr_type_symmetric
-   USE ewald_environment_types,         ONLY: ewald_env_create,&
-                                              ewald_env_get,&
-                                              ewald_env_release,&
-                                              ewald_env_set,&
-                                              ewald_environment_type,&
-                                              read_ewald_section
-   USE ewald_pw_types,                  ONLY: ewald_pw_create,&
-                                              ewald_pw_release,&
-                                              ewald_pw_type
-   USE input_constants,                 ONLY: do_fist_pol_none
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE message_passing,                 ONLY: mp_sum
-   USE mulliken,                        ONLY: mulliken_charges
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: allocate_particle_set,&
-                                              deallocate_particle_set,&
-                                              particle_type
-   USE pw_poisson_types,                ONLY: do_ewald_ewald,&
-                                              do_ewald_none,&
-                                              do_ewald_pme,&
-                                              do_ewald_spme
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type,&
-                                              qmmm_pot_p_type,&
-                                              qmmm_pot_type
-   USE qmmm_util,                       ONLY: spherical_cutoff_factor
-   USE qs_dftb_coulomb,                 ONLY: build_dftb_coulomb,&
-                                              gamma_rab_sr
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type,&
-                                              qs_dftb_pairpot_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_ks_qmmm_types,                ONLY: qs_ks_qmmm_env_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_neighbor_lists,               ONLY: build_qs_neighbor_lists
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE spme,                            ONLY: spme_forces,&
-                                              spme_potential
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE atprop_types, ONLY: atprop_array_init, &
+                           atprop_type
+   USE block_p_types, ONLY: block_p_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type, &
+                               dftb_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_sparse_matrix
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      convert_offsets_to_sizes, dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_distribution_type, &
+      dbcsr_finalize, dbcsr_get_block_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_antisymmetric, &
+      dbcsr_type_symmetric
+   USE ewald_environment_types, ONLY: ewald_env_create, &
+                                      ewald_env_get, &
+                                      ewald_env_release, &
+                                      ewald_env_set, &
+                                      ewald_environment_type, &
+                                      read_ewald_section
+   USE ewald_pw_types, ONLY: ewald_pw_create, &
+                             ewald_pw_release, &
+                             ewald_pw_type
+   USE input_constants, ONLY: do_fist_pol_none
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE message_passing, ONLY: mp_sum
+   USE mulliken, ONLY: mulliken_charges
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: allocate_particle_set, &
+                             deallocate_particle_set, &
+                             particle_type
+   USE pw_poisson_types, ONLY: do_ewald_ewald, &
+                               do_ewald_none, &
+                               do_ewald_pme, &
+                               do_ewald_spme
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type, &
+                             qmmm_pot_p_type, &
+                             qmmm_pot_type
+   USE qmmm_util, ONLY: spherical_cutoff_factor
+   USE qs_dftb_coulomb, ONLY: build_dftb_coulomb, &
+                              gamma_rab_sr
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type, &
+                            qs_dftb_pairpot_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_ks_qmmm_types, ONLY: qs_ks_qmmm_env_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_neighbor_lists, ONLY: build_qs_neighbor_lists
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE spme, ONLY: spme_forces, &
+                   spme_potential
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -143,11 +143,11 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_dftb_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: after, atom_a, atom_b, handle, i, iatom, ic, icol, ikind, img, irow, iw, jatom, &
-         jkind, l1, l2, la, lb, llm, lmaxi, lmaxj, m, n1, n2, n_urpoly, natom, natorb_a, natorb_b, &
-         nderivatives, ngrd, ngrdcut, nimg, nkind, spdim
+                 jkind, l1, l2, la, lb, llm, lmaxi, lmaxj, m, n1, n2, n_urpoly, natom, natorb_a, natorb_b, &
+                 nderivatives, ngrd, ngrdcut, nimg, nkind, spdim
       INTEGER, DIMENSION(3)                              :: cell
       INTEGER, DIMENSION(:), POINTER                     :: atom_of_kind
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
@@ -196,7 +196,7 @@ CONTAINS
             DO l1 = 0, MAX(la, lb)
                DO l2 = 0, MIN(l1, la, lb)
                   DO m = 0, l2
-                     llm = llm+1
+                     llm = llm + 1
                      iptr(l1, l2, m, la, lb) = llm
                   END DO
                END DO
@@ -358,8 +358,8 @@ CONTAINS
             IF (iatom == jatom .AND. dr < 0.001_dp) THEN
                ! diagonal block
                DO i = 1, natorb_a
-                  sblock(i, i) = sblock(i, i)+1._dp
-                  fblock(i, i) = fblock(i, i)+skself(orbptr(i))
+                  sblock(i, i) = sblock(i, i) + 1._dp
+                  fblock(i, i) = fblock(i, i) + skself(orbptr(i))
                END DO
             ELSE
                ! off-diagonal block
@@ -383,7 +383,7 @@ CONTAINS
                      drij = rij
                      dfblock = 0._dp; dsblock = 0._dp
 
-                     drij(i) = rij(i)-ddr*f0
+                     drij(i) = rij(i) - ddr*f0
                      CALL compute_block_sk(dsblock, smatij, smatji, drij, ngrd, ngrdcut, dgrd, &
                                            llm, lmaxi, lmaxj, irow, iatom)
                      CALL compute_block_sk(dfblock, fmatij, fmatji, drij, ngrd, ngrdcut, dgrd, &
@@ -392,7 +392,7 @@ CONTAINS
                      dsblock = -dsblock
                      dfblock = -dfblock
 
-                     drij(i) = rij(i)+ddr*f0
+                     drij(i) = rij(i) + ddr*f0
                      CALL compute_block_sk(dsblock, smatij, smatji, drij, ngrd, ngrdcut, dgrd, &
                                            llm, lmaxi, lmaxj, irow, iatom)
                      CALL compute_block_sk(dfblock, fmatij, fmatji, drij, ngrd, ngrdcut, dgrd, &
@@ -404,11 +404,11 @@ CONTAINS
                      foab = 2.0_dp*SUM(dfblock*pblock)
                      fow = -2.0_dp*SUM(dsblock*wblock)
 
-                     force_ab(i) = force_ab(i)+foab
-                     force_w(i) = force_w(i)+fow
+                     force_ab(i) = force_ab(i) + foab
+                     force_w(i) = force_w(i) + fow
                      IF (dftb_control%self_consistent) THEN
-                        CPASSERT(ASSOCIATED(dsblocks(i+1)%block))
-                        dsblocks(i+1)%block = dsblocks(i+1)%block+dsblock
+                        CPASSERT(ASSOCIATED(dsblocks(i + 1)%block))
+                        dsblocks(i + 1)%block = dsblocks(i + 1)%block + dsblock
                      END IF
                   ENDDO
                   IF (use_virial) THEN
@@ -431,10 +431,10 @@ CONTAINS
                atom_b = atom_of_kind(jatom)
                IF (irow == iatom) force_ab = -force_ab
                IF (irow == iatom) force_w = -force_w
-               force(ikind)%all_potential(:, atom_a) = force(ikind)%all_potential(:, atom_a)-force_ab(:)
-               force(jkind)%all_potential(:, atom_b) = force(jkind)%all_potential(:, atom_b)+force_ab(:)
-               force(ikind)%overlap(:, atom_a) = force(ikind)%overlap(:, atom_a)-force_w(:)
-               force(jkind)%overlap(:, atom_b) = force(jkind)%overlap(:, atom_b)+force_w(:)
+               force(ikind)%all_potential(:, atom_a) = force(ikind)%all_potential(:, atom_a) - force_ab(:)
+               force(jkind)%all_potential(:, atom_b) = force(jkind)%all_potential(:, atom_b) + force_ab(:)
+               force(ikind)%overlap(:, atom_a) = force(ikind)%overlap(:, atom_a) - force_w(:)
+               force(jkind)%overlap(:, atom_b) = force(jkind)%overlap(:, atom_b) + force_w(:)
             END IF
 
          END IF
@@ -444,18 +444,18 @@ CONTAINS
             erepij = 0._dp
             CALL urep_egr(rij, dr, erepij, force_rr, &
                           n_urpoly, urep, spdim, s_cut, srep, spxr, scoeff, surr, calculate_forces)
-            erep = erep+erepij
+            erep = erep + erepij
             IF (atprop%energy) THEN
-               atprop%atecc(iatom) = atprop%atecc(iatom)+0.5_dp*erepij
-               atprop%atecc(jatom) = atprop%atecc(jatom)+0.5_dp*erepij
+               atprop%atecc(iatom) = atprop%atecc(iatom) + 0.5_dp*erepij
+               atprop%atecc(jatom) = atprop%atecc(jatom) + 0.5_dp*erepij
             END IF
             IF (calculate_forces .AND. (iatom /= jatom .OR. dr > 0.001_dp)) THEN
                atom_a = atom_of_kind(iatom)
                atom_b = atom_of_kind(jatom)
                force(ikind)%repulsive(:, atom_a) = &
-                  force(ikind)%repulsive(:, atom_a)-force_rr(:)
+                  force(ikind)%repulsive(:, atom_a) - force_rr(:)
                force(jkind)%repulsive(:, atom_b) = &
-                  force(jkind)%repulsive(:, atom_b)+force_rr(:)
+                  force(jkind)%repulsive(:, atom_b) + force_rr(:)
                IF (use_virial) THEN
                   CALL virial_pair_force(virial%pv_virial, -1._dp, force_rr, rij)
                   IF (atprop%stress) THEN
@@ -548,7 +548,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, handle, iatom, ikind, img, &
                                                             ispin, natom, nkind, nspins, &
@@ -623,7 +623,7 @@ CONTAINS
             CALL get_dftb_atom_param(dftb_kind, zeff=zeff)
             DO iatom = 1, natom
                atom_a = atomic_kind_set(ikind)%atom_list(iatom)
-               mcharge(atom_a) = zeff-SUM(charges(atom_a, 1:nspins))
+               mcharge(atom_a) = zeff - SUM(charges(atom_a, 1:nspins))
             END DO
          END DO
          DEALLOCATE (charges)
@@ -645,14 +645,14 @@ CONTAINS
             ! Compute QM/MM Energy
             CALL dbcsr_trace(qs_env%ks_qmmm_env%matrix_h(1)%matrix, &
                              matrix_p1(ispin)%matrix, trace=qmmm_el)
-            energy%qmmm_el = energy%qmmm_el+qmmm_el
+            energy%qmmm_el = energy%qmmm_el + qmmm_el
          END DO
          pc_ener = qs_env%ks_qmmm_env%pc_ener
-         energy%qmmm_el = energy%qmmm_el+pc_ener
+         energy%qmmm_el = energy%qmmm_el + pc_ener
       END IF
 
-      energy%total = energy%core+energy%hartree+energy%qmmm_el+ &
-                     energy%repulsive+energy%dispersion+energy%dftb3
+      energy%total = energy%core + energy%hartree + energy%qmmm_el + &
+                     energy%repulsive + energy%dispersion + energy%dftb3
 
       output_unit = cp_print_key_unit_nr(logger, scf_section, "PRINT%DETAILED_ENERGY", &
                                          extension=".scfLog")
@@ -705,10 +705,10 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_s
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_dftb_overlap', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, iatom, icol, ikind, indder, irow, j, jatom, jkind, l1, l2, la, lb, &
-         llm, lmaxi, lmaxj, m, n1, n2, natom, natorb_a, natorb_b, ngrd, ngrdcut, nkind
+                 llm, lmaxi, lmaxj, m, n1, n2, natom, natorb_a, natorb_b, ngrd, ngrdcut, nkind
       LOGICAL                                            :: defined, found
       REAL(KIND=dp)                                      :: ddr, dgrd, dr, f0
       REAL(KIND=dp), DIMENSION(0:3)                      :: skself
@@ -740,7 +740,7 @@ CONTAINS
             DO l1 = 0, MAX(la, lb)
                DO l2 = 0, MIN(l1, la, lb)
                   DO m = 0, l2
-                     llm = llm+1
+                     llm = llm + 1
                      iptr(l1, l2, m, la, lb) = llm
                   END DO
                END DO
@@ -822,7 +822,7 @@ CONTAINS
             IF (iatom == jatom .AND. dr < 0.001_dp) THEN
                ! diagonal block
                DO i = 1, natorb_a
-                  sblock(i, i) = sblock(i, i)+1._dp
+                  sblock(i, i) = sblock(i, i) + 1._dp
                END DO
             ELSE
                ! off-diagonal block
@@ -840,48 +840,48 @@ CONTAINS
                      drij = rij
                      f0 = 1.0_dp; IF (irow == iatom) f0 = -1.0_dp
 
-                     drij(i) = rij(i)-ddr*f0
+                     drij(i) = rij(i) - ddr*f0
                      CALL compute_block_sk(dsblockm, smatij, smatji, drij, ngrd, ngrdcut, dgrd, &
                                            llm, lmaxi, lmaxj, irow, iatom)
 
-                     drij(i) = rij(i)+ddr*f0
+                     drij(i) = rij(i) + ddr*f0
                      CALL compute_block_sk(dsblock, smatij, smatji, drij, ngrd, ngrdcut, dgrd, &
                                            llm, lmaxi, lmaxj, irow, iatom)
 
-                     dsblock1(:, :, i) = (dsblock+dsblockm)
-                     dsblock = dsblock-dsblockm
+                     dsblock1(:, :, i) = (dsblock + dsblockm)
+                     dsblock = dsblock - dsblockm
                      dsblock = dsblock/(2.0_dp*ddr)
 
-                     CPASSERT(ASSOCIATED(dsblocks(i+1)%block))
-                     dsblocks(i+1)%block = dsblocks(i+1)%block+dsblock
+                     CPASSERT(ASSOCIATED(dsblocks(i + 1)%block))
+                     dsblocks(i + 1)%block = dsblocks(i + 1)%block + dsblock
                      IF (nderivative .GT. 1) THEN
-                        indder = indder+5-i
+                        indder = indder + 5 - i
                         dsblocks(indder)%block = 0.0_dp
-                        dsblocks(indder)%block = dsblocks(indder)%block+ &
-                                                 (dsblock1(:, :, i)-2.0_dp*sblock)/ddr**2
+                        dsblocks(indder)%block = dsblocks(indder)%block + &
+                                                 (dsblock1(:, :, i) - 2.0_dp*sblock)/ddr**2
                      END IF
                   ENDDO
 
                   IF (nderivative .GT. 1) THEN
                      DO i = 1, 2
-                        DO j = i+1, 3
+                        DO j = i + 1, 3
                            dsblock = 0._dp; dsblockm = 0.0_dp
                            drij = rij
                            f0 = 1.0_dp; IF (irow == iatom) f0 = -1.0_dp
 
-                           drij(i) = rij(i)-ddr*f0; drij(j) = rij(j)-ddr*f0
+                           drij(i) = rij(i) - ddr*f0; drij(j) = rij(j) - ddr*f0
                            CALL compute_block_sk(dsblockm, smatij, smatji, drij, ngrd, ngrdcut, dgrd, &
                                                  llm, lmaxi, lmaxj, irow, iatom)
 
-                           drij(i) = rij(i)+ddr*f0; drij(j) = rij(j)+ddr*f0
+                           drij(i) = rij(i) + ddr*f0; drij(j) = rij(j) + ddr*f0
                            CALL compute_block_sk(dsblock, smatij, smatji, drij, ngrd, ngrdcut, dgrd, &
                                                  llm, lmaxi, lmaxj, irow, iatom)
 
-                           indder = 2+2*i+j
+                           indder = 2 + 2*i + j
                            dsblocks(indder)%block = 0.0_dp
                            dsblocks(indder)%block = &
-                              dsblocks(indder)%block+( &
-                              dsblock+dsblockm-dsblock1(:, :, i)-dsblock1(:, :, j)+2.0_dp*sblock)/(2.0_dp*ddr**2)
+                              dsblocks(indder)%block + ( &
+                              dsblock + dsblockm - dsblock1(:, :, i) - dsblock1(:, :, j) + 2.0_dp*sblock)/(2.0_dp*ddr**2)
                         END DO
                      END DO
                   END IF
@@ -919,7 +919,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb_qmmm_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, handle, i, iatom, ikind, jatom, &
                                                             natom, natorb, nkind
@@ -983,7 +983,7 @@ CONTAINS
                                  qmmm_env%spherical_cutoff, &
                                  particles_qm)
             END IF
-            pc_ener = pc_ener+qpot(iatom)*zeff
+            pc_ener = pc_ener + qpot(iatom)*zeff
          END DO
       END DO
 
@@ -1003,7 +1003,7 @@ CONTAINS
          CALL dbcsr_get_block_p(matrix=matrix_h(1)%matrix, &
                                 row=iatom, col=jatom, block=hblock, found=found)
          CPASSERT(found)
-         hblock = hblock-0.5_dp*sblock*(qpot(iatom)+qpot(jatom))
+         hblock = hblock - 0.5_dp*sblock*(qpot(iatom) + qpot(jatom))
       END DO
       CALL dbcsr_iterator_stop(iter)
 
@@ -1030,7 +1030,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb_qmmm_matrix_zero', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_h, matrix_s
@@ -1077,7 +1077,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb_qmmm_matrix_pc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, do_ipol, ewald_type, handle, i, &
                                                             iatom, ikind, imm, imp, indmm, ipot, &
@@ -1227,7 +1227,7 @@ CONTAINS
                                     qmmm_env%added_charges%mm_atom_index, mm_cell, iatom, rcutoff, &
                                     particles_qm)
                END IF
-               pc_ener = pc_ener+qpot(iatom)*zeff
+               pc_ener = pc_ener + qpot(iatom)*zeff
             END DO
          END DO
       CASE (do_ewald_none)
@@ -1256,7 +1256,7 @@ CONTAINS
                                     qmmm_env%spherical_cutoff, &
                                     particles_qm)
                END IF
-               pc_ener = pc_ener+qpot(iatom)*zeff
+               pc_ener = pc_ener + qpot(iatom)*zeff
             END DO
          END DO
       CASE DEFAULT
@@ -1279,7 +1279,7 @@ CONTAINS
          CALL dbcsr_get_block_p(matrix=matrix_h(1)%matrix, &
                                 row=iatom, col=jatom, block=hblock, found=found)
          CPASSERT(found)
-         hblock = hblock-0.5_dp*sblock*(qpot(iatom)+qpot(jatom))
+         hblock = hblock - 0.5_dp*sblock*(qpot(iatom) + qpot(jatom))
       END DO
       CALL dbcsr_iterator_stop(iter)
 
@@ -1322,7 +1322,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: Forces, Forces_added_charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deriv_dftb_qmmm_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, blk, handle, i, iatom, ikind, &
                                                             iqm, jatom, natom, natorb, nkind, &
@@ -1376,7 +1376,7 @@ CONTAINS
             CALL get_dftb_atom_param(dftb_kind, zeff=zeff)
             DO iatom = 1, natom
                atom_a = atomic_kind_set(ikind)%atom_list(iatom)
-               mcharge(atom_a) = zeff-SUM(charges(atom_a, 1:nspins))
+               mcharge(atom_a) = zeff - SUM(charges(atom_a, 1:nspins))
             END DO
          END DO
          DEALLOCATE (charges)
@@ -1399,7 +1399,7 @@ CONTAINS
             IF (.NOT. defined .OR. natorb < 1) CYCLE
             DO i = 1, SIZE(list)
                iatom = list(i)
-               iqm = iqm+1
+               iqm = iqm + 1
                CALL build_mm_pot(qpot(iatom), 0, eta_a(0), qmmm_env%Potentials, particles_mm, &
                                  qmmm_env%mm_atom_chrg, qmmm_env%mm_atom_index, mm_cell, iatom, &
                                  qmmm_env%spherical_cutoff, particles_qm)
@@ -1434,9 +1434,9 @@ CONTAINS
             CALL get_dftb_atom_param(dftb_kind, defined=defined, natorb=natorb)
             IF (.NOT. defined .OR. natorb < 1) CYCLE
             DO i = 1, SIZE(list)
-               iqm = iqm+1
+               iqm = iqm + 1
                iatom = qmmm_env%qm_atom_index(list(i))
-               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:)+Forces_QM(:, iqm)
+               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:) + Forces_QM(:, iqm)
             END DO
          END DO
 
@@ -1453,19 +1453,19 @@ CONTAINS
             !
             IF (iatom == jatom) CYCLE
             !
-            gmij = -0.5_dp*(qpot(iatom)+qpot(jatom))
+            gmij = -0.5_dp*(qpot(iatom) + qpot(jatom))
             NULLIFY (pblock)
             CALL dbcsr_get_block_p(matrix=matrix_p(1)%matrix, &
                                    row=iatom, col=jatom, block=pblock, found=found)
             CPASSERT(found)
             DO i = 1, 3
                NULLIFY (dsblock)
-               CALL dbcsr_get_block_p(matrix=matrix_s(1+i)%matrix, &
+               CALL dbcsr_get_block_p(matrix=matrix_s(1 + i)%matrix, &
                                       row=iatom, col=jatom, block=dsblock, found=found)
                CPASSERT(found)
                fi = -2.0_dp*gmij*SUM(pblock*dsblock)
-               Forces_QM(i, iatom) = Forces_QM(i, iatom)+fi
-               Forces_QM(i, jatom) = Forces_QM(i, jatom)-fi
+               Forces_QM(i, iatom) = Forces_QM(i, iatom) + fi
+               Forces_QM(i, jatom) = Forces_QM(i, jatom) - fi
             END DO
          END DO
          CALL dbcsr_iterator_stop(iter)
@@ -1482,7 +1482,7 @@ CONTAINS
             DO i = 1, SIZE(list)
                iqm = list(i)
                iatom = qmmm_env%qm_atom_index(iqm)
-               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:)+Forces_QM(:, iqm)
+               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:) + Forces_QM(:, iqm)
             END DO
          END DO
          !
@@ -1524,10 +1524,10 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: Forces, Forces_added_charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deriv_dftb_qmmm_matrix_pc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_a, blk, do_ipol, ewald_type, handle, i, iatom, ikind, imm, imp, indmm, ipot, &
-         iqm, jatom, natom, natorb, nkind, nmm, nspins, number_qm_atoms
+                 iqm, jatom, natom, natorb, nkind, nmm, nspins, number_qm_atoms
       INTEGER, DIMENSION(:), POINTER                     :: list
       LOGICAL                                            :: defined, do_multipoles, found
       REAL(KIND=dp)                                      :: alpha, fi, gmij, zeff
@@ -1583,7 +1583,7 @@ CONTAINS
             CALL get_dftb_atom_param(dftb_kind, zeff=zeff)
             DO iatom = 1, natom
                atom_a = atomic_kind_set(ikind)%atom_list(iatom)
-               mcharge(atom_a) = zeff-SUM(charges(atom_a, 1:nspins))
+               mcharge(atom_a) = zeff - SUM(charges(atom_a, 1:nspins))
             END DO
          END DO
          DEALLOCATE (charges)
@@ -1646,7 +1646,7 @@ CONTAINS
                CALL mp_sum(Forces_MM, para_env%group)
                DO Imp = 1, nmm
                   Imm = Pot%mm_atom_index(Imp)
-                  Forces(:, Imm) = Forces(:, Imm)-Forces_MM(:, Imp)
+                  Forces(:, Imm) = Forces(:, Imm) - Forces_MM(:, Imp)
                END DO
                DEALLOCATE (Forces_MM)
             END DO
@@ -1687,7 +1687,7 @@ CONTAINS
                   CALL mp_sum(Forces_MM, para_env%group)
                   DO Imp = 1, nmm
                      Imm = Pot%mm_atom_index(Imp)
-                     Forces_added_charges(:, Imm) = Forces_added_charges(:, Imm)-Forces_MM(:, Imp)
+                     Forces_added_charges(:, Imm) = Forces_added_charges(:, Imm) - Forces_MM(:, Imp)
                   END DO
                   DEALLOCATE (Forces_MM)
                END DO
@@ -1713,7 +1713,7 @@ CONTAINS
                IF (.NOT. defined .OR. natorb < 1) CYCLE
                DO i = 1, SIZE(list)
                   iatom = list(i)
-                  iqm = iqm+1
+                  iqm = iqm + 1
                   CALL build_mm_pot(qpot(iatom), 1, eta_a(0), qmmm_env%Potentials, particles_mm, &
                                     qmmm_env%mm_atom_chrg, qmmm_env%mm_atom_index, &
                                     mm_cell, iatom, rcutoff, particles_qm)
@@ -1771,7 +1771,7 @@ CONTAINS
                IF (.NOT. defined .OR. natorb < 1) CYCLE
                DO i = 1, SIZE(list)
                   iatom = list(i)
-                  iqm = iqm+1
+                  iqm = iqm + 1
                   CALL build_mm_pot(qpot(iatom), 0, eta_a(0), qmmm_env%Potentials, particles_mm, &
                                     qmmm_env%mm_atom_chrg, qmmm_env%mm_atom_index, mm_cell, iatom, &
                                     qmmm_env%spherical_cutoff, particles_qm)
@@ -1809,9 +1809,9 @@ CONTAINS
             CALL get_dftb_atom_param(dftb_kind, defined=defined, natorb=natorb)
             IF (.NOT. defined .OR. natorb < 1) CYCLE
             DO i = 1, SIZE(list)
-               iqm = iqm+1
+               iqm = iqm + 1
                iatom = qmmm_env%qm_atom_index(list(i))
-               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:)+Forces_QM(:, iqm)
+               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:) + Forces_QM(:, iqm)
             END DO
          END DO
 
@@ -1828,19 +1828,19 @@ CONTAINS
             !
             IF (iatom == jatom) CYCLE
             !
-            gmij = -0.5_dp*(qpot(iatom)+qpot(jatom))
+            gmij = -0.5_dp*(qpot(iatom) + qpot(jatom))
             NULLIFY (pblock)
             CALL dbcsr_get_block_p(matrix=matrix_p(1)%matrix, &
                                    row=iatom, col=jatom, block=pblock, found=found)
             CPASSERT(found)
             DO i = 1, 3
                NULLIFY (dsblock)
-               CALL dbcsr_get_block_p(matrix=matrix_s(1+i)%matrix, &
+               CALL dbcsr_get_block_p(matrix=matrix_s(1 + i)%matrix, &
                                       row=iatom, col=jatom, block=dsblock, found=found)
                CPASSERT(found)
                fi = -2.0_dp*gmij*SUM(pblock*dsblock)
-               Forces_QM(i, iatom) = Forces_QM(i, iatom)+fi
-               Forces_QM(i, jatom) = Forces_QM(i, jatom)-fi
+               Forces_QM(i, iatom) = Forces_QM(i, iatom) + fi
+               Forces_QM(i, jatom) = Forces_QM(i, jatom) - fi
             END DO
          END DO
          CALL dbcsr_iterator_stop(iter)
@@ -1857,7 +1857,7 @@ CONTAINS
             DO i = 1, SIZE(list)
                iqm = list(i)
                iatom = qmmm_env%qm_atom_index(iqm)
-               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:)+Forces_QM(:, iqm)
+               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:) + Forces_QM(:, iqm)
             END DO
          END DO
          !
@@ -1928,7 +1928,7 @@ CONTAINS
          LoopMM: DO Imp = 1, SIZE(Pot%mm_atom_index)
             Imm = Pot%mm_atom_index(Imp)
             IndMM = mm_atom_index(Imm)
-            r_pbc = pbc(particles_mm(IndMM)%r-particles_qm(IndQM)%r, mm_cell)
+            r_pbc = pbc(particles_mm(IndMM)%r - particles_qm(IndQM)%r, mm_cell)
             rt1 = r_pbc(1)
             rt2 = r_pbc(2)
             rt3 = r_pbc(3)
@@ -1944,13 +1944,13 @@ CONTAINS
             IF (dr > rtiny) THEN
                IF (pot_type == 0) THEN
                   sr = gamma_rab_sr(dr, qm_alpha, eta_mm, 0.0_dp)
-                  qpot = qpot+qeff*(1.0_dp/dr-sr)
+                  qpot = qpot + qeff*(1.0_dp/dr - sr)
                ELSE IF (pot_type == 1) THEN
                   sr = gamma_rab_sr(dr, qm_alpha, eta_mm, 0.0_dp)
-                  qpot = qpot-qeff*sr
+                  qpot = qpot - qeff*sr
                ELSE IF (pot_type == 2) THEN
                   sr = erfc(qm_alpha*dr)/dr
-                  qpot = qpot+qeff*sr
+                  qpot = qpot + qeff*sr
                ELSE
                   CPABORT("")
                END IF
@@ -2012,7 +2012,7 @@ CONTAINS
          LoopMM: DO Imp = 1, SIZE(Pot%mm_atom_index)
             Imm = Pot%mm_atom_index(Imp)
             IndMM = mm_atom_index(Imm)
-            r_pbc = pbc(particles_mm(IndMM)%r-particles_qm(IndQM)%r, mm_cell)
+            r_pbc = pbc(particles_mm(IndMM)%r - particles_qm(IndQM)%r, mm_cell)
             rt1 = r_pbc(1)
             rt2 = r_pbc(2)
             rt3 = r_pbc(3)
@@ -2027,18 +2027,18 @@ CONTAINS
             END IF
             IF (ABS(qeff) <= qsmall) CYCLE
             IF (dr > rtiny) THEN
-               drp = dr+ddrmm
-               drm = dr-ddrmm
+               drp = dr + ddrmm
+               drm = dr - ddrmm
                IF (pot_type == 0) THEN
-                  dsr = 0.5_dp*(gamma_rab_sr(drp, qm_alpha, eta_mm, 0.0_dp)- &
+                  dsr = 0.5_dp*(gamma_rab_sr(drp, qm_alpha, eta_mm, 0.0_dp) - &
                                 gamma_rab_sr(drm, qm_alpha, eta_mm, 0.0_dp))/ddrmm
-                  fsr = qeff*qcharge*(-1.0_dp/(dr*dr)-dsr)
+                  fsr = qeff*qcharge*(-1.0_dp/(dr*dr) - dsr)
                ELSE IF (pot_type == 1) THEN
-                  dsr = 0.5_dp*(gamma_rab_sr(drp, qm_alpha, eta_mm, 0.0_dp)- &
+                  dsr = 0.5_dp*(gamma_rab_sr(drp, qm_alpha, eta_mm, 0.0_dp) - &
                                 gamma_rab_sr(drm, qm_alpha, eta_mm, 0.0_dp))/ddrmm
                   fsr = -qeff*qcharge*dsr
                ELSE IF (pot_type == 2) THEN
-                  dsr = 0.5_dp*(erfc(qm_alpha*drp)/drp-erfc(qm_alpha*drm)/drm)/ddrmm
+                  dsr = 0.5_dp*(erfc(qm_alpha*drp)/drp - erfc(qm_alpha*drm)/drm)/ddrmm
                   fsr = qeff*qcharge*dsr
                ELSE
                   CPABORT("")
@@ -2048,9 +2048,9 @@ CONTAINS
                force_ab = 0.0_dp
             END IF
             ! The array of QM forces are really the forces
-            forces_qm(:) = forces_qm(:)-force_ab
+            forces_qm(:) = forces_qm(:) - force_ab
             ! The one of MM atoms are instead gradients
-            forces(:, Imm) = forces(:, Imm)-force_ab
+            forces(:, Imm) = forces(:, Imm) - force_ab
          END DO LoopMM
       END DO MainLoopPot
       CALL timestop(handle)
@@ -2080,7 +2080,7 @@ CONTAINS
       INTEGER                                            :: llm, lmaxi, lmaxj, irow, iatom
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_block_sk', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: dr
       REAL(KIND=dp), DIMENSION(20)                       :: skabij, skabji
@@ -2114,7 +2114,7 @@ CONTAINS
          POINTER                                         :: sab_nl
 
       CHARACTER(len=*), PARAMETER :: routineN = 'setup_matrices1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(1)                                       :: symmetry_type
       CHARACTER(LEN=default_string_length)               :: matnames
@@ -2204,7 +2204,7 @@ CONTAINS
          POINTER                                         :: sab_nl
 
       CHARACTER(len=*), PARAMETER :: routineN = 'setup_matrices2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(1)                                       :: symmetry_type
       CHARACTER(LEN=default_string_length)               :: matnames
@@ -2345,10 +2345,10 @@ CONTAINS
       INTEGER                                            :: fgpm, k, l, lgpm
       REAL(dp)                                           :: error, xa(max_inter), ya(max_inter)
 
-      lgpm = MIN(clgp+INT(max_inter/2.0), ngrd)
-      fgpm = lgpm-max_inter+1
-      DO k = 0, max_inter-1
-         xa(k+1) = (fgpm+k)*dgrd
+      lgpm = MIN(clgp + INT(max_inter/2.0), ngrd)
+      fgpm = lgpm - max_inter + 1
+      DO k = 0, max_inter - 1
+         xa(k + 1) = (fgpm + k)*dgrd
       END DO
       !
       ! Interpolate matrix elements for all orbitals
@@ -2382,16 +2382,16 @@ CONTAINS
       REAL(dp)                                           :: error, xa(max_extra), ya(max_extra)
 
       nzero = max_extra/3
-      ntable = max_extra-nzero
+      ntable = max_extra - nzero
       !
       ! Get the three last distances from the table
       !
       DO k = 1, ntable
-         xa(k) = (ngrd-(max_extra-3)+k)*dgrd
+         xa(k) = (ngrd - (max_extra - 3) + k)*dgrd
       END DO
       DO k = 1, nzero
-         xa(ntable+k) = (ngrd+k-1)*dgrd+slako_d0
-         ya(ntable+k) = 0.0
+         xa(ntable + k) = (ngrd + k - 1)*dgrd + slako_d0
+         ya(ntable + k) = 0.0
       END DO
       !
       ! Extrapolate matrix elements for all orbitals
@@ -2400,9 +2400,9 @@ CONTAINS
          !
          ! Read SK parameters from table
          !
-         fgp = ngrd+1-(max_extra-3)
+         fgp = ngrd + 1 - (max_extra - 3)
          lgp = ngrd
-         ya(1:max_extra-3) = slakotab(fgp:lgp, l)
+         ya(1:max_extra - 3) = slakotab(fgp:lgp, l)
          CALL polint(xa, ya, max_extra, dx, skpar(l), error)
       END DO
    END SUBROUTINE extrapol
@@ -2539,10 +2539,10 @@ CONTAINS
 !> \version 1.0
 ! **************************************************************************************************
       SUBROUTINE skss(skpar, mat)
-      REAL(dp), INTENT(in)                               :: skpar(:)
-      REAL(dp), INTENT(inout)                            :: mat(:, :)
+         REAL(dp), INTENT(in)                               :: skpar(:)
+         REAL(dp), INTENT(inout)                            :: mat(:, :)
 
-         mat(1, 1) = mat(1, 1)+skpar(1)
+         mat(1, 1) = mat(1, 1) + skpar(1)
          !
       END SUBROUTINE skss
 
@@ -2555,22 +2555,22 @@ CONTAINS
 !> \version 1.0
 ! **************************************************************************************************
       SUBROUTINE sksp(skpar, mat, ind, transposed)
-      REAL(dp), INTENT(in)                               :: skpar(:)
-      REAL(dp), INTENT(inout)                            :: mat(:, :)
-      INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
-      LOGICAL, INTENT(in)                                :: transposed
+         REAL(dp), INTENT(in)                               :: skpar(:)
+         REAL(dp), INTENT(inout)                            :: mat(:, :)
+         INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
+         LOGICAL, INTENT(in)                                :: transposed
 
-      INTEGER                                            :: l
-      REAL(dp)                                           :: skp
+         INTEGER                                            :: l
+         REAL(dp)                                           :: skp
 
          skp = skpar(ind(1, 0, 0))
          IF (transposed) THEN
             DO l = 1, 3
-               mat(1, l+1) = mat(1, l+1)+rr(l)*skp
+               mat(1, l + 1) = mat(1, l + 1) + rr(l)*skp
             END DO
          ELSE
             DO l = 1, 3
-               mat(l+1, 1) = mat(l+1, 1)-rr(l)*skp
+               mat(l + 1, 1) = mat(l + 1, 1) - rr(l)*skp
             END DO
          END IF
          !
@@ -2583,35 +2583,35 @@ CONTAINS
 !> \param ind ...
 ! **************************************************************************************************
       SUBROUTINE skpp(skpar, mat, ind)
-      REAL(dp), INTENT(in)                               :: skpar(:)
-      REAL(dp), INTENT(inout)                            :: mat(:, :)
-      INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
+         REAL(dp), INTENT(in)                               :: skpar(:)
+         REAL(dp), INTENT(inout)                            :: mat(:, :)
+         INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
 
-      INTEGER                                            :: ii, ir, is, k, l
-      REAL(dp)                                           :: epp(6), matel(6), skppp, skpps
+         INTEGER                                            :: ii, ir, is, k, l
+         REAL(dp)                                           :: epp(6), matel(6), skppp, skpps
 
          epp(1:3) = rr2(1:3)
          DO l = 1, 3
-            epp(l+3) = rr(l)*rr(l+1)
+            epp(l + 3) = rr(l)*rr(l + 1)
          END DO
          skppp = skpar(ind(1, 1, 1))
          skpps = skpar(ind(1, 1, 0))
          !
          DO l = 1, 3
-            matel(l) = epp(l)*skpps+(1._dp-epp(l))*skppp
+            matel(l) = epp(l)*skpps + (1._dp - epp(l))*skppp
          END DO
          DO l = 4, 6
-            matel(l) = epp(l)*(skpps-skppp)
+            matel(l) = epp(l)*(skpps - skppp)
          END DO
          !
          DO ir = 1, 3
-            DO is = 1, ir-1
-               ii = ir-is
-               k = 3*ii-(ii*(ii-1))/2+is
-               mat(is+1, ir+1) = mat(is+1, ir+1)+matel(k)
-               mat(ir+1, is+1) = mat(ir+1, is+1)+matel(k)
+            DO is = 1, ir - 1
+               ii = ir - is
+               k = 3*ii - (ii*(ii - 1))/2 + is
+               mat(is + 1, ir + 1) = mat(is + 1, ir + 1) + matel(k)
+               mat(ir + 1, is + 1) = mat(ir + 1, is + 1) + matel(k)
             END DO
-            mat(ir+1, ir+1) = mat(ir+1, ir+1)+matel(ir)
+            mat(ir + 1, ir + 1) = mat(ir + 1, ir + 1) + matel(ir)
          END DO
       END SUBROUTINE skpp
 
@@ -2623,32 +2623,32 @@ CONTAINS
 !> \param transposed ...
 ! **************************************************************************************************
       SUBROUTINE sksd(skpar, mat, ind, transposed)
-      REAL(dp), INTENT(in)                               :: skpar(:)
-      REAL(dp), INTENT(inout)                            :: mat(:, :)
-      INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
-      LOGICAL, INTENT(in)                                :: transposed
+         REAL(dp), INTENT(in)                               :: skpar(:)
+         REAL(dp), INTENT(inout)                            :: mat(:, :)
+         INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
+         LOGICAL, INTENT(in)                                :: transposed
 
-      INTEGER                                            :: l
-      REAL(dp)                                           :: d4, d5, es(5), r3, sksds
+         INTEGER                                            :: l
+         REAL(dp)                                           :: d4, d5, es(5), r3, sksds
 
          sksds = skpar(ind(2, 0, 0))
          r3 = SQRT(3._dp)
-         d4 = rr2(3)-0.5_dp*(rr2(1)+rr2(2))
-         d5 = rr2(1)-rr2(2)
+         d4 = rr2(3) - 0.5_dp*(rr2(1) + rr2(2))
+         d5 = rr2(1) - rr2(2)
          !
          DO l = 1, 3
-            es(l) = r3*rr(l)*rr(l+1)
+            es(l) = r3*rr(l)*rr(l + 1)
          END DO
          es(4) = 0.5_dp*r3*d5
          es(5) = d4
          !
          IF (transposed) THEN
             DO l = 1, 5
-               mat(1, l+4) = mat(1, l+4)+es(l)*sksds
+               mat(1, l + 4) = mat(1, l + 4) + es(l)*sksds
             END DO
          ELSE
             DO l = 1, 5
-               mat(l+4, 1) = mat(l+4, 1)+es(l)*sksds
+               mat(l + 4, 1) = mat(l + 4, 1) + es(l)*sksds
             END DO
          END IF
       END SUBROUTINE sksd
@@ -2661,33 +2661,33 @@ CONTAINS
 !> \param transposed ...
 ! **************************************************************************************************
       SUBROUTINE skpd(skpar, mat, ind, transposed)
-      REAL(dp), INTENT(in)                               :: skpar(:)
-      REAL(dp), INTENT(inout)                            :: mat(:, :)
-      INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
-      LOGICAL, INTENT(in)                                :: transposed
+         REAL(dp), INTENT(in)                               :: skpar(:)
+         REAL(dp), INTENT(inout)                            :: mat(:, :)
+         INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
+         LOGICAL, INTENT(in)                                :: transposed
 
-      INTEGER                                            :: ir, is, k, l, m
-      REAL(dp)                                           :: d3, d4, d5, d6, dm(15), epd(13, 2), r3, &
-                                                            sktmp
+         INTEGER                                            :: ir, is, k, l, m
+         REAL(dp)                                           :: d3, d4, d5, d6, dm(15), epd(13, 2), r3, &
+                                                               sktmp
 
          r3 = SQRT(3.0_dp)
-         d3 = rr2(1)+rr2(2)
-         d4 = rr2(3)-0.5_dp*d3
-         d5 = rr2(1)-rr2(2)
+         d3 = rr2(1) + rr2(2)
+         d4 = rr2(3) - 0.5_dp*d3
+         d5 = rr2(1) - rr2(2)
          d6 = rr(1)*rr(2)*rr(3)
          DO l = 1, 3
-            epd(l, 1) = r3*rr2(l)*rr(l+1)
-            epd(l, 2) = rr(l+1)*(1.0_dp-2._dp*rr2(l))
-            epd(l+4, 1) = r3*rr2(l)*rr(l+2)
-            epd(l+4, 2) = rr(l+2)*(1.0_dp-2*rr2(l))
-            epd(l+7, 1) = 0.5_dp*r3*rr(l)*d5
-            epd(l+10, 1) = rr(l)*d4
+            epd(l, 1) = r3*rr2(l)*rr(l + 1)
+            epd(l, 2) = rr(l + 1)*(1.0_dp - 2._dp*rr2(l))
+            epd(l + 4, 1) = r3*rr2(l)*rr(l + 2)
+            epd(l + 4, 2) = rr(l + 2)*(1.0_dp - 2*rr2(l))
+            epd(l + 7, 1) = 0.5_dp*r3*rr(l)*d5
+            epd(l + 10, 1) = rr(l)*d4
          END DO
          !
          epd(4, 1) = r3*d6
          epd(4, 2) = -2._dp*d6
-         epd(8, 2) = rr(1)*(1.0_dp-d5)
-         epd(9, 2) = -rr(2)*(1.0_dp+d5)
+         epd(8, 2) = rr(1)*(1.0_dp - d5)
+         epd(9, 2) = -rr(2)*(1.0_dp + d5)
          epd(10, 2) = -rr(3)*d5
          epd(11, 2) = -r3*rr(1)*rr2(3)
          epd(12, 2) = -r3*rr(2)*rr2(3)
@@ -2696,16 +2696,16 @@ CONTAINS
          dm(1:15) = 0.0_dp
          !
          DO m = 1, 2
-            sktmp = skpar(ind(2, 1, m-1))
-            dm(1) = dm(1)+epd(1, m)*sktmp
-            dm(2) = dm(2)+epd(6, m)*sktmp
-            dm(3) = dm(3)+epd(4, m)*sktmp
-            dm(5) = dm(5)+epd(2, m)*sktmp
-            dm(6) = dm(6)+epd(7, m)*sktmp
-            dm(7) = dm(7)+epd(5, m)*sktmp
-            dm(9) = dm(9)+epd(3, m)*sktmp
+            sktmp = skpar(ind(2, 1, m - 1))
+            dm(1) = dm(1) + epd(1, m)*sktmp
+            dm(2) = dm(2) + epd(6, m)*sktmp
+            dm(3) = dm(3) + epd(4, m)*sktmp
+            dm(5) = dm(5) + epd(2, m)*sktmp
+            dm(6) = dm(6) + epd(7, m)*sktmp
+            dm(7) = dm(7) + epd(5, m)*sktmp
+            dm(9) = dm(9) + epd(3, m)*sktmp
             DO l = 8, 13
-               dm(l+2) = dm(l+2)+epd(l, m)*sktmp
+               dm(l + 2) = dm(l + 2) + epd(l, m)*sktmp
             END DO
          END DO
          !
@@ -2715,15 +2715,15 @@ CONTAINS
          IF (transposed) THEN
             DO ir = 1, 5
                DO is = 1, 3
-                  k = 3*(ir-1)+is
-                  mat(is+1, ir+4) = mat(is+1, ir+4)+dm(k)
+                  k = 3*(ir - 1) + is
+                  mat(is + 1, ir + 4) = mat(is + 1, ir + 4) + dm(k)
                END DO
             END DO
          ELSE
             DO ir = 1, 5
                DO is = 1, 3
-                  k = 3*(ir-1)+is
-                  mat(ir+4, is+1) = mat(ir+4, is+1)-dm(k)
+                  k = 3*(ir - 1) + is
+                  mat(ir + 4, is + 1) = mat(ir + 4, is + 1) - dm(k)
                END DO
             END DO
          END IF
@@ -2737,26 +2737,26 @@ CONTAINS
 !> \param ind ...
 ! **************************************************************************************************
       SUBROUTINE skdd(skpar, mat, ind)
-      REAL(dp), INTENT(in)                               :: skpar(:)
-      REAL(dp), INTENT(inout)                            :: mat(:, :)
-      INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
+         REAL(dp), INTENT(in)                               :: skpar(:)
+         REAL(dp), INTENT(inout)                            :: mat(:, :)
+         INTEGER, INTENT(in)                                :: ind(0:, 0:, 0:)
 
-      INTEGER                                            :: ii, ir, is, k, l, m
-      REAL(dp)                                           :: d3, d4, d5, dd(3), dm(15), e(15, 3), r3
+         INTEGER                                            :: ii, ir, is, k, l, m
+         REAL(dp)                                           :: d3, d4, d5, dd(3), dm(15), e(15, 3), r3
 
          r3 = SQRT(3._dp)
-         d3 = rr2(1)+rr2(2)
-         d4 = rr2(3)-0.5_dp*d3
-         d5 = rr2(1)-rr2(2)
+         d3 = rr2(1) + rr2(2)
+         d4 = rr2(3) - 0.5_dp*d3
+         d5 = rr2(1) - rr2(2)
          DO l = 1, 3
-            e(l, 1) = rr2(l)*rr2(l+1)
-            e(l, 2) = rr2(l)+rr2(l+1)-4._dp*e(l, 1)
-            e(l, 3) = rr2(l+2)+e(l, 1)
+            e(l, 1) = rr2(l)*rr2(l + 1)
+            e(l, 2) = rr2(l) + rr2(l + 1) - 4._dp*e(l, 1)
+            e(l, 3) = rr2(l + 2) + e(l, 1)
             e(l, 1) = 3._dp*e(l, 1)
          END DO
          e(4, 1) = d5**2
-         e(4, 2) = d3-e(4, 1)
-         e(4, 3) = rr2(3)+0.25_dp*e(4, 1)
+         e(4, 2) = d3 - e(4, 1)
+         e(4, 3) = rr2(3) + 0.25_dp*e(4, 1)
          e(4, 1) = 0.75_dp*e(4, 1)
          e(5, 1) = d4**2
          e(5, 2) = 3._dp*rr2(3)*d3
@@ -2765,22 +2765,22 @@ CONTAINS
          dd(2) = rr(2)*rr(1)
          dd(3) = rr(3)*rr(2)
          DO l = 1, 2
-            e(l+5, 1) = 3._dp*rr2(l+1)*dd(l)
-            e(l+5, 2) = dd(l)*(1._dp-4._dp*rr2(l+1))
-            e(l+5, 3) = dd(l)*(rr2(l+1)-1._dp)
+            e(l + 5, 1) = 3._dp*rr2(l + 1)*dd(l)
+            e(l + 5, 2) = dd(l)*(1._dp - 4._dp*rr2(l + 1))
+            e(l + 5, 3) = dd(l)*(rr2(l + 1) - 1._dp)
          END DO
          e(8, 1) = dd(1)*d5*1.5_dp
-         e(8, 2) = dd(1)*(1.0_dp-2.0_dp*d5)
-         e(8, 3) = dd(1)*(0.5_dp*d5-1.0_dp)
+         e(8, 2) = dd(1)*(1.0_dp - 2.0_dp*d5)
+         e(8, 3) = dd(1)*(0.5_dp*d5 - 1.0_dp)
          e(9, 1) = d5*0.5_dp*d4*r3
          e(9, 2) = -d5*rr2(3)*r3
-         e(9, 3) = d5*0.25_dp*(1.0_dp+rr2(3))*r3
+         e(9, 3) = d5*0.25_dp*(1.0_dp + rr2(3))*r3
          e(10, 1) = rr2(1)*dd(3)*3.0_dp
-         e(10, 2) = (0.25_dp-rr2(1))*dd(3)*4.0_dp
-         e(10, 3) = dd(3)*(rr2(1)-1.0_dp)
+         e(10, 2) = (0.25_dp - rr2(1))*dd(3)*4.0_dp
+         e(10, 3) = dd(3)*(rr2(1) - 1.0_dp)
          e(11, 1) = 1.5_dp*dd(3)*d5
-         e(11, 2) = -dd(3)*(1.0_dp+2.0_dp*d5)
-         e(11, 3) = dd(3)*(1.0_dp+0.5_dp*d5)
+         e(11, 2) = -dd(3)*(1.0_dp + 2.0_dp*d5)
+         e(11, 3) = dd(3)*(1.0_dp + 0.5_dp*d5)
          e(13, 3) = 0.5_dp*d5*dd(2)
          e(13, 2) = -2.0_dp*dd(2)*d5
          e(13, 1) = e(13, 3)*3.0_dp
@@ -2788,27 +2788,27 @@ CONTAINS
          e(14, 1) = d4*dd(3)*r3
          e(15, 1) = d4*dd(2)*r3
          e(15, 2) = -2.0_dp*r3*dd(2)*rr2(3)
-         e(15, 3) = 0.5_dp*r3*(1.0_dp+rr2(3))*dd(2)
-         e(14, 2) = r3*dd(3)*(d3-rr2(3))
+         e(15, 3) = 0.5_dp*r3*(1.0_dp + rr2(3))*dd(2)
+         e(14, 2) = r3*dd(3)*(d3 - rr2(3))
          e(14, 3) = -r3*0.5_dp*dd(3)*d3
-         e(12, 2) = r3*dd(1)*(d3-rr2(3))
+         e(12, 2) = r3*dd(1)*(d3 - rr2(3))
          e(12, 3) = -r3*0.5_dp*dd(1)*d3
          !
          dm(1:15) = 0._dp
          DO l = 1, 15
             DO m = 1, 3
-               dm(l) = dm(l)+e(l, m)*skpar(ind(2, 2, m-1))
+               dm(l) = dm(l) + e(l, m)*skpar(ind(2, 2, m - 1))
             END DO
          END DO
          !
          DO ir = 1, 5
-            DO is = 1, ir-1
-               ii = ir-is
-               k = 5*ii-(ii*(ii-1))/2+is
-               mat(ir+4, is+4) = mat(ir+4, is+4)+dm(k)
-               mat(is+4, ir+4) = mat(is+4, ir+4)+dm(k)
+            DO is = 1, ir - 1
+               ii = ir - is
+               k = 5*ii - (ii*(ii - 1))/2 + is
+               mat(ir + 4, is + 4) = mat(ir + 4, is + 4) + dm(k)
+               mat(is + 4, ir + 4) = mat(is + 4, ir + 4) + dm(k)
             END DO
-            mat(ir+4, ir+4) = mat(ir+4, ir+4)+dm(ir)
+            mat(ir + 4, ir + 4) = mat(ir + 4, ir + 4) + dm(ir)
          END DO
       END SUBROUTINE skdd
       !
@@ -2838,9 +2838,9 @@ CONTAINS
 
       ns = 1
 
-      dif = ABS(x-xa(1))
+      dif = ABS(x - xa(1))
       DO i = 1, n
-         dift = ABS(x-xa(i))
+         dift = ABS(x - xa(i))
          IF (dift .LT. dif) THEN
             ns = i
             dif = dift
@@ -2850,25 +2850,25 @@ CONTAINS
       END DO
       !
       y = ya(ns)
-      ns = ns-1
-      DO m = 1, n-1
-         DO i = 1, n-m
-            ho = xa(i)-x
-            hp = xa(i+m)-x
-            w = c(i+1)-d(i)
-            den = ho-hp
+      ns = ns - 1
+      DO m = 1, n - 1
+         DO i = 1, n - m
+            ho = xa(i) - x
+            hp = xa(i + m) - x
+            w = c(i + 1) - d(i)
+            den = ho - hp
             CPASSERT(den /= 0.0_dp)
             den = w/den
             d(i) = hp*den
             c(i) = ho*den
          END DO
-         IF (2*ns .LT. n-m) THEN
-            dy = c(ns+1)
+         IF (2*ns .LT. n - m) THEN
+            dy = c(ns + 1)
          ELSE
             dy = d(ns)
-            ns = ns-1
+            ns = ns - 1
          ENDIF
-         y = y+dy
+         y = y + dy
       END DO
 !
       RETURN
@@ -2912,14 +2912,14 @@ CONTAINS
          !
          ! polynomial part
          !
-         rz = urep(1)-r
+         rz = urep(1) - r
          IF (rz <= rtiny) RETURN
          DO ic = 2, n_urpoly
-            erep = erep+urep(ic)*rz**(ic)
+            erep = erep + urep(ic)*rz**(ic)
          END DO
          IF (dograd) THEN
             DO ic = 2, n_urpoly
-               de_z = de_z-ic*urep(ic)*rz**(ic-1)
+               de_z = de_z - ic*urep(ic)*rz**(ic - 1)
             END DO
          END IF
       ELSE IF (spdim > 0) THEN
@@ -2939,8 +2939,8 @@ CONTAINS
          !
          IF (r < spxr(1, 1)) THEN
             ! a) short range
-            erep = erep+EXP(-srep(1)*r+srep(2))+srep(3)
-            IF (dograd) de_z = de_z-srep(1)*EXP(-srep(1)*r+srep(2))
+            erep = erep + EXP(-srep(1)*r + srep(2)) + srep(3)
+            IF (dograd) de_z = de_z - srep(1)*EXP(-srep(1)*r + srep(2))
          ELSE
             !
             ! condition c). First determine between which places the spline is located:
@@ -2949,32 +2949,32 @@ CONTAINS
                IF (r < spxr(isp, 1)) CYCLE ispg ! distance is smaller than this spline range
                IF (r >= spxr(isp, 2)) CYCLE ispg ! distance is larger than this spline range
                ! at this point we have found the correct spline interval
-               rz = r-spxr(isp, 1)
+               rz = r - spxr(isp, 1)
                IF (isp /= spdim) THEN
                   nsp = 3 ! condition ca
                   DO jsp = 0, nsp
-                     erep = erep+scoeff(isp, jsp+1)*rz**(jsp)
+                     erep = erep + scoeff(isp, jsp + 1)*rz**(jsp)
                   END DO
                   IF (dograd) THEN
                      DO jsp = 1, nsp
-                        de_z = de_z+jsp*scoeff(isp, jsp+1)*rz**(jsp-1)
+                        de_z = de_z + jsp*scoeff(isp, jsp + 1)*rz**(jsp - 1)
                      END DO
                   END IF
                ELSE
                   nsp = 5 ! condition cb
                   DO jsp = 0, nsp
                      IF (jsp <= 3) THEN
-                        erep = erep+scoeff(isp, jsp+1)*rz**(jsp)
+                        erep = erep + scoeff(isp, jsp + 1)*rz**(jsp)
                      ELSE
-                        erep = erep+surr(jsp-3)*rz**(jsp)
+                        erep = erep + surr(jsp - 3)*rz**(jsp)
                      ENDIF
                   END DO
                   IF (dograd) THEN
                      DO jsp = 1, nsp
                         IF (jsp <= 3) THEN
-                           de_z = de_z+jsp*scoeff(isp, jsp+1)*rz**(jsp-1)
+                           de_z = de_z + jsp*scoeff(isp, jsp + 1)*rz**(jsp - 1)
                         ELSE
-                           de_z = de_z+jsp*surr(jsp-3)*rz**(jsp-1)
+                           de_z = de_z + jsp*surr(jsp - 3)*rz**(jsp - 1)
                         ENDIF
                      END DO
                   END IF

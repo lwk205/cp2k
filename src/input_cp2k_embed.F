@@ -8,23 +8,23 @@
 !> \author Vladimir Rybkin - University of Zurich
 ! **************************************************************************************************
 MODULE input_cp2k_embed
-   USE bibliography,                    ONLY: Heaton_Burgess2007,&
-                                              Huang2011
-   USE cp_output_handling,              ONLY: add_last_numeric,&
-                                              cp_print_key_section_create,&
-                                              low_print_level
-   USE input_constants,                 ONLY: dfet,&
-                                              dmfet
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: integer_t
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: Heaton_Burgess2007, &
+                           Huang2011
+   USE cp_output_handling, ONLY: add_last_numeric, &
+                                 cp_print_key_section_create, &
+                                 low_print_level
+   USE input_constants, ONLY: dfet, &
+                              dmfet
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: integer_t
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -46,7 +46,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_embed_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: sub2section, sub3section, subsection
@@ -187,7 +187,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_print_embed_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: print_key
 

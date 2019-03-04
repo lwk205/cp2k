@@ -11,7 +11,7 @@
 ! **************************************************************************************************
 MODULE qs_charges_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,7 +65,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(in), OPTIONAL                :: total_rho_core_rspace, total_rho_gspace
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_charges_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (qs_charges)
       qs_charges%total_rho_core_rspace = 0.0_dp
@@ -96,11 +96,11 @@ CONTAINS
       TYPE(qs_charges_type), POINTER                     :: qs_charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_charges_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(qs_charges))
       CPASSERT(qs_charges%ref_count > 0)
-      qs_charges%ref_count = qs_charges%ref_count+1
+      qs_charges%ref_count = qs_charges%ref_count + 1
    END SUBROUTINE qs_charges_retain
 
 ! **************************************************************************************************
@@ -114,11 +114,11 @@ CONTAINS
       TYPE(qs_charges_type), POINTER                     :: qs_charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_charges_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qs_charges)) THEN
          CPASSERT(qs_charges%ref_count > 0)
-         qs_charges%ref_count = qs_charges%ref_count-1
+         qs_charges%ref_count = qs_charges%ref_count - 1
          IF (qs_charges%ref_count < 1) THEN
             DEALLOCATE (qs_charges%total_rho1_hard)
             DEALLOCATE (qs_charges%total_rho1_soft)

@@ -17,53 +17,53 @@
 ! **************************************************************************************************
 MODULE xas_restart
 
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_get_submatrix,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_set_submatrix,&
-                                              cp_fm_type,&
-                                              cp_fm_write_unformatted
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_generate_filename,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_bcast
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_gspace_mixing,                ONLY: mixing_init
-   USE qs_ks_types,                     ONLY: qs_ks_did_change
-   USE qs_mo_io,                        ONLY: wfn_restart_file_name
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix
-   USE qs_mo_occupation,                ONLY: set_mo_occupation
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              set_mo_set
-   USE qs_rho_atom_types,               ONLY: rho_atom_type
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE scf_control_types,               ONLY: scf_control_type
-   USE string_utilities,                ONLY: xstring
-   USE xas_env_types,                   ONLY: get_xas_env,&
-                                              set_xas_env,&
-                                              xas_environment_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_get_submatrix, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_set_submatrix, &
+                          cp_fm_type, &
+                          cp_fm_write_unformatted
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_generate_filename, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_bcast
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_gspace_mixing, ONLY: mixing_init
+   USE qs_ks_types, ONLY: qs_ks_did_change
+   USE qs_mo_io, ONLY: wfn_restart_file_name
+   USE qs_mo_methods, ONLY: calculate_density_matrix
+   USE qs_mo_occupation, ONLY: set_mo_occupation
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          set_mo_set
+   USE qs_rho_atom_types, ONLY: rho_atom_type
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE scf_control_types, ONLY: scf_control_type
+   USE string_utilities, ONLY: xstring
+   USE xas_env_types, ONLY: get_xas_env, &
+                            set_xas_env, &
+                            xas_environment_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -105,12 +105,12 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: istate
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'xas_read_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       INTEGER :: group, handle, i, ia, ie, ispin, my_spin, nao, nao_read, nelectron, nexc_atoms, &
-         nexc_atoms_read, nexc_search, nexc_search_read, nmo, nmo_read, output_unit, rst_unit, &
-         source, xas_estate, xas_estate_read, xas_method_read
+                 nexc_atoms_read, nexc_search, nexc_search_read, nmo, nmo_read, output_unit, rst_unit, &
+                 source, xas_estate, xas_estate_read, xas_method_read
       LOGICAL                                            :: file_exists
       REAL(dp)                                           :: occ_estate, occ_estate_read, &
                                                             xas_nelectron, xas_nelectron_read
@@ -237,7 +237,7 @@ CONTAINS
             END DO
             ! Skip extra MOs if there any
             IF (para_env%ionode) THEN
-               DO i = nmo+1, nmo_read
+               DO i = nmo + 1, nmo_read
                   READ (rst_unit) vecbuffer
                END DO
             END IF
@@ -280,7 +280,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: xas_method, iatom, istate
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'xas_write_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       CHARACTER(LEN=default_string_length)               :: my_middle
@@ -372,7 +372,7 @@ CONTAINS
       TYPE(scf_control_type), POINTER                    :: scf_control
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'xas_initialize_rho', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, my_spin, nelectron
       TYPE(cp_para_env_type), POINTER                    :: para_env
@@ -398,7 +398,7 @@ CONTAINS
          IF (ispin == my_spin) THEN
             IF (xas_env%homo_occ == 0) THEN
                CALL get_mo_set(mos(ispin)%mo_set, nelectron=nelectron)
-               nelectron = nelectron-1
+               nelectron = nelectron - 1
                CALL set_mo_set(mos(ispin)%mo_set, nelectron=nelectron)
             END IF
             CALL set_mo_occupation(mo_set=qs_env%mos(ispin)%mo_set, smear=scf_control%smear, &
@@ -440,7 +440,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_s
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'find_excited_core_orbital', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ic_max, ir_max, m, my_spin, n, nao, &
                                                             nexc_search, nmo, xas_estate

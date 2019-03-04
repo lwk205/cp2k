@@ -8,30 +8,30 @@
 !> \author teo [tlaino] - University of Zurich - 09.2007
 ! **************************************************************************************************
 MODULE thermostat_types
-   USE al_system_types,                 ONLY: al_dealloc,&
-                                              al_init,&
-                                              al_system_type
-   USE csvr_system_types,               ONLY: csvr_dealloc,&
-                                              csvr_init,&
-                                              csvr_system_type
-   USE extended_system_types,           ONLY: lnhc_dealloc,&
-                                              lnhc_init,&
-                                              lnhc_parameters_type
-   USE gle_system_types,                ONLY: gle_dealloc,&
-                                              gle_init,&
-                                              gle_type
-   USE input_constants,                 ONLY: do_region_global,&
-                                              do_region_massive,&
-                                              do_thermo_al,&
-                                              do_thermo_csvr,&
-                                              do_thermo_gle,&
-                                              do_thermo_nose
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE simpar_types,                    ONLY: simpar_type
+   USE al_system_types, ONLY: al_dealloc, &
+                              al_init, &
+                              al_system_type
+   USE csvr_system_types, ONLY: csvr_dealloc, &
+                                csvr_init, &
+                                csvr_system_type
+   USE extended_system_types, ONLY: lnhc_dealloc, &
+                                    lnhc_init, &
+                                    lnhc_parameters_type
+   USE gle_system_types, ONLY: gle_dealloc, &
+                               gle_init, &
+                               gle_type
+   USE input_constants, ONLY: do_region_global, &
+                              do_region_massive, &
+                              do_thermo_al, &
+                              do_thermo_csvr, &
+                              do_thermo_gle, &
+                              do_thermo_nose
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE simpar_types, ONLY: simpar_type
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -110,7 +110,7 @@ CONTAINS
       TYPE(thermostats_type), POINTER                    :: thermostats
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_thermostats', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check
 
@@ -119,7 +119,7 @@ CONTAINS
 
       ! Preliminary allocation for thermostats
       ALLOCATE (thermostats)
-      last_thermostats_id_nr = last_thermostats_id_nr+1
+      last_thermostats_id_nr = last_thermostats_id_nr + 1
       thermostats%id_nr = last_thermostats_id_nr
       thermostats%ref_count = 1
 
@@ -157,11 +157,11 @@ CONTAINS
       TYPE(thermostats_type), POINTER                    :: thermostats
 
       CHARACTER(len=*), PARAMETER :: routineN = 'retain_thermostats', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(thermostats)) THEN
          CPASSERT(thermostats%ref_count > 0)
-         thermostats%ref_count = thermostats%ref_count+1
+         thermostats%ref_count = thermostats%ref_count + 1
       END IF
 
    END SUBROUTINE retain_thermostats
@@ -177,7 +177,7 @@ CONTAINS
       TYPE(thermostats_type), POINTER                    :: thermostats
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_thermostats', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check
 
@@ -185,7 +185,7 @@ CONTAINS
       IF (check) THEN
          check = thermostats%ref_count > 0
          CPASSERT(check)
-         thermostats%ref_count = thermostats%ref_count-1
+         thermostats%ref_count = thermostats%ref_count - 1
          IF (thermostats%ref_count < 1) THEN
             CALL release_thermostat_info(thermostats%thermostat_info_part)
             CALL release_thermostat_info(thermostats%thermostat_info_shell)
@@ -235,7 +235,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: label
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_thermostat_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: region
       LOGICAL                                            :: skip_region_loc
@@ -245,7 +245,7 @@ CONTAINS
       skip_region_loc = .FALSE.
       IF (PRESENT(skip_region)) skip_region_loc = skip_region
       ALLOCATE (thermostat)
-      last_thermostat_id_nr = last_thermostat_id_nr+1
+      last_thermostat_id_nr = last_thermostat_id_nr + 1
       thermostat%id_nr = last_thermostat_id_nr
       thermostat%ref_count = 1
       thermostat%section => section
@@ -295,7 +295,7 @@ CONTAINS
       TYPE(thermostat_info_type), POINTER                :: thermostat_info
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_thermostat_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(thermostat_info)) THEN
          IF (ASSOCIATED(thermostat_info%map_loc_thermo_gen)) THEN
@@ -316,7 +316,7 @@ CONTAINS
       TYPE(thermostat_type), POINTER                     :: thermostat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_thermostat_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check
 
@@ -324,7 +324,7 @@ CONTAINS
       IF (check) THEN
          check = thermostat%ref_count > 0
          CPASSERT(check)
-         thermostat%ref_count = thermostat%ref_count-1
+         thermostat%ref_count = thermostat%ref_count - 1
          IF (thermostat%ref_count < 1) THEN
             NULLIFY (thermostat%section)
             IF (ASSOCIATED(thermostat%nhc)) THEN
@@ -357,7 +357,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: dt_fact
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_thermostats', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(thermostats)) THEN
          IF (PRESENT(dt_fact)) THEN

@@ -16,40 +16,40 @@
 ! **************************************************************************************************
 MODULE qs_scf_methods
 
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_symm,&
-                                              cp_fm_triangular_multiply,&
-                                              cp_fm_upper_to_full
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_reduce,&
-                                              cp_fm_cholesky_restore
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver,&
-                                              cp_fm_block_jacobi
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_equivalent,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_desymmetrize, dbcsr_get_block_p, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_type
-   USE input_constants,                 ONLY: cholesky_inverse,&
-                                              cholesky_off,&
-                                              cholesky_reduce,&
-                                              cholesky_restore
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_max
-   USE qs_density_mixing_types,         ONLY: mixing_storage_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_symm, &
+                                 cp_fm_triangular_multiply, &
+                                 cp_fm_upper_to_full
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_reduce, &
+                             cp_fm_cholesky_restore
+   USE cp_fm_diag, ONLY: choose_eigv_solver, &
+                         cp_fm_block_jacobi
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_equivalent, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_desymmetrize, dbcsr_get_block_p, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_type
+   USE input_constants, ONLY: cholesky_inverse, &
+                              cholesky_off, &
+                              cholesky_reduce, &
+                              cholesky_restore
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_max
+   USE qs_density_mixing_types, ONLY: mixing_storage_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -102,7 +102,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: diis, invert
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_env_density_mixing', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, ispin
       LOGICAL                                            :: my_diis, my_invert
@@ -129,7 +129,7 @@ CONTAINS
                   CALL dbcsr_add(matrix_a=p_mix_new(ispin, ic)%matrix, &
                                  alpha_scalar=1.0_dp/my_p_mix, &
                                  matrix_b=rho_ao(ispin, ic)%matrix, &
-                                 beta_scalar=(my_p_mix-1.0_dp)/my_p_mix)
+                                 beta_scalar=(my_p_mix - 1.0_dp)/my_p_mix)
                END IF
             ELSE
                CALL cp_sm_mix(m1=p_mix_new(ispin, ic)%matrix, &
@@ -271,7 +271,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: ortho_dbcsr, ksbuf1, ksbuf2
 
       CHARACTER(len=*), PARAMETER :: routineN = 'eigensolver_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao, nmo
       REAL(KIND=dp), DIMENSION(:), POINTER               :: mo_eigenvalues
@@ -335,7 +335,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: jacobi_threshold
 
       CHARACTER(len=*), PARAMETER :: routineN = 'eigensolver_symm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, nao, nelectron, nmo
       REAL(KIND=dp), DIMENSION(:), POINTER               :: mo_eigenvalues
@@ -359,12 +359,12 @@ CONTAINS
       IF (use_jacobi) THEN
 
          CALL cp_fm_symm("L", "U", nao, homo, 1.0_dp, matrix_ks_fm, mo_coeff, 0.0_dp, work)
-         CALL cp_gemm("T", "N", homo, nao-homo, nao, 1.0_dp, work, mo_coeff, &
-                      0.0_dp, matrix_ks_fm, b_first_col=homo+1, c_first_col=homo+1)
+         CALL cp_gemm("T", "N", homo, nao - homo, nao, 1.0_dp, work, mo_coeff, &
+                      0.0_dp, matrix_ks_fm, b_first_col=homo + 1, c_first_col=homo + 1)
 
          ! Block Jacobi (pseudo-diagonalization, only one sweep)
          CALL cp_fm_block_jacobi(matrix_ks_fm, mo_coeff, mo_eigenvalues, &
-                                 jacobi_threshold, homo+1)
+                                 jacobi_threshold, homo + 1)
 
       ELSE ! full S^(-1/2) has been computed
 
@@ -413,7 +413,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: jacobi_threshold
 
       CHARACTER(len=*), PARAMETER :: routineN = 'eigensolver_simple', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, nao, nelectron, nmo
       REAL(KIND=dp), DIMENSION(:), POINTER               :: mo_eigenvalues
@@ -440,10 +440,10 @@ CONTAINS
 
       IF (use_jacobi) THEN
          CALL cp_fm_symm("L", "U", nao, homo, 1.0_dp, matrix_ks, mo_coeff, 0.0_dp, work)
-         CALL cp_gemm("T", "N", homo, nao-homo, nao, 1.0_dp, work, mo_coeff, &
-                      0.0_dp, matrix_ks, b_first_col=homo+1, c_first_col=homo+1)
+         CALL cp_gemm("T", "N", homo, nao - homo, nao, 1.0_dp, work, mo_coeff, &
+                      0.0_dp, matrix_ks, b_first_col=homo + 1, c_first_col=homo + 1)
          ! Block Jacobi (pseudo-diagonalization, only one sweep)
-         CALL cp_fm_block_jacobi(matrix_ks, mo_coeff, mo_eigenvalues, jacobi_threshold, homo+1)
+         CALL cp_fm_block_jacobi(matrix_ks, mo_coeff, mo_eigenvalues, jacobi_threshold, homo + 1)
       ELSE
 
          CALL choose_eigv_solver(matrix_ks, work, mo_eigenvalues)
@@ -507,16 +507,16 @@ CONTAINS
 
             DO j = 1, SIZE(p_new_block, 2)
                DO i = 1, SIZE(p_new_block, 1)
-                  p_delta_block(i, j) = p_new_block(i, j)-p_old_block(i, j)
+                  p_delta_block(i, j) = p_new_block(i, j) - p_old_block(i, j)
                   delta = MAX(delta, ABS(p_delta_block(i, j)))
                END DO
             END DO
          ELSE
             DO j = 1, SIZE(p_new_block, 2)
                DO i = 1, SIZE(p_new_block, 1)
-                  p_new_block(i, j) = p_new_block(i, j)-p_old_block(i, j)
+                  p_new_block(i, j) = p_new_block(i, j) - p_old_block(i, j)
                   delta = MAX(delta, ABS(p_new_block(i, j)))
-                  p_new_block(i, j) = p_old_block(i, j)+p_mix*p_new_block(i, j)
+                  p_new_block(i, j) = p_old_block(i, j) + p_mix*p_new_block(i, j)
                END DO
             END DO
          ENDIF
@@ -554,7 +554,7 @@ CONTAINS
          INTENT(IN)                                      :: roks_parameter
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'combine_ks_matrices_1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, icol_global, icol_local, &
                                                             irow_global, irow_local, j, &
@@ -590,12 +590,12 @@ CONTAINS
 
       DO icol_local = 1, ncol_local
          icol_global = col_indices(icol_local)
-         j = INT(occa(icol_global))+INT(occb(icol_global))
+         j = INT(occa(icol_global)) + INT(occb(icol_global))
          DO irow_local = 1, nrow_local
             irow_global = row_indices(irow_local)
-            i = INT(occa(irow_global))+INT(occb(irow_global))
+            i = INT(occa(irow_global)) + INT(occb(irow_global))
             fa(irow_local, icol_local) = &
-               roks_parameter(i, j, 1)*fa(irow_local, icol_local)+ &
+               roks_parameter(i, j, 1)*fa(irow_local, icol_local) + &
                roks_parameter(i, j, 2)*fb(irow_local, icol_local)
          END DO
       END DO
@@ -631,7 +631,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nalpha, nbeta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'combine_ks_matrices_2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icol_global, icol_local, &
                                                             irow_global, irow_local, ncol_local, &
@@ -664,7 +664,7 @@ CONTAINS
       compatible_matrices = cp_fm_struct_equivalent(ksa_struct, ksb_struct)
       CPASSERT(compatible_matrices)
 
-      beta = 1.0_dp/(1.0_dp-f)
+      beta = 1.0_dp/(1.0_dp - f)
 
       DO icol_local = 1, ncol_local
 
@@ -674,7 +674,7 @@ CONTAINS
 
             irow_global = row_indices(irow_local)
 
-            t1 = 0.5_dp*(fa(irow_local, icol_local)+fb(irow_local, icol_local))
+            t1 = 0.5_dp*(fa(irow_local, icol_local) + fb(irow_local, icol_local))
 
             IF ((0 < irow_global) .AND. (irow_global <= nbeta)) THEN
                IF ((0 < icol_global) .AND. (icol_global <= nbeta)) THEN
@@ -682,10 +682,10 @@ CONTAINS
                   fa(irow_local, icol_local) = t1
                ELSE IF ((nbeta < icol_global) .AND. (icol_global <= nalpha)) THEN
                   ! closed-open
-                  ta = 0.5_dp*(f-REAL(occa(icol_global), KIND=dp))/f
-                  tb = 0.5_dp*(f-REAL(occb(icol_global), KIND=dp))/f
-                  t2 = ta*fa(irow_local, icol_local)+tb*fb(irow_local, icol_local)
-                  fa(irow_local, icol_local) = t1+(beta-1.0_dp)*t2
+                  ta = 0.5_dp*(f - REAL(occa(icol_global), KIND=dp))/f
+                  tb = 0.5_dp*(f - REAL(occb(icol_global), KIND=dp))/f
+                  t2 = ta*fa(irow_local, icol_local) + tb*fb(irow_local, icol_local)
+                  fa(irow_local, icol_local) = t1 + (beta - 1.0_dp)*t2
                ELSE
                   ! closed-virtual
                   fa(irow_local, icol_local) = t1
@@ -693,26 +693,26 @@ CONTAINS
             ELSE IF ((nbeta < irow_global) .AND. (irow_global <= nalpha)) THEN
                IF ((0 < irow_global) .AND. (irow_global <= nbeta)) THEN
                   ! open-closed
-                  ta = 0.5_dp*(f-REAL(occa(irow_global), KIND=dp))/f
-                  tb = 0.5_dp*(f-REAL(occb(irow_global), KIND=dp))/f
-                  t2 = ta*fa(irow_local, icol_local)+tb*fb(irow_local, icol_local)
-                  fa(irow_local, icol_local) = t1+(beta-1.0_dp)*t2
+                  ta = 0.5_dp*(f - REAL(occa(irow_global), KIND=dp))/f
+                  tb = 0.5_dp*(f - REAL(occb(irow_global), KIND=dp))/f
+                  t2 = ta*fa(irow_local, icol_local) + tb*fb(irow_local, icol_local)
+                  fa(irow_local, icol_local) = t1 + (beta - 1.0_dp)*t2
                ELSE IF ((nbeta < icol_global) .AND. (icol_global <= nalpha)) THEN
                   ! open-open
-                  ta = 0.5_dp*(f-REAL(occa(icol_global), KIND=dp))/f
-                  tb = 0.5_dp*(f-REAL(occb(icol_global), KIND=dp))/f
-                  t2 = ta*fa(irow_local, icol_local)+tb*fb(irow_local, icol_local)
+                  ta = 0.5_dp*(f - REAL(occa(icol_global), KIND=dp))/f
+                  tb = 0.5_dp*(f - REAL(occb(icol_global), KIND=dp))/f
+                  t2 = ta*fa(irow_local, icol_local) + tb*fb(irow_local, icol_local)
                   IF (irow_global == icol_global) THEN
-                     fa(irow_local, icol_local) = t1-t2
+                     fa(irow_local, icol_local) = t1 - t2
                   ELSE
-                     fa(irow_local, icol_local) = t1-0.5_dp*t2
+                     fa(irow_local, icol_local) = t1 - 0.5_dp*t2
                   END IF
                ELSE
                   ! open-virtual
-                  ta = 0.5_dp*(f-REAL(occa(irow_global), KIND=dp))/f
-                  tb = 0.5_dp*(f-REAL(occb(irow_global), KIND=dp))/f
-                  t2 = ta*fa(irow_local, icol_local)+tb*fb(irow_local, icol_local)
-                  fa(irow_local, icol_local) = t1-t2
+                  ta = 0.5_dp*(f - REAL(occa(irow_global), KIND=dp))/f
+                  tb = 0.5_dp*(f - REAL(occb(irow_global), KIND=dp))/f
+                  t2 = ta*fa(irow_local, icol_local) + tb*fb(irow_local, icol_local)
+                  fa(irow_local, icol_local) = t1 - t2
                END IF
             ELSE
                IF ((0 < irow_global) .AND. (irow_global < nbeta)) THEN
@@ -720,10 +720,10 @@ CONTAINS
                   fa(irow_local, icol_local) = t1
                ELSE IF ((nbeta < icol_global) .AND. (icol_global <= nalpha)) THEN
                   ! virtual-open
-                  ta = 0.5_dp*(f-REAL(occa(icol_global), KIND=dp))/f
-                  tb = 0.5_dp*(f-REAL(occb(icol_global), KIND=dp))/f
-                  t2 = ta*fa(irow_local, icol_local)+tb*fb(irow_local, icol_local)
-                  fa(irow_local, icol_local) = t1-t2
+                  ta = 0.5_dp*(f - REAL(occa(icol_global), KIND=dp))/f
+                  tb = 0.5_dp*(f - REAL(occb(icol_global), KIND=dp))/f
+                  t2 = ta*fa(irow_local, icol_local) + tb*fb(irow_local, icol_local)
+                  fa(irow_local, icol_local) = t1 - t2
                ELSE
                   ! virtual-virtual
                   fa(irow_local, icol_local) = t1
@@ -757,12 +757,12 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: level_shift
 
       CHARACTER(len=*), PARAMETER :: routineN = 'correct_mo_eigenvalues', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: imo
 
-      DO imo = homo+1, nmo
-         mo_eigenvalues(imo) = mo_eigenvalues(imo)-level_shift
+      DO imo = homo + 1, nmo
+         mo_eigenvalues(imo) = mo_eigenvalues(imo) - level_shift
       END DO
 
    END SUBROUTINE correct_mo_eigenvalues
@@ -792,7 +792,7 @@ CONTAINS
       TYPE(cp_fm_type), OPTIONAL, POINTER                :: matrix_u_fm
 
       CHARACTER(len=*), PARAMETER :: routineN = 'shift_unocc_mos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(kind=dp), ALLOCATABLE, DIMENSION(:)           :: weights
@@ -831,7 +831,7 @@ CONTAINS
       !             MO index :  1 .. homo   homo+1     ...  nmo
       ALLOCATE (weights(nmo))
       weights(1:homo) = 0.0_dp
-      weights(homo+1:nmo) = level_shift
+      weights(homo + 1:nmo) = level_shift
       ! DELTA * U * C
       ! DELTA is a diagonal matrix, so simply scale all the columns of (U * C) by weights(:)
       CALL cp_fm_column_scale(u_mo_scaled, weights)

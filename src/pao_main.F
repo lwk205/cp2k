@@ -8,50 +8,50 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_main
-   USE bibliography,                    ONLY: Schuett2018,&
-                                              cite_reference
-   USE cp_external_control,             ONLY: external_control
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_copy,&
-                                              dbcsr_create,&
-                                              dbcsr_p_type,&
-                                              dbcsr_release,&
-                                              dbcsr_reserve_diag_blocks,&
-                                              dbcsr_set,&
-                                              dbcsr_type
-   USE dm_ls_scf_types,                 ONLY: ls_mstruct_type,&
-                                              ls_scf_env_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE linesearch,                      ONLY: linesearch_finalize,&
-                                              linesearch_init,&
-                                              linesearch_reset,&
-                                              linesearch_step
-   USE machine,                         ONLY: m_walltime
-   USE pao_input,                       ONLY: parse_pao_section
-   USE pao_io,                          ONLY: pao_read_restart,&
-                                              pao_write_ks_matrix_csr,&
-                                              pao_write_restart,&
-                                              pao_write_s_matrix_csr
-   USE pao_methods,                     ONLY: &
-        pao_add_forces, pao_build_core_hamiltonian, pao_build_diag_distribution, &
-        pao_build_matrix_X, pao_build_orthogonalizer, pao_build_selector, pao_calc_energy, &
-        pao_calc_outer_grad_lnv, pao_check_grad, pao_check_trace_ps, pao_guess_initial_P, &
-        pao_init_kinds, pao_print_atom_info, pao_store_P, pao_test_convergence
-   USE pao_ml,                          ONLY: pao_ml_init,&
-                                              pao_ml_predict
-   USE pao_optimizer,                   ONLY: pao_opt_finalize,&
-                                              pao_opt_init,&
-                                              pao_opt_new_dir
-   USE pao_param,                       ONLY: pao_calc_U,&
-                                              pao_param_finalize,&
-                                              pao_param_init,&
-                                              pao_param_initial_guess,&
-                                              pao_update_AB
-   USE pao_types,                       ONLY: pao_env_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
+   USE bibliography, ONLY: Schuett2018, &
+                           cite_reference
+   USE cp_external_control, ONLY: external_control
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_copy, &
+                        dbcsr_create, &
+                        dbcsr_p_type, &
+                        dbcsr_release, &
+                        dbcsr_reserve_diag_blocks, &
+                        dbcsr_set, &
+                        dbcsr_type
+   USE dm_ls_scf_types, ONLY: ls_mstruct_type, &
+                              ls_scf_env_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE linesearch, ONLY: linesearch_finalize, &
+                         linesearch_init, &
+                         linesearch_reset, &
+                         linesearch_step
+   USE machine, ONLY: m_walltime
+   USE pao_input, ONLY: parse_pao_section
+   USE pao_io, ONLY: pao_read_restart, &
+                     pao_write_ks_matrix_csr, &
+                     pao_write_restart, &
+                     pao_write_s_matrix_csr
+   USE pao_methods, ONLY: &
+      pao_add_forces, pao_build_core_hamiltonian, pao_build_diag_distribution, &
+      pao_build_matrix_X, pao_build_orthogonalizer, pao_build_selector, pao_calc_energy, &
+      pao_calc_outer_grad_lnv, pao_check_grad, pao_check_trace_ps, pao_guess_initial_P, &
+      pao_init_kinds, pao_print_atom_info, pao_store_P, pao_test_convergence
+   USE pao_ml, ONLY: pao_ml_init, &
+                     pao_ml_predict
+   USE pao_optimizer, ONLY: pao_opt_finalize, &
+                            pao_opt_init, &
+                            pao_opt_new_dir
+   USE pao_param, ONLY: pao_calc_U, &
+                        pao_param_finalize, &
+                        pao_param_init, &
+                        pao_param_initial_guess, &
+                        pao_update_AB
+   USE pao_types, ONLY: pao_env_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -244,7 +244,7 @@ CONTAINS
       CALL pao_opt_init(pao)
 
       DO WHILE (.TRUE.)
-         pao%istep = pao%istep+1
+         pao%istep = pao%istep + 1
 
          IF (pao%iw > 0) WRITE (pao%iw, "(A,I9,A)") " PAO| ======================= Iteration: ", &
             pao%istep, " ============================="
@@ -254,7 +254,7 @@ CONTAINS
          CALL pao_check_trace_PS(ls_scf_env)
 
          IF (pao%linesearch%starts) THEN
-            icycle = icycle+1
+            icycle = icycle + 1
             ! calc new gradient including penalty terms
             CALL pao_calc_outer_grad_lnv(qs_env, ls_scf_env, matrix_M)
             CALL pao_calc_U(pao, qs_env, matrix_M=matrix_M, matrix_G=pao%matrix_G, penalty=penalty)
@@ -306,7 +306,7 @@ CONTAINS
 
       ! perform mixing of matrix_X
       IF (do_mixing) THEN
-         CALL dbcsr_add(pao%matrix_X, matrix_X_mixing, pao%mixing, 1.0_dp-pao%mixing)
+         CALL dbcsr_add(pao%matrix_X, matrix_X_mixing, pao%mixing, 1.0_dp - pao%mixing)
          CALL dbcsr_release(matrix_X_mixing)
          IF (pao%iw > 0) WRITE (pao%iw, *) "PAO| Recalculating energy after mixing."
          CALL pao_calc_energy(pao, qs_env, ls_scf_env, energy)

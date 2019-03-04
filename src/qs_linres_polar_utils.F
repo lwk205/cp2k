@@ -13,58 +13,58 @@
 !> \note
 ! **************************************************************************************************
 MODULE qs_linres_polar_utils
-   USE bibliography,                    ONLY: Luber2014,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_trace
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_result_methods,               ONLY: cp_results_erase,&
-                                              put_results
-   USE cp_result_types,                 ONLY: cp_result_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE mathconstants,                   ONLY: twopi
-   USE physcon,                         ONLY: angstrom
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_linres_methods,               ONLY: linres_read_restart,&
-                                              linres_solver,&
-                                              linres_write_restart
-   USE qs_linres_types,                 ONLY: get_polar_env,&
-                                              linres_control_type,&
-                                              polar_env_create,&
-                                              polar_env_type,&
-                                              set_polar_env
-   USE qs_matrix_pools,                 ONLY: qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_p_env_types,                  ONLY: qs_p_env_type
+   USE bibliography, ONLY: Luber2014, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_fm_basic_linalg, ONLY: cp_fm_trace
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_result_methods, ONLY: cp_results_erase, &
+                                put_results
+   USE cp_result_types, ONLY: cp_result_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE mathconstants, ONLY: twopi
+   USE physcon, ONLY: angstrom
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_linres_methods, ONLY: linres_read_restart, &
+                                linres_solver, &
+                                linres_write_restart
+   USE qs_linres_types, ONLY: get_polar_env, &
+                              linres_control_type, &
+                              polar_env_create, &
+                              polar_env_type, &
+                              set_polar_env
+   USE qs_matrix_pools, ONLY: qs_matrix_pools_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_p_env_types, ONLY: qs_p_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -264,7 +264,7 @@ CONTAINS
 !SL compute trace
                   ptmp = 0.0_dp
                   CALL cp_fm_trace(psi1_dBerry(i, ispin)%matrix, mo_derivs(z, ispin)%matrix, ptmp)
-                  polar_tmp(i, z) = polar_tmp(i, z)+ptmp
+                  polar_tmp(i, z) = polar_tmp(i, z) + ptmp
                END DO
                polar_tmp(i, z) = 2.0_dp*polar_tmp(i, z)/(twopi*twopi)
             END DO
@@ -476,7 +476,7 @@ CONTAINS
          loop_idir: DO idir = 1, 3
             IF (output_unit > 0) THEN
                WRITE (output_unit, "(/,T2,A)") &
-                  "POLAR| Response to the perturbation operator Berry phase_"//ACHAR(idir+119)
+                  "POLAR| Response to the perturbation operator Berry phase_"//ACHAR(idir + 119)
             ENDIF
             ! Do scf cycle to optimize psi1
             DO ispin = 1, nspins
@@ -551,7 +551,7 @@ CONTAINS
          OPTIONAL                                        :: pos, act
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_polarisability_tensor', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: my_act, my_pos
       INTEGER                                            :: output_unit

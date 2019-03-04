@@ -13,10 +13,10 @@
 ! **************************************************************************************************
 MODULE cp_files
 
-   USE kinds,                           ONLY: default_path_length
-   USE machine,                         ONLY: default_input_unit,&
-                                              default_output_unit,&
-                                              m_getcwd
+   USE kinds, ONLY: default_path_length
+   USE machine, ONLY: default_input_unit, &
+                      default_output_unit, &
+                      m_getcwd
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -59,7 +59,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_number
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'assign_preconnection', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ic, islot, nc
 
@@ -205,7 +205,7 @@ CONTAINS
       INTEGER                                            :: unit_number
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'delete_preconnection', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ic, nc
 
@@ -277,7 +277,7 @@ CONTAINS
    SUBROUTINE init_preconnection_list()
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'init_preconnection_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ic, nc
 
@@ -325,7 +325,7 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'open_file', routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=11) :: access_string, action_string, current_action, current_form, &
-         form_string, pad_string, position_string, status_string
+                           form_string, pad_string, position_string, status_string
       CHARACTER(LEN=2*default_path_length)               :: message
       CHARACTER(LEN=default_path_length)                 :: cwd, iomsgstr, real_file_name
       INTEGER                                            :: debug_unit, istat
@@ -596,7 +596,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: output_unit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_preconnection_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ic, nc, unit
 

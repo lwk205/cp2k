@@ -11,116 +11,116 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE qs_linres_methods
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set
-   USE cp_external_control,             ONLY: external_control
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_scale_and_add,&
-                                              cp_fm_trace
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_get_submatrix,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_submatrix,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_generate_filename,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_checksum,&
-                                              dbcsr_copy,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type
-   USE hartree_local_methods,           ONLY: Vh_1c_gg_integrals
-   USE input_constants,                 ONLY: do_loc_none,&
-                                              op_loc_berry,&
-                                              ot_precond_none,&
-                                              ot_precond_solver_default,&
-                                              state_loc_all
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_get_rval,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE message_passing,                 ONLY: mp_bcast
-   USE preconditioner,                  ONLY: apply_preconditioner,&
-                                              make_preconditioner
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_create,&
-                                              pw_p_type,&
-                                              pw_release,&
-                                              pw_retain
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_gapw_densities,               ONLY: prepare_gapw_den
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace
-   USE qs_kpp1_env_types,               ONLY: qs_kpp1_env_type
-   USE qs_ks_atom,                      ONLY: update_ks_atom
-   USE qs_linres_types,                 ONLY: linres_control_type
-   USE qs_loc_methods,                  ONLY: qs_loc_driver
-   USE qs_loc_types,                    ONLY: get_qs_loc_env,&
-                                              localized_wfn_control_type,&
-                                              qs_loc_env_create,&
-                                              qs_loc_env_new_type,&
-                                              qs_loc_env_release,&
-                                              qs_loc_env_retain
-   USE qs_loc_utils,                    ONLY: loc_write_restart,&
-                                              qs_loc_control_init,&
-                                              qs_loc_init
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_p_env_types,                  ONLY: qs_p_env_type
-   USE qs_rho0_ggrid,                   ONLY: integrate_vhg0_rspace
-   USE qs_rho_methods,                  ONLY: qs_rho_rebuild,&
-                                              qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_vxc_atom,                     ONLY: calculate_xc_2nd_deriv_atom
-   USE string_utilities,                ONLY: xstring
-   USE xc,                              ONLY: xc_calc_2nd_deriv,&
-                                              xc_prep_2nd_deriv
-   USE xc_derivatives,                  ONLY: xc_functionals_get_needs
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_type
-   USE xc_rho_set_types,                ONLY: xc_rho_set_create,&
-                                              xc_rho_set_release,&
-                                              xc_rho_set_type,&
-                                              xc_rho_set_update
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set
+   USE cp_external_control, ONLY: external_control
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_basic_linalg, ONLY: cp_fm_scale_and_add, &
+                                 cp_fm_trace
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_get_submatrix, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_submatrix, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_generate_filename, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_checksum, &
+                        dbcsr_copy, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type
+   USE hartree_local_methods, ONLY: Vh_1c_gg_integrals
+   USE input_constants, ONLY: do_loc_none, &
+                              op_loc_berry, &
+                              ot_precond_none, &
+                              ot_precond_solver_default, &
+                              state_loc_all
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_get_rval, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE message_passing, ONLY: mp_bcast
+   USE preconditioner, ONLY: apply_preconditioner, &
+                             make_preconditioner
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_create, &
+                       pw_p_type, &
+                       pw_release, &
+                       pw_retain
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_gapw_densities, ONLY: prepare_gapw_den
+   USE qs_integrate_potential, ONLY: integrate_v_rspace
+   USE qs_kpp1_env_types, ONLY: qs_kpp1_env_type
+   USE qs_ks_atom, ONLY: update_ks_atom
+   USE qs_linres_types, ONLY: linres_control_type
+   USE qs_loc_methods, ONLY: qs_loc_driver
+   USE qs_loc_types, ONLY: get_qs_loc_env, &
+                           localized_wfn_control_type, &
+                           qs_loc_env_create, &
+                           qs_loc_env_new_type, &
+                           qs_loc_env_release, &
+                           qs_loc_env_retain
+   USE qs_loc_utils, ONLY: loc_write_restart, &
+                           qs_loc_control_init, &
+                           qs_loc_init
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_p_env_types, ONLY: qs_p_env_type
+   USE qs_rho0_ggrid, ONLY: integrate_vhg0_rspace
+   USE qs_rho_methods, ONLY: qs_rho_rebuild, &
+                             qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_vxc_atom, ONLY: calculate_xc_2nd_deriv_atom
+   USE string_utilities, ONLY: xstring
+   USE xc, ONLY: xc_calc_2nd_deriv, &
+                 xc_prep_2nd_deriv
+   USE xc_derivatives, ONLY: xc_functionals_get_needs
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_type
+   USE xc_rho_set_types, ONLY: xc_rho_set_create, &
+                               xc_rho_set_release, &
+                               xc_rho_set_type, &
+                               xc_rho_set_update
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -154,7 +154,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: centers_only
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'linres_localize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, istate, nmoloc(2), output_unit
       LOGICAL                                            :: my_centers_only
@@ -444,7 +444,7 @@ CONTAINS
          IF (iter .EQ. 1 .OR. MOD(iter, 1) .EQ. 0 .OR. linres_control%converged .OR. restart .OR. should_stop) THEN
             IF (output_unit > 0) THEN
                WRITE (output_unit, "(T5,I5,T18,A3,T28,L1,T38,1E8.2,T48,F16.10,T68,F8.2)") &
-                  iter, linres_control%flag, restart, MAXVAL(alpha), norm_res, t2-t1
+                  iter, linres_control%flag, restart, MAXVAL(alpha), norm_res, t2 - t1
                CALL m_flush(output_unit)
             ENDIF
          ENDIF
@@ -673,7 +673,7 @@ CONTAINS
 
          chksum = 0.0_dp
          DO ispin = 1, nspins
-            chksum = chksum+dbcsr_checksum(p_env%p1(ispin)%matrix)
+            chksum = chksum + dbcsr_checksum(p_env%p1(ispin)%matrix)
          ENDDO
 
          !
@@ -728,7 +728,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: dm
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_dm_response', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, ncol, nspins
 
@@ -893,7 +893,7 @@ CONTAINS
       xc_section => section_vals_get_subs_vals(input, "DFT%XC")
       scf_section => section_vals_get_subs_vals(input, "DFT%SCF")
 
-      p_env%kpp1_env%iter = p_env%kpp1_env%iter+1
+      p_env%kpp1_env%iter = p_env%kpp1_env%iter + 1
 
 ! gets the tmp grids
       CPASSERT(ASSOCIATED(pw_env))
@@ -1179,7 +1179,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'p_env_check_i_alloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=25)                                  :: name
       INTEGER                                            :: handle, ispin, nspins
@@ -1238,7 +1238,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: lr_triplet
 
       CHARACTER(len=*), PARAMETER :: routineN = 'kpp1_check_i_alloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, nspins
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_s
@@ -1453,7 +1453,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: ind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'linres_write_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       CHARACTER(LEN=default_string_length)               :: my_middle, my_pos, my_status
@@ -1529,7 +1529,7 @@ CONTAINS
             IF (rst_unit > 0) WRITE (rst_unit) nmo
 
             DO i = 1, nmo, MAX(max_block, 1)
-               i_block = MIN(max_block, nmo-i+1)
+               i_block = MIN(max_block, nmo - i + 1)
                CALL cp_fm_get_submatrix(vec(ispin)%matrix, vecbuffer, 1, i, nao, i_block)
                ! doing this in one write would increase efficiency, but breaks RESTART compatibility.
                ! to old ones, and in cases where max_block is different between runs, as might happen during
@@ -1568,13 +1568,13 @@ CONTAINS
       INTEGER, INTENT(INOUT), OPTIONAL                   :: ind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'linres_read_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       CHARACTER(LEN=default_string_length)               :: my_middle
       INTEGER :: group, handle, i, i_block, ia, ie, iostat, ispin, iv, iv1, ivec_tmp, j, &
-         max_block, n_rep_val, nao, nao_tmp, nmo, nmo_tmp, nspins, nspins_tmp, output_unit, &
-         rst_unit, source
+                 max_block, n_rep_val, nao, nao_tmp, nmo, nmo_tmp, nspins, nspins_tmp, output_unit, &
+                 rst_unit, source
       LOGICAL                                            :: file_exists
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: vecbuffer
       TYPE(cp_fm_type), POINTER                          :: mo_coeff
@@ -1688,7 +1688,7 @@ CONTAINS
                !
                ! read the response
                DO i = 1, nmo, MAX(max_block, 1)
-                  i_block = MIN(max_block, nmo-i+1)
+                  i_block = MIN(max_block, nmo - i + 1)
                   DO j = 1, i_block
                      IF (rst_unit > 0) READ (rst_unit) vecbuffer(1:nao, j)
                   ENDDO
@@ -1733,7 +1733,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nspins
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'check_p_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, ncol, nrow
 

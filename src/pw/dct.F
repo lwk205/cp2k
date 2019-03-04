@@ -13,22 +13,22 @@
 ! **************************************************************************************************
 MODULE dct
 
-   USE fast,                            ONLY: copy_cr
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_allgather,&
-                                              mp_cart_rank,&
-                                              mp_irecv,&
-                                              mp_isend,&
-                                              mp_request_null,&
-                                              mp_wait,&
-                                              mp_waitall
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_create,&
-                                              pw_grid_setup
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA1D,&
-                                              RECIPROCALSPACE,&
-                                              pw_type
+   USE fast, ONLY: copy_cr
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_allgather, &
+                              mp_cart_rank, &
+                              mp_irecv, &
+                              mp_isend, &
+                              mp_request_null, &
+                              mp_wait, &
+                              mp_waitall
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_grids, ONLY: pw_grid_create, &
+                       pw_grid_setup
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA1D, &
+                       RECIPROCALSPACE, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -138,7 +138,7 @@ CONTAINS
       TYPE(dct_type), INTENT(INOUT)                      :: dct_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dct_type_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -173,7 +173,7 @@ CONTAINS
       TYPE(pw_grid_type), INTENT(INOUT), POINTER         :: dct_pw_grid
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'setup_dct_pw_grids', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blocked, handle, maxn_sendrecv, &
                                                             srcs_shrink
@@ -273,7 +273,7 @@ CONTAINS
       INTEGER, INTENT(OUT)                               :: srcs_shrink
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'set_dests_srcs_pid', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group_size, handle, i, j, k, &
                                                             maxn_sendrecv, rs_dim1, rs_dim2, &
@@ -346,31 +346,31 @@ CONTAINS
          IF (MOD(rs_dim1, 2) .EQ. 0) THEN
             tmp_size1 = rs_dim1
          ELSE
-            tmp_size1 = rs_dim1+1
+            tmp_size1 = rs_dim1 + 1
          END IF
-         ALLOCATE (tmp1_arr(tmp_size1), src_pos1(2, 0:rs_dim1-1))
+         ALLOCATE (tmp1_arr(tmp_size1), src_pos1(2, 0:rs_dim1 - 1))
 
          IF (MOD(rs_dim1, 2) .EQ. 0) THEN
             tmp1_arr(:) = (/(i, i=1, rs_dim1)/)
             src_pos1(:, :) = RESHAPE((/tmp1_arr, -tmp1_arr(tmp_size1:1:-1)/), (/2, rs_dim1/))
          ELSE
             tmp1_arr(:) = (/(i, i=1, rs_dim1), -rs_dim1/)
-            src_pos1(:, :) = RESHAPE((/tmp1_arr, -tmp1_arr(tmp_size1-2:1:-1)/), (/2, rs_dim1/))
+            src_pos1(:, :) = RESHAPE((/tmp1_arr, -tmp1_arr(tmp_size1 - 2:1:-1)/), (/2, rs_dim1/))
          END IF
 !---
          IF (MOD(rs_dim2, 2) .EQ. 0) THEN
             tmp_size2 = rs_dim2
          ELSE
-            tmp_size2 = rs_dim2+1
+            tmp_size2 = rs_dim2 + 1
          END IF
-         ALLOCATE (tmp2_arr(tmp_size2), src_pos2(2, 0:rs_dim2-1))
+         ALLOCATE (tmp2_arr(tmp_size2), src_pos2(2, 0:rs_dim2 - 1))
 
          IF (MOD(rs_dim2, 2) .EQ. 0) THEN
             tmp2_arr(:) = (/(i, i=1, rs_dim2)/)
             src_pos2(:, :) = RESHAPE((/tmp2_arr, -tmp2_arr(tmp_size2:1:-1)/), (/2, rs_dim2/))
          ELSE
             tmp2_arr(:) = (/(i, i=1, rs_dim2), -rs_dim2/)
-            src_pos2(:, :) = RESHAPE((/tmp2_arr, -tmp2_arr(tmp_size2-2:1:-1)/), (/2, rs_dim2/))
+            src_pos2(:, :) = RESHAPE((/tmp2_arr, -tmp2_arr(tmp_size2 - 2:1:-1)/), (/2, rs_dim2/))
          END IF
 !---
          srcs_coord(:, 1) = (/src_pos1(1, rs_pos(1)), src_pos2(1, rs_pos(2))/)
@@ -384,19 +384,19 @@ CONTAINS
          IF (MOD(rs_dim1, 2) .EQ. 0) THEN
             tmp_size1 = rs_dim1
          ELSE
-            tmp_size1 = rs_dim1+1
+            tmp_size1 = rs_dim1 + 1
          END IF
-         ALLOCATE (tmp1_arr(tmp_size1), src_pos1(2, 0:rs_dim1-1))
+         ALLOCATE (tmp1_arr(tmp_size1), src_pos1(2, 0:rs_dim1 - 1))
 
          IF (MOD(rs_dim1, 2) .EQ. 0) THEN
             tmp1_arr(:) = (/(i, i=1, rs_dim1)/)
             src_pos1(:, :) = RESHAPE((/tmp1_arr, -tmp1_arr(tmp_size1:1:-1)/), (/2, rs_dim1/))
          ELSE
             tmp1_arr(:) = (/(i, i=1, rs_dim1), -rs_dim1/)
-            src_pos1(:, :) = RESHAPE((/tmp1_arr, -tmp1_arr(tmp_size1-2:1:-1)/), (/2, rs_dim1/))
+            src_pos1(:, :) = RESHAPE((/tmp1_arr, -tmp1_arr(tmp_size1 - 2:1:-1)/), (/2, rs_dim1/))
          END IF
 !---
-         ALLOCATE (src_pos2_onesdd(0:rs_dim2-1))
+         ALLOCATE (src_pos2_onesdd(0:rs_dim2 - 1))
          src_pos2_onesdd(:) = (/(i, i=1, rs_dim2)/)
 !---
          srcs_coord(:, 1) = (/src_pos1(1, rs_pos(1)), src_pos2_onesdd(rs_pos(2))/)
@@ -405,22 +405,22 @@ CONTAINS
          maxn_sendrecv = 2
          ALLOCATE (srcs_coord(2, maxn_sendrecv))
 
-         ALLOCATE (src_pos1_onesdd(0:rs_dim1-1))
+         ALLOCATE (src_pos1_onesdd(0:rs_dim1 - 1))
          src_pos1_onesdd(:) = (/(i, i=1, rs_dim1)/)
 !---
          IF (MOD(rs_dim2, 2) .EQ. 0) THEN
             tmp_size2 = rs_dim2
          ELSE
-            tmp_size2 = rs_dim2+1
+            tmp_size2 = rs_dim2 + 1
          END IF
-         ALLOCATE (tmp2_arr(tmp_size2), src_pos2(2, 0:rs_dim2-1))
+         ALLOCATE (tmp2_arr(tmp_size2), src_pos2(2, 0:rs_dim2 - 1))
 
          IF (MOD(rs_dim2, 2) .EQ. 0) THEN
             tmp2_arr(:) = (/(i, i=1, rs_dim2)/)
             src_pos2(:, :) = RESHAPE((/tmp2_arr, -tmp2_arr(tmp_size2:1:-1)/), (/2, rs_dim2/))
          ELSE
             tmp2_arr(:) = (/(i, i=1, rs_dim2), -rs_dim2/)
-            src_pos2(:, :) = RESHAPE((/tmp2_arr, -tmp2_arr(tmp_size2-2:1:-1)/), (/2, rs_dim2/))
+            src_pos2(:, :) = RESHAPE((/tmp2_arr, -tmp2_arr(tmp_size2 - 2:1:-1)/), (/2, rs_dim2/))
          END IF
 !---
          srcs_coord(:, 1) = (/src_pos1_onesdd(rs_pos(1)), src_pos2(1, rs_pos(2))/)
@@ -428,8 +428,8 @@ CONTAINS
       CASE (neumannZ)
          maxn_sendrecv = 1
          ALLOCATE (srcs_coord(2, maxn_sendrecv))
-         ALLOCATE (src_pos1_onesdd(0:rs_dim1-1))
-         ALLOCATE (src_pos2_onesdd(0:rs_dim2-1))
+         ALLOCATE (src_pos1_onesdd(0:rs_dim1 - 1))
+         ALLOCATE (src_pos2_onesdd(0:rs_dim2 - 1))
 
          src_pos1_onesdd(:) = (/(i, i=1, rs_dim1)/)
 !---
@@ -443,7 +443,7 @@ CONTAINS
 
       DO k = 1, maxn_sendrecv
 ! convert srcs_coord to pid
-         CALL mp_cart_rank(pw_grid%para%rs_group, ABS(srcs_coord(:, k))-1, srcs_expand(k))
+         CALL mp_cart_rank(pw_grid%para%rs_group, ABS(srcs_coord(:, k)) - 1, srcs_expand(k))
 ! find out the flipping status
          IF ((srcs_coord(1, k) .GT. 0) .AND. (srcs_coord(2, k) .GT. 0)) THEN
             flipg_stat(k) = NOT_FLIPPED
@@ -465,8 +465,8 @@ CONTAINS
       DO i = 1, group_size
          DO j = 1, maxn_sendrecv
             IF (srcs_expand_all(j, i) .EQ. rs_mpo) THEN
-               dests_expand(k) = i-1
-               k = k+1
+               dests_expand(k) = i - 1
+               k = k + 1
             END IF
          END DO
       END DO
@@ -491,7 +491,7 @@ CONTAINS
       DO i = 1, group_size
          DO j = 1, maxn_sendrecv
             IF (dests_shrink_all(j, i) .EQ. rs_mpo) THEN
-               srcs_shrink = i-1
+               srcs_shrink = i - 1
                EXIT
             END IF
          END DO
@@ -533,8 +533,8 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'pw_expand', routineP = moduleN//':'//routineN
 
       INTEGER :: group_size, handle, i, ind, lb1, lb1_loc, lb1_new, lb2, lb2_loc, lb2_new, lb3, &
-         lb3_loc, lb3_new, loc, maxn_sendrecv, rs_group, rs_mpo, ub1, ub1_loc, ub1_new, ub2, &
-         ub2_loc, ub2_new, ub3, ub3_loc, ub3_new
+                 lb3_loc, lb3_new, loc, maxn_sendrecv, rs_group, rs_mpo, ub1, ub1_loc, ub1_new, ub2, &
+                 ub2_loc, ub2_new, ub3, ub3_loc, ub3_new
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: dest_hist, recv_reqs, send_reqs, src_hist
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: pcs_bnds
       INTEGER, DIMENSION(2, 3)                           :: bounds_local_new
@@ -596,7 +596,7 @@ CONTAINS
             recv_msgs(i)%msg = send_msg
 ! if I have already received data from the source, just use the one from the last time
          ELSE IF (ANY(src_hist .EQ. srcs_expand(i))) THEN
-            loc = MINLOC(ABS(src_hist-srcs_expand(i)), 1)
+            loc = MINLOC(ABS(src_hist - srcs_expand(i)), 1)
             lb1_loc = recv_msgs_bnds(1, 1, loc)
             ub1_loc = recv_msgs_bnds(2, 1, loc)
             lb2_loc = recv_msgs_bnds(1, 2, loc)
@@ -617,7 +617,7 @@ CONTAINS
 
 ! flip the received data according on the flipping status
       DO i = 1, maxn_sendrecv
-         SELECT CASE (flipg_stat (i))
+         SELECT CASE (flipg_stat(i))
          CASE (NOT_FLIPPED)
             lb1 = recv_msgs_bnds(1, 1, i)
             ub1 = recv_msgs_bnds(2, 1, i)
@@ -654,8 +654,8 @@ CONTAINS
 
       SELECT CASE (neumann_directions)
       CASE (neumannXYZ, neumannXZ, neumannYZ, neumannZ)
-         ind = INT(0.5*(ub3_new+lb3_new+1))
-         ALLOCATE (catd(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ind-1))
+         ind = INT(0.5*(ub3_new + lb3_new + 1))
+         ALLOCATE (catd(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ind - 1))
       CASE (neumannXY, neumannX, neumannY)
          ALLOCATE (catd(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ub3_new))
       END SELECT
@@ -672,7 +672,7 @@ CONTAINS
       ALLOCATE (cr3d_xpndd(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ub3_new))
       SELECT CASE (neumann_directions)
       CASE (neumannXYZ, neumannXZ, neumannYZ, neumannZ)
-         cr3d_xpndd(:, :, lb3_new:ind-1) = catd
+         cr3d_xpndd(:, :, lb3_new:ind - 1) = catd
          cr3d_xpndd(:, :, ind:ub3_new) = catd_flipdbf
       CASE (neumannXY, neumannX, neumannY)
          cr3d_xpndd(:, :, :) = catd
@@ -719,9 +719,9 @@ CONTAINS
 
       COMPLEX(dp), DIMENSION(:, :, :), POINTER           :: cc3d
       INTEGER :: group_size, handle, i, in_space, in_use, lb1_orig, lb1_xpnd, lb2_orig, lb2_xpnd, &
-         lb3_orig, lb3_xpnd, maxn_sendrecv, recv_req, rs_group, rs_mpo, send_lb1, send_lb2, &
-         send_lb3, send_req, send_ub1, send_ub2, send_ub3, ub1_orig, ub1_xpnd, ub2_orig, ub2_xpnd, &
-         ub3_orig, ub3_xpnd
+                 lb3_orig, lb3_xpnd, maxn_sendrecv, recv_req, rs_group, rs_mpo, send_lb1, send_lb2, &
+                 send_lb3, send_req, send_ub1, send_ub2, send_ub3, ub1_orig, ub1_xpnd, ub2_orig, ub2_xpnd, &
+                 ub3_orig, ub3_xpnd
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: bounds_local_all
       INTEGER, DIMENSION(2, 3)                           :: bounds_local_xpnd
       REAL(dp), DIMENSION(:, :, :), POINTER              :: cr3d, send_crmsg
@@ -758,12 +758,12 @@ CONTAINS
          IF (in_space .EQ. RECIPROCALSPACE) THEN
             ALLOCATE (cr3d(lb1_xpnd:ub1_xpnd, lb2_xpnd:ub2_xpnd, lb3_xpnd:ub3_xpnd))
             ALLOCATE (cc3d(lb1_xpnd:ub1_xpnd, lb2_xpnd:ub2_xpnd, lb3_xpnd:ub3_xpnd))
-            cc3d = RESHAPE(pw_in%cc, (/ub1_xpnd-lb1_xpnd+1, ub2_xpnd-lb2_xpnd+1, ub3_xpnd-lb3_xpnd+1/))
+            cc3d = RESHAPE(pw_in%cc, (/ub1_xpnd - lb1_xpnd + 1, ub2_xpnd - lb2_xpnd + 1, ub3_xpnd - lb3_xpnd + 1/))
             CALL copy_cr(cc3d, cr3d)
             DEALLOCATE (cc3d)
          ELSE
             ALLOCATE (cr3d(lb1_xpnd:ub1_xpnd, lb2_xpnd:ub2_xpnd, lb3_xpnd:ub3_xpnd))
-            cr3d = RESHAPE(pw_in%cr, (/ub1_xpnd-lb1_xpnd+1, ub2_xpnd-lb2_xpnd+1, ub3_xpnd-lb3_xpnd+1/))
+            cr3d = RESHAPE(pw_in%cr, (/ub1_xpnd - lb1_xpnd + 1, ub2_xpnd - lb2_xpnd + 1, ub3_xpnd - lb3_xpnd + 1/))
          END IF
       ELSE
          IF (in_space .EQ. RECIPROCALSPACE) THEN
@@ -781,12 +781,12 @@ CONTAINS
       DO i = 1, maxn_sendrecv
 ! no need to send to myself or to an invalid destination (pid = -1)
          IF ((dests_shrink(i) .NE. rs_mpo) .AND. (dests_shrink(i) .NE. -1)) THEN
-            send_lb1 = bounds_local_all(1, 1, dests_shrink(i)+1)
-            send_ub1 = bounds_local_all(2, 1, dests_shrink(i)+1)
-            send_lb2 = bounds_local_all(1, 2, dests_shrink(i)+1)
-            send_ub2 = bounds_local_all(2, 2, dests_shrink(i)+1)
-            send_lb3 = bounds_local_all(1, 3, dests_shrink(i)+1)
-            send_ub3 = bounds_local_all(2, 3, dests_shrink(i)+1)
+            send_lb1 = bounds_local_all(1, 1, dests_shrink(i) + 1)
+            send_ub1 = bounds_local_all(2, 1, dests_shrink(i) + 1)
+            send_lb2 = bounds_local_all(1, 2, dests_shrink(i) + 1)
+            send_ub2 = bounds_local_all(2, 2, dests_shrink(i) + 1)
+            send_lb3 = bounds_local_all(1, 3, dests_shrink(i) + 1)
+            send_ub3 = bounds_local_all(2, 3, dests_shrink(i) + 1)
 
             ALLOCATE (send_crmsg(send_lb1:send_ub1, send_lb2:send_ub2, send_lb3:send_ub3))
             send_crmsg = cr3d(send_lb1:send_ub1, send_lb2:send_ub2, send_lb3:send_ub3)
@@ -838,7 +838,7 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'flipud', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, lb1, lb1_glbl, lb1_new, lb2, lb2_glbl, lb2_new, lb3, lb3_glbl, &
-         lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
+                 lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: indx
       INTEGER, DIMENSION(2, 3)                           :: bndsl, bndsl_new
 
@@ -864,9 +864,9 @@ CONTAINS
 
 ! set the data at the missing grid points (in a periodic grid) equal to the data at
 ! the last existing grid points
-      ALLOCATE (indx(ub1_new-lb1_new+1))
-      indx(:) = (/(i, i=2*(ub1_glbl+1)-lb1_new, 2*(ub1_glbl+1)-ub1_new, -1)/)
-      IF (lb1_new .EQ. ub1_glbl+1) indx(1) = indx(2)
+      ALLOCATE (indx(ub1_new - lb1_new + 1))
+      indx(:) = (/(i, i=2*(ub1_glbl + 1) - lb1_new, 2*(ub1_glbl + 1) - ub1_new, -1)/)
+      IF (lb1_new .EQ. ub1_glbl + 1) indx(1) = indx(2)
       cr3d_out(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ub3_new) = cr3d_in(indx, :, :)
 
       CALL timestop(handle)
@@ -892,7 +892,7 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fliplr', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, lb1, lb1_glbl, lb1_new, lb2, lb2_glbl, lb2_new, lb3, lb3_glbl, &
-         lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
+                 lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: indy
       INTEGER, DIMENSION(2, 3)                           :: bndsl, bndsl_new
 
@@ -918,9 +918,9 @@ CONTAINS
 
 ! set the data at the missing grid points (in a periodic grid) equal to the data at
 ! the last existing grid points
-      ALLOCATE (indy(ub2_new-lb2_new+1))
-      indy(:) = (/(i, i=2*(ub2_glbl+1)-lb2_new, 2*(ub2_glbl+1)-ub2_new, -1)/)
-      IF (lb2_new .EQ. ub2_glbl+1) indy(1) = indy(2)
+      ALLOCATE (indy(ub2_new - lb2_new + 1))
+      indy(:) = (/(i, i=2*(ub2_glbl + 1) - lb2_new, 2*(ub2_glbl + 1) - ub2_new, -1)/)
+      IF (lb2_new .EQ. ub2_glbl + 1) indy(1) = indy(2)
       cr3d_out(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ub3_new) = cr3d_in(:, indy, :)
 
       CALL timestop(handle)
@@ -946,7 +946,7 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'flipbf', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, lb1, lb1_glbl, lb1_new, lb2, lb2_glbl, lb2_new, lb3, lb3_glbl, &
-         lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
+                 lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: indz
       INTEGER, DIMENSION(2, 3)                           :: bndsl, bndsl_new
 
@@ -972,9 +972,9 @@ CONTAINS
 
 ! set the data at the missing grid points (in a periodic grid) equal to the data at
 ! the last existing grid points
-      ALLOCATE (indz(ub3_new-lb3_new+1))
-      indz(:) = (/(i, i=2*(ub3_glbl+1)-lb3_new, 2*(ub3_glbl+1)-ub3_new, -1)/)
-      IF (lb3_new .EQ. ub3_glbl+1) indz(1) = indz(2)
+      ALLOCATE (indz(ub3_new - lb3_new + 1))
+      indz(:) = (/(i, i=2*(ub3_glbl + 1) - lb3_new, 2*(ub3_glbl + 1) - ub3_new, -1)/)
+      IF (lb3_new .EQ. ub3_glbl + 1) indz(1) = indz(2)
       cr3d_out(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ub3_new) = cr3d_in(:, :, indz)
 
       CALL timestop(handle)
@@ -1000,7 +1000,7 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rot180', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, lb1, lb1_glbl, lb1_new, lb2, lb2_glbl, lb2_new, lb3, lb3_glbl, &
-         lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
+                 lb3_new, ub1, ub1_glbl, ub1_new, ub2, ub2_glbl, ub2_new, ub3, ub3_glbl, ub3_new
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: indx, indy
       INTEGER, DIMENSION(2, 3)                           :: bndsl, bndsl_new
 
@@ -1026,11 +1026,11 @@ CONTAINS
 
 ! set the data at the missing grid points (in a periodic grid) equal to the data at
 ! the last existing grid points
-      ALLOCATE (indx(ub1_new-lb1_new+1), indy(ub2_new-lb2_new+1))
-      indx(:) = (/(i, i=2*(ub1_glbl+1)-lb1_new, 2*(ub1_glbl+1)-ub1_new, -1)/)
-      indy(:) = (/(i, i=2*(ub2_glbl+1)-lb2_new, 2*(ub2_glbl+1)-ub2_new, -1)/)
-      IF (lb1_new .EQ. ub1_glbl+1) indx(1) = indx(2)
-      IF (lb2_new .EQ. ub2_glbl+1) indy(1) = indy(2)
+      ALLOCATE (indx(ub1_new - lb1_new + 1), indy(ub2_new - lb2_new + 1))
+      indx(:) = (/(i, i=2*(ub1_glbl + 1) - lb1_new, 2*(ub1_glbl + 1) - ub1_new, -1)/)
+      indy(:) = (/(i, i=2*(ub2_glbl + 1) - lb2_new, 2*(ub2_glbl + 1) - ub2_new, -1)/)
+      IF (lb1_new .EQ. ub1_glbl + 1) indx(1) = indx(2)
+      IF (lb2_new .EQ. ub2_glbl + 1) indy(1) = indy(2)
       cr3d_out(lb1_new:ub1_new, lb2_new:ub2_new, lb3_new:ub3_new) = cr3d_in(indx, indy, :)
 
       CALL timestop(handle)
@@ -1065,7 +1065,7 @@ CONTAINS
       INTEGER, DIMENSION(2, 3), INTENT(OUT)              :: bounds_new, bounds_local_new
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'expansion_bounds', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group_size, handle, i, lb1_new, lb2_new, &
                                                             lb3_new, loc, maxn_sendrecv, rs_group, &
@@ -1114,13 +1114,13 @@ CONTAINS
       ! Note that this is not easily FFT-able ... needed anyway, so link in FFTW.
       npts_new = 2*pw_grid%npts
       shift = -npts_new/2
-      shift = shift-bounds(1, :)
-      bounds_shftd(:, 1) = bounds(:, 1)+shf_yesno(1)*shift(1)
-      bounds_shftd(:, 2) = bounds(:, 2)+shf_yesno(2)*shift(2)
-      bounds_shftd(:, 3) = bounds(:, 3)+shf_yesno(3)*shift(3)
-      bounds_local_shftd(:, 1) = bounds_local(:, 1)+shf_yesno(1)*shift(1)
-      bounds_local_shftd(:, 2) = bounds_local(:, 2)+shf_yesno(2)*shift(2)
-      bounds_local_shftd(:, 3) = bounds_local(:, 3)+shf_yesno(3)*shift(3)
+      shift = shift - bounds(1, :)
+      bounds_shftd(:, 1) = bounds(:, 1) + shf_yesno(1)*shift(1)
+      bounds_shftd(:, 2) = bounds(:, 2) + shf_yesno(2)*shift(2)
+      bounds_shftd(:, 3) = bounds(:, 3) + shf_yesno(3)*shift(3)
+      bounds_local_shftd(:, 1) = bounds_local(:, 1) + shf_yesno(1)*shift(1)
+      bounds_local_shftd(:, 2) = bounds_local(:, 2) + shf_yesno(2)*shift(2)
+      bounds_local_shftd(:, 3) = bounds_local(:, 3) + shf_yesno(3)*shift(3)
 
 ! let all the nodes know about each others local shifted bounds
       ALLOCATE (bounds_local_all(2, 3, group_size))
@@ -1139,27 +1139,27 @@ CONTAINS
             recv_msgs_bnds(2, 3, i) = bounds_local_shftd(2, 3)
 ! if I have already received data from the source, just use the one from the last time
          ELSE IF (ANY(src_hist .EQ. srcs_expand(i))) THEN
-            loc = MINLOC(ABS(src_hist-srcs_expand(i)), 1)
-            recv_msgs_bnds(1, 1, i) = bounds_local_all(1, 1, srcs_expand(loc)+1)
-            recv_msgs_bnds(2, 1, i) = bounds_local_all(2, 1, srcs_expand(loc)+1)
-            recv_msgs_bnds(1, 2, i) = bounds_local_all(1, 2, srcs_expand(loc)+1)
-            recv_msgs_bnds(2, 2, i) = bounds_local_all(2, 2, srcs_expand(loc)+1)
-            recv_msgs_bnds(1, 3, i) = bounds_local_all(1, 3, srcs_expand(loc)+1)
-            recv_msgs_bnds(2, 3, i) = bounds_local_all(2, 3, srcs_expand(loc)+1)
+            loc = MINLOC(ABS(src_hist - srcs_expand(i)), 1)
+            recv_msgs_bnds(1, 1, i) = bounds_local_all(1, 1, srcs_expand(loc) + 1)
+            recv_msgs_bnds(2, 1, i) = bounds_local_all(2, 1, srcs_expand(loc) + 1)
+            recv_msgs_bnds(1, 2, i) = bounds_local_all(1, 2, srcs_expand(loc) + 1)
+            recv_msgs_bnds(2, 2, i) = bounds_local_all(2, 2, srcs_expand(loc) + 1)
+            recv_msgs_bnds(1, 3, i) = bounds_local_all(1, 3, srcs_expand(loc) + 1)
+            recv_msgs_bnds(2, 3, i) = bounds_local_all(2, 3, srcs_expand(loc) + 1)
          ELSE
-            recv_msgs_bnds(1, 1, i) = bounds_local_all(1, 1, srcs_expand(i)+1)
-            recv_msgs_bnds(2, 1, i) = bounds_local_all(2, 1, srcs_expand(i)+1)
-            recv_msgs_bnds(1, 2, i) = bounds_local_all(1, 2, srcs_expand(i)+1)
-            recv_msgs_bnds(2, 2, i) = bounds_local_all(2, 2, srcs_expand(i)+1)
-            recv_msgs_bnds(1, 3, i) = bounds_local_all(1, 3, srcs_expand(i)+1)
-            recv_msgs_bnds(2, 3, i) = bounds_local_all(2, 3, srcs_expand(i)+1)
+            recv_msgs_bnds(1, 1, i) = bounds_local_all(1, 1, srcs_expand(i) + 1)
+            recv_msgs_bnds(2, 1, i) = bounds_local_all(2, 1, srcs_expand(i) + 1)
+            recv_msgs_bnds(1, 2, i) = bounds_local_all(1, 2, srcs_expand(i) + 1)
+            recv_msgs_bnds(2, 2, i) = bounds_local_all(2, 2, srcs_expand(i) + 1)
+            recv_msgs_bnds(1, 3, i) = bounds_local_all(1, 3, srcs_expand(i) + 1)
+            recv_msgs_bnds(2, 3, i) = bounds_local_all(2, 3, srcs_expand(i) + 1)
          END IF
          src_hist(i) = srcs_expand(i)
       END DO
 
 ! flip the received data based on the flipping status
       DO i = 1, maxn_sendrecv
-         SELECT CASE (flipg_stat (i))
+         SELECT CASE (flipg_stat(i))
          CASE (NOT_FLIPPED)
             pcs_bnds(:, :, i) = recv_msgs_bnds(:, :, i)
          CASE (UD_FLIPPED)
@@ -1185,7 +1185,7 @@ CONTAINS
       bounds_local_new(1, 3) = MINVAL(pcs_bnds(1, 3, :))
       SELECT CASE (neumann_directions)
       CASE (neumannXYZ, neumannXZ, neumannYZ, neumannZ)
-         bounds_local_new(2, 3) = 2*(MAXVAL(pcs_bnds(2, 3, :))+1)-bounds_local_new(1, 3)-1
+         bounds_local_new(2, 3) = 2*(MAXVAL(pcs_bnds(2, 3, :)) + 1) - bounds_local_new(1, 3) - 1
       CASE (neumannXY, neumannX, neumannY)
          bounds_local_new(2, 3) = MAXVAL(pcs_bnds(2, 3, :))
       END SELECT
@@ -1220,16 +1220,16 @@ CONTAINS
       INTEGER, DIMENSION(2, 3)                           :: bndsl_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'flipud_bounds_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
       CALL timeset(routineN, handle)
 
-      bndsl_out(1, 1) = 2*(bounds(2, 1)+1)-bndsl_in(2, 1)
-      bndsl_out(2, 1) = 2*(bounds(2, 1)+1)-bndsl_in(1, 1)
-      IF (bndsl_out(1, 1) .EQ. bounds(2, 1)+2) bndsl_out(1, 1) = bndsl_out(1, 1)-1
-      IF (bndsl_out(2, 1) .EQ. 2*(bounds(2, 1)+1)-bounds(1, 1)) bndsl_out(2, 1) = bndsl_out(2, 1)-1
+      bndsl_out(1, 1) = 2*(bounds(2, 1) + 1) - bndsl_in(2, 1)
+      bndsl_out(2, 1) = 2*(bounds(2, 1) + 1) - bndsl_in(1, 1)
+      IF (bndsl_out(1, 1) .EQ. bounds(2, 1) + 2) bndsl_out(1, 1) = bndsl_out(1, 1) - 1
+      IF (bndsl_out(2, 1) .EQ. 2*(bounds(2, 1) + 1) - bounds(1, 1)) bndsl_out(2, 1) = bndsl_out(2, 1) - 1
 
       bndsl_out(1, 2) = bndsl_in(1, 2)
       bndsl_out(2, 2) = bndsl_in(2, 2)
@@ -1256,7 +1256,7 @@ CONTAINS
       INTEGER, DIMENSION(2, 3)                           :: bndsl_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fliplr_bounds_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -1265,10 +1265,10 @@ CONTAINS
       bndsl_out(1, 1) = bndsl_in(1, 1)
       bndsl_out(2, 1) = bndsl_in(2, 1)
 
-      bndsl_out(1, 2) = 2*(bounds(2, 2)+1)-bndsl_in(2, 2)
-      bndsl_out(2, 2) = 2*(bounds(2, 2)+1)-bndsl_in(1, 2)
-      IF (bndsl_out(1, 2) .EQ. bounds(2, 2)+2) bndsl_out(1, 2) = bndsl_out(1, 2)-1
-      IF (bndsl_out(2, 2) .EQ. 2*(bounds(2, 2)+1)-bounds(1, 2)) bndsl_out(2, 2) = bndsl_out(2, 2)-1
+      bndsl_out(1, 2) = 2*(bounds(2, 2) + 1) - bndsl_in(2, 2)
+      bndsl_out(2, 2) = 2*(bounds(2, 2) + 1) - bndsl_in(1, 2)
+      IF (bndsl_out(1, 2) .EQ. bounds(2, 2) + 2) bndsl_out(1, 2) = bndsl_out(1, 2) - 1
+      IF (bndsl_out(2, 2) .EQ. 2*(bounds(2, 2) + 1) - bounds(1, 2)) bndsl_out(2, 2) = bndsl_out(2, 2) - 1
 
       bndsl_out(1, 3) = bndsl_in(1, 3)
       bndsl_out(2, 3) = bndsl_in(2, 3)
@@ -1292,7 +1292,7 @@ CONTAINS
       INTEGER, DIMENSION(2, 3)                           :: bndsl_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'flipbf_bounds_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -1304,10 +1304,10 @@ CONTAINS
       bndsl_out(1, 2) = bndsl_in(1, 2)
       bndsl_out(2, 2) = bndsl_in(2, 2)
 
-      bndsl_out(1, 3) = 2*(bounds(2, 3)+1)-bndsl_in(2, 3)
-      bndsl_out(2, 3) = 2*(bounds(2, 3)+1)-bndsl_in(1, 3)
-      IF (bndsl_out(1, 3) .EQ. bounds(2, 3)+2) bndsl_out(1, 3) = bndsl_out(1, 3)-1
-      IF (bndsl_out(2, 3) .EQ. 2*(bounds(2, 3)+1)-bounds(1, 3)) bndsl_out(2, 3) = bndsl_out(2, 3)-1
+      bndsl_out(1, 3) = 2*(bounds(2, 3) + 1) - bndsl_in(2, 3)
+      bndsl_out(2, 3) = 2*(bounds(2, 3) + 1) - bndsl_in(1, 3)
+      IF (bndsl_out(1, 3) .EQ. bounds(2, 3) + 2) bndsl_out(1, 3) = bndsl_out(1, 3) - 1
+      IF (bndsl_out(2, 3) .EQ. 2*(bounds(2, 3) + 1) - bounds(1, 3)) bndsl_out(2, 3) = bndsl_out(2, 3) - 1
 
       CALL timestop(handle)
 
@@ -1328,21 +1328,21 @@ CONTAINS
       INTEGER, DIMENSION(2, 3)                           :: bndsl_out
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rot180_bounds_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
       CALL timeset(routineN, handle)
 
-      bndsl_out(1, 1) = 2*(bounds(2, 1)+1)-bndsl_in(2, 1)
-      bndsl_out(2, 1) = 2*(bounds(2, 1)+1)-bndsl_in(1, 1)
-      IF (bndsl_out(1, 1) .EQ. bounds(2, 1)+2) bndsl_out(1, 1) = bndsl_out(1, 1)-1
-      IF (bndsl_out(2, 1) .EQ. 2*(bounds(2, 1)+1)-bounds(1, 1)) bndsl_out(2, 1) = bndsl_out(2, 1)-1
+      bndsl_out(1, 1) = 2*(bounds(2, 1) + 1) - bndsl_in(2, 1)
+      bndsl_out(2, 1) = 2*(bounds(2, 1) + 1) - bndsl_in(1, 1)
+      IF (bndsl_out(1, 1) .EQ. bounds(2, 1) + 2) bndsl_out(1, 1) = bndsl_out(1, 1) - 1
+      IF (bndsl_out(2, 1) .EQ. 2*(bounds(2, 1) + 1) - bounds(1, 1)) bndsl_out(2, 1) = bndsl_out(2, 1) - 1
 
-      bndsl_out(1, 2) = 2*(bounds(2, 2)+1)-bndsl_in(2, 2)
-      bndsl_out(2, 2) = 2*(bounds(2, 2)+1)-bndsl_in(1, 2)
-      IF (bndsl_out(1, 2) .EQ. bounds(2, 2)+2) bndsl_out(1, 2) = bndsl_out(1, 2)-1
-      IF (bndsl_out(2, 2) .EQ. 2*(bounds(2, 2)+1)-bounds(1, 2)) bndsl_out(2, 2) = bndsl_out(2, 2)-1
+      bndsl_out(1, 2) = 2*(bounds(2, 2) + 1) - bndsl_in(2, 2)
+      bndsl_out(2, 2) = 2*(bounds(2, 2) + 1) - bndsl_in(1, 2)
+      IF (bndsl_out(1, 2) .EQ. bounds(2, 2) + 2) bndsl_out(1, 2) = bndsl_out(1, 2) - 1
+      IF (bndsl_out(2, 2) .EQ. 2*(bounds(2, 2) + 1) - bounds(1, 2)) bndsl_out(2, 2) = bndsl_out(2, 2) - 1
 
       bndsl_out(1, 3) = bndsl_in(1, 3)
       bndsl_out(2, 3) = bndsl_in(2, 3)

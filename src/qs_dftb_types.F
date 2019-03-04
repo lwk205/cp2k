@@ -9,8 +9,8 @@
 ! **************************************************************************************************
 MODULE qs_dftb_types
 
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
+   USE kinds, ONLY: default_string_length, &
+                    dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -82,7 +82,7 @@ CONTAINS
          POINTER                                         :: pairpot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_dftb_pairpot_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 
@@ -109,7 +109,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ngrd, llm, spdim
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_dftb_pairpot_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       pairpot%ngrd = ngrd
       pairpot%spdim = spdim
@@ -136,7 +136,7 @@ CONTAINS
          POINTER                                         :: pairpot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_dftb_pairpot_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, n1, n2
 

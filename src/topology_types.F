@@ -14,17 +14,17 @@
 !> \author CJM & JGH
 ! **************************************************************************************************
 MODULE topology_types
-   USE cell_types,                      ONLY: cell_release,&
-                                              cell_type
-   USE colvar_types,                    ONLY: colvar_p_type,&
-                                              colvar_release
-   USE input_constants,                 ONLY: do_bondparm_covalent,&
-                                              do_conn_generate,&
-                                              do_constr_none,&
-                                              do_skip_13
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
+   USE cell_types, ONLY: cell_release, &
+                         cell_type
+   USE colvar_types, ONLY: colvar_p_type, &
+                           colvar_release
+   USE input_constants, ONLY: do_bondparm_covalent, &
+                              do_conn_generate, &
+                              do_constr_none, &
+                              do_skip_13
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -305,7 +305,7 @@ CONTAINS
       TYPE(constraint_info_type), POINTER                :: constraint_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'init_constraint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 ! Bonds involving Hydrogens
 
@@ -393,7 +393,7 @@ CONTAINS
       TYPE(topology_parameters_type), INTENT(INOUT)      :: topology
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_topology', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !-----------------------------------------------------------------------------
 ! 1. DEALLOCATE things in topology%atom_info
@@ -552,7 +552,7 @@ CONTAINS
       TYPE(constraint_info_type), POINTER                :: constraint_info
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_constraint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -769,7 +769,7 @@ CONTAINS
       TYPE(topology_parameters_type), INTENT(INOUT)      :: topology
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pre_read_topology', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(atom_info_type), POINTER                      :: atom_info
 

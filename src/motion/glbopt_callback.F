@@ -8,16 +8,16 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE glbopt_callback
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type,&
-                                              pack_subsys_particles
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE kinds,                           ONLY: dp
-   USE md_ener_types,                   ONLY: md_ener_type
-   USE md_environment_types,            ONLY: get_md_env,&
-                                              md_environment_type
-   USE mdctrl_types,                    ONLY: glbopt_mdctrl_data_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type, &
+                              pack_subsys_particles
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE kinds, ONLY: dp
+   USE md_ener_types, ONLY: md_ener_type
+   USE md_environment_types, ONLY: get_md_env, &
+                                   md_environment_type
+   USE mdctrl_types, ONLY: glbopt_mdctrl_data_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -44,7 +44,7 @@ CONTAINS
       LOGICAL, INTENT(inout)                             :: should_stop
 
       CHARACTER(len=*), PARAMETER :: routineN = 'glbopt_md_callback', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iw, n_atoms
       INTEGER, POINTER                                   :: itimes
@@ -70,18 +70,18 @@ CONTAINS
       ! check if we passed a minimum
       passed_minimum = .TRUE.
       DO i = 1, mdctrl_data%bump_steps_upwards
-         IF (mdctrl_data%epot_history(i) <= mdctrl_data%epot_history(i+1)) &
+         IF (mdctrl_data%epot_history(i) <= mdctrl_data%epot_history(i + 1)) &
             passed_minimum = .FALSE.
       END DO
 
-      DO i = mdctrl_data%bump_steps_upwards+1, mdctrl_data%bump_steps_upwards+mdctrl_data%bump_steps_downwards
-         IF (mdctrl_data%epot_history(i) >= mdctrl_data%epot_history(i+1)) &
+      DO i = mdctrl_data%bump_steps_upwards + 1, mdctrl_data%bump_steps_upwards + mdctrl_data%bump_steps_downwards
+         IF (mdctrl_data%epot_history(i) >= mdctrl_data%epot_history(i + 1)) &
             passed_minimum = .FALSE.
       END DO
 
       ! count the passed bumps and stop md_run when md_bumps_max is reached.
       IF (passed_minimum) &
-         mdctrl_data%md_bump_counter = mdctrl_data%md_bump_counter+1
+         mdctrl_data%md_bump_counter = mdctrl_data%md_bump_counter + 1
 
       IF (mdctrl_data%md_bump_counter >= mdctrl_data%md_bumps_max) THEN
          should_stop = .TRUE.

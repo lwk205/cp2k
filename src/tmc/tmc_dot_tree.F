@@ -15,19 +15,19 @@
 ! \author Mandes Schoenherr
 !----------------------------------------------------------------------!
 MODULE tmc_dot_tree
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE tmc_file_io,                     ONLY: expand_file_name_char,&
-                                              expand_file_name_temp
-   USE tmc_move_types,                  ONLY: mv_type_swap_conf
-   USE tmc_tree_types,                  ONLY: &
-        global_tree_type, gt_elem_list_type, status_accepted, status_accepted_result, &
-        status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
-        status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
-        status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
-        status_deleted_result, status_rejected, status_rejected_result, tree_type
-   USE tmc_types,                       ONLY: tmc_param_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_to_string
+   USE tmc_file_io, ONLY: expand_file_name_char, &
+                          expand_file_name_temp
+   USE tmc_move_types, ONLY: mv_type_swap_conf
+   USE tmc_tree_types, ONLY: &
+      global_tree_type, gt_elem_list_type, status_accepted, status_accepted_result, &
+      status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
+      status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
+      status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
+      status_deleted_result, status_rejected, status_rejected_result, tree_type
+   USE tmc_types, ONLY: tmc_param_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -57,7 +57,7 @@ CONTAINS
       CHARACTER(LEN=50)                                  :: filename
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_dot_file_name', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       filename = ""
 
@@ -84,7 +84,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'init_draw_trees', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: file_ptr, i
 
@@ -118,7 +118,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'finalize_draw_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: file_ptr, i
 
@@ -263,7 +263,7 @@ CONTAINS
       INTEGER                                            :: tree
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_dot_branch', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: file_ptr
 
@@ -316,7 +316,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_global_tree_dot', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=1000)                                :: list_of_nr
       INTEGER                                            :: file_ptr, i, ref_count
@@ -345,7 +345,7 @@ CONTAINS
             ref_count = 0
             tmp_pt_list_elem => new_element%conf(i)%elem%gt_nodes_references
             DO WHILE (ASSOCIATED(tmp_pt_list_elem))
-               ref_count = ref_count+1
+               ref_count = ref_count + 1
                ! create a list with all references
                IF (.FALSE.) WRITE (list_of_nr, *) TRIM(ADJUSTL(list_of_nr)), " ", tmp_pt_list_elem%gt_elem%nr
                tmp_pt_list_elem => tmp_pt_list_elem%next
@@ -396,7 +396,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_dot_color', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=1000)                                :: list_of_nr
       INTEGER                                            :: ref_count
@@ -410,7 +410,7 @@ CONTAINS
          tmp_pt_list_elem => tree_element%gt_nodes_references
          ref_count = 0
          DO WHILE (ASSOCIATED(tmp_pt_list_elem))
-            ref_count = ref_count+1
+            ref_count = ref_count + 1
             ! print a list with all references
             IF (.FALSE.) THEN
                WRITE (list_of_nr, *) TRIM(ADJUSTL(list_of_nr)), " ", tmp_pt_list_elem%gt_elem%nr
@@ -440,7 +440,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_global_tree_dot_color', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(gt_tree_element))
       CPASSERT(ASSOCIATED(tmc_params))

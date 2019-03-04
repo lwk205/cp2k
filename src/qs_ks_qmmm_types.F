@@ -9,17 +9,17 @@
 !> \author Teodoro Laino
 ! **************************************************************************************************
 MODULE qs_ks_qmmm_types
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE cube_utils,                      ONLY: cube_info_type,&
-                                              destroy_cube_info
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE kinds,                           ONLY: dp
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_release,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: pw_p_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE cube_utils, ONLY: cube_info_type, &
+                         destroy_cube_info
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE kinds, ONLY: dp
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_release, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: pw_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -78,14 +78,14 @@ CONTAINS
       TYPE(qs_ks_qmmm_env_type), POINTER                 :: ks_qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ks_qmmm_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       TYPE(pw_pool_type), POINTER                        :: pool
 
       IF (ASSOCIATED(ks_qmmm_env)) THEN
          CPASSERT(ks_qmmm_env%ref_count > 0)
-         ks_qmmm_env%ref_count = ks_qmmm_env%ref_count-1
+         ks_qmmm_env%ref_count = ks_qmmm_env%ref_count - 1
 
          IF (ks_qmmm_env%ref_count < 1) THEN
             CALL pw_env_get(ks_qmmm_env%pw_env, auxbas_pw_pool=pool)
@@ -117,11 +117,11 @@ CONTAINS
       TYPE(qs_ks_qmmm_env_type), POINTER                 :: ks_qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_ks_qmmm_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ks_qmmm_env))
       CPASSERT(ks_qmmm_env%ref_count > 0)
-      ks_qmmm_env%ref_count = ks_qmmm_env%ref_count+1
+      ks_qmmm_env%ref_count = ks_qmmm_env%ref_count + 1
    END SUBROUTINE qs_ks_qmmm_retain
 
 END MODULE qs_ks_qmmm_types

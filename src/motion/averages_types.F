@@ -8,26 +8,26 @@
 !> \author Teodoro Laino [tlaino] - 03.2008 - University of Zurich
 ! **************************************************************************************************
 MODULE averages_types
-   USE cell_types,                      ONLY: cell_type
-   USE colvar_utils,                    ONLY: get_clv_force,&
-                                              number_of_colvar
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE force_env_types,                 ONLY: force_env_type
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_remove_values,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE md_ener_types,                   ONLY: md_ener_type
-   USE virial_types,                    ONLY: virial_create,&
-                                              virial_release,&
-                                              virial_type
+   USE cell_types, ONLY: cell_type
+   USE colvar_utils, ONLY: get_clv_force, &
+                           number_of_colvar
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE force_env_types, ONLY: force_env_type
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_remove_values, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE md_ener_types, ONLY: md_ener_type
+   USE virial_types, ONLY: virial_create, &
+                           virial_release, &
+                           virial_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -83,7 +83,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_averages', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, nint
       LOGICAL                                            :: do_colvars
@@ -95,7 +95,7 @@ CONTAINS
       ! Point to the averages section
       averages%averages_section => averages_section
       ! Initialize averages
-      last_avg_env_id = last_avg_env_id+1
+      last_avg_env_id = last_avg_env_id + 1
       averages%id_nr = last_avg_env_id
       averages%ref_count = 1
       averages%itimes_start = -1
@@ -149,11 +149,11 @@ CONTAINS
       TYPE(average_quantities_type), POINTER             :: averages
 
       CHARACTER(len=*), PARAMETER :: routineN = 'retain_averages', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(averages))
       CPASSERT(averages%ref_count > 0)
-      averages%ref_count = averages%ref_count+1
+      averages%ref_count = averages%ref_count + 1
    END SUBROUTINE retain_averages
 
 ! **************************************************************************************************
@@ -165,13 +165,13 @@ CONTAINS
       TYPE(average_quantities_type), POINTER             :: averages
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_averages', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_vals_type), POINTER                   :: work_section
 
       IF (ASSOCIATED(averages)) THEN
          CPASSERT(averages%ref_count > 0)
-         averages%ref_count = averages%ref_count-1
+         averages%ref_count = averages%ref_count - 1
          IF (averages%ref_count == 0) THEN
             CALL virial_release(averages%virial)
             IF (ASSOCIATED(averages%avecolvar)) THEN
@@ -228,7 +228,7 @@ CONTAINS
       CHARACTER(LEN=default_string_length), INTENT(IN)   :: my_pos, my_act
 
       CHARACTER(len=*), PARAMETER :: routineN = 'compute_averages', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: ctmp
       INTEGER                                            :: delta_t, handle, i, nint, output_unit
@@ -305,7 +305,7 @@ CONTAINS
                   averages%itimes_start = itimes
                END IF
             END IF
-            delta_t = itimes-averages%itimes_start+1
+            delta_t = itimes - averages%itimes_start + 1
 
             ! Perform averages
             SELECT CASE (delta_t)
@@ -450,9 +450,9 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: delta_t
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_averages_rs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
-      avg = (avg*REAL(delta_t-1, dp)+add)/REAL(delta_t, dp)
+      avg = (avg*REAL(delta_t - 1, dp) + add)/REAL(delta_t, dp)
    END SUBROUTINE get_averages_rs
 
 ! **************************************************************************************************
@@ -468,7 +468,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: delta_t
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_averages_rv', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       LOGICAL                                            :: check
@@ -476,7 +476,7 @@ CONTAINS
       check = SIZE(avg) == SIZE(add)
       CPASSERT(check)
       DO i = 1, SIZE(avg)
-         avg(i) = (avg(i)*REAL(delta_t-1, dp)+add(i))/REAL(delta_t, dp)
+         avg(i) = (avg(i)*REAL(delta_t - 1, dp) + add(i))/REAL(delta_t, dp)
       END DO
    END SUBROUTINE get_averages_rv
 
@@ -493,7 +493,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: delta_t
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_averages_rm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
       LOGICAL                                            :: check
@@ -504,7 +504,7 @@ CONTAINS
       CPASSERT(check)
       DO i = 1, SIZE(avg, 2)
          DO j = 1, SIZE(avg, 1)
-            avg(j, i) = (avg(j, i)*REAL(delta_t-1, dp)+add(j, i))/REAL(delta_t, dp)
+            avg(j, i) = (avg(j, i)*REAL(delta_t - 1, dp) + add(j, i))/REAL(delta_t, dp)
          END DO
       END DO
    END SUBROUTINE get_averages_rm

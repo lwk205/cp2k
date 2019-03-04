@@ -7,20 +7,20 @@
 !> \brief manage control variables for the maximum overlap method
 ! **************************************************************************************************
 MODULE qs_mom_types
-   USE bibliography,                    ONLY: Barca2018,&
-                                              Gilbert2008
-   USE input_constants,                 ONLY: momproj_norm,&
-                                              momproj_sum,&
-                                              momtype_imom,&
-                                              momtype_mom
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_create,&
-                                              section_type
-   USE input_val_types,                 ONLY: integer_t
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: Barca2018, &
+                           Gilbert2008
+   USE input_constants, ONLY: momproj_norm, &
+                              momproj_sum, &
+                              momtype_imom, &
+                              momtype_mom
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_create, &
+                                  section_type
+   USE input_val_types, ONLY: integer_t
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -50,7 +50,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_mom_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

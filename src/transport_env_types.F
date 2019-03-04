@@ -14,15 +14,15 @@
 ! **************************************************************************************************
 MODULE transport_env_types
 
-   USE ISO_C_BINDING,                   ONLY: &
-        C_ASSOCIATED, C_BOOL, C_DOUBLE, C_FUNPTR, C_F_POINTER, C_INT, C_NULL_FUNPTR, C_NULL_PTR, &
-        C_PTR
-   USE dbcsr_api,                       ONLY: csr_destroy,&
-                                              csr_type,&
-                                              dbcsr_deallocate_matrix,&
-                                              dbcsr_release,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
+   USE ISO_C_BINDING, ONLY: &
+      C_ASSOCIATED, C_BOOL, C_DOUBLE, C_FUNPTR, C_F_POINTER, C_INT, C_NULL_FUNPTR, C_NULL_PTR, &
+      C_PTR
+   USE dbcsr_api, ONLY: csr_destroy, &
+                        csr_type, &
+                        dbcsr_deallocate_matrix, &
+                        dbcsr_release, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -137,7 +137,7 @@ CONTAINS
       TYPE(transport_env_type), POINTER                  :: transport_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'transport_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -178,7 +178,7 @@ CONTAINS
       TYPE(cp2k_csr_interop_type), INTENT(INOUT)         :: csr_interop_mat
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'csr_interop_nullify', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -230,7 +230,7 @@ CONTAINS
          POINTER                                         :: nzvals_local
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'csr_interop_matrix_get_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -244,7 +244,7 @@ CONTAINS
       IF (PRESENT(data_type)) data_type = csr_interop_mat%data_type
       IF (PRESENT(first_row)) first_row = csr_interop_mat%first_row
 
-      IF (PRESENT(rowptr_local)) CALL C_F_POINTER(csr_interop_mat%rowptr_local, rowptr_local, [nrows_local+1])
+      IF (PRESENT(rowptr_local)) CALL C_F_POINTER(csr_interop_mat%rowptr_local, rowptr_local, [nrows_local + 1])
       IF (PRESENT(colind_local)) CALL C_F_POINTER(csr_interop_mat%colind_local, colind_local, [nze_local])
       IF (PRESENT(nzerow_local)) CALL C_F_POINTER(csr_interop_mat%nzerow_local, nzerow_local, [nrows_local])
       IF (PRESENT(nzvals_local)) CALL C_F_POINTER(csr_interop_mat%nzvals_local, nzvals_local, [nze_local])

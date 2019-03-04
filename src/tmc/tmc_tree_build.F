@@ -31,47 +31,47 @@
 ! **************************************************************************************************
 
 MODULE tmc_tree_build
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE kinds,                           ONLY: dp
-   USE parallel_rng_types,              ONLY: get_rng_stream,&
-                                              next_random_number,&
-                                              reset_to_next_rng_substream,&
-                                              set_rng_stream
-   USE tmc_calculations,                ONLY: calc_e_kin,&
-                                              init_vel
-   USE tmc_dot_tree,                    ONLY: create_dot,&
-                                              create_dot_color,&
-                                              create_global_tree_dot,&
-                                              create_global_tree_dot_color
-   USE tmc_file_io,                     ONLY: read_restart_file,&
-                                              write_result_list_element
-   USE tmc_move_handle,                 ONLY: select_random_move_type
-   USE tmc_move_types,                  ONLY: &
-        mv_type_MD, mv_type_NMC_moves, mv_type_atom_swap, mv_type_atom_trans, &
-        mv_type_gausian_adapt, mv_type_mol_rot, mv_type_mol_trans, mv_type_none, &
-        mv_type_proton_reorder, mv_type_swap_conf, mv_type_volume_move
-   USE tmc_moves,                       ONLY: change_pos,&
-                                              elements_in_new_subbox
-   USE tmc_stati,                       ONLY: TMC_STATUS_FAILED,&
-                                              TMC_STATUS_WAIT_FOR_NEW_TASK,&
-                                              task_type_MC,&
-                                              task_type_gaussian_adaptation
-   USE tmc_tree_references,             ONLY: add_to_references,&
-                                              remove_gt_references,&
-                                              remove_subtree_element_of_all_references,&
-                                              search_and_remove_reference_in_list
-   USE tmc_tree_search,                 ONLY: most_prob_end,&
-                                              search_end_of_clean_g_tree,&
-                                              search_end_of_clean_tree,&
-                                              search_parent_element
-   USE tmc_tree_types,                  ONLY: &
-        add_to_list, elem_array_type, global_tree_type, status_accepted, status_accepted_result, &
-        status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
-        status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
-        status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
-        status_deleted_result, status_ok, status_rejected, status_rejected_result, tree_type
-   USE tmc_types,                       ONLY: tmc_env_type,&
-                                              tmc_param_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE kinds, ONLY: dp
+   USE parallel_rng_types, ONLY: get_rng_stream, &
+                                 next_random_number, &
+                                 reset_to_next_rng_substream, &
+                                 set_rng_stream
+   USE tmc_calculations, ONLY: calc_e_kin, &
+                               init_vel
+   USE tmc_dot_tree, ONLY: create_dot, &
+                           create_dot_color, &
+                           create_global_tree_dot, &
+                           create_global_tree_dot_color
+   USE tmc_file_io, ONLY: read_restart_file, &
+                          write_result_list_element
+   USE tmc_move_handle, ONLY: select_random_move_type
+   USE tmc_move_types, ONLY: &
+      mv_type_MD, mv_type_NMC_moves, mv_type_atom_swap, mv_type_atom_trans, &
+      mv_type_gausian_adapt, mv_type_mol_rot, mv_type_mol_trans, mv_type_none, &
+      mv_type_proton_reorder, mv_type_swap_conf, mv_type_volume_move
+   USE tmc_moves, ONLY: change_pos, &
+                        elements_in_new_subbox
+   USE tmc_stati, ONLY: TMC_STATUS_FAILED, &
+                        TMC_STATUS_WAIT_FOR_NEW_TASK, &
+                        task_type_MC, &
+                        task_type_gaussian_adaptation
+   USE tmc_tree_references, ONLY: add_to_references, &
+                                  remove_gt_references, &
+                                  remove_subtree_element_of_all_references, &
+                                  search_and_remove_reference_in_list
+   USE tmc_tree_search, ONLY: most_prob_end, &
+                              search_end_of_clean_g_tree, &
+                              search_end_of_clean_tree, &
+                              search_parent_element
+   USE tmc_tree_types, ONLY: &
+      add_to_list, elem_array_type, global_tree_type, status_accepted, status_accepted_result, &
+      status_calc_approx_ener, status_calculate_MD, status_calculate_NMC_steps, &
+      status_calculate_energy, status_calculated, status_cancel_ener, status_cancel_nmc, &
+      status_canceled_ener, status_canceled_nmc, status_created, status_deleted, &
+      status_deleted_result, status_ok, status_rejected, status_rejected_result, tree_type
+   USE tmc_types, ONLY: tmc_env_type, &
+                        tmc_param_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -102,7 +102,7 @@ CONTAINS
       INTEGER                                            :: nr_temp
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_new_global_tree_node', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, itmp
 
@@ -136,7 +136,7 @@ CONTAINS
       TYPE(global_tree_type), POINTER                    :: gt_elem
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'deallocate_global_tree_node', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -166,7 +166,7 @@ CONTAINS
       INTEGER                                            :: nr_dim
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_new_sub_tree_node', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -225,7 +225,7 @@ CONTAINS
       TYPE(tree_type), POINTER                           :: tree_elem
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'deallocate_sub_tree_node', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -361,7 +361,7 @@ CONTAINS
       global_tree%nr = 0
       global_tree%swaped = .FALSE.
       global_tree%mv_conf = 1
-      global_tree%mv_next_conf = MODULO(global_tree%mv_conf, SIZE(global_tree%conf))+1
+      global_tree%mv_next_conf = MODULO(global_tree%mv_conf, SIZE(global_tree%conf)) + 1
       global_tree%conf_n_acc = .TRUE.
 
       global_tree%stat = status_created
@@ -452,7 +452,7 @@ CONTAINS
       END DO
 
       IF (tmc_env%m_env%restart_in_file_name .EQ. "") THEN
-         tmc_env%m_env%result_count(:) = tmc_env%m_env%result_count(:)+1
+         tmc_env%m_env%result_count(:) = tmc_env%m_env%result_count(:) + 1
          tmc_env%m_env%result_list(:) = gt_tree_ptr%conf(:)
          !-- write initial elements in result files
          DO i = 1, SIZE(tmc_env%m_env%result_list)
@@ -496,7 +496,7 @@ CONTAINS
       INTEGER                                            :: reactivation_cc_count
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_new_gt_tree_node', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, swap_conf
       LOGICAL                                            :: keep_on, n_acc
@@ -551,13 +551,13 @@ CONTAINS
 
             ! check for existing subtree element
             CPASSERT(ASSOCIATED(new_elem%conf(new_elem%mv_conf)%elem))
-            SELECT CASE (new_elem%conf (new_elem%mv_conf)%elem%stat)
+            SELECT CASE (new_elem%conf(new_elem%mv_conf)%elem%stat)
             CASE (status_cancel_nmc, status_cancel_ener, status_canceled_nmc, &
                   status_canceled_ener)
                ! reactivating subtree element
                !  (but global tree element already exist)
                CALL add_to_references(gt_elem=new_elem)
-               reactivation_cc_count = reactivation_cc_count+1
+               reactivation_cc_count = reactivation_cc_count + 1
             CASE DEFAULT
                CALL cp_abort(__LOCATION__, &
                              "global tree node creation using existing sub tree element, "// &
@@ -572,7 +572,7 @@ CONTAINS
             !  when standard MC moves with single potential are done
             ! the Nested Monte Carlo routine needs to do the configuration
             !  to have old configuration to see if change is accepted
-            SELECT CASE (new_elem%conf (new_elem%mv_conf)%elem%move_type)
+            SELECT CASE (new_elem%conf(new_elem%mv_conf)%elem%move_type)
             CASE (mv_type_MD)
                new_elem%conf(new_elem%mv_conf)%elem%stat = status_calculate_MD
             CASE (mv_type_NMC_moves)
@@ -599,7 +599,7 @@ CONTAINS
             ! set initial values
             CALL allocate_new_global_tree_node(next_el=new_elem, &
                                                nr_temp=tmc_env%params%nr_temp)
-            tmc_env%m_env%tree_node_count(0) = tmc_env%m_env%tree_node_count(0)+1
+            tmc_env%m_env%tree_node_count(0) = tmc_env%m_env%tree_node_count(0) + 1
             new_elem%nr = tmc_env%m_env%tree_node_count(0)
 
             !-- set pointers to and from element one level up
@@ -658,11 +658,11 @@ CONTAINS
             !new_elem%mv_conf = 1+INT(size(new_elem%conf)*rnd)
             ! one temperature after each other
             new_elem%mv_conf = new_elem%parent%mv_next_conf
-            new_elem%mv_next_conf = MODULO(new_elem%mv_conf, SIZE(new_elem%conf))+1
+            new_elem%mv_next_conf = MODULO(new_elem%mv_conf, SIZE(new_elem%conf)) + 1
 
             ! simulated annealing temperature decrease
             new_elem%Temp = tmp_elem%Temp
-            IF (n_acc) new_elem%Temp = tmp_elem%Temp*(1-tmc_env%m_env%temp_decrease)
+            IF (n_acc) new_elem%Temp = tmp_elem%Temp*(1 - tmc_env%m_env%temp_decrease)
 
             !-- rnd for swap
             rnd = next_random_number(tmc_env%rng_stream)
@@ -680,14 +680,14 @@ CONTAINS
                !  and the conf to move in next move
                new_elem%mv_next_conf = new_elem%mv_conf
                ! do swap with conf swap_conf and swap_conf+1
-               swap_conf = 1+INT((tmc_env%params%nr_temp-1)*rnd2)
+               swap_conf = 1 + INT((tmc_env%params%nr_temp - 1)*rnd2)
                new_elem%mv_conf = swap_conf
                !-- swaping pointers to subtree elements
                ! exchange the pointer to the sub tree elements
                tree_elem => new_elem%conf(new_elem%mv_conf)%elem
                new_elem%conf(new_elem%mv_conf)%elem => &
-                  new_elem%conf(new_elem%mv_conf+1)%elem
-               new_elem%conf(new_elem%mv_conf+1)%elem => tree_elem
+                  new_elem%conf(new_elem%mv_conf + 1)%elem
+               new_elem%conf(new_elem%mv_conf + 1)%elem => tree_elem
 
                new_elem%stat = status_calculated
                new_elem%swaped = .TRUE.
@@ -759,7 +759,7 @@ CONTAINS
              new_elem%stat .EQ. status_rejected_result) &
             CPABORT("selected existing RESULT gt node")
          !-- set status of global tree element for decision in master routine
-         SELECT CASE (new_elem%conf (new_elem%mv_conf)%elem%stat)
+         SELECT CASE (new_elem%conf(new_elem%mv_conf)%elem%stat)
          CASE (status_rejected_result, status_rejected, status_accepted, &
                status_accepted_result, status_calculated)
             ! energy is already calculated
@@ -803,7 +803,7 @@ CONTAINS
                status_calculate_NMC_steps
             new_elem%stat = status_calculate_NMC_steps
             stat = new_elem%conf(new_elem%mv_conf)%elem%stat
-            reactivation_cc_count = reactivation_cc_count+1
+            reactivation_cc_count = reactivation_cc_count + 1
             IF (tmc_env%params%DRAW_TREE) &
                CALL create_dot_color(tree_element=new_elem%conf(new_elem%mv_conf)%elem, &
                                      tmc_params=tmc_env%params)
@@ -836,7 +836,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_new_subtree_node', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: conf, handle, itmp
       LOGICAL                                            :: mv_rejected, new_subbox
@@ -862,7 +862,7 @@ CONTAINS
       new_elem%parent => parent_elem
 
       !-- set initial values
-      parent_elem%next_elem_nr = parent_elem%next_elem_nr+1
+      parent_elem%next_elem_nr = parent_elem%next_elem_nr + 1
       new_elem%nr = parent_elem%next_elem_nr
       new_elem%rng_seed = parent_elem%rng_seed
 
@@ -902,7 +902,7 @@ CONTAINS
       ! set the temperature for the NMC moves
       rnd = next_random_number(tmc_env%rng_stream)
       IF (tmc_env%params%NMC_inp_file .NE. "") THEN
-         new_elem%temp_created = INT(tmc_env%params%nr_temp*rnd)+1
+         new_elem%temp_created = INT(tmc_env%params%nr_temp*rnd) + 1
       ELSE
          new_elem%temp_created = act_gt_el%mv_conf
       END IF
@@ -1139,7 +1139,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_unused_g_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: acc_removed, nacc_removed
@@ -1217,7 +1217,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_unused_s_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
       LOGICAL                                            :: acc_removed, nacc_removed, remove_this
@@ -1332,7 +1332,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_result_g_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(global_tree_type), POINTER                    :: tmp_ptr
@@ -1375,7 +1375,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_result_s_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(tree_type), POINTER                           :: tmp_ptr
@@ -1424,7 +1424,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_all_trees', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, tree
       LOGICAL                                            :: change_trajec, flag
@@ -1517,7 +1517,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dealloc_whole_g_tree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: acc_removed, nacc_removed
       TYPE(global_tree_type), POINTER                    :: acc_ptr, nacc_ptr, tmp_ptr
@@ -1561,7 +1561,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dealloc_whole_subtree', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: acc_removed, nacc_removed
       TYPE(tree_type), POINTER                           :: acc_ptr, nacc_ptr, tmp_ptr

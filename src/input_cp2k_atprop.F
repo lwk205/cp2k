@@ -10,13 +10,13 @@
 !> \author JHU
 ! **************************************************************************************************
 MODULE input_cp2k_atprop
-   USE bibliography,                    ONLY: Kikuchi2009
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_create,&
-                                              section_type
+   USE bibliography, ONLY: Kikuchi2009
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_create, &
+                                  section_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -38,7 +38,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_atprop_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

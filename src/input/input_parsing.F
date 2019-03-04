@@ -10,37 +10,37 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE input_parsing
-   USE cp_linked_list_input,            ONLY: &
-        cp_create, cp_dealloc, cp_sll_char_type, cp_sll_int_type, cp_sll_logical_type, &
-        cp_sll_real_type, cp_sll_val_create, cp_sll_val_type, cp_to_array
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit,&
-                                              cp_to_string
-   USE cp_parser_methods,               ONLY: parser_get_object,&
-                                              parser_location,&
-                                              parser_skip_space,&
-                                              parser_test_next_token
-   USE cp_parser_types,                 ONLY: cp_parser_type
-   USE cp_units,                        ONLY: cp_unit_compatible,&
-                                              cp_unit_create,&
-                                              cp_unit_desc,&
-                                              cp_unit_release,&
-                                              cp_unit_set_type,&
-                                              cp_unit_to_cp2k1,&
-                                              cp_unit_type
-   USE input_enumeration_types,         ONLY: enum_c2i,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_describe,&
-                                              keyword_type
-   USE input_section_types,             ONLY: &
-        section_describe, section_get_keyword, section_get_keyword_index, &
-        section_get_subsection_index, section_type, section_typo_match, section_vals_add_values, &
-        section_vals_type, typo_match_section, typo_matching_line, typo_matching_rank
-   USE input_val_types,                 ONLY: &
-        char_t, enum_t, integer_t, lchar_t, logical_t, no_t, real_t, val_create, val_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              max_line_length
-   USE string_utilities,                ONLY: uppercase
+   USE cp_linked_list_input, ONLY: &
+      cp_create, cp_dealloc, cp_sll_char_type, cp_sll_int_type, cp_sll_logical_type, &
+      cp_sll_real_type, cp_sll_val_create, cp_sll_val_type, cp_to_array
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit, &
+                              cp_to_string
+   USE cp_parser_methods, ONLY: parser_get_object, &
+                                parser_location, &
+                                parser_skip_space, &
+                                parser_test_next_token
+   USE cp_parser_types, ONLY: cp_parser_type
+   USE cp_units, ONLY: cp_unit_compatible, &
+                       cp_unit_create, &
+                       cp_unit_desc, &
+                       cp_unit_release, &
+                       cp_unit_set_type, &
+                       cp_unit_to_cp2k1, &
+                       cp_unit_type
+   USE input_enumeration_types, ONLY: enum_c2i, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_describe, &
+                                  keyword_type
+   USE input_section_types, ONLY: &
+      section_describe, section_get_keyword, section_get_keyword_index, &
+      section_get_subsection_index, section_type, section_typo_match, section_vals_add_values, &
+      section_vals_type, typo_match_section, typo_matching_line, typo_matching_rank
+   USE input_val_types, ONLY: &
+      char_t, enum_t, integer_t, lchar_t, logical_t, no_t, real_t, val_create, val_type
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    max_line_length
+   USE string_utilities, ONLY: uppercase
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -68,7 +68,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: root_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'section_vals_parse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=max_line_length)                     :: token
       INTEGER                                            :: desc_level, handle, ik, imatch, irs, is, &
@@ -192,9 +192,9 @@ CONTAINS
                                          lower_to_upper=.TRUE.)
                   IF (token(1:1) == parser%section_character) THEN
                      IF (token == "&END") THEN
-                        nSub = nSub-1
+                        nSub = nSub - 1
                      ELSE
-                        nSub = nSub+1
+                        nSub = nSub + 1
                      END IF
                   END IF
                END DO
@@ -228,7 +228,7 @@ CONTAINS
             ELSE ! token is a "normal" keyword
                ik = section_get_keyword_index(section, token)
                IF (ik < 1) THEN ! don't accept pseudo keyword names
-                  parser%icol = parser%icol1-1 ! re-read also the actual token
+                  parser%icol = parser%icol1 - 1 ! re-read also the actual token
                   ik = 0
                   IF (.NOT. ASSOCIATED(section%keywords(0)%keyword)) THEN
                      IF (output_unit > 0) THEN
@@ -313,7 +313,7 @@ CONTAINS
       TYPE(val_type), OPTIONAL, POINTER                  :: default_value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'val_create_parsing', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: c_val, info, location
       CHARACTER(len=default_string_length), &
@@ -646,10 +646,10 @@ CONTAINS
             CPASSERT(check)
             check = c_val(LEN_TRIM(c_val):LEN_TRIM(c_val)) == "]"
             CPASSERT(check)
-            CALL cp_unit_create(my_unit, c_val(2:LEN_TRIM(c_val)-1))
+            CALL cp_unit_create(my_unit, c_val(2:LEN_TRIM(c_val) - 1))
          ELSE
             IF (c_val /= "") THEN
-               CALL cp_unit_create(my_unit, c_val(2:LEN_TRIM(c_val)-1))
+               CALL cp_unit_create(my_unit, c_val(2:LEN_TRIM(c_val) - 1))
             ELSE
                my_unit => unit
             END IF

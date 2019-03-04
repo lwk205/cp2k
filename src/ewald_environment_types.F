@@ -10,32 +10,32 @@
 !> \author CJM NOV-30-2003
 ! **************************************************************************************************
 MODULE ewald_environment_types
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE input_cp2k_poisson,              ONLY: create_ewald_section
-   USE input_enumeration_types,         ONLY: enum_i2c,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_get,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_get_keyword,&
-                                              section_release,&
-                                              section_type,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_release,&
-                                              section_vals_retain,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE pw_poisson_types,                ONLY: do_ewald_ewald,&
-                                              do_ewald_none,&
-                                              do_ewald_pme,&
-                                              do_ewald_spme
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE input_cp2k_poisson, ONLY: create_ewald_section
+   USE input_enumeration_types, ONLY: enum_i2c, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_get, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_get_keyword, &
+                                  section_release, &
+                                  section_type, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_release, &
+                                  section_vals_retain, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE pw_poisson_types, ONLY: do_ewald_ewald, &
+                               do_ewald_none, &
+                               do_ewald_pme, &
+                               do_ewald_spme
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -244,11 +244,11 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ewald_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (ewald_env)
       ewald_env%ref_count = 1
-      last_ewald_env_id_nr = last_ewald_env_id_nr+1
+      last_ewald_env_id_nr = last_ewald_env_id_nr + 1
       ewald_env%id_nr = last_ewald_env_id_nr
       NULLIFY (ewald_env%poisson_section)
       CALL cp_para_env_retain(para_env)
@@ -267,11 +267,11 @@ CONTAINS
       TYPE(ewald_environment_type), POINTER              :: ewald_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ewald_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ewald_env))
       CPASSERT(ewald_env%ref_count > 0)
-      ewald_env%ref_count = ewald_env%ref_count+1
+      ewald_env%ref_count = ewald_env%ref_count + 1
    END SUBROUTINE ewald_env_retain
 
 ! **************************************************************************************************
@@ -285,11 +285,11 @@ CONTAINS
       TYPE(ewald_environment_type), POINTER              :: ewald_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ewald_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(ewald_env)) THEN
          CPASSERT(ewald_env%ref_count > 0)
-         ewald_env%ref_count = ewald_env%ref_count-1
+         ewald_env%ref_count = ewald_env%ref_count - 1
          IF (ewald_env%ref_count < 1) THEN
             CALL cp_para_env_release(ewald_env%para_env)
             CALL section_vals_release(ewald_env%poisson_section)
@@ -313,7 +313,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: ewald_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_ewald_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iw
       INTEGER, DIMENSION(:), POINTER                     :: gmax_read
@@ -345,7 +345,7 @@ CONTAINS
       SELECT CASE (ewald_env%ewald_type)
       CASE (do_ewald_ewald, do_ewald_spme)
          CALL section_vals_val_get(ewald_section, "GMAX", i_vals=gmax_read)
-         SELECT CASE (SIZE (gmax_read, 1))
+         SELECT CASE (SIZE(gmax_read, 1))
          CASE (1)
             ewald_env%gmax = gmax_read(1)
          CASE (3)
@@ -446,27 +446,27 @@ CONTAINS
       REAL(KIND=dp)                                      :: precs, value
 
       CHARACTER(len=*), PARAMETER :: routineN = 'find_ewald_optimal_value', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: func, func1, func2, s, s1, s2
 
       s = 0.1_dp
-      func = EXP(-s**2)/s**2-precs
+      func = EXP(-s**2)/s**2 - precs
       CPASSERT(func > 0.0_dp)
       DO WHILE (func > 0.0_dp)
-         s = s+0.1_dp
-         func = EXP(-s**2)/s**2-precs
+         s = s + 0.1_dp
+         func = EXP(-s**2)/s**2 - precs
       END DO
       s2 = s
-      s1 = s-0.1_dp
+      s1 = s - 0.1_dp
       ! Start bisection
       DO WHILE (.TRUE.)
-         func2 = EXP(-s2**2)/s2**2-precs
-         func1 = EXP(-s1**2)/s1**2-precs
+         func2 = EXP(-s2**2)/s2**2 - precs
+         func1 = EXP(-s1**2)/s1**2 - precs
          CPASSERT(func1 >= 0)
          CPASSERT(func2 <= 0)
-         s = 0.5_dp*(s1+s2)
-         func = EXP(-s**2)/s**2-precs
+         s = 0.5_dp*(s1 + s2)
+         func = EXP(-s**2)/s**2 - precs
          IF (func > 0.0_dp) THEN
             s1 = s
          ELSE IF (func < 0.0_dp) THEN

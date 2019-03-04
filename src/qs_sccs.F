@@ -25,77 +25,77 @@
 
 MODULE qs_sccs
 
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              sccs_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr,&
-                                              low_print_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE cp_realspace_grid_init,          ONLY: init_input_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE input_constants,                 ONLY: sccs_andreussi,&
-                                              sccs_derivative_cd3,&
-                                              sccs_derivative_cd5,&
-                                              sccs_derivative_cd7,&
-                                              sccs_derivative_fft,&
-                                              sccs_fattebert_gygi
-   USE input_section_types,             ONLY: section_get_ivals,&
-                                              section_get_lval,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: twopi
-   USE message_passing,                 ONLY: mp_max,&
-                                              mp_sum
-   USE particle_list_types,             ONLY: particle_list_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_derive,&
-                                              pw_integral_ab,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_type,&
-                                              realspace_grid_input_type,&
-                                              realspace_grid_type,&
-                                              rs_grid_create,&
-                                              rs_grid_create_descriptor,&
-                                              rs_grid_release,&
-                                              rs_grid_release_descriptor
-   USE rs_methods,                      ONLY: derive_fdm_cd3,&
-                                              derive_fdm_cd5,&
-                                              derive_fdm_cd7
+   USE cp_control_types, ONLY: dft_control_type, &
+                               sccs_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr, &
+                                 low_print_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE cp_realspace_grid_init, ONLY: init_input_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE input_constants, ONLY: sccs_andreussi, &
+                              sccs_derivative_cd3, &
+                              sccs_derivative_cd5, &
+                              sccs_derivative_cd7, &
+                              sccs_derivative_fft, &
+                              sccs_fattebert_gygi
+   USE input_section_types, ONLY: section_get_ivals, &
+                                  section_get_lval, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp, &
+                    int_8
+   USE mathconstants, ONLY: twopi
+   USE message_passing, ONLY: mp_max, &
+                              mp_sum
+   USE particle_list_types, ONLY: particle_list_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_derive, &
+                         pw_integral_ab, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE realspace_grid_types, ONLY: realspace_grid_desc_type, &
+                                   realspace_grid_input_type, &
+                                   realspace_grid_type, &
+                                   rs_grid_create, &
+                                   rs_grid_create_descriptor, &
+                                   rs_grid_release, &
+                                   rs_grid_release_descriptor
+   USE rs_methods, ONLY: derive_fdm_cd3, &
+                         derive_fdm_cd5, &
+                         derive_fdm_cd7
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -143,8 +143,8 @@ CONTAINS
       LOGICAL                                            :: append_cube, calculate_stress_tensor, &
                                                             mpi_io, should_output
       REAL(KIND=dp) :: cavity_surface, cavity_volume, cell_volume, dphi2, dvol, eps0, f, &
-         norm_drho2, polarisation_charge, rho_delta, rho_delta_avg, rho_delta_max, rho_iter_new, &
-         tot_rho_elec, tot_rho_solute
+                       norm_drho2, polarisation_charge, rho_delta, rho_delta_avg, rho_delta_max, rho_iter_new, &
+                       tot_rho_elec, tot_rho_solute
       REAL(KIND=dp), DIMENSION(3)                        :: abc
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(cp_para_env_type), POINTER                    :: para_env
@@ -161,7 +161,7 @@ CONTAINS
       TYPE(pw_pool_p_type), DIMENSION(:), POINTER        :: pw_pools
       TYPE(pw_pool_type), POINTER                        :: auxbas_pw_pool
       TYPE(pw_type), POINTER :: deps_elec, eps_elec, ln_eps_elec, norm_drho_elec, phi_pol, &
-         phi_solute, rho_elec, rho_iter_old, rho_solute, rho_tot, rho_tot_zero, theta
+                                phi_solute, rho_elec, rho_iter_old, rho_solute, rho_tot, rho_tot_zero, theta
       TYPE(qs_energy_type), POINTER                      :: energy
       TYPE(qs_rho_type), POINTER                         :: rho
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
@@ -350,21 +350,21 @@ CONTAINS
       cavity_surface = 0.0_dp
       cavity_volume = 0.0_dp
 
-      IF (should_output .AND. (ABS(eps0-1.0_dp) > tol)) THEN
+      IF (should_output .AND. (ABS(eps0 - 1.0_dp) > tol)) THEN
 
          ! Initialise the switching function theta
          theta => work_r3d(4)%pw
          CALL pw_zero(theta)
 
          ! Calculate the (quantum) volume of the solute cavity
-         f = 1.0_dp/(eps0-1.0_dp)
+         f = 1.0_dp/(eps0 - 1.0_dp)
 !$OMP    PARALLEL DO DEFAULT(NONE) &
 !$OMP                PRIVATE(i,j,k) &
 !$OMP                SHARED(eps0,eps_elec,f,lb,theta,ub)
          DO k = lb(3), ub(3)
             DO j = lb(2), ub(2)
                DO i = lb(1), ub(1)
-                  theta%cr3d(i, j, k) = f*(eps0-eps_elec%cr3d(i, j, k))
+                  theta%cr3d(i, j, k) = f*(eps0 - eps_elec%cr3d(i, j, k))
                END DO
             END DO
          END DO
@@ -392,9 +392,9 @@ CONTAINS
             DO j = lb(2), ub(2)
                DO i = lb(1), ub(1)
                   norm_drho_elec%cr3d(i, j, k) = SQRT(drho_elec(1)%pw%cr3d(i, j, k)* &
-                                                      drho_elec(1)%pw%cr3d(i, j, k)+ &
+                                                      drho_elec(1)%pw%cr3d(i, j, k) + &
                                                       drho_elec(2)%pw%cr3d(i, j, k)* &
-                                                      drho_elec(2)%pw%cr3d(i, j, k)+ &
+                                                      drho_elec(2)%pw%cr3d(i, j, k) + &
                                                       drho_elec(3)%pw%cr3d(i, j, k)* &
                                                       drho_elec(3)%pw%cr3d(i, j, k))
                END DO
@@ -480,7 +480,7 @@ CONTAINS
                            v_sccs%cr3d(i, j, k) = sccs_control%gamma_solvent*theta%cr3d(i, j, k)* &
                                                   (drho_elec(di)%pw%cr3d(i, j, k)* &
                                                    drho_elec(dj)%pw%cr3d(i, j, k)* &
-                                                   d2rho_elec(di, dj)%pw%cr3d(i, j, k)/norm_drho2- &
+                                                   d2rho_elec(di, dj)%pw%cr3d(i, j, k)/norm_drho2 - &
                                                    d2rho_elec(di, di)%pw%cr3d(i, j, k))/norm_drho2
                         END DO
                      END DO
@@ -597,7 +597,7 @@ CONTAINS
       iter_loop: DO
 
          ! Increment iteration counter
-         iter = iter+1
+         iter = iter + 1
 
          ! Check if the requested maximum number of SCCS iterations is reached
          IF (iter > sccs_control%max_iter) THEN
@@ -628,15 +628,15 @@ CONTAINS
          DO k = lb(3), ub(3)
             DO j = lb(2), ub(2)
                DO i = lb(1), ub(1)
-                  rho_iter_new = (dln_eps_elec(1)%pw%cr3d(i, j, k)*dphi_tot(1)%pw%cr3d(i, j, k)+ &
-                                  dln_eps_elec(2)%pw%cr3d(i, j, k)*dphi_tot(2)%pw%cr3d(i, j, k)+ &
+                  rho_iter_new = (dln_eps_elec(1)%pw%cr3d(i, j, k)*dphi_tot(1)%pw%cr3d(i, j, k) + &
+                                  dln_eps_elec(2)%pw%cr3d(i, j, k)*dphi_tot(2)%pw%cr3d(i, j, k) + &
                                   dln_eps_elec(3)%pw%cr3d(i, j, k)*dphi_tot(3)%pw%cr3d(i, j, k))*f
-                  rho_iter_new = rho_iter_old%cr3d(i, j, k)+ &
-                                 sccs_control%mixing*(rho_iter_new-rho_iter_old%cr3d(i, j, k))
-                  rho_delta = ABS(rho_iter_new-rho_iter_old%cr3d(i, j, k))
+                  rho_iter_new = rho_iter_old%cr3d(i, j, k) + &
+                                 sccs_control%mixing*(rho_iter_new - rho_iter_old%cr3d(i, j, k))
+                  rho_delta = ABS(rho_iter_new - rho_iter_old%cr3d(i, j, k))
                   rho_delta_max = MAX(rho_delta, rho_delta_max)
-                  rho_delta_avg = rho_delta_avg+rho_delta
-                  rho_tot%cr3d(i, j, k) = rho_tot_zero%cr3d(i, j, k)+rho_iter_new
+                  rho_delta_avg = rho_delta_avg + rho_delta
+                  rho_tot%cr3d(i, j, k) = rho_tot_zero%cr3d(i, j, k) + rho_iter_new
                   rho_iter_old%cr3d(i, j, k) = rho_iter_new
                END DO
             END DO
@@ -783,10 +783,10 @@ CONTAINS
       DO k = lb(3), ub(3)
          DO j = lb(2), ub(2)
             DO i = lb(1), ub(1)
-               dphi2 = dphi_tot(1)%pw%cr3d(i, j, k)*dphi_tot(1)%pw%cr3d(i, j, k)+ &
-                       dphi_tot(2)%pw%cr3d(i, j, k)*dphi_tot(2)%pw%cr3d(i, j, k)+ &
+               dphi2 = dphi_tot(1)%pw%cr3d(i, j, k)*dphi_tot(1)%pw%cr3d(i, j, k) + &
+                       dphi_tot(2)%pw%cr3d(i, j, k)*dphi_tot(2)%pw%cr3d(i, j, k) + &
                        dphi_tot(3)%pw%cr3d(i, j, k)*dphi_tot(3)%pw%cr3d(i, j, k)
-               v_sccs%cr3d(i, j, k) = v_sccs%cr3d(i, j, k)+f*deps_elec%cr3d(i, j, k)*dphi2
+               v_sccs%cr3d(i, j, k) = v_sccs%cr3d(i, j, k) + f*deps_elec%cr3d(i, j, k)*dphi2
             END DO
          END DO
       END DO
@@ -844,11 +844,11 @@ CONTAINS
       CALL timeset(routineN, handle)
 
       f = LOG(epsilon_solvent)/twopi
-      diff = rho_max-rho_min
+      diff = rho_max - rho_min
       IF (diff > tol) THEN
          ln_rho_max = LOG(rho_max)
          ln_rho_min = LOG(rho_min)
-         q = twopi/(ln_rho_max-ln_rho_min)
+         q = twopi/(ln_rho_max - ln_rho_min)
          dq = -f*q
       END IF
 
@@ -870,10 +870,10 @@ CONTAINS
                ELSE IF (rho <= rho_max) THEN
                   IF (diff > tol) THEN
                      x = LOG(rho)
-                     y = q*(ln_rho_max-x)
-                     t = f*(y-SIN(y))
+                     y = q*(ln_rho_max - x)
+                     t = f*(y - SIN(y))
                      eps_elec%cr3d(i, j, k) = EXP(t)
-                     dt = dq*(1.0_dp-COS(y))
+                     dt = dq*(1.0_dp - COS(y))
                      deps_elec%cr3d(i, j, k) = eps_elec%cr3d(i, j, k)*dt/rho
                   ELSE
                      eps_elec%cr3d(i, j, k) = 1.0_dp
@@ -920,8 +920,8 @@ CONTAINS
 
       CALL timeset(routineN, handle)
 
-      df = (1.0_dp-epsilon_solvent)/rho_zero
-      f = 0.5_dp*(epsilon_solvent-1.0_dp)
+      df = (1.0_dp - epsilon_solvent)/rho_zero
+      f = 0.5_dp*(epsilon_solvent - 1.0_dp)
       q = 1.0_dp/rho_zero
       twobeta = 2.0_dp*beta
 
@@ -943,8 +943,8 @@ CONTAINS
                ELSE
                   s = rho*q
                   p = s**twobeta
-                  t = 1.0_dp/(1.0_dp+p)
-                  eps_elec%cr3d(i, j, k) = 1.0_dp+f*(1.0_dp+(1.0_dp-p)*t)
+                  t = 1.0_dp/(1.0_dp + p)
+                  eps_elec%cr3d(i, j, k) = 1.0_dp + f*(1.0_dp + (1.0_dp - p)*t)
                   deps_elec%cr3d(i, j, k) = df*twobeta*t*t*p/s
                END IF
             END DO
@@ -1009,7 +1009,7 @@ CONTAINS
          CASE (sccs_derivative_cd7)
             border_points = 3
          END SELECT
-         CALL init_input_type(input_settings, 2*border_points+1, rs_grid_section, &
+         CALL init_input_type(input_settings, 2*border_points + 1, rs_grid_section, &
                               1, (/-1, -1, -1/))
          CALL rs_grid_create_descriptor(rs_desc, f%pw_grid, input_settings, &
                                         border_points=border_points)
@@ -1092,7 +1092,7 @@ CONTAINS
                                                             delta_rho
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'surface_andreussi', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: tol = 1.0E-12_dp
 
       INTEGER                                            :: handle, i, j, k, l
@@ -1103,13 +1103,13 @@ CONTAINS
 
       CALL timeset(routineN, handle)
 
-      e = epsilon_solvent-1.0_dp
+      e = epsilon_solvent - 1.0_dp
       f = LOG(epsilon_solvent)/twopi
-      diff = rho_max-rho_min
+      diff = rho_max - rho_min
       IF (diff > tol) THEN
          ln_rho_max = LOG(rho_max)
          ln_rho_min = LOG(rho_min)
-         q = twopi/(ln_rho_max-ln_rho_min)
+         q = twopi/(ln_rho_max - ln_rho_min)
       END IF
 
       lb(1:3) = rho_elec%pw_grid%bounds_local(1, 1:3)
@@ -1124,14 +1124,14 @@ CONTAINS
          DO j = lb(2), ub(2)
             DO i = lb(1), ub(1)
                DO l = 1, 2
-                  rho = rho_elec%cr3d(i, j, k)+(REAL(l, KIND=dp)-1.5_dp)*delta_rho
+                  rho = rho_elec%cr3d(i, j, k) + (REAL(l, KIND=dp) - 1.5_dp)*delta_rho
                   IF (rho < rho_min) THEN
                      eps_elec = epsilon_solvent
                   ELSE IF (rho <= rho_max) THEN
                      IF (diff > tol) THEN
                         x = LOG(rho)
-                        y = q*(ln_rho_max-x)
-                        t = f*(y-SIN(y))
+                        y = q*(ln_rho_max - x)
+                        t = f*(y - SIN(y))
                         eps_elec = EXP(t)
                      ELSE
                         eps_elec = 1.0_dp
@@ -1139,9 +1139,9 @@ CONTAINS
                   ELSE
                      eps_elec = 1.0_dp
                   END IF
-                  theta(l) = (epsilon_solvent-eps_elec)/e
+                  theta(l) = (epsilon_solvent - eps_elec)/e
                END DO
-               dtheta%cr3d(i, j, k) = (theta(2)-theta(1))*norm_drho_elec%cr3d(i, j, k)/delta_rho
+               dtheta%cr3d(i, j, k) = (theta(2) - theta(1))*norm_drho_elec%cr3d(i, j, k)/delta_rho
             END DO
          END DO
       END DO
@@ -1176,7 +1176,7 @@ CONTAINS
                                                             delta_rho
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'surface_fattebert_gygi', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: tol = 1.0E-12_dp
 
       INTEGER                                            :: handle, i, j, k, l
@@ -1186,7 +1186,7 @@ CONTAINS
 
       CALL timeset(routineN, handle)
 
-      e = epsilon_solvent-1.0_dp
+      e = epsilon_solvent - 1.0_dp
       f = 0.5_dp*e
       q = 1.0_dp/rho_zero
       twobeta = 2.0_dp*beta
@@ -1203,18 +1203,18 @@ CONTAINS
          DO j = lb(2), ub(2)
             DO i = lb(1), ub(1)
                DO l = 1, 2
-                  rho = rho_elec%cr3d(i, j, k)+(REAL(l, KIND=dp)-1.5_dp)*delta_rho
+                  rho = rho_elec%cr3d(i, j, k) + (REAL(l, KIND=dp) - 1.5_dp)*delta_rho
                   IF (rho < tol) THEN
                      eps_elec = epsilon_solvent
                   ELSE
                      s = rho*q
                      p = s**twobeta
-                     t = 1.0_dp/(1.0_dp+p)
-                     eps_elec = 1.0_dp+f*(1.0_dp+(1.0_dp-p)*t)
+                     t = 1.0_dp/(1.0_dp + p)
+                     eps_elec = 1.0_dp + f*(1.0_dp + (1.0_dp - p)*t)
                   END IF
-                  theta(l) = (epsilon_solvent-eps_elec)/e
+                  theta(l) = (epsilon_solvent - eps_elec)/e
                END DO
-               dtheta%cr3d(i, j, k) = (theta(2)-theta(1))*norm_drho_elec%cr3d(i, j, k)/delta_rho
+               dtheta%cr3d(i, j, k) = (theta(2) - theta(1))*norm_drho_elec%cr3d(i, j, k)/delta_rho
             END DO
          END DO
       END DO

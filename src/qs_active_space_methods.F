@@ -10,124 +10,124 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE qs_active_space_methods
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: &
-        allocate_sto_basis_set, create_gto_from_sto_basis, deallocate_gto_basis_set, &
-        deallocate_sto_basis_set, gto_basis_set_type, init_orb_basis_set, set_sto_basis_set, &
-        srules, sto_basis_set_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale
-   USE cp_fm_diag,                      ONLY: cp_fm_syevd
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_p_type, cp_fm_release, &
-        cp_fm_set_all, cp_fm_set_element, cp_fm_to_fm, cp_fm_type
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: &
-        cp_p_file, cp_print_key_finished_output, cp_print_key_should_output, cp_print_key_unit_nr, &
-        debug_print_level, high_print_level, low_print_level, medium_print_level, &
-        silent_print_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE dbcsr_api,                       ONLY: csr_create,&
-                                              csr_type,&
-                                              dbcsr_copy,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: &
-        casci_canonical, dmft_model, eri_method_full_gpw, eri_method_gpw_ht, eri_operator_coulomb, &
-        eri_operator_erf, eri_operator_erfc, eri_operator_gaussian, eri_operator_yukawa, hf_model, &
-        mao_projection, rsdft_model, wannier_projection
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: fourpi
-   USE memory_utilities,                ONLY: reallocate
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE periodic_table,                  ONLY: ptable
-   USE pw_env_methods,                  ONLY: pw_env_create,&
-                                              pw_env_rebuild
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_release,&
-                                              pw_env_type
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_methods,                      ONLY: pw_integrate_function,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_rebuild,&
-                                              pw_poisson_solve
-   USE pw_poisson_types,                ONLY: ANALYTIC0D,&
-                                              PERIODIC3D,&
-                                              greens_fn_type,&
-                                              pw_poisson_analytic,&
-                                              pw_poisson_periodic,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_release,&
-                                              pw_type
-   USE qs_active_space_types,           ONLY: active_space_type,&
-                                              create_active_space_type,&
-                                              csr_idx_from_combined,&
-                                              csr_idx_to_combined,&
-                                              eri_type,&
-                                              eri_type_eri_element_func,&
-                                              get_irange_csr
-   USE qs_collocate_density,            ONLY: calculate_wavefunction
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_methods,                   ONLY: qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_loc_methods,                  ONLY: qs_loc_driver
-   USE qs_loc_types,                    ONLY: qs_loc_env_create,&
-                                              qs_loc_env_new_type,&
-                                              qs_loc_env_release
-   USE qs_loc_utils,                    ONLY: qs_loc_control_init,&
-                                              qs_loc_env_init,&
-                                              qs_loc_init
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix,&
-                                              calculate_subspace_eigenvalues
-   USE qs_mo_types,                     ONLY: allocate_mo_set,&
-                                              get_mo_set,&
-                                              init_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE task_list_methods,               ONLY: generate_qs_task_list
-   USE task_list_types,                 ONLY: allocate_task_list,&
-                                              deallocate_task_list,&
-                                              task_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: &
+      allocate_sto_basis_set, create_gto_from_sto_basis, deallocate_gto_basis_set, &
+      deallocate_sto_basis_set, gto_basis_set_type, init_orb_basis_set, set_sto_basis_set, &
+      srules, sto_basis_set_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale
+   USE cp_fm_diag, ONLY: cp_fm_syevd
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_p_type, cp_fm_release, &
+      cp_fm_set_all, cp_fm_set_element, cp_fm_to_fm, cp_fm_type
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: &
+      cp_p_file, cp_print_key_finished_output, cp_print_key_should_output, cp_print_key_unit_nr, &
+      debug_print_level, high_print_level, low_print_level, medium_print_level, &
+      silent_print_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE dbcsr_api, ONLY: csr_create, &
+                        csr_type, &
+                        dbcsr_copy, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE input_constants, ONLY: &
+      casci_canonical, dmft_model, eri_method_full_gpw, eri_method_gpw_ht, eri_operator_coulomb, &
+      eri_operator_erf, eri_operator_erfc, eri_operator_gaussian, eri_operator_yukawa, hf_model, &
+      mao_projection, rsdft_model, wannier_projection
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp, &
+                    int_8
+   USE mathconstants, ONLY: fourpi
+   USE memory_utilities, ONLY: reallocate
+   USE message_passing, ONLY: mp_sum
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE periodic_table, ONLY: ptable
+   USE pw_env_methods, ONLY: pw_env_create, &
+                             pw_env_rebuild
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_release, &
+                           pw_env_type
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_methods, ONLY: pw_integrate_function, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_rebuild, &
+                                 pw_poisson_solve
+   USE pw_poisson_types, ONLY: ANALYTIC0D, &
+                               PERIODIC3D, &
+                               greens_fn_type, &
+                               pw_poisson_analytic, &
+                               pw_poisson_periodic, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_release, &
+                       pw_type
+   USE qs_active_space_types, ONLY: active_space_type, &
+                                    create_active_space_type, &
+                                    csr_idx_from_combined, &
+                                    csr_idx_to_combined, &
+                                    eri_type, &
+                                    eri_type_eri_element_func, &
+                                    get_irange_csr
+   USE qs_collocate_density, ONLY: calculate_wavefunction
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_methods, ONLY: qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_loc_methods, ONLY: qs_loc_driver
+   USE qs_loc_types, ONLY: qs_loc_env_create, &
+                           qs_loc_env_new_type, &
+                           qs_loc_env_release
+   USE qs_loc_utils, ONLY: qs_loc_control_init, &
+                           qs_loc_env_init, &
+                           qs_loc_init
+   USE qs_mo_methods, ONLY: calculate_density_matrix, &
+                            calculate_subspace_eigenvalues
+   USE qs_mo_types, ONLY: allocate_mo_set, &
+                          get_mo_set, &
+                          init_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE task_list_methods, ONLY: generate_qs_task_list
+   USE task_list_types, ONLY: allocate_task_list, &
+                              deallocate_task_list, &
+                              task_list_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -159,19 +159,19 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'active_space_main', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=10)                                  :: cshell, lnam(5)
       INTEGER :: eri_method, eri_operator, eri_print, handle, i, iatom, ishell, isp, ispin, iw, j, &
-         jm, m, mselect, n1, n2, nactive, nao, natom, ncol, nel, ninactive, ninactive_alpha, &
-         ninactive_beta, nmo, nn1, nn2, nspins, ntot, zval
+                 jm, m, mselect, n1, n2, nactive, nao, natom, ncol, nel, ninactive, ninactive_alpha, &
+                 ninactive_beta, nmo, nn1, nn2, nspins, ntot, zval
       INTEGER, DIMENSION(2)                              :: nactive_orb, nepol, ninactive_orb
       INTEGER, DIMENSION(5)                              :: nshell
       INTEGER, DIMENSION(:), POINTER                     :: invals
       LOGICAL                                            :: do_kpoints, ex_operator, ex_perd, &
                                                             explicit, isolated, store_wfn
       REAL(KIND=dp) :: eri_eps_grid, eri_eps_int, eri_gpw_cutoff, eri_op_param, eri_rcut, &
-         eri_rel_cutoff, fel, focc, maxocc, nze_percentage
+                       eri_rel_cutoff, fel, focc, maxocc, nze_percentage
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: eigenvalues
       TYPE(active_space_type), POINTER                   :: active_space_env
       TYPE(atomic_kind_type), POINTER                    :: atomic_kind
@@ -263,12 +263,12 @@ CONTAINS
          END IF
          ninactive_alpha = invals(1)
          ninactive_beta = invals(2)
-         ninactive = ninactive_alpha+ninactive_beta
+         ninactive = ninactive_alpha + ninactive_beta
       ELSE
          IF (explicit) THEN
             ninactive = invals(1)
          ELSE
-            ninactive = ntot-nactive
+            ninactive = ntot - nactive
          END IF
          ninactive_alpha = ninactive
          ninactive_beta = 0
@@ -276,7 +276,7 @@ CONTAINS
       CPASSERT(ninactive >= 0)
       CPASSERT(ninactive_alpha >= 0)
       CPASSERT(ninactive_beta >= 0)
-      CPASSERT(ntot == ninactive+nactive)
+      CPASSERT(ntot == ninactive + nactive)
       IF (nspins > 1) THEN
          CPASSERT(nepol(1) >= ninactive_alpha)
          CPASSERT(nepol(2) >= ninactive_beta)
@@ -417,11 +417,11 @@ CONTAINS
          DO i = 1, 5
             ishell = i
             IF (cshell(n1:n1) == " ") THEN
-               ishell = ishell-1
+               ishell = ishell - 1
                EXIT
             END IF
             READ (cshell(n1:), "(I1,A1)") nshell(i), lnam(i)
-            n1 = n1+2
+            n1 = n1 + 2
          END DO
       END IF
 
@@ -440,7 +440,7 @@ CONTAINS
             nmo = 0
             DO ispin = 1, nspins
                CALL get_mo_set(mos(ispin)%mo_set, nmo=m)
-               IF (m < ninactive_orb(ispin)+nactive_orb(ispin)) THEN
+               IF (m < ninactive_orb(ispin) + nactive_orb(ispin)) THEN
                   CPABORT("Not enough canonical orbitals available.")
                END IF
                nmo = MAX(m, nmo)
@@ -464,7 +464,7 @@ CONTAINS
                   mo_set => active_space_env%mos_active(ispin)%mo_set
                   CALL get_mo_set(mo_set, mo_coeff=fm_target)
                   ncol = nactive_orb(ispin)
-                  CALL cp_fm_to_fm(fm_ref, fm_target, ncol, ninactive_orb(ispin)+1, 1)
+                  CALL cp_fm_to_fm(fm_ref, fm_target, ncol, ninactive_orb(ispin) + 1, 1)
                END DO
             END IF
             IF (iw > 0) THEN
@@ -472,12 +472,12 @@ CONTAINS
                   WRITE (iw, '(/,T4,A,I3,T65,A)') "Canonical Orbital Selection for spin", ispin, &
                      "[atomic units]"
                   DO i = 1, ninactive_orb(ispin), 4
-                     jm = MIN(3, ninactive_orb(ispin)-i)
-                     WRITE (iw, '(T3,4(F14.6,A5))') (eigenvalues(i+j, 1), " [I]", j=0, jm)
+                     jm = MIN(3, ninactive_orb(ispin) - i)
+                     WRITE (iw, '(T3,4(F14.6,A5))') (eigenvalues(i + j, 1), " [I]", j=0, jm)
                   END DO
-                  DO i = ninactive_orb(ispin)+1, ninactive_orb(ispin)+nactive_orb(ispin), 4
-                     jm = MIN(3, ninactive_orb(ispin)+nactive_orb(ispin)-i)
-                     WRITE (iw, '(T3,4(F14.6,A5))') (eigenvalues(i+j, 1), " [A]", j=0, jm)
+                  DO i = ninactive_orb(ispin) + 1, ninactive_orb(ispin) + nactive_orb(ispin), 4
+                     jm = MIN(3, ninactive_orb(ispin) + nactive_orb(ispin) - i)
+                     WRITE (iw, '(T3,4(F14.6,A5))') (eigenvalues(i + j, 1), " [A]", j=0, jm)
                   END DO
                END DO
             END IF
@@ -649,7 +649,7 @@ CONTAINS
 
       ! allocate container for integrals (CSR matrix)
       CALL get_qs_env(qs_env, para_env=para_env)
-      m = (nspins*(nspins+1))/2
+      m = (nspins*(nspins + 1))/2
       ALLOCATE (active_space_env%eri%eri(m))
       DO i = 1, m
          ALLOCATE (active_space_env%eri%eri(i)%csr_mat)
@@ -664,8 +664,8 @@ CONTAINS
             n1 = nactive_orb(2)
             n2 = nactive_orb(2)
          END IF
-         nn1 = (n1*(n1+1))/2
-         nn2 = (n2*(n2+1))/2
+         nn1 = (n1*(n1 + 1))/2
+         nn2 = (n2*(n2 + 1))/2
          CALL csr_create(eri_mat, nn1, nn2, 0_int_8, 0, 0, para_env%group)
          CALL get_mo_set(active_space_env%mos_active(i)%mo_set, nmo=active_space_env%eri%norb)
       END DO
@@ -723,11 +723,11 @@ CONTAINS
          DO isp = 1, nspins
             fmat => active_space_env%p_ref(isp)%matrix
             CALL cp_fm_set_all(fmat, alpha=0.0_dp)
-            n1 = active_space_env%nelectrons(isp)-active_space_env%ninspin(isp)
+            n1 = active_space_env%nelectrons(isp) - active_space_env%ninspin(isp)
             DO i = 1, nactive_orb(isp)
                fel = MIN(focc, REAL(n1, KIND=dp))
                CALL cp_fm_set_element(fmat, i, i, fel)
-               n1 = n1-NINT(fel)
+               n1 = n1 - NINT(fel)
                n1 = MAX(n1, 0)
             END DO
          END DO
@@ -769,7 +769,7 @@ CONTAINS
       TYPE(active_space_type), POINTER                   :: active_space_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_operators', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, is, nmo, nspins
       TYPE(cp_fm_type), POINTER                          :: hmat, ksmat, mo_coeff, vxcmat
@@ -859,7 +859,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: op_sub
 
       CHARACTER(len=*), PARAMETER :: routineN = 'subspace_operator', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ncol, nrow
       TYPE(cp_fm_type), POINTER                          :: vectors
@@ -903,7 +903,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_subspace_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_fm_struct_type), POINTER                   :: fm_struct
 
@@ -939,10 +939,10 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_eri_gpw', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i_multigrid, icount2, intcount, irange(2), isp, isp1, isp2, ispin, iwa1, &
-         iwa12, iwa2, iwb1, iwb2, iwbs, iwbt, iwfn, n_multigrid, nmm, nmo, nmo1, nmo2, nspins, nx
+                 iwa12, iwa2, iwb1, iwb2, iwbs, iwbt, iwfn, n_multigrid, nmm, nmo, nmo1, nmo2, nspins, nx
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: eri_index
       LOGICAL                                            :: print1, print2, &
                                                             skip_load_balance_distributed
@@ -1001,7 +1001,7 @@ CONTAINS
       dft_control%qs_control%cutoff = eri_env%eri_gpw%cutoff*0.5_dp
       dft_control%qs_control%e_cutoff(1) = dft_control%qs_control%cutoff
       DO i_multigrid = 2, n_multigrid
-         dft_control%qs_control%e_cutoff(i_multigrid) = dft_control%qs_control%e_cutoff(i_multigrid-1) &
+         dft_control%qs_control%e_cutoff(i_multigrid) = dft_control%qs_control%e_cutoff(i_multigrid - 1) &
                                                         /progression_factor
       END DO
 
@@ -1100,7 +1100,7 @@ CONTAINS
       intcount = 0
       DO isp1 = 1, nspins
          CALL get_mo_set(mo_set=mos(isp1)%mo_set, nmo=nmo1)
-         nmm = (nmo1*(nmo1+1))/2
+         nmm = (nmo1*(nmo1 + 1))/2
          irange = get_irange_csr(nmm, eri_env%eri(1)%csr_mat%mp_group)
          DO iwa1 = 1, nmo1
             IF (eri_env%eri_gpw%store_wfn) THEN
@@ -1111,7 +1111,7 @@ CONTAINS
             DO iwa2 = iwa1, nmo1
                iwa12 = csr_idx_to_combined(iwa1, iwa2, nmo1)
                IF (iwa12 >= irange(1) .AND. iwa12 <= irange(2)) THEN
-                  iwa12 = iwa12-irange(1)+1
+                  iwa12 = iwa12 - irange(1) + 1
                ELSE
                   iwa12 = 0
                END IF
@@ -1138,12 +1138,12 @@ CONTAINS
                ELSEIF (eri_env%method == eri_method_full_gpw) THEN
                   DO isp2 = isp1, nspins
                      CALL get_mo_set(mo_set=mos(isp1)%mo_set, nmo=nmo2)
-                     nx = (nmo2*(nmo2+1))/2
+                     nx = (nmo2*(nmo2 + 1))/2
                      ALLOCATE (eri(nx), eri_index(nx))
                      icount2 = 0
                      iwbs = 1
                      IF (isp1 == isp2) iwbs = iwa1
-                     isp = (isp1-1)*isp2-((isp1-1)*(isp1-2))/2+(isp2-isp1+1)
+                     isp = (isp1 - 1)*isp2 - ((isp1 - 1)*(isp1 - 2))/2 + (isp2 - isp1 + 1)
                      DO iwb1 = iwbs, nmo2
                         IF (eri_env%eri_gpw%store_wfn) THEN
                            wfn3 => wfn_a(iwb1, isp2)
@@ -1161,12 +1161,12 @@ CONTAINS
                            wfn_r%pw%cr3d = rho_r%pw%cr3d*wfn3%pw%cr3d*wfn4%pw%cr3d
                            erint = pw_integrate_function(wfn_r%pw)
                            IF (erint > eri_env%eps_integral) THEN
-                              intcount = intcount+1
+                              intcount = intcount + 1
                               IF (print2 .AND. iw > 0) THEN
                                  WRITE (iw, "(T4,'ERI_GPW|',T20,2I4,' [',I1,']',2I4,' [',I1,']',T58,G20.14)") &
                                     iwa1, iwa2, isp1, iwb1, iwb2, isp2, erint
                               END IF
-                              icount2 = icount2+1
+                              icount2 = icount2 + 1
                               eri(icount2) = erint
                               eri_index(icount2) = csr_idx_to_combined(iwb1, iwb2, nmo2)
                            END IF
@@ -1229,7 +1229,7 @@ CONTAINS
       TYPE(eri_type)                                     :: eri_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_eri_green_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ig
       REAL(KIND=dp)                                      :: a, ea, g2, g3d, ga, gg, rg, rlength
@@ -1253,7 +1253,7 @@ CONTAINS
             a = eri_env%operator_parameter**2
             DO ig = grid%first_gne0, grid%ngpts_cut_local
                g2 = grid%gsq(ig)
-               gf%cc(ig) = fourpi/(a+g2)
+               gf%cc(ig) = fourpi/(a + g2)
             END DO
             IF (grid%have_g0) gf%cc(1) = fourpi/a
          CASE (eri_operator_erf)
@@ -1269,7 +1269,7 @@ CONTAINS
             DO ig = grid%first_gne0, grid%ngpts_cut_local
                g2 = grid%gsq(ig)
                ga = -0.25_dp*g2/a
-               gf%cc(ig) = fourpi/g2*(1._dp-EXP(ga))
+               gf%cc(ig) = fourpi/g2*(1._dp - EXP(ga))
             END DO
             IF (grid%have_g0) gf%cc(1) = 0.25_dp*fourpi/a
          CASE (eri_operator_gaussian)
@@ -1287,7 +1287,7 @@ CONTAINS
                g2 = grid%gsq(ig)
                gg = SQRT(g2)
                g3d = fourpi/g2
-               gf%cc(ig) = g3d*(1.0_dp-COS(rlength*gg))
+               gf%cc(ig) = g3d*(1.0_dp - COS(rlength*gg))
             END DO
             IF (grid%have_g0) gf%cc(1) = 0.5_dp*fourpi*rlength*rlength
          CASE (eri_operator_yukawa)
@@ -1297,11 +1297,11 @@ CONTAINS
             DO ig = grid%first_gne0, grid%ngpts_cut_local
                g2 = grid%gsq(ig)
                gg = SQRT(g2)
-               g3d = fourpi/(a*a+g2)
+               g3d = fourpi/(a*a + g2)
                rg = rlength*gg
-               gf%cc(ig) = g3d*(1.0_dp-ea*(COS(rg)+a/gg*SIN(rg)))
+               gf%cc(ig) = g3d*(1.0_dp - ea*(COS(rg) + a/gg*SIN(rg)))
             END DO
-            IF (grid%have_g0) gf%cc(1) = fourpi/(a*a)*(1.0_dp-ea*(1._dp+a*rlength))
+            IF (grid%have_g0) gf%cc(1) = fourpi/(a*a)*(1.0_dp - ea*(1._dp + a*rlength))
          CASE (eri_operator_erf)
             rlength = green%radius
             a = eri_env%operator_parameter**2
@@ -1309,7 +1309,7 @@ CONTAINS
                g2 = grid%gsq(ig)
                gg = SQRT(g2)
                ga = -0.25_dp*g2/a
-               gf%cc(ig) = fourpi/g2*EXP(ga)*(1.0_dp-COS(rlength*gg))
+               gf%cc(ig) = fourpi/g2*EXP(ga)*(1.0_dp - COS(rlength*gg))
             END DO
             IF (grid%have_g0) gf%cc(1) = 0.5_dp*fourpi*rlength*rlength
          CASE (eri_operator_erfc)
@@ -1319,7 +1319,7 @@ CONTAINS
                g2 = grid%gsq(ig)
                gg = SQRT(g2)
                ga = -0.25_dp*g2/a
-               gf%cc(ig) = fourpi/g2*(1._dp-EXP(ga))*(1.0_dp-COS(rlength*gg))
+               gf%cc(ig) = fourpi/g2*(1._dp - EXP(ga))*(1.0_dp - COS(rlength*gg))
             END DO
             IF (grid%have_g0) gf%cc(1) = 0._dp
          CASE (eri_operator_gaussian)
@@ -1358,27 +1358,27 @@ CONTAINS
          CPASSERT(irow <= csr_mat%nrows_total)
          CPASSERT(irow > csr_mat%nrows_local)
          nze = csr_mat%nze_local
-         nze_new = nze+nnz
+         nze_new = nze + nnz
          ! values
          CALL reallocate(csr_mat%nzval_local%r_dp, 1, nze_new)
-         csr_mat%nzval_local%r_dp(nze+1:nze_new) = rdat(1:nnz)
+         csr_mat%nzval_local%r_dp(nze + 1:nze_new) = rdat(1:nnz)
          ! col indices
          CALL reallocate(csr_mat%colind_local, 1, nze_new)
-         csr_mat%colind_local(nze+1:nze_new) = rind(1:nnz)
+         csr_mat%colind_local(nze + 1:nze_new) = rind(1:nnz)
          ! rows
          nrow = csr_mat%nrows_local
-         CALL reallocate(csr_mat%rowptr_local, 1, irow+1)
-         csr_mat%rowptr_local(nrow+1:irow) = nze+1
-         csr_mat%rowptr_local(irow+1) = nze_new+1
+         CALL reallocate(csr_mat%rowptr_local, 1, irow + 1)
+         csr_mat%rowptr_local(nrow + 1:irow) = nze + 1
+         csr_mat%rowptr_local(irow + 1) = nze_new + 1
          ! nzerow
          CALL reallocate(csr_mat%nzerow_local, 1, irow)
-         DO k = nrow+1, irow
-            csr_mat%nzerow_local(k) = csr_mat%rowptr_local(k+1)-csr_mat%rowptr_local(k)
+         DO k = nrow + 1, irow
+            csr_mat%nzerow_local(k) = csr_mat%rowptr_local(k + 1) - csr_mat%rowptr_local(k)
          ENDDO
          csr_mat%nrows_local = irow
-         csr_mat%nze_local = csr_mat%nze_local+nnz
+         csr_mat%nze_local = csr_mat%nze_local + nnz
       END IF
-      csr_mat%nze_total = csr_mat%nze_total+nnz
+      csr_mat%nze_total = csr_mat%nze_total + nnz
       csr_mat%has_indices = .TRUE.
 
    END SUBROUTINE update_csr_matrix
@@ -1395,7 +1395,7 @@ CONTAINS
       TYPE(mo_set_p_type), DIMENSION(:)                  :: mos
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_orbital_cubes', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filebody, filename, title
       INTEGER                                            :: i, imo, isp, nmo, str(3), unit_nr
@@ -1574,7 +1574,7 @@ CONTAINS
       TYPE(active_space_type), POINTER                   :: active_space_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'subspace_fock_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i1, i12, i12l, i2, i3, i34, i34l, i4, &
                                                             irange(2), irptr, is, nelec, nindex, &
@@ -1612,40 +1612,40 @@ CONTAINS
          ! calculate energy
          eeri = 0.0_dp
          eri => active_space_env%eri%eri(1)%csr_mat
-         nindex = (norb*(norb+1))/2
+         nindex = (norb*(norb + 1))/2
          irange = get_irange_csr(nindex, eri%mp_group)
          DO i1 = 1, norb
             DO i2 = i1, norb
                i12 = csr_idx_to_combined(i1, i2, norb)
                IF (i12 >= irange(1) .AND. i12 <= irange(2)) THEN
-                  i12l = i12-irange(1)+1
-                  irptr = eri%rowptr_local(i12l)-1
+                  i12l = i12 - irange(1) + 1
+                  irptr = eri%rowptr_local(i12l) - 1
                   DO i34l = 1, eri%nzerow_local(i12l)
-                     i34 = eri%colind_local(irptr+i34l)
+                     i34 = eri%colind_local(irptr + i34l)
                      CALL csr_idx_from_combined(i34, norb, i3, i4)
-                     erint = eri%nzval_local%r_dp(irptr+i34l)
+                     erint = eri%nzval_local%r_dp(irptr + i34l)
                      ! Coulomb
-                     ks_ref(i1, i2) = ks_ref(i1, i2)+erint*p_mat(i3, i4)
+                     ks_ref(i1, i2) = ks_ref(i1, i2) + erint*p_mat(i3, i4)
                      IF (i3 /= i4) THEN
-                        ks_ref(i1, i2) = ks_ref(i1, i2)+erint*p_mat(i3, i4)
+                        ks_ref(i1, i2) = ks_ref(i1, i2) + erint*p_mat(i3, i4)
                      END IF
                      IF (i12 /= i34) THEN
-                        ks_ref(i3, i4) = ks_ref(i3, i4)+erint*p_mat(i1, i2)
+                        ks_ref(i3, i4) = ks_ref(i3, i4) + erint*p_mat(i1, i2)
                         IF (i1 /= i2) THEN
-                           ks_ref(i3, i4) = ks_ref(i3, i4)+erint*p_mat(i1, i2)
+                           ks_ref(i3, i4) = ks_ref(i3, i4) + erint*p_mat(i1, i2)
                         END IF
                      END IF
                      ! Exchange
                      erint = -0.5_dp*erint
-                     ks_ref(i1, i3) = ks_ref(i1, i3)+erint*p_mat(i2, i4)
+                     ks_ref(i1, i3) = ks_ref(i1, i3) + erint*p_mat(i2, i4)
                      IF (i1 /= i2) THEN
-                        ks_ref(i2, i3) = ks_ref(i2, i3)+erint*p_mat(i1, i4)
+                        ks_ref(i2, i3) = ks_ref(i2, i3) + erint*p_mat(i1, i4)
                      END IF
                      IF (i3 /= i4) THEN
-                        ks_ref(i1, i4) = ks_ref(i1, i4)+erint*p_mat(i2, i3)
+                        ks_ref(i1, i4) = ks_ref(i1, i4) + erint*p_mat(i2, i3)
                      END IF
                      IF (i1 /= i2 .AND. i3 /= i4) THEN
-                        ks_ref(i2, i4) = ks_ref(i2, i4)+erint*p_mat(i1, i3)
+                        ks_ref(i2, i4) = ks_ref(i2, i4) + erint*p_mat(i1, i3)
                      END IF
                   END DO
                END IF
@@ -1660,8 +1660,8 @@ CONTAINS
          CALL mp_sum(ks_ref, eri%mp_group)
          !
          eeri = 0.5_dp*SUM(ks_ref*p_mat)
-         esub = eref-SUM(ks_mat(1:norb, 1:norb)*p_mat(1:norb, 1:norb))+eeri
-         ks_mat(1:norb, 1:norb) = ks_mat(1:norb, 1:norb)-ks_ref(1:norb, 1:norb)
+         esub = eref - SUM(ks_mat(1:norb, 1:norb)*p_mat(1:norb, 1:norb)) + eeri
+         ks_mat(1:norb, 1:norb) = ks_mat(1:norb, 1:norb) - ks_ref(1:norb, 1:norb)
          !
          active_space_env%energy_inactive = esub
          !
@@ -1706,7 +1706,7 @@ CONTAINS
       CHARACTER(len=*), DIMENSION(:), INTENT(IN)         :: lnam
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_pro_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=6), DIMENSION(:), POINTER            :: sym
       INTEGER                                            :: i, l, nj
@@ -1721,9 +1721,9 @@ CONTAINS
       ! electronic configuration
       ne = 0
       DO l = 1, 4 !lq(1)+1
-         nj = 2*(l-1)+1
+         nj = 2*(l - 1) + 1
          DO i = l, 7 ! nq(1)
-            ne(l, i) = ptable(zval)%e_conv(l-1)-2*nj*(i-l)
+            ne(l, i) = ptable(zval)%e_conv(l - 1) - 2*nj*(i - l)
             ne(l, i) = MAX(ne(l, i), 0)
             ne(l, i) = MIN(ne(l, i), 2*nj)
          END DO
@@ -1731,7 +1731,7 @@ CONTAINS
       ALLOCATE (nq(ishell), lq(ishell), zet(ishell), sym(ishell))
       DO i = 1, ishell
          nq(i) = nshell(i)
-         SELECT CASE (lnam (i))
+         SELECT CASE (lnam(i))
          CASE ('S', 's')
             lq(i) = 0
          CASE ('P', 'p')
@@ -1765,7 +1765,7 @@ CONTAINS
       TYPE(active_space_type), POINTER                   :: active_space_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'update_active_space', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao, nmo, nspins
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: p_ref

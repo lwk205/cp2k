@@ -8,39 +8,39 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE qs_subsys_methods
-   USE atom_types,                      ONLY: lmat
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cell_methods,                    ONLY: read_cell,&
-                                              write_cell
-   USE cell_types,                      ONLY: cell_clone,&
-                                              cell_create,&
-                                              cell_release,&
-                                              cell_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_methods,               ONLY: cp_subsys_create
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_release,&
-                                              cp_subsys_set,&
-                                              cp_subsys_type
-   USE external_potential_types,        ONLY: all_potential_type,&
-                                              get_potential,&
-                                              gth_potential_type,&
-                                              sgp_potential_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_types,             ONLY: get_molecule_kind,&
-                                              molecule_kind_type,&
-                                              set_molecule_kind
-   USE qs_kind_types,                   ONLY: create_qs_kind_set,&
-                                              get_qs_kind,&
-                                              init_atom_electronic_state,&
-                                              qs_kind_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_set,&
-                                              qs_subsys_type
+   USE atom_types, ONLY: lmat
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cell_methods, ONLY: read_cell, &
+                           write_cell
+   USE cell_types, ONLY: cell_clone, &
+                         cell_create, &
+                         cell_release, &
+                         cell_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_methods, ONLY: cp_subsys_create
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_release, &
+                              cp_subsys_set, &
+                              cp_subsys_type
+   USE external_potential_types, ONLY: all_potential_type, &
+                                       get_potential, &
+                                       gth_potential_type, &
+                                       sgp_potential_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE molecule_kind_types, ONLY: get_molecule_kind, &
+                                  molecule_kind_type, &
+                                  set_molecule_kind
+   USE qs_kind_types, ONLY: create_qs_kind_set, &
+                            get_qs_kind, &
+                            init_atom_electronic_state, &
+                            qs_kind_type
+   USE qs_subsys_types, ONLY: qs_subsys_set, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -75,7 +75,7 @@ CONTAINS
       TYPE(cell_type), OPTIONAL, POINTER                 :: cell, cell_ref
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_subsys_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: use_ref_cell
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
@@ -159,7 +159,7 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'num_ao_el_per_molecule', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: arbitrary_spin, iatom, ikind, imol, &
                                                             n_ao, natom, nmol_kind, nsgf, nspins, &
@@ -222,7 +222,7 @@ CONTAINS
                ! For now, only the total number of electrons can be obtained
                ! from init_atom_electronic_state
                n_occ_alpha_and_beta(ARBITRARY_SPIN) = &
-                  n_occ_alpha_and_beta(ARBITRARY_SPIN)+SUM(ne_explicit)+ &
+                  n_occ_alpha_and_beta(ARBITRARY_SPIN) + SUM(ne_explicit) + &
                   SUM(NINT(2*edelta(:, :, ARBITRARY_SPIN)))
                ! We need a way to specify the number of alpha and beta electrons
                ! on each molecule (i.e. multiplicity is not enough)
@@ -241,7 +241,7 @@ CONTAINS
                   zeff = 0.0_dp
                   zeff_correction = 0.0_dp
                END IF
-               z_molecule = z_molecule+NINT(zeff-zeff_correction)
+               z_molecule = z_molecule + NINT(zeff - zeff_correction)
 
                ! this one does not work because nelem is not adjusted in the symmetry breaking code
                !CALL get_atomic_kind(atomic_kind,z=z)
@@ -252,13 +252,13 @@ CONTAINS
                ELSE
                   nsgf = 0
                ENDIF
-               n_ao = n_ao+nsgf
+               n_ao = n_ao + nsgf
 
             END DO ! iatom
 
             ! At this point we have the number of electrons (alpha+beta) on the molecule
             !  as they are seen by the ATOMIC GUESS routines
-            charge_molecule = REAL(z_molecule-n_occ_alpha_and_beta(ARBITRARY_SPIN), dp)
+            charge_molecule = REAL(z_molecule - n_occ_alpha_and_beta(ARBITRARY_SPIN), dp)
             CALL set_molecule_kind(molecule_kind=molecule_kind, &
                                    nelectron=n_occ_alpha_and_beta(ARBITRARY_SPIN), &
                                    charge=charge_molecule, &

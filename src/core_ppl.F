@@ -14,37 +14,37 @@
 ! **************************************************************************************************
 MODULE core_ppl
 
-   USE ai_overlap_ppl,                  ONLY: ppl_integral,&
-                                              ppl_integral_ri
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_p_type
-   USE external_potential_types,        ONLY: get_potential,&
-                                              gth_potential_type,&
-                                              sgp_potential_type
-   USE kinds,                           ONLY: dp
-   USE lri_environment_types,           ONLY: lri_kind_type
-   USE orbital_pointers,                ONLY: init_orbital_pointers,&
-                                              ncoset
-   USE particle_types,                  ONLY: particle_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type,&
-                                              nl_set_sub_iterator,&
-                                              nl_sub_iterate
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE ai_overlap_ppl, ONLY: ppl_integral, &
+                             ppl_integral_ri
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_get_block_p, &
+                        dbcsr_p_type
+   USE external_potential_types, ONLY: get_potential, &
+                                       gth_potential_type, &
+                                       sgp_potential_type
+   USE kinds, ONLY: dp
+   USE lri_environment_types, ONLY: lri_kind_type
+   USE orbital_pointers, ONLY: init_orbital_pointers, &
+                               ncoset
+   USE particle_types, ONLY: particle_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type, &
+                                     nl_set_sub_iterator, &
+                                     nl_sub_iterate
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num, omp_get_num_threads
 
@@ -101,9 +101,9 @@ CONTAINS
       INTEGER, PARAMETER                                 :: nexp_max = 30
 
       INTEGER :: atom_a, atom_b, atom_c, handle, i, iatom, icol, ikind, img, inode, irow, iset, &
-         jatom, jkind, jset, katom, kkind, ldai, ldsab, maxco, maxder, maxl, maxlgto, maxlppl, &
-         maxnset, maxsgf, mepos, n_local, natom, ncoa, ncob, nexp_lpot, nexp_ppl, nkind, nloc, &
-         nseta, nsetb, nthread, sgfa, sgfb
+                 jatom, jkind, jset, katom, kkind, ldai, ldsab, maxco, maxder, maxl, maxlgto, maxlppl, &
+                 maxnset, maxsgf, mepos, n_local, natom, ncoa, ncob, nexp_lpot, nexp_ppl, nkind, nloc, &
+                 nseta, nsetb, nthread, sgfa, sgfb
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind
       INTEGER, DIMENSION(1:10)                           :: nrloc
       INTEGER, DIMENSION(3)                              :: cellind
@@ -163,10 +163,10 @@ CONTAINS
                            basis_type=basis_type)
 
       maxl = MAX(maxlgto, maxlppl)
-      CALL init_orbital_pointers(2*maxl+2*nder+1)
+      CALL init_orbital_pointers(2*maxl + 2*nder + 1)
 
       ldsab = MAX(maxco, ncoset(maxlppl), maxsgf, maxlppl)
-      ldai = ncoset(maxl+nder+1)
+      ldai = ncoset(maxl + nder + 1)
 
       ALLOCATE (basis_set_list(nkind))
       DO ikind = 1, nkind
@@ -209,8 +209,8 @@ CONTAINS
 !$    mepos = omp_get_thread_num()
 
       ALLOCATE (hab(ldsab, ldsab, maxnset, maxnset), work(ldsab, ldsab*maxder))
-      ldai = ncoset(2*maxlgto+2*nder)
-      ALLOCATE (ppl_work(ldai, ldai, MAX(maxder, 2*maxlgto+2*nder+1)))
+      ldai = ncoset(2*maxlgto + 2*nder)
+      ALLOCATE (ppl_work(ldai, ldai, MAX(maxder, 2*maxlgto + 2*nder + 1)))
       IF (calculate_forces) THEN
          ALLOCATE (pab(maxco, maxco, maxnset, maxnset))
          ldai = ncoset(maxlgto)
@@ -331,11 +331,11 @@ CONTAINS
                   CALL get_potential(potential=gth_potential, &
                                      nexp_lpot=nexp_lpot, alpha_lpot=alpha_lpot, nct_lpot=nct_lpot, cval_lpot=cval_lpot)
                   CPASSERT(nexp_lpot < nexp_max)
-                  nexp_ppl = nexp_lpot+1
-                  alpha_ppl(2:nexp_lpot+1) = alpha_lpot(1:nexp_lpot)
-                  nct_ppl(2:nexp_lpot+1) = nct_lpot(1:nexp_lpot)
+                  nexp_ppl = nexp_lpot + 1
+                  alpha_ppl(2:nexp_lpot + 1) = alpha_lpot(1:nexp_lpot)
+                  nct_ppl(2:nexp_lpot + 1) = nct_lpot(1:nexp_lpot)
                   DO i = 1, nexp_lpot
-                     cval_ppl(1:nct_lpot(i), i+1) = cval_lpot(1:nct_lpot(i), i)
+                     cval_ppl(1:nct_lpot(i), i + 1) = cval_lpot(1:nct_lpot(i), i)
                   END DO
                END IF
             ELSE IF (ASSOCIATED(sgp_potential)) THEN
@@ -345,7 +345,7 @@ CONTAINS
                   IF (SUM(ABS(aloc(1:nloc))) < 1.0e-12_dp) CYCLE
                   nexp_ppl = nloc
                   CPASSERT(nexp_ppl <= nexp_max)
-                  nct_ppl(1:nloc) = nrloc(1:nloc)-1
+                  nct_ppl(1:nloc) = nrloc(1:nloc) - 1
                   alpha_ppl(1:nloc) = bloc(1:nloc)
                   cval_ppl(1, 1:nloc) = aloc(1:nloc)
                ELSE
@@ -367,22 +367,22 @@ CONTAINS
                CALL get_iterator_info(ap_iterator, mepos=mepos, jatom=katom, r=rac)
 
                dac = SQRT(SUM(rac*rac))
-               rbc(:) = rac(:)-rab(:)
+               rbc(:) = rac(:) - rab(:)
                dbc = SQRT(SUM(rbc*rbc))
-               IF ((MAXVAL(set_radius_a(:))+ppl_radius < dac) .OR. &
-                   (MAXVAL(set_radius_b(:))+ppl_radius < dbc)) THEN
+               IF ((MAXVAL(set_radius_a(:)) + ppl_radius < dac) .OR. &
+                   (MAXVAL(set_radius_b(:)) + ppl_radius < dbc)) THEN
                   CYCLE
                END IF
 
                DO iset = 1, nseta
-                  IF (set_radius_a(iset)+ppl_radius < dac) CYCLE
+                  IF (set_radius_a(iset) + ppl_radius < dac) CYCLE
                   ncoa = npgfa(iset)*ncoset(la_max(iset))
                   sgfa = first_sgfa(1, iset)
                   DO jset = 1, nsetb
-                     IF (set_radius_b(jset)+ppl_radius < dbc) CYCLE
+                     IF (set_radius_b(jset) + ppl_radius < dbc) CYCLE
                      ncob = npgfb(jset)*ncoset(lb_max(jset))
                      sgfb = first_sgfb(1, jset)
-                     IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+                     IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
                      ! *** Calculate the GTH pseudo potential forces ***
                      IF (calculate_forces) THEN
 
@@ -401,19 +401,19 @@ CONTAINS
                         atom_c = atom_of_kind(katom)
 
 !$OMP CRITICAL(force_critical)
-                        force(ikind)%gth_ppl(1, atom_a) = force(ikind)%gth_ppl(1, atom_a)+f0*force_a(1)
-                        force(ikind)%gth_ppl(2, atom_a) = force(ikind)%gth_ppl(2, atom_a)+f0*force_a(2)
-                        force(ikind)%gth_ppl(3, atom_a) = force(ikind)%gth_ppl(3, atom_a)+f0*force_a(3)
-                        force(kkind)%gth_ppl(1, atom_c) = force(kkind)%gth_ppl(1, atom_c)-f0*force_a(1)
-                        force(kkind)%gth_ppl(2, atom_c) = force(kkind)%gth_ppl(2, atom_c)-f0*force_a(2)
-                        force(kkind)%gth_ppl(3, atom_c) = force(kkind)%gth_ppl(3, atom_c)-f0*force_a(3)
+                        force(ikind)%gth_ppl(1, atom_a) = force(ikind)%gth_ppl(1, atom_a) + f0*force_a(1)
+                        force(ikind)%gth_ppl(2, atom_a) = force(ikind)%gth_ppl(2, atom_a) + f0*force_a(2)
+                        force(ikind)%gth_ppl(3, atom_a) = force(ikind)%gth_ppl(3, atom_a) + f0*force_a(3)
+                        force(kkind)%gth_ppl(1, atom_c) = force(kkind)%gth_ppl(1, atom_c) - f0*force_a(1)
+                        force(kkind)%gth_ppl(2, atom_c) = force(kkind)%gth_ppl(2, atom_c) - f0*force_a(2)
+                        force(kkind)%gth_ppl(3, atom_c) = force(kkind)%gth_ppl(3, atom_c) - f0*force_a(3)
 
-                        force(jkind)%gth_ppl(1, atom_b) = force(jkind)%gth_ppl(1, atom_b)+f0*force_b(1)
-                        force(jkind)%gth_ppl(2, atom_b) = force(jkind)%gth_ppl(2, atom_b)+f0*force_b(2)
-                        force(jkind)%gth_ppl(3, atom_b) = force(jkind)%gth_ppl(3, atom_b)+f0*force_b(3)
-                        force(kkind)%gth_ppl(1, atom_c) = force(kkind)%gth_ppl(1, atom_c)-f0*force_b(1)
-                        force(kkind)%gth_ppl(2, atom_c) = force(kkind)%gth_ppl(2, atom_c)-f0*force_b(2)
-                        force(kkind)%gth_ppl(3, atom_c) = force(kkind)%gth_ppl(3, atom_c)-f0*force_b(3)
+                        force(jkind)%gth_ppl(1, atom_b) = force(jkind)%gth_ppl(1, atom_b) + f0*force_b(1)
+                        force(jkind)%gth_ppl(2, atom_b) = force(jkind)%gth_ppl(2, atom_b) + f0*force_b(2)
+                        force(jkind)%gth_ppl(3, atom_b) = force(jkind)%gth_ppl(3, atom_b) + f0*force_b(3)
+                        force(kkind)%gth_ppl(1, atom_c) = force(kkind)%gth_ppl(1, atom_c) - f0*force_b(1)
+                        force(kkind)%gth_ppl(2, atom_c) = force(kkind)%gth_ppl(2, atom_c) - f0*force_b(2)
+                        force(kkind)%gth_ppl(3, atom_c) = force(kkind)%gth_ppl(3, atom_c) - f0*force_b(3)
 
                         IF (use_virial) THEN
                            CALL virial_pair_force(virial%pv_virial, f0, force_a, rac)
@@ -526,12 +526,12 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: basis_type
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_core_ppl_ri', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: nexp_max = 30
 
       INTEGER :: atom_a, atom_c, handle, i, iatom, ikind, inode, iset, katom, kkind, maxco, &
-         maxsgf, mepos, n_local, natom, ncoa, nexp_lpot, nexp_ppl, nfun, nkind, nloc, nseta, &
-         nthread, sgfa, sgfb
+                 maxsgf, mepos, n_local, natom, ncoa, nexp_lpot, nexp_ppl, nfun, nkind, nloc, nseta, &
+                 nthread, sgfa, sgfb
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind
       INTEGER, DIMENSION(1:10)                           :: nrloc
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, nct_lpot, npgfa, nsgfa
@@ -641,11 +641,11 @@ CONTAINS
                CALL get_potential(potential=gth_potential, &
                                   nexp_lpot=nexp_lpot, alpha_lpot=alpha_lpot, nct_lpot=nct_lpot, cval_lpot=cval_lpot)
                CPASSERT(nexp_lpot < nexp_max)
-               nexp_ppl = nexp_lpot+1
-               alpha_ppl(2:nexp_lpot+1) = alpha_lpot(1:nexp_lpot)
-               nct_ppl(2:nexp_lpot+1) = nct_lpot(1:nexp_lpot)
+               nexp_ppl = nexp_lpot + 1
+               alpha_ppl(2:nexp_lpot + 1) = alpha_lpot(1:nexp_lpot)
+               nct_ppl(2:nexp_lpot + 1) = nct_lpot(1:nexp_lpot)
                DO i = 1, nexp_lpot
-                  cval_ppl(1:nct_lpot(i), i+1) = cval_lpot(1:nct_lpot(i), i)
+                  cval_ppl(1:nct_lpot(i), i + 1) = cval_lpot(1:nct_lpot(i), i)
                END DO
             END IF
          ELSE IF (ASSOCIATED(sgp_potential)) THEN
@@ -655,7 +655,7 @@ CONTAINS
                IF (SUM(ABS(aloc(1:nloc))) < 1.0e-12_dp) CYCLE
                nexp_ppl = nloc
                CPASSERT(nexp_ppl <= nexp_max)
-               nct_ppl(1:nloc) = nrloc(1:nloc)-1
+               nct_ppl(1:nloc) = nrloc(1:nloc) - 1
                alpha_ppl(1:nloc) = bloc(1:nloc)
                cval_ppl(1, 1:nloc) = aloc(1:nloc)
             ELSE
@@ -671,12 +671,12 @@ CONTAINS
          END IF
 
          dac = SQRT(SUM(rac*rac))
-         IF ((MAXVAL(set_radius_a(:))+ppl_radius < dac)) CYCLE
+         IF ((MAXVAL(set_radius_a(:)) + ppl_radius < dac)) CYCLE
          IF (calculate_forces) force_a = 0.0_dp
          work(1:nfun) = 0.0_dp
 
          DO iset = 1, nseta
-            IF (set_radius_a(iset)+ppl_radius < dac) CYCLE
+            IF (set_radius_a(iset) + ppl_radius < dac) CYCLE
             ! integrals
             IF (calculate_forces) THEN
                va = 0.0_dp
@@ -694,28 +694,28 @@ CONTAINS
             END IF
             ! contraction
             sgfa = first_sgfa(1, iset)
-            sgfb = sgfa+nsgfa(iset)-1
+            sgfb = sgfa + nsgfa(iset) - 1
             ncoa = npgfa(iset)*ncoset(la_max(iset))
             bcon => sphi_a(1:ncoa, sgfa:sgfb)
             work(sgfa:sgfb) = MATMUL(TRANSPOSE(bcon), va(1:ncoa))
             IF (calculate_forces) THEN
                dvas(1:nsgfa(iset), 1:3) = MATMUL(TRANSPOSE(bcon), dva(1:ncoa, 1:3))
-               force_a(1) = force_a(1)+SUM(lri_ppl_coef(ikind)%acoef(atom_a, sgfa:sgfb)*dvas(1:nsgfa(iset), 1))
-               force_a(2) = force_a(2)+SUM(lri_ppl_coef(ikind)%acoef(atom_a, sgfa:sgfb)*dvas(1:nsgfa(iset), 2))
-               force_a(3) = force_a(3)+SUM(lri_ppl_coef(ikind)%acoef(atom_a, sgfa:sgfb)*dvas(1:nsgfa(iset), 3))
+               force_a(1) = force_a(1) + SUM(lri_ppl_coef(ikind)%acoef(atom_a, sgfa:sgfb)*dvas(1:nsgfa(iset), 1))
+               force_a(2) = force_a(2) + SUM(lri_ppl_coef(ikind)%acoef(atom_a, sgfa:sgfb)*dvas(1:nsgfa(iset), 2))
+               force_a(3) = force_a(3) + SUM(lri_ppl_coef(ikind)%acoef(atom_a, sgfa:sgfb)*dvas(1:nsgfa(iset), 3))
             END IF
          END DO
 !$OMP CRITICAL(int_critical)
-         lri_ppl_coef(ikind)%v_int(atom_a, 1:nfun) = lri_ppl_coef(ikind)%v_int(atom_a, 1:nfun)+work(1:nfun)
+         lri_ppl_coef(ikind)%v_int(atom_a, 1:nfun) = lri_ppl_coef(ikind)%v_int(atom_a, 1:nfun) + work(1:nfun)
 !$OMP END CRITICAL(int_critical)
          IF (calculate_forces) THEN
 !$OMP CRITICAL(force_critical)
-            force(ikind)%gth_ppl(1, atom_a) = force(ikind)%gth_ppl(1, atom_a)+force_a(1)
-            force(ikind)%gth_ppl(2, atom_a) = force(ikind)%gth_ppl(2, atom_a)+force_a(2)
-            force(ikind)%gth_ppl(3, atom_a) = force(ikind)%gth_ppl(3, atom_a)+force_a(3)
-            force(kkind)%gth_ppl(1, atom_c) = force(kkind)%gth_ppl(1, atom_c)-force_a(1)
-            force(kkind)%gth_ppl(2, atom_c) = force(kkind)%gth_ppl(2, atom_c)-force_a(2)
-            force(kkind)%gth_ppl(3, atom_c) = force(kkind)%gth_ppl(3, atom_c)-force_a(3)
+            force(ikind)%gth_ppl(1, atom_a) = force(ikind)%gth_ppl(1, atom_a) + force_a(1)
+            force(ikind)%gth_ppl(2, atom_a) = force(ikind)%gth_ppl(2, atom_a) + force_a(2)
+            force(ikind)%gth_ppl(3, atom_a) = force(ikind)%gth_ppl(3, atom_a) + force_a(3)
+            force(kkind)%gth_ppl(1, atom_c) = force(kkind)%gth_ppl(1, atom_c) - force_a(1)
+            force(kkind)%gth_ppl(2, atom_c) = force(kkind)%gth_ppl(2, atom_c) - force_a(2)
+            force(kkind)%gth_ppl(3, atom_c) = force(kkind)%gth_ppl(3, atom_c) - force_a(3)
             IF (use_virial) THEN
                CALL virial_pair_force(virial%pv_virial, 1.0_dp, force_a, rac)
             END IF

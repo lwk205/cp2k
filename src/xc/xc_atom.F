@@ -6,23 +6,23 @@
 ! **************************************************************************************************
 MODULE xc_atom
 
-   USE cp_linked_list_xc_deriv,         ONLY: cp_sll_xc_deriv_next,&
-                                              cp_sll_xc_deriv_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE pw_pool_types,                   ONLY: pw_pool_type
-   USE pw_types,                        ONLY: pw_p_type
-   USE xc,                              ONLY: divide_by_norm_drho,&
-                                              xc_calc_2nd_deriv
-   USE xc_derivative_set_types,         ONLY: xc_derivative_set_type,&
-                                              xc_dset_get_derivative
-   USE xc_derivative_types,             ONLY: xc_derivative_get,&
-                                              xc_derivative_type
-   USE xc_derivatives,                  ONLY: xc_functionals_eval
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_type
-   USE xc_rho_set_types,                ONLY: xc_rho_set_get,&
-                                              xc_rho_set_type
+   USE cp_linked_list_xc_deriv, ONLY: cp_sll_xc_deriv_next, &
+                                      cp_sll_xc_deriv_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE pw_pool_types, ONLY: pw_pool_type
+   USE pw_types, ONLY: pw_p_type
+   USE xc, ONLY: divide_by_norm_drho, &
+                 xc_calc_2nd_deriv
+   USE xc_derivative_set_types, ONLY: xc_derivative_set_type, &
+                                      xc_dset_get_derivative
+   USE xc_derivative_types, ONLY: xc_derivative_get, &
+                                  xc_derivative_type
+   USE xc_derivatives, ONLY: xc_functionals_eval
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_type
+   USE xc_rho_set_types, ONLY: xc_rho_set_get, &
+                               xc_rho_set_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -159,7 +159,7 @@ CONTAINS
             exc = 0.0_dp
             DO ir = 1, nr
                DO ia = 1, na
-                  exc = exc+deriv_data(ia, ir, 1)*w(ia, ir)
+                  exc = exc + deriv_data(ia, ir, 1)*w(ia, ir)
                END DO
             END DO
             NULLIFY (deriv_data)
@@ -172,7 +172,7 @@ CONTAINS
             exc = 0.0_dp
             DO ir = 1, nr
                DO ia = 1, na
-                  exc = exc+deriv_data(ia, ir, 1)*w(ia, ir)
+                  exc = exc + deriv_data(ia, ir, 1)*w(ia, ir)
                END DO
             END DO
             NULLIFY (deriv_data)
@@ -196,8 +196,8 @@ CONTAINS
                deriv_att => xc_dset_get_derivative(deriv_set, "(rho)")
                IF (ASSOCIATED(deriv_att)) THEN
                   CALL xc_derivative_get(deriv_att, deriv_data=deriv_data)
-                  vxc(:, :, 1) = vxc(:, :, 1)+deriv_data(:, :, 1)*w(:, :)*my_adiabatic_rescale_factor
-                  vxc(:, :, 2) = vxc(:, :, 2)+deriv_data(:, :, 1)*w(:, :)*my_adiabatic_rescale_factor
+                  vxc(:, :, 1) = vxc(:, :, 1) + deriv_data(:, :, 1)*w(:, :)*my_adiabatic_rescale_factor
+                  vxc(:, :, 2) = vxc(:, :, 2) + deriv_data(:, :, 1)*w(:, :)*my_adiabatic_rescale_factor
                   NULLIFY (deriv_data)
                END IF
             ELSE
@@ -256,8 +256,8 @@ CONTAINS
                         DO idir = 1, 3
                            IF (rho_set%norm_drho(ia, ir, 1) > drho_cutoff) THEN
                               vxg(idir, ia, ir, 1:2) = &
-                                 vxg(idir, ia, ir, 1:2)+( &
-                                 rho_set%drhoa(idir)%array(ia, ir, 1)+ &
+                                 vxg(idir, ia, ir, 1:2) + ( &
+                                 rho_set%drhoa(idir)%array(ia, ir, 1) + &
                                  rho_set%drhob(idir)%array(ia, ir, 1))* &
                                  deriv_data(ia, ir, 1)*w(ia, ir)/rho_set%norm_drho(ia, ir, 1)* &
                                  my_adiabatic_rescale_factor
@@ -344,7 +344,7 @@ CONTAINS
       REAL(dp), DIMENSION(:, :, :, :), POINTER           :: vxg
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'xc_2nd_deriv_of_r', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
       LOGICAL                                            :: lsd
@@ -429,7 +429,7 @@ CONTAINS
       INTEGER, DIMENSION(2, 3), INTENT(IN)               :: bo
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'xc_rho_set_atom_update', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: idir
 
@@ -670,7 +670,7 @@ CONTAINS
             ! this should never be the case unless you use LDA functionals with LSD
             IF (.NOT. tddft_split) THEN
                DO ia = 1, na
-                  rho_set%rho(ia, ir, 1) = rho(ia, 1)+rho(ia, 2)
+                  rho_set%rho(ia, ir, 1) = rho(ia, 1) + rho(ia, 2)
                END DO
             ELSE
                DO ia = 1, na
@@ -684,7 +684,7 @@ CONTAINS
          IF (needs%rho_1_3) THEN
             IF (.NOT. tddft_split) THEN
                DO ia = 1, na
-                  rho_set%rho_1_3(ia, ir, 1) = MAX(rho(ia, 1)+rho(ia, 2), 0.0_dp)**f13
+                  rho_set%rho_1_3(ia, ir, 1) = MAX(rho(ia, 1) + rho(ia, 2), 0.0_dp)**f13
                END DO
             ELSE
                DO ia = 1, na
@@ -731,9 +731,9 @@ CONTAINS
             IF (.NOT. tddft_split) THEN
                DO ia = 1, na
                   rho_set%norm_drho(ia, ir, 1) = SQRT( &
-                                                 (drho(1, ia, ir, 1)+drho(1, ia, ir, 2))**2+ &
-                                                 (drho(2, ia, ir, 1)+drho(2, ia, ir, 2))**2+ &
-                                                 (drho(3, ia, ir, 1)+drho(3, ia, ir, 2))**2)
+                                                 (drho(1, ia, ir, 1) + drho(1, ia, ir, 2))**2 + &
+                                                 (drho(2, ia, ir, 1) + drho(2, ia, ir, 2))**2 + &
+                                                 (drho(3, ia, ir, 1) + drho(3, ia, ir, 2))**2)
                END DO
             ELSE
                DO ia = 1, na
@@ -768,8 +768,8 @@ CONTAINS
             IF (.NOT. tddft_split) THEN
                DO ia = 1, na
                   rho_set%drhoa_drhob(ia, ir, 1) = &
-                     (drho(1, ia, ir, 1)*drho(1, ia, ir, 2))+ &
-                     (drho(2, ia, ir, 1)*drho(2, ia, ir, 2))+ &
+                     (drho(1, ia, ir, 1)*drho(1, ia, ir, 2)) + &
+                     (drho(2, ia, ir, 1)*drho(2, ia, ir, 2)) + &
                      (drho(3, ia, ir, 1)*drho(3, ia, ir, 2))
                END DO
             ELSE
@@ -789,7 +789,7 @@ CONTAINS
             IF (.NOT. tddft_split) THEN
                DO idir = 1, 3
                   DO ia = 1, na
-                     rho_set%drho(idir)%array(ia, ir, 1) = drho(idir, ia, ir, 1)+drho(idir, ia, ir, 2)
+                     rho_set%drho(idir)%array(ia, ir, 1) = drho(idir, ia, ir, 1) + drho(idir, ia, ir, 2)
                   END DO
                END DO
             ELSE
@@ -833,7 +833,7 @@ CONTAINS
       IF (needs%tau) THEN
          IF (my_nspins == 2) THEN
             DO ia = 1, na
-               rho_set%tau(ia, ir, 1) = tau(ia, 1)+tau(ia, 2)
+               rho_set%tau(ia, ir, 1) = tau(ia, 1) + tau(ia, 2)
             END DO
             rho_set%owns%tau = .TRUE.
             rho_set%has%tau = .TRUE.

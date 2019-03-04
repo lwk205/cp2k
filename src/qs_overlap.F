@@ -14,50 +14,50 @@
 !> \author Matthias Krack (03.09.2001,25.06.2003)
 ! **************************************************************************************************
 MODULE qs_overlap
-   USE ai_contraction,                  ONLY: block_add,&
-                                              contraction,&
-                                              decontraction,&
-                                              force_trace
-   USE ai_overlap,                      ONLY: overlap_ab
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE block_p_types,                   ONLY: block_p_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_create, dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, dbcsr_get_block_p, &
-        dbcsr_p_type, dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry, &
-        dbcsr_type_symmetric
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE orbital_pointers,                ONLY: indco,&
-                                              ncoset
-   USE orbital_symbols,                 ONLY: cgf_symbol
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_integral_utils,               ONLY: basis_set_list_setup,&
-                                              get_memory_usage
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              get_neighbor_list_set_p,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE string_utilities,                ONLY: compress,&
-                                              uppercase
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE ai_contraction, ONLY: block_add, &
+                             contraction, &
+                             decontraction, &
+                             force_trace
+   USE ai_overlap, ONLY: overlap_ab
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE block_p_types, ONLY: block_p_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE dbcsr_api, ONLY: &
+      dbcsr_create, dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, dbcsr_get_block_p, &
+      dbcsr_p_type, dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry, &
+      dbcsr_type_symmetric
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE orbital_pointers, ONLY: indco, &
+                               ncoset
+   USE orbital_symbols, ONLY: cgf_symbol
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_integral_utils, ONLY: basis_set_list_setup, &
+                                get_memory_usage
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     get_neighbor_list_set_p, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE string_utilities, ONLY: compress, &
+                               uppercase
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num
 #include "./base/base_uses.f90"
@@ -132,11 +132,11 @@ CONTAINS
          POINTER                                         :: matrixkp_p
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_overlap_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_a, atom_b, handle, i, iatom, ic, icol, ikind, irow, iset, jatom, jkind, &
-         jset, ldsab, maxder, maxs, mepos, n1, n2, natom, ncoa, ncob, nder, nimg, nkind, nseta, &
-         nsetb, nthread, sgfa, sgfb
+                 jset, ldsab, maxder, maxs, mepos, n1, n2, natom, ncoa, ncob, nder, nimg, nkind, nseta, &
+                 nsetb, nthread, sgfa, sgfb
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind
       INTEGER, DIMENSION(3)                              :: cell
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, npgfa, &
@@ -354,21 +354,21 @@ CONTAINS
          END IF
          trans = do_symmetric .AND. (iatom > jatom)
 
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
          dab = SQRT(rab2)
 
          DO iset = 1, nseta
 
             ncoa = npgfa(iset)*ncoset(la_max(iset))
-            n1 = npgfa(iset)*(ncoset(la_max(iset))-ncoset(la_min(iset)-1))
+            n1 = npgfa(iset)*(ncoset(la_max(iset)) - ncoset(la_min(iset) - 1))
             sgfa = first_sgfa(1, iset)
 
             DO jset = 1, nsetb
 
-               IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+               IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
 
                ncob = npgfb(jset)*ncoset(lb_max(jset))
-               n2 = npgfb(jset)*(ncoset(lb_max(jset))-ncoset(lb_min(jset)-1))
+               n2 = npgfb(jset)*(ncoset(lb_max(jset)) - ncoset(lb_min(jset) - 1))
                sgfb = first_sgfb(1, jset)
 
                ! calculate integrals and derivatives
@@ -396,8 +396,8 @@ CONTAINS
                                      trans=trans)
                   CALL force_trace(force_a, oint(:, :, 2:4), pmat, n1, n2, 3)
 !$OMP CRITICAL(forceupdate)
-                  force(ikind)%overlap(:, atom_a) = force(ikind)%overlap(:, atom_a)-ff*force_a(:)
-                  force(jkind)%overlap(:, atom_b) = force(jkind)%overlap(:, atom_b)+ff*force_a(:)
+                  force(ikind)%overlap(:, atom_a) = force(ikind)%overlap(:, atom_a) - ff*force_a(:)
+                  force(jkind)%overlap(:, atom_b) = force(jkind)%overlap(:, atom_b) + ff*force_a(:)
                   IF (use_virial) THEN
                      CALL virial_pair_force(virial%pv_virial, -f0, force_a, rab)
                   END IF
@@ -472,10 +472,10 @@ CONTAINS
          POINTER                                         :: sab_nl
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_overlap_matrix_simple', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_a, atom_b, handle, iatom, icol, ikind, irow, iset, jatom, jkind, jset, &
-         ldsab, m1, m2, mepos, n1, n2, natom, ncoa, ncob, nkind, nseta, nsetb, nthread, sgfa, sgfb
+                 ldsab, m1, m2, mepos, n1, n2, natom, ncoa, ncob, nkind, nseta, nsetb, nthread, sgfa, sgfb
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, npgfa, &
                                                             npgfb, nsgfa, nsgfb
@@ -599,21 +599,21 @@ CONTAINS
          CPASSERT(found)
          trans = do_symmetric .AND. (iatom > jatom)
 
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
          dab = SQRT(rab2)
 
          DO iset = 1, nseta
 
             ncoa = npgfa(iset)*ncoset(la_max(iset))
-            n1 = npgfa(iset)*(ncoset(la_max(iset))-ncoset(la_min(iset)-1))
+            n1 = npgfa(iset)*(ncoset(la_max(iset)) - ncoset(la_min(iset) - 1))
             sgfa = first_sgfa(1, iset)
 
             DO jset = 1, nsetb
 
-               IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+               IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
 
                ncob = npgfb(jset)*ncoset(lb_max(jset))
-               n2 = npgfb(jset)*(ncoset(lb_max(jset))-ncoset(lb_min(jset)-1))
+               n2 = npgfb(jset)*(ncoset(lb_max(jset)) - ncoset(lb_min(jset) - 1))
                sgfb = first_sgfb(1, jset)
 
                ! calculate integrals and derivatives
@@ -680,10 +680,10 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_p
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_overlap_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, iatom, icol, ikind, inode, irow, iset, jatom, jkind, jset, last_jatom, &
-         ldsab, n1, n2, ncoa, ncob, nder, nkind, nseta, nsetb, sgfa, sgfb
+                 ldsab, n1, n2, ncoa, ncob, nder, nkind, nseta, nsetb, sgfa, sgfb
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, npgfa, &
                                                             npgfb, nsgfa, nsgfb
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgfa, first_sgfb
@@ -793,21 +793,21 @@ CONTAINS
          END IF
          trans = do_symmetric .AND. (iatom > jatom)
 
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
          dab = SQRT(rab2)
 
          DO iset = 1, nseta
 
             ncoa = npgfa(iset)*ncoset(la_max(iset))
-            n1 = npgfa(iset)*(ncoset(la_max(iset))-ncoset(la_min(iset)-1))
+            n1 = npgfa(iset)*(ncoset(la_max(iset)) - ncoset(la_min(iset) - 1))
             sgfa = first_sgfa(1, iset)
 
             DO jset = 1, nsetb
 
-               IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
+               IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
 
                ncob = npgfb(jset)*ncoset(lb_max(jset))
-               n2 = npgfb(jset)*(ncoset(lb_max(jset))-ncoset(lb_min(jset)-1))
+               n2 = npgfb(jset)*(ncoset(lb_max(jset)) - ncoset(lb_min(jset) - 1))
                sgfb = first_sgfb(1, jset)
 
                IF (ASSOCIATED(p_block) .AND. ((iatom /= jatom) .OR. use_virial)) THEN
@@ -821,8 +821,8 @@ CONTAINS
                                   lb_max(jset), lb_min(jset), npgfb(jset), rpgfb(:, jset), zetb(:, jset), &
                                   rab, dab=drab)
                   CALL force_trace(force_a, drab, pab, n1, n2, 3)
-                  force(1:3, iatom) = force(1:3, iatom)-ff*force_a(1:3)
-                  force(1:3, jatom) = force(1:3, jatom)+ff*force_a(1:3)
+                  force(1:3, iatom) = force(1:3, iatom) - ff*force_a(1:3)
+                  force(1:3, jatom) = force(1:3, jatom) + ff*force_a(1:3)
                   IF (use_virial) THEN
                      CALL virial_pair_force(virial%pv_virial, -f0, force_a, rab)
                   END IF
@@ -865,7 +865,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: symmetric
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_sab_matrix_1d', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=12)                                  :: cgfsym
       CHARACTER(LEN=32)                                  :: symmetry_string
@@ -959,7 +959,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: symmetric
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_sab_matrix_2d', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=12)                                  :: cgfsym
       CHARACTER(LEN=32)                                  :: symmetry_string

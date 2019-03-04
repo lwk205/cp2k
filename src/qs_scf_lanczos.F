@@ -12,27 +12,27 @@
 ! **************************************************************************************************
 MODULE qs_scf_lanczos
 
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_qr_factorization,&
-                                              cp_fm_scale_and_add,&
-                                              cp_fm_transpose,&
-                                              cp_fm_triangular_multiply
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_submatrix, cp_fm_p_type, cp_fm_release, cp_fm_set_all, &
-        cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type, cp_fm_vectorsnorm
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_scf_types,                    ONLY: krylov_space_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_qr_factorization, &
+                                 cp_fm_scale_and_add, &
+                                 cp_fm_transpose, &
+                                 cp_fm_triangular_multiply
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_submatrix, cp_fm_p_type, cp_fm_release, cp_fm_set_all, &
+      cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type, cp_fm_vectorsnorm
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_to_string
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_scf_types, ONLY: krylov_space_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -63,7 +63,7 @@ CONTAINS
       TYPE(mo_set_p_type), DIMENSION(:), POINTER         :: mos
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'krylov_space_allocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ik, ispin, max_nmo, nao, nblock, &
                                                             ndim, nk, nmo, nspin
@@ -182,12 +182,12 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: check_moconv_only
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'lanczos_refinement', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rmone = -1.0_dp, rone = 1.0_dp, &
                                                             rzero = 0.0_dp
 
       INTEGER :: hand1, hand2, hand3, hand4, hand5, handle, ib, ik, imo, imo_low, imo_up, it, jt, &
-         nblock, ndim, nmo, nmo_converged, nmo_nc, nmob, num_blocks
+                 nblock, ndim, nmo, nmo_converged, nmo_nc, nmob, num_blocks
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: itaken
       LOGICAL                                            :: my_check_moconv_only
       REAL(dp)                                           :: max_norm, min_norm, vmax
@@ -255,9 +255,9 @@ CONTAINS
       END DO
       DO imo = 1, nmo
          IF (c_res(imo) <= eps_iter) THEN
-            nmo_converged = nmo_converged+1
+            nmo_converged = nmo_converged + 1
          ELSE
-            nmo_nc = nmo-nmo_converged
+            nmo_nc = nmo - nmo_converged
             EXIT
          END IF
       END DO
@@ -277,20 +277,20 @@ CONTAINS
          RETURN
       ELSE IF (krylov_space%nmo_nc > 0) THEN
 
-         CALL cp_fm_to_fm(c0, c1, nmo_nc, nmo_converged+1, 1)
+         CALL cp_fm_to_fm(c0, c1, nmo_nc, nmo_converged + 1, 1)
 
          nblock = krylov_space%nblock
          IF (MODULO(nmo_nc, nblock) > 0.0_dp) THEN
-            num_blocks = nmo_nc/nblock+1
+            num_blocks = nmo_nc/nblock + 1
          ELSE
             num_blocks = nmo_nc/nblock
          END IF
 
          DO ib = 1, num_blocks
 
-            imo_low = (ib-1)*nblock+1
+            imo_low = (ib - 1)*nblock + 1
             imo_up = MIN(ib*nblock, nmo_nc)
-            nmob = imo_up-imo_low+1
+            nmob = imo_up - imo_low + 1
             ndim = krylov_space%nkrylov*nmob
 
             NULLIFY (fm_struct_tmp)
@@ -391,14 +391,14 @@ CONTAINS
                CALL cp_gemm('N', 'N', nao, nmob, nmob, rone, v_mat(ik)%matrix, a_mat, &
                             rzero, c_tmp)
                CALL cp_fm_scale_and_add(rmone, c_tmp, rone, hc)
-               CALL cp_fm_to_fm(v_mat(ik-1)%matrix, hc, nmob, 1, 1)
+               CALL cp_fm_to_fm(v_mat(ik - 1)%matrix, hc, nmob, 1, 1)
                CALL cp_fm_triangular_multiply(b_mat, hc, side='R', transpose_tr=.TRUE., &
                                               n_rows=nao, n_cols=nmob, alpha=rmone)
                CALL cp_fm_scale_and_add(rone, c_tmp, rone, hc)
 
                ! Build the block tridiagonal matrix
-               it = (ik-2)*nmob+1
-               jt = (ik-1)*nmob+1
+               it = (ik - 2)*nmob + 1
+               jt = (ik - 1)*nmob + 1
 
                CALL cp_fm_get_submatrix(a_mat, tblock, 1, 1, nmob, nmob)
                CALL cp_fm_set_submatrix(t_mat, tblock, jt, jt, nmob, nmob)
@@ -421,9 +421,9 @@ CONTAINS
 !        !Compute the refined vectors
             CALL cp_fm_set_all(c2_tmp, rzero)
             DO ik = 1, krylov_space%nkrylov
-               jt = (ik-1)*nmob
+               jt = (ik - 1)*nmob
                CALL cp_gemm('N', 'N', nao, ndim, nmob, rone, v_mat(ik)%matrix, t_vec, rone, c2_tmp, &
-                            b_first_row=(jt+1))
+                            b_first_row=(jt + 1))
             END DO
             DEALLOCATE (tvblock)
 
@@ -454,7 +454,7 @@ CONTAINS
             DEALLOCATE (q_mat)
 
             !Copy in the converged set to enlarge the converged subspace
-            CALL cp_fm_to_fm(v_mat(1)%matrix, c0, nmob, 1, (nmo_converged+imo_low))
+            CALL cp_fm_to_fm(v_mat(1)%matrix, c0, nmob, 1, (nmo_converged + imo_low))
             CALL timestop(hand4)
 
             IF (nmob < nblock) THEN
@@ -519,13 +519,13 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: check_moconv_only
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'lanczos_refinement_2v', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: rmone = -1.0_dp, rone = 1.0_dp, &
                                                             rzero = 0.0_dp
 
       INTEGER :: hand1, hand2, hand3, hand4, hand5, hand6, handle, i, ia, ib, ik, imo, imo_low, &
-         imo_up, info, it, j, jt, liwork, lwork, nblock, ndim, nmo, nmo_converged, nmo_nc, nmob, &
-         num_blocks
+                 imo_up, info, it, j, jt, liwork, lwork, nblock, ndim, nmo, nmo_converged, nmo_nc, nmob, &
+                 num_blocks
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: itaken
       INTEGER, DIMENSION(:), POINTER                     :: iwork
       LOGICAL                                            :: my_check_moconv_only
@@ -600,9 +600,9 @@ CONTAINS
       END DO
       DO imo = 1, nmo
          IF (c_res(imo) <= eps_iter) THEN
-            nmo_converged = nmo_converged+1
+            nmo_converged = nmo_converged + 1
          ELSE
-            nmo_nc = nmo-nmo_converged
+            nmo_nc = nmo - nmo_converged
             EXIT
          END IF
       END DO
@@ -620,20 +620,20 @@ CONTAINS
          ! Do nothing
       ELSE IF (krylov_space%nmo_nc > 0) THEN
 
-         CALL cp_fm_to_fm(c0, c1, nmo_nc, nmo_converged+1, 1)
+         CALL cp_fm_to_fm(c0, c1, nmo_nc, nmo_converged + 1, 1)
 
          nblock = krylov_space%nblock
          IF (MODULO(nmo_nc, nblock) > 0.0_dp) THEN
-            num_blocks = nmo_nc/nblock+1
+            num_blocks = nmo_nc/nblock + 1
          ELSE
             num_blocks = nmo_nc/nblock
          END IF
 
          DO ib = 1, num_blocks
 
-            imo_low = (ib-1)*nblock+1
+            imo_low = (ib - 1)*nblock + 1
             imo_up = MIN(ib*nblock, nmo_nc)
-            nmob = imo_up-imo_low+1
+            nmob = imo_up - imo_low + 1
             ndim = krylov_space%nkrylov*nmob
 
             ! Allocation
@@ -768,32 +768,32 @@ CONTAINS
                CALL cp_fm_scale_and_add(rmone, c_tmp, rone, hc)
 
                IF (SIZE(c_tmp%local_data, 2) == nmob) THEN
-                  a_loc => v_mat(ik-1)%matrix%local_data
+                  a_loc => v_mat(ik - 1)%matrix%local_data
                   DO j = 1, nmob
                      DO i = 1, j
                         DO ia = 1, SIZE(c_tmp%local_data, 1)
-                           b_loc(ia, i) = b_loc(ia, i)-a_loc(ia, j)*b_block(i, j)
+                           b_loc(ia, i) = b_loc(ia, i) - a_loc(ia, j)*b_block(i, j)
                         END DO
                      END DO
                   END DO
                END IF
 
                ! Build the block tridiagonal matrix
-               it = (ik-2)*nmob
-               jt = (ik-1)*nmob
+               it = (ik - 2)*nmob
+               jt = (ik - 1)*nmob
                DO j = 1, nmob
-                  t_mat(jt+1:jt+nmob, jt+j) = a_block(1:nmob, j)
+                  t_mat(jt + 1:jt + nmob, jt + j) = a_block(1:nmob, j)
                   DO i = 1, nmob
-                     t_mat(it+i, jt+j) = b_block(j, i)
-                     t_mat(jt+j, it+i) = b_block(j, i)
+                     t_mat(it + i, jt + j) = b_block(j, i)
+                     t_mat(jt + j, it + i) = b_block(j, i)
                   END DO
                END DO
             END DO ! ik
             CALL timestop(hand2)
 
             CALL timeset(routineN//"_diag_tri", hand3)
-            lwork = 1+6*ndim+2*ndim**2+5000
-            liwork = 5*ndim+3
+            lwork = 1 + 6*ndim + 2*ndim**2 + 5000
+            liwork = 5*ndim + 3
             ALLOCATE (work(lwork))
             ALLOCATE (iwork(liwork))
 
@@ -816,9 +816,9 @@ CONTAINS
                IF (SIZE(c2_tmp%local_data, 2) == ndim) THEN
 !            a_loc => v_mat(ik)%matrix%local_data
                   a_loc => v_tmp%local_data
-                  it = (ik-1)*nmob
+                  it = (ik - 1)*nmob
                   CALL dgemm('N', 'N', SIZE(c2_tmp%local_data, 1), ndim, nmob, 1.0_dp, a_loc(1, 1), &
-                             SIZE(c2_tmp%local_data, 1), t_mat(it+1, 1), ndim, 1.0_dp, &
+                             SIZE(c2_tmp%local_data, 1), t_mat(it + 1, 1), ndim, 1.0_dp, &
                              b_loc(1, 1), SIZE(c2_tmp%local_data, 1))
                END IF
             END DO !ik
@@ -854,7 +854,7 @@ CONTAINS
             DEALLOCATE (q_mat)
 
             !Copy in the converged set to enlarge the converged subspace
-            CALL cp_fm_to_fm(v_mat(1)%matrix, c0, nmob, 1, (nmo_converged+imo_low))
+            CALL cp_fm_to_fm(v_mat(1)%matrix, c0, nmob, 1, (nmo_converged + imo_low))
             CALL timestop(hand4)
 
             CALL cp_fm_release(c2_tmp)

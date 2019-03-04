@@ -10,22 +10,22 @@
 !>                                       (patch by Marcel Baer)
 ! **************************************************************************************************
 MODULE constraint_vsite
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: get_molecule_kind,&
-                                              molecule_kind_type,&
-                                              vsite_constraint_type
-   USE molecule_list_types,             ONLY: molecule_list_type
-   USE molecule_types,                  ONLY: get_molecule,&
-                                              global_constraint_type,&
-                                              molecule_type
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE kinds, ONLY: dp
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_type
+   USE molecule_kind_types, ONLY: get_molecule_kind, &
+                                  molecule_kind_type, &
+                                  vsite_constraint_type
+   USE molecule_list_types, ONLY: molecule_list_type
+   USE molecule_types, ONLY: get_molecule, &
+                             global_constraint_type, &
+                             molecule_type
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -170,14 +170,14 @@ CONTAINS
 
       DO iconst = 1, nvsite
          IF (vsite_list(iconst)%restraint%active) CYCLE
-         index_a = vsite_list(iconst)%a+first_atom-1
-         index_b = vsite_list(iconst)%b+first_atom-1
-         index_c = vsite_list(iconst)%c+first_atom-1
-         index_d = vsite_list(iconst)%d+first_atom-1
+         index_a = vsite_list(iconst)%a + first_atom - 1
+         index_b = vsite_list(iconst)%b + first_atom - 1
+         index_c = vsite_list(iconst)%c + first_atom - 1
+         index_d = vsite_list(iconst)%d + first_atom - 1
 
-         r1(:) = pos(:, index_b)-pos(:, index_c)
-         r2(:) = pos(:, index_d)-pos(:, index_c)
-         pos(:, index_a) = pos(:, index_c)+vsite_list(iconst)%wbc*r1(:)+ &
+         r1(:) = pos(:, index_b) - pos(:, index_c)
+         r2(:) = pos(:, index_d) - pos(:, index_c)
+         pos(:, index_a) = pos(:, index_c) + vsite_list(iconst)%wbc*r1(:) + &
                            vsite_list(iconst)%wdc*r2(:)
       END DO
    END SUBROUTINE shake_vsite_low
@@ -205,18 +205,18 @@ CONTAINS
 
       DO iconst = 1, nvsite
          IF (vsite_list(iconst)%restraint%active) CYCLE
-         index_a = vsite_list(iconst)%a+first_atom-1
-         index_b = vsite_list(iconst)%b+first_atom-1
-         index_c = vsite_list(iconst)%c+first_atom-1
-         index_d = vsite_list(iconst)%d+first_atom-1
+         index_a = vsite_list(iconst)%a + first_atom - 1
+         index_b = vsite_list(iconst)%b + first_atom - 1
+         index_c = vsite_list(iconst)%c + first_atom - 1
+         index_d = vsite_list(iconst)%d + first_atom - 1
 
          wb = vsite_list(iconst)%wbc
          wd = vsite_list(iconst)%wdc
-         wc = 1.0_dp-vsite_list(iconst)%wbc-vsite_list(iconst)%wdc
+         wc = 1.0_dp - vsite_list(iconst)%wbc - vsite_list(iconst)%wdc
 
-         particle_set(index_b)%f(:) = particle_set(index_b)%f(:)+wb*particle_set(index_a)%f(:)
-         particle_set(index_c)%f(:) = particle_set(index_c)%f(:)+wc*particle_set(index_a)%f(:)
-         particle_set(index_d)%f(:) = particle_set(index_d)%f(:)+wd*particle_set(index_a)%f(:)
+         particle_set(index_b)%f(:) = particle_set(index_b)%f(:) + wb*particle_set(index_a)%f(:)
+         particle_set(index_c)%f(:) = particle_set(index_c)%f(:) + wc*particle_set(index_a)%f(:)
+         particle_set(index_d)%f(:) = particle_set(index_d)%f(:) + wd*particle_set(index_a)%f(:)
          particle_set(index_a)%f(:) = 0.0_dp
       END DO
 
@@ -245,18 +245,18 @@ CONTAINS
 
       DO iconst = 1, nvsite
          IF (vsite_list(iconst)%restraint%active) CYCLE
-         index_a = vsite_list(iconst)%a+first_atom-1
-         index_b = vsite_list(iconst)%b+first_atom-1
-         index_c = vsite_list(iconst)%c+first_atom-1
-         index_d = vsite_list(iconst)%d+first_atom-1
+         index_a = vsite_list(iconst)%a + first_atom - 1
+         index_b = vsite_list(iconst)%b + first_atom - 1
+         index_c = vsite_list(iconst)%c + first_atom - 1
+         index_d = vsite_list(iconst)%d + first_atom - 1
 
          wb = vsite_list(iconst)%wbc
          wd = vsite_list(iconst)%wdc
-         wc = 1.0_dp-vsite_list(iconst)%wbc-vsite_list(iconst)%wdc
+         wc = 1.0_dp - vsite_list(iconst)%wbc - vsite_list(iconst)%wdc
 
-         particle_set(index_b)%f(:) = particle_set(index_b)%f(:)+wb*particle_set(index_a)%f(:)
-         particle_set(index_c)%f(:) = particle_set(index_c)%f(:)+wc*particle_set(index_a)%f(:)
-         particle_set(index_d)%f(:) = particle_set(index_d)%f(:)+wd*particle_set(index_a)%f(:)
+         particle_set(index_b)%f(:) = particle_set(index_b)%f(:) + wb*particle_set(index_a)%f(:)
+         particle_set(index_c)%f(:) = particle_set(index_c)%f(:) + wc*particle_set(index_a)%f(:)
+         particle_set(index_d)%f(:) = particle_set(index_d)%f(:) + wd*particle_set(index_a)%f(:)
          particle_set(index_a)%f(:) = 0.0_dp
       END DO
    END SUBROUTINE force_vsite_ext

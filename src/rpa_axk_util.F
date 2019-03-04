@@ -11,21 +11,21 @@
 !> \author Vladimir Rybkin
 ! **************************************************************************************************
 MODULE rpa_axk_util
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE hfx_types,                       ONLY: hfx_create,&
-                                              hfx_type
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE hfx_types, ONLY: hfx_create, &
+                        hfx_type
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -55,7 +55,7 @@ CONTAINS
       INTEGER                                            :: n_rep_hf
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'hfx_create_subgroup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, natom
       LOGICAL                                            :: do_hfx

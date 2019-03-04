@@ -10,38 +10,38 @@
 !> \author Teodoro Laino - Zurich University (2007) [tlaino]
 ! **************************************************************************************************
 MODULE colvar_utils
-   USE cell_types,                      ONLY: cell_type
-   USE colvar_methods,                  ONLY: colvar_eval_mol_f
-   USE colvar_types,                    ONLY: &
-        colvar_counters, colvar_setup, colvar_type, coord_colvar_id, distance_from_path_colvar_id, &
-        gyration_colvar_id, mindist_colvar_id, population_colvar_id, reaction_path_colvar_id, &
-        rmsd_colvar_id
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_constants,                 ONLY: rmsd_all,&
-                                              rmsd_list
-   USE kinds,                           ONLY: dp
-   USE mathlib,                         ONLY: invert_matrix
-   USE memory_utilities,                ONLY: reallocate
-   USE message_passing,                 ONLY: mp_sum
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: colvar_constraint_type,&
-                                              fixd_constraint_type,&
-                                              get_molecule_kind,&
-                                              molecule_kind_type
-   USE molecule_list_types,             ONLY: molecule_list_type
-   USE molecule_types,                  ONLY: get_molecule,&
-                                              global_constraint_type,&
-                                              local_colvar_constraint_type,&
-                                              molecule_type
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE rmsd,                            ONLY: rmsd3
-   USE string_utilities,                ONLY: uppercase
-   USE util,                            ONLY: sort
+   USE cell_types, ONLY: cell_type
+   USE colvar_methods, ONLY: colvar_eval_mol_f
+   USE colvar_types, ONLY: &
+      colvar_counters, colvar_setup, colvar_type, coord_colvar_id, distance_from_path_colvar_id, &
+      gyration_colvar_id, mindist_colvar_id, population_colvar_id, reaction_path_colvar_id, &
+      rmsd_colvar_id
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_constants, ONLY: rmsd_all, &
+                              rmsd_list
+   USE kinds, ONLY: dp
+   USE mathlib, ONLY: invert_matrix
+   USE memory_utilities, ONLY: reallocate
+   USE message_passing, ONLY: mp_sum
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_type
+   USE molecule_kind_types, ONLY: colvar_constraint_type, &
+                                  fixd_constraint_type, &
+                                  get_molecule_kind, &
+                                  molecule_kind_type
+   USE molecule_list_types, ONLY: molecule_list_type
+   USE molecule_types, ONLY: get_molecule, &
+                             global_constraint_type, &
+                             local_colvar_constraint_type, &
+                             molecule_type
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE rmsd, ONLY: rmsd3
+   USE string_utilities, ONLY: uppercase
+   USE util, ONLY: sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -71,7 +71,7 @@ CONTAINS
       INTEGER                                            :: ntot
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'number_of_colvar', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, imol
       LOGICAL                                            :: my_unique, skip_inter_colvar
@@ -101,7 +101,7 @@ CONTAINS
          DO ikind = 1, molecule_kinds%n_els
             molecule_kind => molecule_kind_set(ikind)
             CALL get_molecule_kind(molecule_kind, ncolv=ncolv)
-            ntot = ntot+ncolv%ntot
+            ntot = ntot + ncolv%ntot
          END DO
       ELSE
          MOL: DO imol = 1, SIZE(molecule_set)
@@ -110,13 +110,13 @@ CONTAINS
 
             CALL get_molecule_kind(molecule_kind, &
                                    ncolv=ncolv)
-            ntot = ntot+ncolv%ntot
+            ntot = ntot + ncolv%ntot
          END DO MOL
       END IF
       ! Intermolecular Colvar
       IF (.NOT. skip_inter_colvar) THEN
          IF (ASSOCIATED(gci)) THEN
-            ntot = ntot+gci%ncolv%ntot
+            ntot = ntot + gci%ncolv%ntot
          END IF
       END IF
       CALL timestop(handle)
@@ -134,7 +134,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'set_colvars_target', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ikind, ind, nkind
       TYPE(cell_type), POINTER                           :: cell
@@ -320,9 +320,9 @@ CONTAINS
          CPASSERT(ASSOCIATED(MassI))
          CPASSERT(SIZE(MassI) == natom*3)
          DO i = 1, natom
-            MassI((i-1)*3+1) = 1.0_dp/particle_set(i)%atomic_kind%mass
-            MassI((i-1)*3+2) = 1.0_dp/particle_set(i)%atomic_kind%mass
-            MassI((i-1)*3+3) = 1.0_dp/particle_set(i)%atomic_kind%mass
+            MassI((i - 1)*3 + 1) = 1.0_dp/particle_set(i)%atomic_kind%mass
+            MassI((i - 1)*3 + 2) = 1.0_dp/particle_set(i)%atomic_kind%mass
+            MassI((i - 1)*3 + 3) = 1.0_dp/particle_set(i)%atomic_kind%mass
          END DO
       END IF
       CALL timestop(handle)
@@ -347,12 +347,12 @@ CONTAINS
       TYPE(molecule_type), POINTER                       :: molecule
 
       offset = 0
-      DO j = 1, i-1
+      DO j = 1, i - 1
          molecule => molecule_set(j)
          molecule_kind => molecule%molecule_kind
          CALL get_molecule_kind(molecule_kind, &
                                 ncolv=ncolv)
-         offset = offset+ncolv%ntot
+         offset = offset + ncolv%ntot
       END DO
 
    END FUNCTION get_colvar_offset
@@ -477,8 +477,8 @@ CONTAINS
 
       ival = offset
       DO iconst = 1, SIZE(colv_list)
-         n_tot = n_tot+1
-         ival = ival+1
+         n_tot = n_tot + 1
+         ival = ival + 1
          ! Update colvar
          IF (PRESENT(coords)) THEN
             CALL colvar_eval_mol_f(lcolv(iconst)%colvar, cell, particles=particle_set, &
@@ -492,10 +492,10 @@ CONTAINS
          ! Build the Wilson-Eliashevich Matrix
          IF (PRESENT(Bmatrix)) THEN
             DO iatm = 1, SIZE(lcolv(iconst)%colvar%i_atom)
-               ind = (lcolv(iconst)%colvar%i_atom(iatm)-1)*3
-               Bmatrix(ind+1, ival) = lcolv(iconst)%colvar%dsdr(1, iatm)
-               Bmatrix(ind+2, ival) = lcolv(iconst)%colvar%dsdr(2, iatm)
-               Bmatrix(ind+3, ival) = lcolv(iconst)%colvar%dsdr(3, iatm)
+               ind = (lcolv(iconst)%colvar%i_atom(iatm) - 1)*3
+               Bmatrix(ind + 1, ival) = lcolv(iconst)%colvar%dsdr(1, iatm)
+               Bmatrix(ind + 2, ival) = lcolv(iconst)%colvar%dsdr(2, iatm)
+               Bmatrix(ind + 3, ival) = lcolv(iconst)%colvar%dsdr(3, iatm)
             END DO
          END IF
       END DO
@@ -551,10 +551,10 @@ CONTAINS
          DO j = 1, i
             tmp = 0.0_dp
             DO k = 1, nsize_xyz
-               tmp = tmp+Bmatrix(k, j)*MassI(k)*Bmatrix(k, i)
+               tmp = tmp + Bmatrix(k, j)*MassI(k)*Bmatrix(k, i)
             END DO
-            Mmatrix((i-1)*nsize_int+j) = tmp
-            Mmatrix((j-1)*nsize_int+i) = tmp
+            Mmatrix((i - 1)*nsize_int + j) = tmp
+            Mmatrix((j - 1)*nsize_int + i) = tmp
          END DO
       END DO
       DEALLOCATE (MassI)
@@ -577,7 +577,7 @@ CONTAINS
          POINTER                                         :: particles
 
       CHARACTER(len=*), PARAMETER :: routineN = 'post_process_colvar', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=3)                                   :: name_kind
       INTEGER                                            :: i, ii, j, natoms, nkinds, nr_frame, stat
@@ -594,8 +594,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%coord_param%c_kinds_from(j)) == name_kind) THEN
-                        CALL reallocate(colvar%coord_param%i_at_from, 1, colvar%coord_param%n_atoms_from+1)
-                        colvar%coord_param%n_atoms_from = colvar%coord_param%n_atoms_from+1
+                        CALL reallocate(colvar%coord_param%i_at_from, 1, colvar%coord_param%n_atoms_from + 1)
+                        colvar%coord_param%n_atoms_from = colvar%coord_param%n_atoms_from + 1
                         colvar%coord_param%i_at_from(colvar%coord_param%n_atoms_from) = i
                      END IF
                   END DO
@@ -612,8 +612,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%coord_param%c_kinds_to(j)) == name_kind) THEN
-                        CALL reallocate(colvar%coord_param%i_at_to, 1, colvar%coord_param%n_atoms_to+1)
-                        colvar%coord_param%n_atoms_to = colvar%coord_param%n_atoms_to+1
+                        CALL reallocate(colvar%coord_param%i_at_to, 1, colvar%coord_param%n_atoms_to + 1)
+                        colvar%coord_param%n_atoms_to = colvar%coord_param%n_atoms_to + 1
                         colvar%coord_param%i_at_to(colvar%coord_param%n_atoms_to) = i
                      END IF
                   END DO
@@ -630,8 +630,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%coord_param%c_kinds_to_b(j)) == name_kind) THEN
-                        CALL reallocate(colvar%coord_param%i_at_to_b, 1, colvar%coord_param%n_atoms_to_b+1)
-                        colvar%coord_param%n_atoms_to_b = colvar%coord_param%n_atoms_to_b+1
+                        CALL reallocate(colvar%coord_param%i_at_to_b, 1, colvar%coord_param%n_atoms_to_b + 1)
+                        colvar%coord_param%n_atoms_to_b = colvar%coord_param%n_atoms_to_b + 1
                         colvar%coord_param%i_at_to_b(colvar%coord_param%n_atoms_to_b) = i
                      END IF
                   END DO
@@ -656,8 +656,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%mindist_param%k_coord_from(j)) == name_kind) THEN
-                        CALL reallocate(colvar%mindist_param%i_coord_from, 1, colvar%mindist_param%n_coord_from+1)
-                        colvar%mindist_param%n_coord_from = colvar%mindist_param%n_coord_from+1
+                        CALL reallocate(colvar%mindist_param%i_coord_from, 1, colvar%mindist_param%n_coord_from + 1)
+                        colvar%mindist_param%n_coord_from = colvar%mindist_param%n_coord_from + 1
                         colvar%mindist_param%i_coord_from(colvar%mindist_param%n_coord_from) = i
                      END IF
                   END DO
@@ -674,8 +674,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%mindist_param%k_coord_to(j)) == name_kind) THEN
-                        CALL reallocate(colvar%mindist_param%i_coord_to, 1, colvar%mindist_param%n_coord_to+1)
-                        colvar%mindist_param%n_coord_to = colvar%mindist_param%n_coord_to+1
+                        CALL reallocate(colvar%mindist_param%i_coord_to, 1, colvar%mindist_param%n_coord_to + 1)
+                        colvar%mindist_param%n_coord_to = colvar%mindist_param%n_coord_to + 1
                         colvar%mindist_param%i_coord_to(colvar%mindist_param%n_coord_to) = i
                      END IF
                   END DO
@@ -700,8 +700,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%population_param%c_kinds_from(j)) == name_kind) THEN
-                        CALL reallocate(colvar%population_param%i_at_from, 1, colvar%population_param%n_atoms_from+1)
-                        colvar%population_param%n_atoms_from = colvar%population_param%n_atoms_from+1
+                        CALL reallocate(colvar%population_param%i_at_from, 1, colvar%population_param%n_atoms_from + 1)
+                        colvar%population_param%n_atoms_from = colvar%population_param%n_atoms_from + 1
                         colvar%population_param%i_at_from(colvar%population_param%n_atoms_from) = i
                      END IF
                   END DO
@@ -718,8 +718,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%population_param%c_kinds_to(j)) == name_kind) THEN
-                        CALL reallocate(colvar%population_param%i_at_to, 1, colvar%population_param%n_atoms_to+1)
-                        colvar%population_param%n_atoms_to = colvar%population_param%n_atoms_to+1
+                        CALL reallocate(colvar%population_param%i_at_to, 1, colvar%population_param%n_atoms_to + 1)
+                        colvar%population_param%n_atoms_to = colvar%population_param%n_atoms_to + 1
                         colvar%population_param%i_at_to(colvar%population_param%n_atoms_to) = i
                      END IF
                   END DO
@@ -745,8 +745,8 @@ CONTAINS
                      name_kind = TRIM(particles(i)%atomic_kind%name)
                      CALL uppercase(name_kind)
                      IF (TRIM(colvar%gyration_param%c_kinds(j)) == name_kind) THEN
-                        CALL reallocate(colvar%gyration_param%i_at, 1, colvar%gyration_param%n_atoms+1)
-                        colvar%gyration_param%n_atoms = colvar%gyration_param%n_atoms+1
+                        CALL reallocate(colvar%gyration_param%i_at, 1, colvar%gyration_param%n_atoms + 1)
+                        colvar%gyration_param%n_atoms = colvar%gyration_param%n_atoms + 1
                         colvar%gyration_param%i_at(colvar%gyration_param%n_atoms) = i
                      END IF
                   END DO

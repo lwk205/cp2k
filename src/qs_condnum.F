@@ -9,25 +9,25 @@
 !> \author JGH (14.11.2016)
 ! **************************************************************************************************
 MODULE qs_condnum
-   USE arnoldi_api,                     ONLY: arnoldi_conjugate_gradient,&
-                                              arnoldi_extremal
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_norm
-   USE cp_fm_diag,                      ONLY: cp_fm_power
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_gershgorin_norm, &
-        dbcsr_get_block_diag, dbcsr_get_info, dbcsr_get_matrix_type, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric
-   USE kinds,                           ONLY: dp
-   USE mathlib,                         ONLY: invmat
+   USE arnoldi_api, ONLY: arnoldi_conjugate_gradient, &
+                          arnoldi_extremal
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_basic_linalg, ONLY: cp_fm_norm
+   USE cp_fm_diag, ONLY: cp_fm_power
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_gershgorin_norm, &
+      dbcsr_get_block_diag, dbcsr_get_info, dbcsr_get_matrix_type, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric
+   USE kinds, ONLY: dp
+   USE mathlib, ONLY: invmat
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -66,7 +66,7 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'overlap_condnum', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, maxiter, nbas, ndep
       LOGICAL                                            :: converged
@@ -234,17 +234,17 @@ CONTAINS
          g = dlange("1", nbas, 1, x, nbas, work)
          IF (g <= gg) EXIT
          x(1:nbas) = SIGN(1._dp, x(1:nbas))
-         IF (SUM(ABS(x-xsi)) == 0 .OR. SUM(ABS(x+xsi)) == 0) EXIT
+         IF (SUM(ABS(x - xsi)) == 0 .OR. SUM(ABS(x + xsi)) == 0) EXIT
          xsi(1:nbas) = x(1:nbas)
          CALL dbcsr_solve(amat, x, pmat)
-         k = k+1
+         k = k + 1
          IF (k > 5) EXIT
          IF (SUM(r) == SUM(MAXLOC(ABS(x)))) EXIT
       END DO
       !
       IF (nbas > 1) THEN
          DO i = 1, nbas
-            x(i) = -1._dp**(i+1)*(1._dp+REAL(i-1, dp)/REAL(nbas-1, dp))
+            x(i) = -1._dp**(i + 1)*(1._dp + REAL(i - 1, dp)/REAL(nbas - 1, dp))
          END DO
       ELSE
          x(1) = 1.0_dp
@@ -288,7 +288,7 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: pmat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'smat_precon_diag', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, info, jatom, n
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: sblock

@@ -4,38 +4,38 @@
 !--------------------------------------------------------------------------------------------------!
 
 MODULE optimize_dmfet_potential
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_fm_to_dbcsr
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_copy_general,&
-                                              cp_fm_create,&
-                                              cp_fm_maxabsval,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_init_p,&
-                                              dbcsr_multiply,&
-                                              dbcsr_p_type,&
-                                              dbcsr_release,&
-                                              dbcsr_trace,&
-                                              dbcsr_type,&
-                                              dbcsr_type_no_symmetry
-   USE embed_types,                     ONLY: opt_dmfet_pot_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_fm_to_dbcsr
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_copy_general, &
+                          cp_fm_create, &
+                          cp_fm_maxabsval, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_init_p, &
+                        dbcsr_multiply, &
+                        dbcsr_p_type, &
+                        dbcsr_release, &
+                        dbcsr_trace, &
+                        dbcsr_type, &
+                        dbcsr_type_no_symmetry
+   USE embed_types, ONLY: opt_dmfet_pot_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE

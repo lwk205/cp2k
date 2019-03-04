@@ -11,7 +11,7 @@
 ! **************************************************************************************************
 MODULE force_field_kind_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -127,7 +127,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_bend_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
 
@@ -160,7 +160,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_bond_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
 
@@ -186,7 +186,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_torsion_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
 
@@ -214,7 +214,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_ub_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
 
@@ -239,7 +239,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_impr_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
 
@@ -264,7 +264,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_opbend_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
 
@@ -287,7 +287,7 @@ CONTAINS
       TYPE(bend_kind_type), DIMENSION(:), POINTER        :: bend_kind_set
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'deallocate_bend_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -310,7 +310,7 @@ CONTAINS
       TYPE(bond_kind_type), DIMENSION(:), POINTER        :: bond_kind_set
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'deallocate_bond_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (bond_kind_set)
 
@@ -325,7 +325,7 @@ CONTAINS
       TYPE(torsion_kind_type), INTENT(INOUT)             :: torsion_kind
 
       CHARACTER(len=*), PARAMETER :: routineN = 'torsion_kind_dealloc_ref', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(torsion_kind%k)) THEN
          DEALLOCATE (torsion_kind%k)
@@ -347,7 +347,7 @@ CONTAINS
       TYPE(ub_kind_type), DIMENSION(:), POINTER          :: ub_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ub_kind_dealloc_ref', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (ub_kind_set)
 
@@ -359,7 +359,7 @@ CONTAINS
    SUBROUTINE impr_kind_dealloc_ref()
 
       CHARACTER(len=*), PARAMETER :: routineN = 'impr_kind_dealloc_ref', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !
 ! Questa e' la migliore routine che mente umana abbia concepito! ;-)

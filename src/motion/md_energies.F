@@ -12,73 +12,73 @@
 !>   - New MD data are appended to the old data (15.09.2003,MK)
 ! **************************************************************************************************
 MODULE md_energies
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE averages_types,                  ONLY: average_quantities_type,&
-                                              compute_averages
-   USE barostat_types,                  ONLY: barostat_type
-   USE barostat_utils,                  ONLY: print_barostat_status
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type,&
-                                              use_mixed_force
-   USE input_constants,                 ONLY: npe_f_ensemble,&
-                                              npe_i_ensemble,&
-                                              nph_uniaxial_damped_ensemble,&
-                                              nph_uniaxial_ensemble,&
-                                              npt_f_ensemble,&
-                                              npt_i_ensemble,&
-                                              reftraj_ensemble
-   USE input_cp2k_md,                   ONLY: create_md_section
-   USE input_enumeration_types,         ONLY: enum_i2c,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_get,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_get_keyword,&
-                                              section_release,&
-                                              section_type,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE md_conserved_quantities,         ONLY: calc_nfree_qm,&
-                                              compute_conserved_quantity
-   USE md_ener_types,                   ONLY: md_ener_type,&
-                                              zero_md_ener
-   USE md_environment_types,            ONLY: get_md_env,&
-                                              md_environment_type,&
-                                              set_md_env
-   USE motion_utils,                    ONLY: write_simulation_cell,&
-                                              write_stress_tensor,&
-                                              write_trajectory
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: write_structure_data
-   USE physcon,                         ONLY: angstrom,&
-                                              femtoseconds,&
-                                              kelvin
-   USE qmmm_types,                      ONLY: qmmm_env_type
-   USE qs_linres_polar_utils,           ONLY: write_polarisability_tensor
-   USE reftraj_types,                   ONLY: reftraj_type
-   USE simpar_types,                    ONLY: simpar_type
-   USE thermal_region_types,            ONLY: thermal_regions_type
-   USE thermal_region_utils,            ONLY: print_thermal_regions_temperature
-   USE thermostat_types,                ONLY: thermostats_type
-   USE thermostat_utils,                ONLY: print_thermostats_status
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE averages_types, ONLY: average_quantities_type, &
+                             compute_averages
+   USE barostat_types, ONLY: barostat_type
+   USE barostat_utils, ONLY: print_barostat_status
+   USE cell_types, ONLY: cell_type, &
+                         get_cell
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type, &
+                              use_mixed_force
+   USE input_constants, ONLY: npe_f_ensemble, &
+                              npe_i_ensemble, &
+                              nph_uniaxial_damped_ensemble, &
+                              nph_uniaxial_ensemble, &
+                              npt_f_ensemble, &
+                              npt_i_ensemble, &
+                              reftraj_ensemble
+   USE input_cp2k_md, ONLY: create_md_section
+   USE input_enumeration_types, ONLY: enum_i2c, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_get, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_get_keyword, &
+                                  section_release, &
+                                  section_type, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE md_conserved_quantities, ONLY: calc_nfree_qm, &
+                                      compute_conserved_quantity
+   USE md_ener_types, ONLY: md_ener_type, &
+                            zero_md_ener
+   USE md_environment_types, ONLY: get_md_env, &
+                                   md_environment_type, &
+                                   set_md_env
+   USE motion_utils, ONLY: write_simulation_cell, &
+                           write_stress_tensor, &
+                           write_trajectory
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: write_structure_data
+   USE physcon, ONLY: angstrom, &
+                      femtoseconds, &
+                      kelvin
+   USE qmmm_types, ONLY: qmmm_env_type
+   USE qs_linres_polar_utils, ONLY: write_polarisability_tensor
+   USE reftraj_types, ONLY: reftraj_type
+   USE simpar_types, ONLY: simpar_type
+   USE thermal_region_types, ONLY: thermal_regions_type
+   USE thermal_region_utils, ONLY: print_thermal_regions_temperature
+   USE thermostat_types, ONLY: thermostats_type
+   USE thermostat_utils, ONLY: print_thermostats_status
+   USE virial_types, ONLY: virial_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -110,7 +110,7 @@ CONTAINS
       TYPE(simpar_type), POINTER                         :: simpar
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_md_ener', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nkind
       LOGICAL                                            :: shell_adiabatic
@@ -221,7 +221,7 @@ CONTAINS
       TYPE(md_ener_type), POINTER                        :: md_ener
 
       CHARACTER(len=*), PARAMETER :: routineN = 'md_ener_reftraj', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(force_env_type), POINTER                      :: force_env
       TYPE(reftraj_type), POINTER                        :: reftraj
@@ -233,7 +233,7 @@ CONTAINS
          CALL force_env_get(force_env, potential_energy=md_ener%epot)
       ELSE
          md_ener%epot = reftraj%epot
-         md_ener%delta_epot = (reftraj%epot-reftraj%epot0)/REAL(reftraj%natom, kind=dp)*kelvin
+         md_ener%delta_epot = (reftraj%epot - reftraj%epot0)/REAL(reftraj%natom, kind=dp)*kelvin
       END IF
 
    END SUBROUTINE md_ener_reftraj
@@ -253,7 +253,7 @@ CONTAINS
       TYPE(md_environment_type), POINTER                 :: md_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'md_write_output', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: fmd, my_act, my_pos
       INTEGER                                            :: ene, ener_mix, handle, i, nat, nkind, &
@@ -320,7 +320,7 @@ CONTAINS
       IF (virial%pv_availability) THEN
          pv_scalar = 0._dp
          DO i = 1, 3
-            pv_scalar = pv_scalar+virial%pv_total(i, i)
+            pv_scalar = pv_scalar + virial%pv_total(i, i)
          END DO
          pv_scalar = pv_scalar/3._dp/cell%deth
          pv_scalar = cp_unit_from_cp2k(pv_scalar, "bar")
@@ -357,17 +357,17 @@ CONTAINS
          ! Computing the Hugoniot for NPH calculations
          IF (simpar%ensemble == nph_uniaxial_ensemble .OR. &
              simpar%ensemble == nph_uniaxial_damped_ensemble) THEN
-            IF (simpar%e0 == 0._dp) simpar%e0 = md_ener%epot+md_ener%ekin
-            hugoniot = md_ener%epot+md_ener%ekin-simpar%e0-0.5_dp*(pv_xx_nc+simpar%p0)* &
-                       (simpar%v0-cell%deth)
+            IF (simpar%e0 == 0._dp) simpar%e0 = md_ener%epot + md_ener%ekin
+            hugoniot = md_ener%epot + md_ener%ekin - simpar%e0 - 0.5_dp*(pv_xx_nc + simpar%p0)* &
+                       (simpar%v0 - cell%deth)
          ENDIF
 
          IF (simpar%ensemble == reftraj_ensemble) reftraj%init = init
       ELSE
          ! Performing protocol for anything beyond the first step of MD
          IF (simpar%ensemble == nph_uniaxial_ensemble .OR. simpar%ensemble == nph_uniaxial_damped_ensemble) THEN
-            hugoniot = md_ener%epot+md_ener%ekin-simpar%e0-0.5_dp*(pv_xx_nc+simpar%p0)* &
-                       (simpar%v0-cell%deth)
+            hugoniot = md_ener%epot + md_ener%ekin - simpar%e0 - 0.5_dp*(pv_xx_nc + simpar%p0)* &
+                       (simpar%v0 - cell%deth)
          END IF
 
          IF (simpar%ensemble == reftraj_ensemble) THEN
@@ -619,7 +619,7 @@ CONTAINS
       CHARACTER(LEN=default_string_length), INTENT(IN)   :: my_pos, my_act
 
       CHARACTER(len=*), PARAMETER :: routineN = 'md_write_info_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iw
       TYPE(enumeration_type), POINTER                    :: enum

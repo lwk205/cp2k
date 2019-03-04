@@ -17,25 +17,25 @@
 !>      @version 2.2002
 ! **************************************************************************************************
 MODULE cp_lbfgs_optimizer_gopt
-   USE cp_lbfgs,                        ONLY: setulb
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE force_env_types,                 ONLY: force_env_type
-   USE gopt_f_methods,                  ONLY: gopt_f_io
-   USE gopt_f_types,                    ONLY: gopt_f_release,&
-                                              gopt_f_retain,&
-                                              gopt_f_type
-   USE gopt_param_types,                ONLY: gopt_param_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_walltime
-   USE message_passing,                 ONLY: mp_bcast
+   USE cp_lbfgs, ONLY: setulb
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE force_env_types, ONLY: force_env_type
+   USE gopt_f_methods, ONLY: gopt_f_io
+   USE gopt_f_types, ONLY: gopt_f_release, &
+                           gopt_f_retain, &
+                           gopt_f_type
+   USE gopt_param_types, ONLY: gopt_param_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_walltime
+   USE message_passing, ONLY: mp_bcast
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -209,7 +209,7 @@ CONTAINS
       REAL(kind=dp), INTENT(in), OPTIONAL                :: trust_radius
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, lenwa, n
 
@@ -228,7 +228,7 @@ CONTAINS
                optimizer%para_env, &
                optimizer%obj_funct)
       optimizer%ref_count = 0
-      last_lbfgs_optimizer_id = last_lbfgs_optimizer_id+1
+      last_lbfgs_optimizer_id = last_lbfgs_optimizer_id + 1
       optimizer%id_nr = last_lbfgs_optimizer_id
       n = SIZE(x0)
       optimizer%m = 4
@@ -249,7 +249,7 @@ CONTAINS
       IF (PRESENT(master)) optimizer%master = master
       IF (optimizer%master == optimizer%para_env%mepos) THEN
          !MK This has to be adapted for a new L-BFGS version possibly
-         lenwa = 2*optimizer%m*n+5*n+11*optimizer%m*optimizer%m+8*optimizer%m
+         lenwa = 2*optimizer%m*n + 5*n + 11*optimizer%m*optimizer%m + 8*optimizer%m
          ALLOCATE (optimizer%kind_of_bound(n), optimizer%i_work_array(3*n), &
                    optimizer%isave(44))
          ALLOCATE (optimizer%x(n), optimizer%lower_bound(n), &
@@ -302,11 +302,11 @@ CONTAINS
       TYPE(cp_lbfgs_opt_gopt_type), POINTER              :: optimizer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(optimizer))
       CPASSERT(optimizer%ref_count > 0)
-      optimizer%ref_count = optimizer%ref_count+1
+      optimizer%ref_count = optimizer%ref_count + 1
    END SUBROUTINE cp_opt_gopt_retain
 
 ! **************************************************************************************************
@@ -321,7 +321,7 @@ CONTAINS
       TYPE(cp_lbfgs_opt_gopt_type), POINTER              :: optimizer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -329,7 +329,7 @@ CONTAINS
 
       IF (ASSOCIATED(optimizer)) THEN
          CPASSERT(optimizer%ref_count > 0)
-         optimizer%ref_count = optimizer%ref_count-1
+         optimizer%ref_count = optimizer%ref_count - 1
          IF (optimizer%ref_count == 0) THEN
             optimizer%status = 6
             IF (ASSOCIATED(optimizer%kind_of_bound)) THEN
@@ -420,7 +420,7 @@ CONTAINS
       REAL(kind=dp), INTENT(out), OPTIONAL               :: last_f, f
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_get', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !  call timeset(routineN,handle)
 
@@ -500,7 +500,7 @@ CONTAINS
       TYPE(gopt_param_type), POINTER                     :: gopt_param
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_step', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=5)                                   :: wildcard
       INTEGER                                            :: dataunit, handle, its
@@ -637,11 +637,11 @@ CONTAINS
 
             ! Some IO and Convergence check
             t_now = m_walltime()
-            t_diff = t_now-t_old
+            t_diff = t_now - t_old
             t_old = t_now
             CALL gopt_f_io(optimizer%obj_funct, force_env, force_env%root_section, &
                            its, optimizer%f, dataunit, optimizer%eold, optimizer%emin, wildcard, gopt_param, &
-                           SIZE(optimizer%x), optimizer%x-xold, optimizer%gradient, conv, used_time=t_diff)
+                           SIZE(optimizer%x), optimizer%x - xold, optimizer%gradient, conv, used_time=t_diff)
             CALL mp_bcast(conv, optimizer%master, optimizer%para_env%group)
             CALL cp_print_key_finished_output(dataunit, logger, geo_section, &
                                               "PRINT%PROGRAM_RUN_INFO")
@@ -726,7 +726,7 @@ CONTAINS
       REAL(kind=dp), INTENT(inout), OPTIONAL             :: f, last_f, projected_gradient
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_bcast_res', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(kind=dp), DIMENSION(4)                        :: results
 
@@ -783,7 +783,7 @@ CONTAINS
       LOGICAL                                            :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_next', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !call timeset(routineN,handle)
 
@@ -811,7 +811,7 @@ CONTAINS
       TYPE(cp_lbfgs_opt_gopt_type), POINTER              :: optimizer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_opt_gopt_stop', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !  call timeset(routineN,handle)
 

@@ -8,33 +8,33 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE swarm_master
-   USE cp_external_control,             ONLY: external_control
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE glbopt_master,                   ONLY: glbopt_master_finalize,&
-                                              glbopt_master_init,&
-                                              glbopt_master_steer,&
-                                              glbopt_master_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: swarm_do_glbopt
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length
-   USE swarm_message,                   ONLY: swarm_message_add,&
-                                              swarm_message_equal,&
-                                              swarm_message_file_read,&
-                                              swarm_message_file_write,&
-                                              swarm_message_free,&
-                                              swarm_message_get,&
-                                              swarm_message_type
+   USE cp_external_control, ONLY: external_control
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE glbopt_master, ONLY: glbopt_master_finalize, &
+                            glbopt_master_init, &
+                            glbopt_master_steer, &
+                            glbopt_master_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: swarm_do_glbopt
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length
+   USE swarm_message, ONLY: swarm_message_add, &
+                            swarm_message_equal, &
+                            swarm_message_file_read, &
+                            swarm_message_file_write, &
+                            swarm_message_free, &
+                            swarm_message_get, &
+                            swarm_message_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -88,7 +88,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: n_workers
 
       CHARACTER(len=*), PARAMETER :: routineN = 'swarm_master_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_logger_type), POINTER                      :: logger
 
@@ -231,7 +231,7 @@ CONTAINS
       TYPE(swarm_message_type), INTENT(OUT)              :: cmd
 
       CHARACTER(len=*), PARAMETER :: routineN = 'swarm_master_steer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: command, status
       INTEGER                                            :: handle, worker_id
@@ -256,7 +256,7 @@ CONTAINS
 
       IF (.NOT. master%ignore_last_iteration) THEN
          ! There are no queued commands. Do the normal processing.
-         master%i_iteration = master%i_iteration+1
+         master%i_iteration = master%i_iteration + 1
 
          IF (master%iw > 0) WRITE (master%iw, '(A,A,1X,I8,A,A)') ' SWARM| ', REPEAT("*", 15), &
             master%i_iteration, ' Master / Worker Communication  ', REPEAT("*", 15)
@@ -301,8 +301,8 @@ CONTAINS
       ! Don't pollute comlog with "continue waiting"-commands.
       CALL swarm_message_get(report, "status", status)
       CALL swarm_message_get(cmd, "command", command)
-      IF (TRIM(status) == "wait_done") master%n_waiting = master%n_waiting-1
-      IF (TRIM(command) == "wait") master%n_waiting = master%n_waiting+1
+      IF (TRIM(status) == "wait_done") master%n_waiting = master%n_waiting - 1
+      IF (TRIM(command) == "wait") master%n_waiting = master%n_waiting + 1
       IF (master%n_waiting < 0) CPABORT("master%n_waiting < 0")
       IF (TRIM(status) /= "wait_done" .OR. TRIM(command) /= "wait") THEN
          CALL swarm_message_file_write(report, master%comlog_unit)
@@ -325,7 +325,7 @@ CONTAINS
       TYPE(swarm_master_type)                            :: master
 
       CHARACTER(len=*), PARAMETER :: routineN = 'swarm_master_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_logger_type), POINTER                      :: logger
 

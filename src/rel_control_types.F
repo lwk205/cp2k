@@ -12,13 +12,13 @@
 ! **************************************************************************************************
 MODULE rel_control_types
 
-   USE input_constants,                 ONLY: rel_none,&
-                                              rel_pot_full,&
-                                              rel_trans_full,&
-                                              rel_zora_full
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
+   USE input_constants, ONLY: rel_none, &
+                              rel_pot_full, &
+                              rel_trans_full, &
+                              rel_zora_full
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -108,7 +108,7 @@ CONTAINS
       CPASSERT(ASSOCIATED(rel_control))
 
       CPASSERT(rel_control%ref_count > 0)
-      rel_control%ref_count = rel_control%ref_count+1
+      rel_control%ref_count = rel_control%ref_count + 1
 
    END SUBROUTINE rel_c_retain
 
@@ -130,7 +130,7 @@ CONTAINS
 
       IF (ASSOCIATED(rel_control)) THEN
          CPASSERT(rel_control%ref_count > 0)
-         rel_control%ref_count = rel_control%ref_count-1
+         rel_control%ref_count = rel_control%ref_count - 1
          IF (rel_control%ref_count < 1) THEN
             DEALLOCATE (rel_control)
          END IF
@@ -156,7 +156,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rel_c_read_parameters', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_vals_type), POINTER                   :: rel_section
 

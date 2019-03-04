@@ -5,53 +5,53 @@
 
 ! **************************************************************************************************
 MODULE atom_energy
-   USE atom_admm_methods,               ONLY: atom_admm
-   USE atom_electronic_structure,       ONLY: calculate_atom
-   USE atom_fit,                        ONLY: atom_fit_density,&
-                                              atom_fit_kgpot
-   USE atom_grb,                        ONLY: atom_grb_construction
-   USE atom_operators,                  ONLY: atom_int_release,&
-                                              atom_int_setup,&
-                                              atom_ppint_release,&
-                                              atom_ppint_setup,&
-                                              atom_relint_release,&
-                                              atom_relint_setup
-   USE atom_output,                     ONLY: atom_print_basis,&
-                                              atom_print_info,&
-                                              atom_print_method,&
-                                              atom_print_orbitals,&
-                                              atom_print_potential,&
-                                              atom_write_pseudo_param
-   USE atom_sgp,                        ONLY: atom_sgp_construction
-   USE atom_types,                      ONLY: &
-        atom_basis_type, atom_gthpot_type, atom_integrals, atom_optimization_type, atom_orbitals, &
-        atom_p_type, atom_potential_type, atom_state, atom_type, create_atom_orbs, &
-        create_atom_type, gth_pseudo, init_atom_basis, init_atom_potential, lmat, &
-        read_atom_opt_section, release_atom_basis, release_atom_potential, release_atom_type, &
-        set_atom
-   USE atom_utils,                      ONLY: &
-        atom_completeness, atom_condnumber, atom_consistent_method, atom_core_density, &
-        atom_density, atom_local_potential, atom_read_external_density, atom_read_external_vxc, &
-        atom_set_occupation, atom_write_zmp_restart, get_maxl_occ, get_maxn_occ
-   USE atom_xc,                         ONLY: calculate_atom_ext_vxc,&
-                                              calculate_atom_zmp
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_constants,                 ONLY: do_analytic
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: dfac,&
-                                              gamma1,&
-                                              pi
-   USE periodic_table,                  ONLY: nelem,&
-                                              ptable
-   USE physcon,                         ONLY: bohr
+   USE atom_admm_methods, ONLY: atom_admm
+   USE atom_electronic_structure, ONLY: calculate_atom
+   USE atom_fit, ONLY: atom_fit_density, &
+                       atom_fit_kgpot
+   USE atom_grb, ONLY: atom_grb_construction
+   USE atom_operators, ONLY: atom_int_release, &
+                             atom_int_setup, &
+                             atom_ppint_release, &
+                             atom_ppint_setup, &
+                             atom_relint_release, &
+                             atom_relint_setup
+   USE atom_output, ONLY: atom_print_basis, &
+                          atom_print_info, &
+                          atom_print_method, &
+                          atom_print_orbitals, &
+                          atom_print_potential, &
+                          atom_write_pseudo_param
+   USE atom_sgp, ONLY: atom_sgp_construction
+   USE atom_types, ONLY: &
+      atom_basis_type, atom_gthpot_type, atom_integrals, atom_optimization_type, atom_orbitals, &
+      atom_p_type, atom_potential_type, atom_state, atom_type, create_atom_orbs, &
+      create_atom_type, gth_pseudo, init_atom_basis, init_atom_potential, lmat, &
+      read_atom_opt_section, release_atom_basis, release_atom_potential, release_atom_type, &
+      set_atom
+   USE atom_utils, ONLY: &
+      atom_completeness, atom_condnumber, atom_consistent_method, atom_core_density, &
+      atom_density, atom_local_potential, atom_read_external_density, atom_read_external_vxc, &
+      atom_set_occupation, atom_write_zmp_restart, get_maxl_occ, get_maxn_occ
+   USE atom_xc, ONLY: calculate_atom_ext_vxc, &
+                      calculate_atom_zmp
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_constants, ONLY: do_analytic
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: dfac, &
+                            gamma1, &
+                            pi
+   USE periodic_table, ONLY: nelem, &
+                             ptable
+   USE physcon, ONLY: bohr
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -74,7 +74,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: atom_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_energy_opt', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: elem
       CHARACTER(LEN=default_string_length)               :: filename
@@ -101,8 +101,8 @@ CONTAINS
       TYPE(atom_state), POINTER                          :: state
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(section_vals_type), POINTER :: admm_section, basis_section, external_vxc_section, &
-         method_section, opt_section, potential_section, powell_section, sgp_section, xc_section, &
-         zmp_restart_section, zmp_section
+                                          method_section, opt_section, potential_section, powell_section, sgp_section, xc_section, &
+                                          zmp_restart_section, zmp_section
 
       CALL timeset(routineN, handle)
 
@@ -159,7 +159,7 @@ CONTAINS
       maxn = 0
       CALL section_vals_val_get(atom_section, "CALCULATE_STATES", i_vals=cn)
       DO in = 1, MIN(SIZE(cn), 4)
-         maxn(in-1) = cn(in)
+         maxn(in - 1) = cn(in)
       END DO
       DO in = 0, lmat
          maxn(in) = MIN(maxn(in), ae_basis%nbas(in))
@@ -253,7 +253,7 @@ CONTAINS
                ! get and set the core occupations
                CALL section_vals_val_get(atom_section, "CORE", c_vals=tmpstringlist)
                CALL atom_set_occupation(tmpstringlist, state%core, pocc)
-               zcore = zval-NINT(SUM(state%core))
+               zcore = zval - NINT(SUM(state%core))
                CALL set_atom(atom_info(in, im)%atom, zcore=zcore, pp_calc=.TRUE.)
             ELSE
                state%core = 0._dp
@@ -478,7 +478,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nder, iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_response_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ider, j, k, l, lhomo, m, n, nhomo, &
                                                             s1, s2
@@ -513,14 +513,14 @@ CONTAINS
       s1 = SIZE(atom%orbitals%wfn, 1)
       s2 = SIZE(atom%orbitals%wfn, 2)
       ALLOCATE (wfn(s1, s2, 0:lmat, -nder:nder))
-      s2 = MAXVAL(state%maxn_occ)+nder
+      s2 = MAXVAL(state%maxn_occ) + nder
       ALLOCATE (rbasis(s1, s2, 0:lmat))
       rbasis = 0._dp
 
       DO ider = -nder, nder
          dene = REAL(ider, KIND=dp)*delta
          CPASSERT(fhomo > ABS(dene))
-         state%occupation(lhomo, nhomo) = fhomo+dene
+         state%occupation(lhomo, nhomo) = fhomo + dene
          CALL calculate_atom(atom, iw=0, noguess=.TRUE.)
          wfn(:, :, :, ider) = atom%orbitals%wfn
          state%occupation(lhomo, nhomo) = fhomo
@@ -536,24 +536,24 @@ CONTAINS
             i = MAX(state%maxn_occ(l), 1)
             SELECT CASE (ider)
             CASE (1)
-               rbasis(:, i+1, l) = 0.5_dp*(wfn(:, i, l, 1)-wfn(:, i, l, -1))/delta
+               rbasis(:, i + 1, l) = 0.5_dp*(wfn(:, i, l, 1) - wfn(:, i, l, -1))/delta
             CASE (2)
-               rbasis(:, i+2, l) = 0.25_dp*(wfn(:, i, l, 2)-2._dp*wfn(:, i, l, 0)+wfn(:, i, l, -2))/delta**2
+               rbasis(:, i + 2, l) = 0.25_dp*(wfn(:, i, l, 2) - 2._dp*wfn(:, i, l, 0) + wfn(:, i, l, -2))/delta**2
             CASE (3)
-               rbasis(:, i+3, l) = 0.125_dp*(wfn(:, i, l, 3)-3._dp*wfn(:, i, l, 1) &
-                                             +3._dp*wfn(:, i, l, -1)-wfn(:, i, l, -3))/delta**3
+               rbasis(:, i + 3, l) = 0.125_dp*(wfn(:, i, l, 3) - 3._dp*wfn(:, i, l, 1) &
+                                               + 3._dp*wfn(:, i, l, -1) - wfn(:, i, l, -3))/delta**3
             CASE DEFAULT
                CPABORT("")
             END SELECT
          END DO
 
          ! orthogonalization, use gram-schmidt in order to keep the natural order (semi-core, valence, response) of the wfn.
-         n = state%maxn_occ(l)+nder
+         n = state%maxn_occ(l) + nder
          m = atom%basis%nbas(l)
          DO i = 1, n
-            DO j = 1, i-1
+            DO j = 1, i - 1
                o = DOT_PRODUCT(rbasis(1:m, j, l), RESHAPE(MATMUL(ovlp(1:m, 1:m, l), rbasis(1:m, i:i, l)), (/m/)))
-               rbasis(1:m, i, l) = rbasis(1:m, i, l)-o*rbasis(1:m, j, l)
+               rbasis(1:m, i, l) = rbasis(1:m, i, l) - o*rbasis(1:m, j, l)
             ENDDO
             o = DOT_PRODUCT(rbasis(1:m, i, l), RESHAPE(MATMUL(ovlp(1:m, 1:m, l), rbasis(1:m, i:i, l)), (/m/)))
             rbasis(1:m, i, l) = rbasis(1:m, i, l)/SQRT(o)
@@ -563,7 +563,7 @@ CONTAINS
          ALLOCATE (amat(n, n))
          amat(1:n, 1:n) = MATMUL(TRANSPOSE(rbasis(1:m, 1:n, l)), MATMUL(ovlp(1:m, 1:m, l), rbasis(1:m, 1:n, l)))
          DO i = 1, n
-            amat(i, i) = amat(i, i)-1._dp
+            amat(i, i) = amat(i, i) - 1._dp
          END DO
          IF (MAXVAL(ABS(amat)) > 1.e-12) THEN
             WRITE (iw, '(/,A,G20.10)') " Orthogonality error  ", MAXVAL(ABS(amat))
@@ -574,9 +574,9 @@ CONTAINS
          WRITE (iw, '(/,A,T30,I3)') " Angular momentum :", l
 
          WRITE (iw, '(/,A,I0,A,I0,A)') "             Exponent     Coef.(Quickstep Normalization), first ", &
-            n-nder, " valence ", nder, " response"
-         expzet = 0.25_dp*REAL(2*l+3, dp)
-         prefac = SQRT(SQRT(pi)/2._dp**(l+2)*dfac(2*l+1))
+            n - nder, " valence ", nder, " response"
+         expzet = 0.25_dp*REAL(2*l + 3, dp)
+         prefac = SQRT(SQRT(pi)/2._dp**(l + 2)*dfac(2*l + 1))
          DO i = 1, m
             zeta = (2._dp*atom%basis%am(i, l))**expzet
             WRITE (iw, '(4X,F20.10,4X,15ES20.6)') atom%basis%am(i, l), ((prefac*rbasis(i, k, l)/zeta), k=1, n)
@@ -747,11 +747,11 @@ CONTAINS
          rp(:) = atom%basis%grid%rad
          ef(:) = EXP(-0.5_dp*rp*rp/(rl*rl))
          DO i = 1, pot%nl(l)
-            pf = rl**(l+0.5_dp*(4._dp*i-1._dp))
-            j = l+2*i-1
+            pf = rl**(l + 0.5_dp*(4._dp*i - 1._dp))
+            j = l + 2*i - 1
             pf = SQRT(2._dp)/(pf*SQRT(gamma1(j)))
-            beta(:) = pf*rp**(l+2*i-2)*ef
-            ibeta = ibeta+1
+            beta(:) = pf*rp**(l + 2*i - 2)*ef
+            ibeta = ibeta + 1
             CALL compose(string, "<PP_BETA", counter=ibeta)
             WRITE (iw, '(T8,A)') TRIM(string)
             CALL compose(string, "angular_momentum", ival=l)
@@ -776,8 +776,8 @@ CONTAINS
       dij = 0._dp
       DO l = 0, lmat
          IF (pot%nl(l) == 0) CYCLE
-         ibeta = SUM(pot%nl(0:l-1))+1
-         i = ibeta+pot%nl(l)-1
+         ibeta = SUM(pot%nl(0:l - 1)) + 1
+         i = ibeta + pot%nl(l) - 1
          dij(ibeta:i, ibeta:i) = pot%hnl(1:pot%nl(l), 1:pot%nl(l), l)
       END DO
       WRITE (iw, '(T8,A)') '<PP_DIJ type="real"'
@@ -794,7 +794,7 @@ CONTAINS
       DO l = 0, lmat
          DO i = 1, 10
             IF (ABS(atom%state%occupation(l, i)) == 0._dp) CYCLE
-            nwfn = nwfn+1
+            nwfn = nwfn + 1
             CALL compose(string, "<PP_CHI", counter=nwfn)
             WRITE (iw, '(T8,A)') TRIM(string)
             CALL compose(string, "l", ival=l)
@@ -806,7 +806,7 @@ CONTAINS
             WRITE (iw, '(T12,A)') 'columns="4">'
             beta = 0._dp
             DO k = 1, atom%basis%nbas(l)
-               beta(:) = beta(:)+atom%orbitals%wfn(k, i, l)*atom%basis%bf(:, k, l)
+               beta(:) = beta(:) + atom%orbitals%wfn(k, i, l)*atom%basis%bf(:, k, l)
             END DO
             beta(:) = beta*atom%basis%grid%rad
             IF (up) THEN

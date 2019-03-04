@@ -10,11 +10,11 @@
 ! **************************************************************************************************
 MODULE semi_empirical_int3_utils
 
-   USE input_constants,                 ONLY: do_method_pchg
-   USE kinds,                           ONLY: dp
-   USE semi_empirical_int_arrays,       ONLY: clm_d,&
-                                              indexb
-   USE semi_empirical_types,            ONLY: semi_empirical_type
+   USE input_constants, ONLY: do_method_pchg
+   USE kinds, ONLY: dp
+   USE semi_empirical_int_arrays, ONLY: clm_d, &
+                                        indexb
+   USE semi_empirical_types, ONLY: semi_empirical_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -57,10 +57,10 @@ CONTAINS
       REAL(KIND=dp)                                      :: add, ccc, chrg, pij, pkl, sum
 
       sum = 0.0_dp
-      l1 = ABS(li-lj)
-      lij = indexb(li+1, lj+1)
-      l2 = ABS(lk-ll)
-      lkl = indexb(lk+1, ll+1)
+      l1 = ABS(li - lj)
+      lij = indexb(li + 1, lj + 1)
+      l2 = ABS(lk - ll)
+      lkl = indexb(lk + 1, ll + 1)
 
       ! Standard value of the integral
       IF (l1 == 0) THEN
@@ -92,7 +92,7 @@ CONTAINS
          IF (itype == do_method_pchg) THEN
             add = 0.0_dp
          ELSE
-            add = (pij+pkl)**2
+            add = (pij + pkl)**2
          END IF
          ccc = clm_d(ij, l1, 0)*clm_d(kl, l2, 0)
          IF (ABS(ccc) > EPSILON(0.0_dp)) THEN

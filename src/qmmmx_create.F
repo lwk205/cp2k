@@ -8,19 +8,19 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE qmmmx_create
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_release,&
-                                              section_vals_type
-   USE qmmm_create,                     ONLY: qmmm_env_create
-   USE qmmm_types,                      ONLY: qmmm_env_get,&
-                                              qmmm_env_release,&
-                                              qmmm_env_type
-   USE qmmmx_types,                     ONLY: qmmmx_env_type
-   USE qmmmx_util,                      ONLY: setup_force_mixing_qmmm_sections,&
-                                              update_force_mixing_labels
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_type
+   USE global_types, ONLY: global_environment_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_release, &
+                                  section_vals_type
+   USE qmmm_create, ONLY: qmmm_env_create
+   USE qmmm_types, ONLY: qmmm_env_get, &
+                         qmmm_env_release, &
+                         qmmm_env_type
+   USE qmmmx_types, ONLY: qmmmx_env_type
+   USE qmmmx_util, ONLY: setup_force_mixing_qmmm_sections, &
+                         update_force_mixing_labels
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -56,7 +56,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: use_motion_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmmx_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_subsys_type), POINTER                      :: subsys
       TYPE(qmmm_env_type), POINTER                       :: dummy_qmmm_env

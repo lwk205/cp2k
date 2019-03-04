@@ -9,36 +9,36 @@
 ! **************************************************************************************************
 MODULE shell_opt
 
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cg_optimizer,                    ONLY: geoopt_cg
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_add_iter_level,&
-                                              cp_rm_iter_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE gopt_f_types,                    ONLY: gopt_f_create,&
-                                              gopt_f_release,&
-                                              gopt_f_type
-   USE gopt_param_types,                ONLY: gopt_param_read,&
-                                              gopt_param_release,&
-                                              gopt_param_type
-   USE input_constants,                 ONLY: default_shellcore_method_id
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE integrator_utils,                ONLY: tmp_variables_type
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE shell_potential_types,           ONLY: shell_kind_type
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cg_optimizer, ONLY: geoopt_cg
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_add_iter_level, &
+                                 cp_rm_iter_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE gopt_f_types, ONLY: gopt_f_create, &
+                           gopt_f_release, &
+                           gopt_f_type
+   USE gopt_param_types, ONLY: gopt_param_read, &
+                               gopt_param_release, &
+                               gopt_param_type
+   USE input_constants, ONLY: default_shellcore_method_id
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE integrator_utils, ONLY: tmp_variables_type
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE shell_potential_types, ONLY: shell_kind_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -69,7 +69,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: check
 
       CHARACTER(len=*), PARAMETER :: routineN = 'optimize_shell_core', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iat, nshell
       LOGICAL                                            :: do_update, explicit, my_check, optimize
@@ -120,9 +120,9 @@ CONTAINS
       ALLOCATE (dvec_sc(3*nshell))
       ALLOCATE (dvec_sc_0(3*nshell))
       DO i = 1, nshell
-         dvec_sc(1+3*(i-1)) = core_particle_set(i)%r(1)-shell_particle_set(i)%r(1)
-         dvec_sc(2+3*(i-1)) = core_particle_set(i)%r(2)-shell_particle_set(i)%r(2)
-         dvec_sc(3+3*(i-1)) = core_particle_set(i)%r(3)-shell_particle_set(i)%r(3)
+         dvec_sc(1 + 3*(i - 1)) = core_particle_set(i)%r(1) - shell_particle_set(i)%r(1)
+         dvec_sc(2 + 3*(i - 1)) = core_particle_set(i)%r(2) - shell_particle_set(i)%r(2)
+         dvec_sc(3 + 3*(i - 1)) = core_particle_set(i)%r(3) - shell_particle_set(i)%r(3)
       END DO
       dvec_sc_0 = dvec_sc
 
@@ -136,9 +136,9 @@ CONTAINS
                      geo_section, gopt_env, dvec_sc, do_update=do_update)
       IF (.NOT. do_update) THEN
          DO i = 1, nshell
-            shell_particle_set(i)%r(1) = -dvec_sc_0(1+3*(i-1))+core_particle_set(i)%r(1)
-            shell_particle_set(i)%r(2) = -dvec_sc_0(2+3*(i-1))+core_particle_set(i)%r(2)
-            shell_particle_set(i)%r(3) = -dvec_sc_0(3+3*(i-1))+core_particle_set(i)%r(3)
+            shell_particle_set(i)%r(1) = -dvec_sc_0(1 + 3*(i - 1)) + core_particle_set(i)%r(1)
+            shell_particle_set(i)%r(2) = -dvec_sc_0(2 + 3*(i - 1)) + core_particle_set(i)%r(2)
+            shell_particle_set(i)%r(3) = -dvec_sc_0(3 + 3*(i - 1)) + core_particle_set(i)%r(3)
          END DO
       END IF
       CALL cp_rm_iter_level(logger%iter_info, "SHELL_OPT")
@@ -191,7 +191,7 @@ CONTAINS
       LOGICAL, INTENT(INOUT)                             :: optimize
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'check_shell_core_distance', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, iparticle, iparticle_local, &
                                                             itest, nkind, nparticle_local, &
@@ -216,7 +216,7 @@ CONTAINS
 
                   rc(:) = core_particle_set(shell_index)%r(:)
                   rs(:) = shell_particle_set(shell_index)%r(:)
-                  dsc = SQRT((rc(1)-rs(1))**2+(rc(2)-rs(2))**2+(rc(3)-rs(3))**2)
+                  dsc = SQRT((rc(1) - rs(1))**2 + (rc(2) - rs(2))**2 + (rc(3) - rs(3))**2)
                   IF (dsc > shell%max_dist) THEN
                      itest = 1
                   END IF

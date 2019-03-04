@@ -15,18 +15,18 @@
 !>          Dorothea Golze
 ! **************************************************************************************************
 MODULE lri_integrals
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE generic_os_integrals,            ONLY: int_overlap_ab_os,&
-                                              int_overlap_aba_os,&
-                                              int_overlap_abb_os
-   USE generic_shg_integrals,           ONLY: get_abb_same_kind,&
-                                              int_overlap_ab_shg_low,&
-                                              int_overlap_aba_shg_low,&
-                                              int_overlap_abb_shg_low,&
-                                              lri_precalc_angular_shg_part
-   USE kinds,                           ONLY: dp
-   USE lri_environment_types,           ONLY: lri_environment_type,&
-                                              lri_int_type
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE generic_os_integrals, ONLY: int_overlap_ab_os, &
+                                   int_overlap_aba_os, &
+                                   int_overlap_abb_os
+   USE generic_shg_integrals, ONLY: get_abb_same_kind, &
+                                    int_overlap_ab_shg_low, &
+                                    int_overlap_aba_shg_low, &
+                                    int_overlap_abb_shg_low, &
+                                    lri_precalc_angular_shg_part
+   USE kinds, ONLY: dp
+   USE lri_environment_types, ONLY: lri_environment_type, &
+                                    lri_int_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -600,7 +600,7 @@ CONTAINS
                                                             skip_dabb
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'allocate_int_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: do_aba, do_abb, do_daba, do_dabb, &
                                                             do_dsab, do_dsoo, do_sab, do_soo
@@ -682,7 +682,7 @@ CONTAINS
       TYPE(dint_type), INTENT(INOUT), OPTIONAL           :: lridint
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'deallocate_int_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(lriint)) THEN
          IF (ALLOCATED(lriint%sabint)) DEALLOCATE (lriint%sabint)

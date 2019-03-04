@@ -9,30 +9,30 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE qmmm_types_low
-   USE cp_eri_mme_interface,            ONLY: cp_eri_mme_finalize,&
-                                              cp_eri_mme_param
-   USE ewald_environment_types,         ONLY: ewald_env_release,&
-                                              ewald_environment_type
-   USE ewald_pw_types,                  ONLY: ewald_pw_release,&
-                                              ewald_pw_type
-   USE force_field_types,               ONLY: deallocate_inp_info,&
-                                              init_inp_info,&
-                                              input_info_type
-   USE input_constants,                 ONLY: do_eri_mme,&
-                                              do_qmmm_none
-   USE kinds,                           ONLY: dp
-   USE particle_types,                  ONLY: allocate_particle_set,&
-                                              deallocate_particle_set,&
-                                              particle_type
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_release
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_release,&
-                                              pw_pool_type,&
-                                              pw_pools_dealloc
-   USE pw_types,                        ONLY: pw_type
-   USE qmmm_gaussian_types,             ONLY: qmmm_gaussian_p_type
+   USE cp_eri_mme_interface, ONLY: cp_eri_mme_finalize, &
+                                   cp_eri_mme_param
+   USE ewald_environment_types, ONLY: ewald_env_release, &
+                                      ewald_environment_type
+   USE ewald_pw_types, ONLY: ewald_pw_release, &
+                             ewald_pw_type
+   USE force_field_types, ONLY: deallocate_inp_info, &
+                                init_inp_info, &
+                                input_info_type
+   USE input_constants, ONLY: do_eri_mme, &
+                              do_qmmm_none
+   USE kinds, ONLY: dp
+   USE particle_types, ONLY: allocate_particle_set, &
+                             deallocate_particle_set, &
+                             particle_type
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_grids, ONLY: pw_grid_release
+   USE pw_pool_types, ONLY: pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_release, &
+                            pw_pool_type, &
+                            pw_pools_dealloc
+   USE pw_types, ONLY: pw_type
+   USE qmmm_gaussian_types, ONLY: qmmm_gaussian_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -261,12 +261,12 @@ CONTAINS
       TYPE(qmmm_env_mm_type), POINTER                    :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_mm_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(qmmm_env))
       ALLOCATE (qmmm_env)
       qmmm_env%ref_count = 1
-      last_qmmm_env_id_nr = last_qmmm_env_id_nr+1
+      last_qmmm_env_id_nr = last_qmmm_env_id_nr + 1
       qmmm_env%id_nr = last_qmmm_env_id_nr
       NULLIFY (qmmm_env%qm_atom_index, &
                qmmm_env%qm_molecule_index, &
@@ -290,11 +290,11 @@ CONTAINS
       TYPE(qmmm_env_mm_type), POINTER                    :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_mm_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(qmmm_env))
       CPASSERT(qmmm_env%ref_count > 0)
-      qmmm_env%ref_count = qmmm_env%ref_count+1
+      qmmm_env%ref_count = qmmm_env%ref_count + 1
    END SUBROUTINE qmmm_env_mm_retain
 
 ! **************************************************************************************************
@@ -307,11 +307,11 @@ CONTAINS
       TYPE(qmmm_env_mm_type), POINTER                    :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_mm_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qmmm_env)) THEN
          CPASSERT(qmmm_env%ref_count > 0)
-         qmmm_env%ref_count = qmmm_env%ref_count-1
+         qmmm_env%ref_count = qmmm_env%ref_count - 1
          IF (qmmm_env%ref_count == 0) THEN
             IF (ASSOCIATED(qmmm_env%qm_atom_index)) THEN
                DEALLOCATE (qmmm_env%qm_atom_index)
@@ -348,12 +348,12 @@ CONTAINS
       TYPE(qmmm_env_qm_type), POINTER                    :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_qm_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(qmmm_env))
       ALLOCATE (qmmm_env)
       qmmm_env%ref_count = 1
-      last_qmmm_env_id_nr = last_qmmm_env_id_nr+1
+      last_qmmm_env_id_nr = last_qmmm_env_id_nr + 1
       qmmm_env%id_nr = last_qmmm_env_id_nr
       NULLIFY (qmmm_env%qm_atom_index, qmmm_env%mm_link_atoms, &
                qmmm_env%mm_atom_index, qmmm_env%mm_atom_chrg, &
@@ -396,11 +396,11 @@ CONTAINS
       TYPE(qmmm_env_qm_type), POINTER                    :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_qm_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qmmm_env)) THEN
          CPASSERT(qmmm_env%ref_count > 0)
-         qmmm_env%ref_count = qmmm_env%ref_count-1
+         qmmm_env%ref_count = qmmm_env%ref_count - 1
          IF (qmmm_env%ref_count == 0) THEN
             IF (ASSOCIATED(qmmm_env%qm_atom_index)) THEN
                DEALLOCATE (qmmm_env%qm_atom_index)
@@ -504,7 +504,7 @@ CONTAINS
       TYPE(qmmm_links_type), POINTER                     :: qmmm_links
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_links_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: I
 
@@ -532,7 +532,7 @@ CONTAINS
       TYPE(image_charge_type), POINTER                   :: image_charge_pot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_image_charge_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(image_charge_pot)) THEN
          IF (ASSOCIATED(image_charge_pot%image_mm_list)) THEN
@@ -556,7 +556,7 @@ CONTAINS
       TYPE(qmmm_pot_p_type), DIMENSION(:), POINTER       :: Potentials
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_pot_type_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: I
 
@@ -584,7 +584,7 @@ CONTAINS
       TYPE(qmmm_per_pot_p_type), DIMENSION(:), POINTER   :: Per_Potentials
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_per_pot_type_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: I
 
@@ -631,7 +631,7 @@ CONTAINS
       TYPE(add_set_type), POINTER                        :: added_charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'add_set_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(added_charges)) THEN
          IF (ASSOCIATED(added_charges%add_env)) THEN
@@ -678,7 +678,7 @@ CONTAINS
       TYPE(add_shell_type), POINTER                      :: added_shells
 
       CHARACTER(len=*), PARAMETER :: routineN = 'add_shell_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(added_shells)) THEN
          IF (ASSOCIATED(added_shells%added_particles)) THEN
@@ -727,7 +727,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ndim
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_add_set_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(added_charges)) CALL add_set_release(added_charges)
       ALLOCATE (added_charges)
@@ -767,7 +767,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ndim
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_add_shell_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(added_shells)) CALL add_shell_release(added_shells)
       ALLOCATE (added_shells)
@@ -803,7 +803,7 @@ CONTAINS
       TYPE(image_charge_type), POINTER                   :: image_charge_pot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_image_charge_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(image_charge_pot)) CALL qmmm_image_charge_dealloc(image_charge_pot)
       ALLOCATE (image_charge_pot)

@@ -5,7 +5,7 @@
 
 MODULE fast
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 
    IMPLICIT NONE
 

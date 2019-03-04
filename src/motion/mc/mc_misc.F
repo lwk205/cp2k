@@ -9,17 +9,17 @@
 !> \author MJM
 ! **************************************************************************************************
 MODULE mc_misc
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE force_env_types,                 ONLY: use_fist_force,&
-                                              use_qs_force
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: pi
-   USE mc_types,                        ONLY: &
-        accattempt, get_mc_input_file, get_mc_molecule_info, get_mc_par, mc_averages_type, &
-        mc_input_file_type, mc_molecule_info_type, mc_moves_p_type, mc_moves_type, mc_simpar_type
-   USE physcon,                         ONLY: angstrom
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE force_env_types, ONLY: use_fist_force, &
+                              use_qs_force
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: pi
+   USE mc_types, ONLY: &
+      accattempt, get_mc_input_file, get_mc_molecule_info, get_mc_par, mc_averages_type, &
+      mc_input_file_type, mc_molecule_info_type, mc_moves_p_type, mc_moves_type, mc_simpar_type
+   USE physcon, ONLY: angstrom
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -45,7 +45,7 @@ CONTAINS
       TYPE(mc_averages_type), POINTER                    :: averages
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_averages_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -77,7 +77,7 @@ CONTAINS
       TYPE(mc_averages_type), POINTER                    :: averages
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_averages_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -144,7 +144,7 @@ CONTAINS
                       mc_molecule_info=mc_molecule_info)
       CALL get_mc_molecule_info(mc_molecule_info, nmol_types=nmol_types)
       WRITE (molecule_string, '(I2)') nmol_types
-      WRITE (tab_string, '(I4)') 81-11*nmol_types
+      WRITE (tab_string, '(I4)') 81 - 11*nmol_types
       format_string = "(A,T"//TRIM(ADJUSTL(tab_string))//","//TRIM(ADJUSTL(molecule_string))//"(2X,F9.6))"
 
 ! write out some data averaged over the whole simulation
@@ -241,13 +241,13 @@ CONTAINS
             WRITE (iw, '(A,T43,A)') "Conformational Moves", &
                "Attempted       Accepted       Percent"
             WRITE (iw, '(T46,I6,9X,I6,7X,F7.3)') &
-               moves%bond%attempts+moves%angle%attempts+ &
+               moves%bond%attempts + moves%angle%attempts + &
                moves%dihedral%attempts, &
-               moves%bond%successes+moves%angle%successes+ &
+               moves%bond%successes + moves%angle%successes + &
                moves%dihedral%successes, &
-               REAL(moves%bond%successes+moves%angle%successes+ &
+               REAL(moves%bond%successes + moves%angle%successes + &
                     moves%dihedral%successes, dp)/ &
-               REAL(moves%bond%attempts+moves%angle%attempts+ &
+               REAL(moves%bond%attempts + moves%angle%attempts + &
                     moves%dihedral%attempts, dp)*100.0E0_dp
             string2 = "Attempted       Accepted       Percent"
             string1 = "Bond Changes"
@@ -364,12 +364,12 @@ CONTAINS
       ENDDO
 
 ! see if the energies add up properly
-      IF (ABS(initial_energy+energy_check-final_energy) .GT. 0.0000001E0_dp) &
+      IF (ABS(initial_energy + energy_check - final_energy) .GT. 0.0000001E0_dp) &
          THEN
          WRITE (iw, *) '!!!!!!! We have an energy problem. !!!!!!!!'
          WRITE (iw, '(A,T64,F16.10)') 'Final Energy = ', final_energy
          WRITE (iw, '(A,T64,F16.10)') 'Inital Energy + energy_check =', &
-            initial_energy+energy_check
+            initial_energy + energy_check
       ENDIF
       WRITE (iw, '(A,A)') '****************************************************', &
          '****************************'
@@ -468,15 +468,15 @@ CONTAINS
       TYPE(mc_input_file_type), POINTER                  :: mc_input_file
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mc_make_dat_file_new', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(60)                                      :: cell_string, mol_string
       CHARACTER(default_string_length)                   :: line_text
       CHARACTER(default_string_length), DIMENSION(:), &
          POINTER                                         :: atom_names_empty, text
       INTEGER :: cell_column, cell_row, coord_row_end, coord_row_start, global_row_end, iline, &
-         in_use, itype, iunit, motion_row_end, motion_row_start, nmol_types, nunits_empty, &
-         run_type_row, start_line, unit
+                 in_use, itype, iunit, motion_row_end, motion_row_start, nmol_types, nunits_empty, &
+                 run_type_row, start_line, unit
       INTEGER, DIMENSION(:), POINTER                     :: mol_set_nmol_column, mol_set_nmol_row
       REAL(dp), DIMENSION(:, :), POINTER                 :: coordinates_empty
 
@@ -498,17 +498,17 @@ CONTAINS
       nmol_types = SIZE(nchains)
 
 ! first, write all the information up to the cell lengths
-      DO iline = 1, cell_row-1
+      DO iline = 1, cell_row - 1
          WRITE (unit, '(A)') TRIM(text(iline))
       ENDDO
 ! substitute in the current cell lengths
       WRITE (cell_string, '(3(F13.8,2X))') box_length(1:3)*angstrom
       line_text = text(cell_row)
-      line_text(cell_column:cell_column+50) = cell_string(1:51)
+      line_text(cell_column:cell_column + 50) = cell_string(1:51)
       WRITE (unit, '(A)') TRIM(line_text)
 
 ! now write everything until the coordinates
-      DO iline = cell_row+1, coord_row_start
+      DO iline = cell_row + 1, coord_row_start
          WRITE (unit, '(A)') TRIM(text(iline))
       ENDDO
 
@@ -530,7 +530,7 @@ CONTAINS
 ! now we need to write the MOL_SET section
       start_line = coord_row_end
       DO itype = 1, nmol_types
-         DO iline = start_line, mol_set_nmol_row(itype)-1
+         DO iline = start_line, mol_set_nmol_row(itype) - 1
             WRITE (unit, '(A)') TRIM(text(iline))
          ENDDO
 
@@ -542,15 +542,15 @@ CONTAINS
          ENDIF
 
          line_text = text(mol_set_nmol_row(itype))
-         line_text(mol_set_nmol_column(itype):mol_set_nmol_column(itype)+9) = &
+         line_text(mol_set_nmol_column(itype):mol_set_nmol_column(itype) + 9) = &
             mol_string(1:10)
          WRITE (unit, '(A)') TRIM(line_text)
-         start_line = mol_set_nmol_row(itype)+1
+         start_line = mol_set_nmol_row(itype) + 1
       ENDDO
 
 ! write up to the RUN_TYPE...tailor this for the type of environment, so
 ! that we can easily do ./cp2k.sdbg input.dat and have it run
-      DO iline = mol_set_nmol_row(nmol_types)+1, run_type_row-1
+      DO iline = mol_set_nmol_row(nmol_types) + 1, run_type_row - 1
          WRITE (unit, '(A)') TRIM(text(iline))
       ENDDO
       SELECT CASE (in_use)
@@ -559,7 +559,7 @@ CONTAINS
       CASE (use_qs_force)
          WRITE (unit, '(A)') '  RUN_TYPE     ENERGY_FORCE'
       END SELECT
-      DO iline = run_type_row+1, global_row_end
+      DO iline = run_type_row + 1, global_row_end
          WRITE (unit, '(A)') TRIM(text(iline))
       ENDDO
       DO iline = motion_row_start, motion_row_end

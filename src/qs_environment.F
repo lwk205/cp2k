@@ -15,172 +15,172 @@
 !> \author MK (18.05.2000)
 ! **************************************************************************************************
 MODULE qs_environment
-   USE almo_scf_env_methods,            ONLY: almo_scf_env_create
-   USE atom_kind_orbitals,              ONLY: calculate_atomic_relkin
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE auto_basis,                      ONLY: create_aux_fit_basis_set,&
-                                              create_lri_aux_basis_set,&
-                                              create_ri_aux_basis_set
-   USE basis_set_container_types,       ONLY: add_basis_set_to_container
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE bibliography,                    ONLY: Iannuzzi2006,&
-                                              Iannuzzi2007,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_release,&
-                                              dft_control_type,&
-                                              dftb_control_type,&
-                                              gapw_control_type,&
-                                              qs_control_type,&
-                                              semi_empirical_control_type
-   USE cp_control_utils,                ONLY: read_ddapc_section,&
-                                              read_dft_control,&
-                                              read_mgrid_section,&
-                                              read_qs_section,&
-                                              read_tddfpt2_control,&
-                                              read_tddfpt_control,&
-                                              write_dft_control,&
-                                              write_qs_control
-   USE cp_ddapc_types,                  ONLY: cp_ddapc_ewald_create
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_env,                     ONLY: cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_type
-   USE cp_symmetry,                     ONLY: write_symmetry
-   USE distribution_1d_types,           ONLY: distribution_1d_release,&
-                                              distribution_1d_type
-   USE distribution_methods,            ONLY: distribute_molecules_1d
-   USE dm_ls_scf_create,                ONLY: ls_scf_create
-   USE et_coupling_types,               ONLY: et_coupling_create
-   USE ewald_environment_types,         ONLY: ewald_env_create,&
-                                              ewald_env_get,&
-                                              ewald_env_release,&
-                                              ewald_env_set,&
-                                              ewald_environment_type,&
-                                              read_ewald_section
-   USE ewald_pw_methods,                ONLY: ewald_pw_grid_update
-   USE ewald_pw_types,                  ONLY: ewald_pw_create,&
-                                              ewald_pw_release,&
-                                              ewald_pw_type
-   USE fist_nonbond_env_types,          ONLY: fist_nonbond_env_create,&
-                                              fist_nonbond_env_type
-   USE gamma,                           ONLY: init_md_ftable
-   USE global_types,                    ONLY: global_environment_type
-   USE hartree_local_methods,           ONLY: init_coulomb_local
-   USE header,                          ONLY: dftb_header,&
-                                              qs_header,&
-                                              se_header
-   USE hfx_types,                       ONLY: hfx_create
-   USE input_constants,                 ONLY: &
-        dispersion_d3, do_et_ddapc, do_method_am1, do_method_dftb, do_method_gapw, &
-        do_method_gapw_xc, do_method_gpw, do_method_lrigpw, do_method_mndo, do_method_mndod, &
-        do_method_ofgpw, do_method_pdg, do_method_pm3, do_method_pm6, do_method_pm6fm, &
-        do_method_pnnl, do_method_rigpw, do_method_rm1, do_qmmm_gauss, do_qmmm_swave, &
-        general_roks, kg_tnadd_embed_ri, rel_none, rel_trans_atom, vdw_pairpot_dftd3, wfi_aspc_nr, &
-        wfi_linear_ps_method_nr, wfi_linear_wf_method_nr, wfi_ps_method_nr, &
-        wfi_use_guess_method_nr, xc_vdw_fun_none, xc_vdw_fun_nonloc, xc_vdw_fun_pairpot
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kg_environment,                  ONLY: kg_env_create
-   USE kinds,                           ONLY: dp
-   USE kpoint_methods,                  ONLY: kpoint_env_initialize,&
-                                              kpoint_initialize,&
-                                              kpoint_initialize_mos
-   USE kpoint_types,                    ONLY: kpoint_create,&
-                                              kpoint_type,&
-                                              read_kpoint_section,&
-                                              write_kpoint_info
-   USE lri_environment_init,            ONLY: lri_env_basis,&
-                                              lri_env_init
-   USE lri_environment_types,           ONLY: lri_environment_type
-   USE machine,                         ONLY: m_flush
-   USE molecule_kind_types,             ONLY: molecule_kind_type,&
-                                              write_molecule_kind_set
-   USE molecule_types,                  ONLY: molecule_type
-   USE mp2_setup,                       ONLY: read_mp2_section
-   USE mp2_types,                       ONLY: mp2_env_create
-   USE multipole_types,                 ONLY: do_multipole_none
-   USE orbital_pointers,                ONLY: init_orbital_pointers
+   USE almo_scf_env_methods, ONLY: almo_scf_env_create
+   USE atom_kind_orbitals, ONLY: calculate_atomic_relkin
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE auto_basis, ONLY: create_aux_fit_basis_set, &
+                         create_lri_aux_basis_set, &
+                         create_ri_aux_basis_set
+   USE basis_set_container_types, ONLY: add_basis_set_to_container
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE bibliography, ONLY: Iannuzzi2006, &
+                           Iannuzzi2007, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_release, &
+                               dft_control_type, &
+                               dftb_control_type, &
+                               gapw_control_type, &
+                               qs_control_type, &
+                               semi_empirical_control_type
+   USE cp_control_utils, ONLY: read_ddapc_section, &
+                               read_dft_control, &
+                               read_mgrid_section, &
+                               read_qs_section, &
+                               read_tddfpt2_control, &
+                               read_tddfpt_control, &
+                               write_dft_control, &
+                               write_qs_control
+   USE cp_ddapc_types, ONLY: cp_ddapc_ewald_create
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_env, ONLY: cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_type
+   USE cp_symmetry, ONLY: write_symmetry
+   USE distribution_1d_types, ONLY: distribution_1d_release, &
+                                    distribution_1d_type
+   USE distribution_methods, ONLY: distribute_molecules_1d
+   USE dm_ls_scf_create, ONLY: ls_scf_create
+   USE et_coupling_types, ONLY: et_coupling_create
+   USE ewald_environment_types, ONLY: ewald_env_create, &
+                                      ewald_env_get, &
+                                      ewald_env_release, &
+                                      ewald_env_set, &
+                                      ewald_environment_type, &
+                                      read_ewald_section
+   USE ewald_pw_methods, ONLY: ewald_pw_grid_update
+   USE ewald_pw_types, ONLY: ewald_pw_create, &
+                             ewald_pw_release, &
+                             ewald_pw_type
+   USE fist_nonbond_env_types, ONLY: fist_nonbond_env_create, &
+                                     fist_nonbond_env_type
+   USE gamma, ONLY: init_md_ftable
+   USE global_types, ONLY: global_environment_type
+   USE hartree_local_methods, ONLY: init_coulomb_local
+   USE header, ONLY: dftb_header, &
+                     qs_header, &
+                     se_header
+   USE hfx_types, ONLY: hfx_create
+   USE input_constants, ONLY: &
+      dispersion_d3, do_et_ddapc, do_method_am1, do_method_dftb, do_method_gapw, &
+      do_method_gapw_xc, do_method_gpw, do_method_lrigpw, do_method_mndo, do_method_mndod, &
+      do_method_ofgpw, do_method_pdg, do_method_pm3, do_method_pm6, do_method_pm6fm, &
+      do_method_pnnl, do_method_rigpw, do_method_rm1, do_qmmm_gauss, do_qmmm_swave, &
+      general_roks, kg_tnadd_embed_ri, rel_none, rel_trans_atom, vdw_pairpot_dftd3, wfi_aspc_nr, &
+      wfi_linear_ps_method_nr, wfi_linear_wf_method_nr, wfi_ps_method_nr, &
+      wfi_use_guess_method_nr, xc_vdw_fun_none, xc_vdw_fun_nonloc, xc_vdw_fun_pairpot
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kg_environment, ONLY: kg_env_create
+   USE kinds, ONLY: dp
+   USE kpoint_methods, ONLY: kpoint_env_initialize, &
+                             kpoint_initialize, &
+                             kpoint_initialize_mos
+   USE kpoint_types, ONLY: kpoint_create, &
+                           kpoint_type, &
+                           read_kpoint_section, &
+                           write_kpoint_info
+   USE lri_environment_init, ONLY: lri_env_basis, &
+                                   lri_env_init
+   USE lri_environment_types, ONLY: lri_environment_type
+   USE machine, ONLY: m_flush
+   USE molecule_kind_types, ONLY: molecule_kind_type, &
+                                  write_molecule_kind_set
+   USE molecule_types, ONLY: molecule_type
+   USE mp2_setup, ONLY: read_mp2_section
+   USE mp2_types, ONLY: mp2_env_create
+   USE multipole_types, ONLY: do_multipole_none
+   USE orbital_pointers, ONLY: init_orbital_pointers
    USE orbital_transformation_matrices, ONLY: init_spherical_harmonics
-   USE particle_methods,                ONLY: write_particle_distances,&
-                                              write_qs_particle_coordinates,&
-                                              write_structure_data
-   USE particle_types,                  ONLY: particle_type
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type
-   USE qs_dftb_parameters,              ONLY: qs_dftb_param_init
-   USE qs_dftb_types,                   ONLY: qs_dftb_pairpot_type
-   USE qs_dispersion_nonloc,            ONLY: qs_dispersion_nonloc_init
-   USE qs_dispersion_pairpot,           ONLY: qs_dispersion_pairpot_init
-   USE qs_dispersion_types,             ONLY: qs_dispersion_type
-   USE qs_dispersion_utils,             ONLY: qs_dispersion_env_set,&
-                                              qs_write_dispersion
-   USE qs_energy_types,                 ONLY: allocate_qs_energy,&
-                                              qs_energy_type
-   USE qs_environment_methods,          ONLY: qs_env_setup
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_interactions,                 ONLY: init_interaction_radii,&
-                                              init_se_nlradius,&
-                                              write_core_charge_radii,&
-                                              write_paw_radii,&
-                                              write_pgf_orb_radii,&
-                                              write_ppl_radii,&
-                                              write_ppnl_radii
-   USE qs_kind_types,                   ONLY: &
-        check_qs_kind_set, get_qs_kind, get_qs_kind_set, init_gapw_basis_set, init_gapw_nlcc, &
-        init_qs_kind_set, qs_kind_type, set_qs_kind, write_gto_basis_sets, write_qs_kind_set
-   USE qs_ks_types,                     ONLY: qs_ks_env_create,&
-                                              qs_ks_env_type,&
-                                              qs_ks_release,&
-                                              set_ks_env
-   USE qs_mo_types,                     ONLY: allocate_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho0_ggrid,                   ONLY: rho0_s_grid_create
-   USE qs_rho0_methods,                 ONLY: init_rho0
-   USE qs_rho0_types,                   ONLY: rho0_mpole_type
-   USE qs_rho_atom_methods,             ONLY: init_rho_atom
-   USE qs_subsys_methods,               ONLY: qs_subsys_create
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_release,&
-                                              qs_subsys_set,&
-                                              qs_subsys_type
-   USE qs_wf_history_methods,           ONLY: wfi_create,&
-                                              wfi_create_for_kp
-   USE qs_wf_history_types,             ONLY: qs_wf_history_type,&
-                                              wfi_release
-   USE rel_control_types,               ONLY: rel_c_create,&
-                                              rel_c_read_parameters,&
-                                              rel_c_release,&
-                                              rel_control_type
-   USE scf_control_types,               ONLY: scf_c_create,&
-                                              scf_c_read_parameters,&
-                                              scf_c_release,&
-                                              scf_c_write_parameters,&
-                                              scf_control_type
-   USE semi_empirical_expns3_methods,   ONLY: semi_empirical_expns3_setup
-   USE semi_empirical_int_arrays,       ONLY: init_se_intd_array
-   USE semi_empirical_mpole_methods,    ONLY: nddo_mpole_setup
-   USE semi_empirical_mpole_types,      ONLY: nddo_mpole_type
-   USE semi_empirical_store_int_types,  ONLY: semi_empirical_si_create,&
-                                              semi_empirical_si_type
-   USE semi_empirical_types,            ONLY: se_taper_create,&
-                                              se_taper_type
-   USE semi_empirical_utils,            ONLY: se_cutoff_compatible
-   USE transport,                       ONLY: transport_env_create
+   USE particle_methods, ONLY: write_particle_distances, &
+                               write_qs_particle_coordinates, &
+                               write_structure_data
+   USE particle_types, ONLY: particle_type
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type
+   USE qs_dftb_parameters, ONLY: qs_dftb_param_init
+   USE qs_dftb_types, ONLY: qs_dftb_pairpot_type
+   USE qs_dispersion_nonloc, ONLY: qs_dispersion_nonloc_init
+   USE qs_dispersion_pairpot, ONLY: qs_dispersion_pairpot_init
+   USE qs_dispersion_types, ONLY: qs_dispersion_type
+   USE qs_dispersion_utils, ONLY: qs_dispersion_env_set, &
+                                  qs_write_dispersion
+   USE qs_energy_types, ONLY: allocate_qs_energy, &
+                              qs_energy_type
+   USE qs_environment_methods, ONLY: qs_env_setup
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_interactions, ONLY: init_interaction_radii, &
+                              init_se_nlradius, &
+                              write_core_charge_radii, &
+                              write_paw_radii, &
+                              write_pgf_orb_radii, &
+                              write_ppl_radii, &
+                              write_ppnl_radii
+   USE qs_kind_types, ONLY: &
+      check_qs_kind_set, get_qs_kind, get_qs_kind_set, init_gapw_basis_set, init_gapw_nlcc, &
+      init_qs_kind_set, qs_kind_type, set_qs_kind, write_gto_basis_sets, write_qs_kind_set
+   USE qs_ks_types, ONLY: qs_ks_env_create, &
+                          qs_ks_env_type, &
+                          qs_ks_release, &
+                          set_ks_env
+   USE qs_mo_types, ONLY: allocate_mo_set, &
+                          mo_set_p_type
+   USE qs_rho0_ggrid, ONLY: rho0_s_grid_create
+   USE qs_rho0_methods, ONLY: init_rho0
+   USE qs_rho0_types, ONLY: rho0_mpole_type
+   USE qs_rho_atom_methods, ONLY: init_rho_atom
+   USE qs_subsys_methods, ONLY: qs_subsys_create
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_release, &
+                              qs_subsys_set, &
+                              qs_subsys_type
+   USE qs_wf_history_methods, ONLY: wfi_create, &
+                                    wfi_create_for_kp
+   USE qs_wf_history_types, ONLY: qs_wf_history_type, &
+                                  wfi_release
+   USE rel_control_types, ONLY: rel_c_create, &
+                                rel_c_read_parameters, &
+                                rel_c_release, &
+                                rel_control_type
+   USE scf_control_types, ONLY: scf_c_create, &
+                                scf_c_read_parameters, &
+                                scf_c_release, &
+                                scf_c_write_parameters, &
+                                scf_control_type
+   USE semi_empirical_expns3_methods, ONLY: semi_empirical_expns3_setup
+   USE semi_empirical_int_arrays, ONLY: init_se_intd_array
+   USE semi_empirical_mpole_methods, ONLY: nddo_mpole_setup
+   USE semi_empirical_mpole_types, ONLY: nddo_mpole_type
+   USE semi_empirical_store_int_types, ONLY: semi_empirical_si_create, &
+                                             semi_empirical_si_type
+   USE semi_empirical_types, ONLY: se_taper_create, &
+                                   se_taper_type
+   USE semi_empirical_utils, ONLY: se_cutoff_compatible
+   USE transport, ONLY: transport_env_create
 !  USE xas_control,                     ONLY: write_xas_control
 #include "./base/base_uses.f90"
 
@@ -466,8 +466,8 @@ CONTAINS
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_init_subsys', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, ikind, ispin, iw, lmax_sphere, maxl, maxlgto, maxlgto_lri, maxlppl, &
-         maxlppnl, method_id, multiplicity, my_ival, n_ao, n_ao_aux_fit, n_mo_add, natom, &
-         nelectron, nkind, output_unit, tnadd_method
+                 maxlppnl, method_id, multiplicity, my_ival, n_ao, n_ao_aux_fit, n_mo_add, natom, &
+                 nelectron, nkind, output_unit, tnadd_method
       INTEGER, DIMENSION(2)                              :: n_mo, nelectron_spin
       LOGICAL                                            :: all_potential_present, be_silent, &
                                                             do_kpoints, e1terms, has_unit_metric, &
@@ -505,8 +505,8 @@ CONTAINS
       TYPE(scf_control_type), POINTER                    :: scf_control
       TYPE(se_taper_type), POINTER                       :: se_taper
       TYPE(section_vals_type), POINTER :: dft_section, et_coupling_section, et_ddapc_section, &
-         ewald_section, lri_section, nl_section, poisson_section, pp_section, print_section, &
-         qs_section, se_section, tddfpt_section, xc_section
+                                          ewald_section, lri_section, nl_section, poisson_section, pp_section, print_section, &
+                                          qs_section, se_section, tddfpt_section, xc_section
       TYPE(semi_empirical_control_type), POINTER         :: se_control
       TYPE(semi_empirical_si_type), POINTER              :: se_store_int_env
 
@@ -729,7 +729,7 @@ CONTAINS
          CALL get_qs_kind_set(qs_kind_set, maxlgto=maxlgto_lri, basis_type="RI_HXC")
          maxlgto = MAX(maxlgto, maxlgto_lri)
       END IF
-      maxl = MAX(2*maxlgto, maxlppl, maxlppnl, lmax_sphere)+1
+      maxl = MAX(2*maxlgto, maxlppl, maxlppnl, lmax_sphere) + 1
 
       CALL init_orbital_pointers(maxl)
 
@@ -748,7 +748,7 @@ CONTAINS
       !   *** Initialize the pretabulation for the calculation of the   ***
       !   *** incomplete Gamma function F_n(t) after McMurchie-Davidson ***
       CALL get_qs_kind_set(qs_kind_set, maxlgto=maxlgto)
-      maxl = MAX(3*maxlgto+1, 0)
+      maxl = MAX(3*maxlgto + 1, 0)
       CALL init_md_ftable(maxl)
 
       !   *** Initialize the atomic interaction radii ***
@@ -1030,7 +1030,7 @@ CONTAINS
       CALL get_qs_kind_set(qs_kind_set, nsgf=n_ao, nelectron=nelectron)
 
       ! the total number of electrons
-      nelectron = nelectron-dft_control%charge
+      nelectron = nelectron - dft_control%charge
 
       IF (dft_control%multiplicity == 0) THEN
          IF (MODULO(nelectron, 2) == 0) THEN
@@ -1075,11 +1075,11 @@ CONTAINS
             n_mo(1) = 1
             n_mo(2) = 0
          ELSE
-            IF (MODULO(nelectron+multiplicity-1, 2) /= 0) THEN
+            IF (MODULO(nelectron + multiplicity - 1, 2) /= 0) THEN
                CPABORT("LSD: try to use a different multiplicity")
             END IF
-            nelectron_spin(1) = (nelectron+multiplicity-1)/2
-            nelectron_spin(2) = (nelectron-multiplicity+1)/2
+            nelectron_spin(1) = (nelectron + multiplicity - 1)/2
+            nelectron_spin(2) = (nelectron - multiplicity + 1)/2
             IF (nelectron_spin(1) < 0) THEN
                CPABORT("LSD: too few electrons for this multiplicity")
             END IF
@@ -1097,7 +1097,7 @@ CONTAINS
             IF (MODULO(nelectron, 2) == 0) THEN
                n_mo(1) = nelectron/2
             ELSE
-               n_mo(1) = INT(nelectron/2._dp)+1
+               n_mo(1) = INT(nelectron/2._dp) + 1
             END IF
             n_mo(2) = 0
          ELSE
@@ -1105,12 +1105,12 @@ CONTAINS
 
             ! The simplist spin distribution is written here. Special cases will
             ! need additional user input
-            IF (MODULO(nelectron+multiplicity-1, 2) /= 0) THEN
+            IF (MODULO(nelectron + multiplicity - 1, 2) /= 0) THEN
                CPABORT("LSD: try to use a different multiplicity")
             END IF
 
-            nelectron_spin(1) = (nelectron+multiplicity-1)/2
-            nelectron_spin(2) = (nelectron-multiplicity+1)/2
+            nelectron_spin(1) = (nelectron + multiplicity - 1)/2
+            nelectron_spin(2) = (nelectron - multiplicity + 1)/2
 
             IF (nelectron_spin(2) < 0) THEN
                CPABORT("LSD: too few electrons for this multiplicity")
@@ -1135,10 +1135,10 @@ CONTAINS
          ELSE
             n_mo_add = scf_control%added_mos(1)
          END IF
-         IF (n_mo_add > n_ao-n_mo(2)) &
+         IF (n_mo_add > n_ao - n_mo(2)) &
             CPWARN("More added MOs requested for beta spin than available.")
-         scf_control%added_mos(2) = MIN(n_mo_add, n_ao-n_mo(2))
-         n_mo(2) = n_mo(2)+scf_control%added_mos(2)
+         scf_control%added_mos(2) = MIN(n_mo_add, n_ao - n_mo(2))
+         n_mo(2) = n_mo(2) + scf_control%added_mos(2)
       END IF
 
       ! proceed alpha orbitals after the beta orbitals; this is essential to avoid
@@ -1149,12 +1149,12 @@ CONTAINS
       ! However, if we try to proceed alpha orbitals first, this leads us n_mo(1:2) = (10,8)
       ! due to the following assignment instruction above:
       !   IF (scf_control%added_mos(2) > 0) THEN ... ELSE; n_mo_add = scf_control%added_mos(1); END IF
-      IF (scf_control%added_mos(1) > n_ao-n_mo(1)) &
+      IF (scf_control%added_mos(1) > n_ao - n_mo(1)) &
          CALL cp_warn(__LOCATION__, &
                       "More added MOs requested than available. "// &
                       "The full set of unoccupied MOs will be used.")
-      scf_control%added_mos(1) = MIN(scf_control%added_mos(1), n_ao-n_mo(1))
-      n_mo(1) = n_mo(1)+scf_control%added_mos(1)
+      scf_control%added_mos(1) = MIN(scf_control%added_mos(1), n_ao - n_mo(1))
+      n_mo(1) = n_mo(1) + scf_control%added_mos(1)
 
       IF (dft_control%nspins == 2) THEN
          IF (n_mo(2) > n_mo(1)) &
@@ -1345,7 +1345,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: force_env_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_total_numbers', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: maxlgto, maxlppl, maxlppnl, natom, ncgf, &
                                                             nkind, npgf, nset, nsgf, nshell, &
@@ -1374,7 +1374,7 @@ CONTAINS
          WRITE (UNIT=output_unit, FMT="(/,/,T2,A)") &
             "TOTAL NUMBERS AND MAXIMUM NUMBERS"
 
-         IF (nset+npgf+ncgf > 0) THEN
+         IF (nset + npgf + ncgf > 0) THEN
             WRITE (UNIT=output_unit, FMT="(/,T3,A,(T30,A,T71,I10))") &
                "Total number of", &
                "- Atomic kinds:                  ", nkind, &
@@ -1384,7 +1384,7 @@ CONTAINS
                "- Primitive Cartesian functions: ", npgf, &
                "- Cartesian basis functions:     ", ncgf, &
                "- Spherical basis functions:     ", nsgf
-         ELSE IF (nshell+nsgf > 0) THEN
+         ELSE IF (nshell + nsgf > 0) THEN
             WRITE (UNIT=output_unit, FMT="(/,T3,A,(T30,A,T71,I10))") &
                "Total number of", &
                "- Atomic kinds:                  ", nkind, &
@@ -1423,7 +1423,7 @@ CONTAINS
                               nsgf=nsgf, &
                               nshell=nshell, &
                               basis_type="LRI_AUX")
-         IF (nset+npgf+ncgf > 0) THEN
+         IF (nset + npgf + ncgf > 0) THEN
             WRITE (UNIT=output_unit, FMT="(/,T3,A,/,T3,A,(T30,A,T71,I10))") &
                "LRI_AUX Basis: ", &
                "Total number of", &
@@ -1445,7 +1445,7 @@ CONTAINS
                               nsgf=nsgf, &
                               nshell=nshell, &
                               basis_type="RI_HXC")
-         IF (nset+npgf+ncgf > 0) THEN
+         IF (nset + npgf + ncgf > 0) THEN
             WRITE (UNIT=output_unit, FMT="(/,T3,A,/,T3,A,(T30,A,T71,I10))") &
                "RI_HXC Basis: ", &
                "Total number of", &
@@ -1467,7 +1467,7 @@ CONTAINS
                               nsgf=nsgf, &
                               nshell=nshell, &
                               basis_type="AUX_FIT")
-         IF (nset+npgf+ncgf > 0) THEN
+         IF (nset + npgf + ncgf > 0) THEN
             WRITE (UNIT=output_unit, FMT="(/,T3,A,/,T3,A,(T30,A,T71,I10))") &
                "AUX_FIT ADMM-Basis: ", &
                "Total number of", &

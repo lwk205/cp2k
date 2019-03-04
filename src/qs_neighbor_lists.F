@@ -15,83 +15,83 @@
 !> \author Matthias Krack (08.10.1999,26.03.2002,16.06.2003)
 ! **************************************************************************************************
 MODULE qs_neighbor_lists
-   USE almo_scf_types,                  ONLY: almo_max_cutoff_multiplier
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell,&
-                                              pbc,&
-                                              plane_distance,&
-                                              real_to_scaled,&
-                                              scaled_to_real
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE distribution_2d_types,           ONLY: distribution_2d_type
-   USE ewald_environment_types,         ONLY: ewald_env_get,&
-                                              ewald_environment_type
-   USE external_potential_types,        ONLY: all_potential_type,&
-                                              get_potential,&
-                                              gth_potential_type,&
-                                              sgp_potential_type
-   USE input_constants,                 ONLY: dispersion_uff,&
-                                              do_method_lrigpw,&
-                                              do_method_rigpw,&
-                                              do_se_IS_slater,&
-                                              vdw_pairpot_dftd3,&
-                                              vdw_pairpot_dftd3bj,&
-                                              xc_vdw_fun_pairpot
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              int_8
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE message_passing,                 ONLY: mp_max,&
-                                              mp_sum
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE paw_proj_set_types,              ONLY: get_paw_proj_set,&
-                                              paw_proj_set_type
-   USE periodic_table,                  ONLY: ptable
-   USE physcon,                         ONLY: bohr
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_dispersion_types,             ONLY: qs_dispersion_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: &
-        add_neighbor_list, add_neighbor_node, allocate_neighbor_list_set, &
-        deallocate_neighbor_list_set, get_iterator_info, neighbor_list_iterate, &
-        neighbor_list_iterator_create, neighbor_list_iterator_p_type, &
-        neighbor_list_iterator_release, neighbor_list_p_type, neighbor_list_set_p_type, &
-        neighbor_list_set_type
-   USE string_utilities,                ONLY: compress
-   USE subcell_types,                   ONLY: allocate_subcell,&
-                                              deallocate_subcell,&
-                                              give_ijk_subcell,&
-                                              subcell_type
-   USE util,                            ONLY: locate,&
-                                              sort
+   USE almo_scf_types, ONLY: almo_max_cutoff_multiplier
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type, &
+                         get_cell, &
+                         pbc, &
+                         plane_distance, &
+                         real_to_scaled, &
+                         scaled_to_real
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE distribution_2d_types, ONLY: distribution_2d_type
+   USE ewald_environment_types, ONLY: ewald_env_get, &
+                                      ewald_environment_type
+   USE external_potential_types, ONLY: all_potential_type, &
+                                       get_potential, &
+                                       gth_potential_type, &
+                                       sgp_potential_type
+   USE input_constants, ONLY: dispersion_uff, &
+                              do_method_lrigpw, &
+                              do_method_rigpw, &
+                              do_se_IS_slater, &
+                              vdw_pairpot_dftd3, &
+                              vdw_pairpot_dftd3bj, &
+                              xc_vdw_fun_pairpot
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    int_8
+   USE kpoint_types, ONLY: kpoint_type
+   USE message_passing, ONLY: mp_max, &
+                              mp_sum
+   USE molecule_types, ONLY: molecule_type
+   USE particle_types, ONLY: particle_type
+   USE paw_proj_set_types, ONLY: get_paw_proj_set, &
+                                 paw_proj_set_type
+   USE periodic_table, ONLY: ptable
+   USE physcon, ONLY: bohr
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_dispersion_types, ONLY: qs_dispersion_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: &
+      add_neighbor_list, add_neighbor_node, allocate_neighbor_list_set, &
+      deallocate_neighbor_list_set, get_iterator_info, neighbor_list_iterate, &
+      neighbor_list_iterator_create, neighbor_list_iterator_p_type, &
+      neighbor_list_iterator_release, neighbor_list_p_type, neighbor_list_set_p_type, &
+      neighbor_list_set_type
+   USE string_utilities, ONLY: compress
+   USE subcell_types, ONLY: allocate_subcell, &
+                            deallocate_subcell, &
+                            give_ijk_subcell, &
+                            subcell_type
+   USE util, ONLY: locate, &
+                   sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -292,21 +292,21 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: force_env_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_qs_neighbor_lists', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: print_key_path
       INTEGER                                            :: handle, ikind, iw, maxatom, nkind, &
                                                             numshells, zat
       LOGICAL :: all_potential_present, almo, dftb, do_hfx, dokp, explicit, gth_potential_present, &
-         lri_optbas, lrigpw, mic, molecule_only, nddo, paw_atom, paw_atom_present, rigpw, &
-         sgp_potential_present
+                 lri_optbas, lrigpw, mic, molecule_only, nddo, paw_atom, paw_atom_present, rigpw, &
+                 sgp_potential_present
       LOGICAL, ALLOCATABLE, DIMENSION(:) :: all_present, aux_fit_present, aux_present, &
-         core_present, default_present, oce_present, orb_present, ppl_present, ppnl_present, &
-         ri_present
+                                            core_present, default_present, oce_present, orb_present, ppl_present, ppnl_present, &
+                                            ri_present
       REAL(dp)                                           :: almo_rcov, almo_rvdw, alpha, roperator, &
                                                             subcells
       REAL(dp), ALLOCATABLE, DIMENSION(:) :: all_pot_rad, aux_fit_radius, c_radius, calpha, &
-         core_radius, oce_radius, orb_radius, ppl_radius, ppnl_radius, ri_radius, zeff
+                                             core_radius, oce_radius, orb_radius, ppl_radius, ppnl_radius, ri_radius, zeff
       REAL(dp), ALLOCATABLE, DIMENSION(:, :)             :: pair_radius
       TYPE(all_potential_type), POINTER                  :: all_potential
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
@@ -323,9 +323,9 @@ CONTAINS
       TYPE(local_atoms_type), ALLOCATABLE, DIMENSION(:)  :: atom2d
       TYPE(molecule_type), DIMENSION(:), POINTER         :: molecule_set
       TYPE(neighbor_list_set_p_type), DIMENSION(:), POINTER :: saa_list, sab_all, sab_almo, &
-         sab_aux_fit, sab_aux_fit_asymm, sab_aux_fit_vs_orb, sab_cn, sab_core, sab_kp, sab_lrc, &
-         sab_orb, sab_scp, sab_se, sab_tbe, sab_vdw, sac_ae, sac_lri, sac_ppl, sap_oce, sap_ppnl, &
-         soa_list, soo_list
+                                            sab_aux_fit, sab_aux_fit_asymm, sab_aux_fit_vs_orb, sab_cn, sab_core, sab_kp, sab_lrc, &
+                                          sab_orb, sab_scp, sab_se, sab_tbe, sab_vdw, sac_ae, sac_lri, sac_ppl, sap_oce, sap_ppnl, &
+                                                               soa_list, soo_list
       TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
       TYPE(paw_proj_set_type), POINTER                   :: paw_proj
       TYPE(qs_dftb_atom_type), POINTER                   :: dftb_atom
@@ -379,7 +379,7 @@ CONTAINS
 
       ! This sets the id number of the qs neighbor lists, new lists, means new version
       ! new version implies new sparsity of the matrices
-      last_qs_neighbor_list_id_nr = last_qs_neighbor_list_id_nr+1
+      last_qs_neighbor_list_id_nr = last_qs_neighbor_list_id_nr + 1
       CALL set_ks_env(ks_env=ks_env, neighbor_list_id=last_qs_neighbor_list_id_nr)
 
       CALL get_ks_env(ks_env=ks_env, &
@@ -645,7 +645,7 @@ CONTAINS
             ELSE
                CALL pair_radius_setup(orb_present, orb_present, orb_radius, orb_radius, pair_radius)
             END IF
-            pair_radius = pair_radius+roperator
+            pair_radius = pair_radius + roperator
          ELSE
             CALL pair_radius_setup(orb_present, orb_present, orb_radius, orb_radius, pair_radius)
          END IF
@@ -927,7 +927,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: nlname
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_neighbor_lists', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE local_lists
          INTEGER, DIMENSION(:), POINTER           :: list
@@ -1075,7 +1075,7 @@ CONTAINS
          DO jkind = 1, nkind
             IF (.NOT. pres_b(jkind)) CYCLE
 
-            iab = ikind+nkind*(jkind-1)
+            iab = ikind + nkind*(jkind - 1)
 
             ! Calculate the square of the maximum interaction distance
             IF (pair_radius(ikind, jkind) <= 0._dp) CYCLE
@@ -1106,7 +1106,7 @@ CONTAINS
                                               0.5_dp*subcells*subcell_scale/sab_max_guard(:))))
 
             ! number of image cells to be considered
-            ncell(:) = (INT(sab_max(:))+1)*periodic(:)
+            ncell(:) = (INT(sab_max(:)) + 1)*periodic(:)
 
             CALL allocate_neighbor_list_set(neighbor_list_set=ab_list(iab)%neighbor_list_set, &
                                             symmetric=my_symmetric)
@@ -1126,12 +1126,12 @@ CONTAINS
                atom_a = atom(ikind)%list(iatom)
                r = r_pbc(:, atom_a)
                CALL give_ijk_subcell(r, i, j, k, cell, nsubcell)
-               subcell(i, j, k)%natom = subcell(i, j, k)%natom+1
+               subcell(i, j, k)%natom = subcell(i, j, k)%natom + 1
             END DO
             DO k = 1, nsubcell(3)
                DO j = 1, nsubcell(2)
                   DO i = 1, nsubcell(1)
-                     maxat = subcell(i, j, k)%natom+subcell(i, j, k)%natom/10
+                     maxat = subcell(i, j, k)%natom + subcell(i, j, k)%natom/10
                      ALLOCATE (subcell(i, j, k)%atom_list(maxat))
                      subcell(i, j, k)%natom = 0
                   END DO
@@ -1142,7 +1142,7 @@ CONTAINS
                atom_a = atom(ikind)%list(iatom)
                r = r_pbc(:, atom_a)
                CALL give_ijk_subcell(r, i, j, k, cell, nsubcell)
-               subcell(i, j, k)%natom = subcell(i, j, k)%natom+1
+               subcell(i, j, k)%natom = subcell(i, j, k)%natom + 1
                subcell(i, j, k)%atom_list(subcell(i, j, k)%natom) = iatom_local
             END DO
 
@@ -1159,9 +1159,9 @@ CONTAINS
                CALL real_to_scaled(sb_pbc(:), r(:), cell)
 
                loop2_kcell: DO kcell = -ncell(3), ncell(3)
-                  sb(3) = sb_pbc(3)+REAL(kcell, dp)
-                  sb_min(3) = sb(3)-sab_max(3)
-                  sb_max(3) = sb(3)+sab_max(3)
+                  sb(3) = sb_pbc(3) + REAL(kcell, dp)
+                  sb_min(3) = sb(3) - sab_max(3)
+                  sb_max(3) = sb(3) + sab_max(3)
                   IF (periodic(3) /= 0) THEN
                      IF (sb_min(3) >= 0.5_dp) EXIT loop2_kcell
                      IF (sb_max(3) < -0.5_dp) CYCLE loop2_kcell
@@ -1169,9 +1169,9 @@ CONTAINS
                   cell_b(3) = kcell
 
                   loop2_jcell: DO jcell = -ncell(2), ncell(2)
-                     sb(2) = sb_pbc(2)+REAL(jcell, dp)
-                     sb_min(2) = sb(2)-sab_max(2)
-                     sb_max(2) = sb(2)+sab_max(2)
+                     sb(2) = sb_pbc(2) + REAL(jcell, dp)
+                     sb_min(2) = sb(2) - sab_max(2)
+                     sb_max(2) = sb(2) + sab_max(2)
                      IF (periodic(2) /= 0) THEN
                         IF (sb_min(2) >= 0.5_dp) EXIT loop2_jcell
                         IF (sb_max(2) < -0.5_dp) CYCLE loop2_jcell
@@ -1179,9 +1179,9 @@ CONTAINS
                      cell_b(2) = jcell
 
                      loop2_icell: DO icell = -ncell(1), ncell(1)
-                        sb(1) = sb_pbc(1)+REAL(icell, dp)
-                        sb_min(1) = sb(1)-sab_max(1)
-                        sb_max(1) = sb(1)+sab_max(1)
+                        sb(1) = sb_pbc(1) + REAL(icell, dp)
+                        sb_min(1) = sb(1) - sab_max(1)
+                        sb_max(1) = sb(1) + sab_max(1)
                         IF (periodic(1) /= 0) THEN
                            IF (sb_min(1) >= 0.5_dp) EXIT loop2_icell
                            IF (sb_max(1) < -0.5_dp) CYCLE loop2_icell
@@ -1223,24 +1223,24 @@ CONTAINS
                                     END IF
                                     IF (my_symmetric) THEN
                                        IF (atom_a > atom_b) THEN
-                                          include_ab = (MODULO(atom_a+atom_b, 2) /= 0)
+                                          include_ab = (MODULO(atom_a + atom_b, 2) /= 0)
                                        ELSE
-                                          include_ab = (MODULO(atom_a+atom_b, 2) == 0)
+                                          include_ab = (MODULO(atom_a + atom_b, 2) == 0)
                                        END IF
                                     ELSE
                                        include_ab = .TRUE.
                                     END IF
                                     IF (include_ab) THEN
                                        ra(:) = r_pbc(:, atom_a)
-                                       rab(:) = rb(:)-ra(:)
-                                       rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+                                       rab(:) = rb(:) - ra(:)
+                                       rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
                                        IF (rab2 < rab2_max) THEN
                                           include_ab = .TRUE.
                                           IF (my_mic) THEN
                                              ! only if rab is minimum image the pair will be included
                                              ! ideally the range of the pair list is < L/2 so that this never triggers
                                              rab_pbc(:) = pbc(rab(:), cell)
-                                             IF (SUM((rab_pbc-rab)**2) > EPSILON(1.0_dp)) THEN
+                                             IF (SUM((rab_pbc - rab)**2) > EPSILON(1.0_dp)) THEN
                                                 include_ab = .FALSE.
                                              ENDIF
                                           ENDIF
@@ -1314,7 +1314,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN), OPTIONAL             :: operator_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'setup_neighbor_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=4)                                   :: otype
       INTEGER                                            :: ikind, nkind
@@ -1441,7 +1441,7 @@ CONTAINS
          nb = 0
       END IF
 
-      ALLOCATE (list(na+nb))
+      ALLOCATE (list(na + nb))
 
       n = na
       IF (na .GT. 0) list(1:na) = lista(1:na)
@@ -1450,7 +1450,7 @@ CONTAINS
             DO i = 1, na
                IF (listb(ib) == list(i)) CYCLE loopb
             END DO
-            n = n+1
+            n = n + 1
             list(n) = listb(ib)
          END DO loopb
       ENDIF
@@ -1472,7 +1472,7 @@ CONTAINS
       REAL(dp), DIMENSION(:, :), INTENT(OUT)             :: pair_radius
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pair_radius_setup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, nkind
 
@@ -1484,7 +1484,7 @@ CONTAINS
          IF (.NOT. present_a(i)) CYCLE
          DO j = 1, nkind
             IF (.NOT. present_b(j)) CYCLE
-            pair_radius(i, j) = radius_a(i)+radius_b(j)
+            pair_radius(i, j) = radius_a(i) + radius_b(j)
          END DO
       END DO
 
@@ -1508,7 +1508,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_neighbor_distribution', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       LOGICAL, PARAMETER                                 :: full_output = .FALSE.
 
       INTEGER                                            :: group, handle, ikind, inode, ipe, jkind, &
@@ -1522,7 +1522,7 @@ CONTAINS
 
       CALL timeset(routineN, handle)
       group = para_env%group
-      mype = para_env%mepos+1
+      mype = para_env%mepos + 1
       npe = para_env%num_pe
 
       ! Allocate work storage
@@ -1544,8 +1544,8 @@ CONTAINS
          CALL get_iterator_info(nl_iterator, ikind=ikind, jkind=jkind, inode=inode, nnode=nnode)
          IF (inode == 1) THEN
             n = nnsgf(ikind)*nnsgf(jkind)
-            nblock(mype) = nblock(mype)+nnode
-            nelement(mype) = nelement(mype)+n*nnode
+            nblock(mype) = nblock(mype) + nnode
+            nelement(mype) = nelement(mype) + n*nnode
          END IF
       END DO
       CALL neighbor_list_iterator_release(nl_iterator)
@@ -1576,16 +1576,16 @@ CONTAINS
                    FMT="(/,/,T2,A,/,/,T3,A,/,/,(T4,I6,T27,I10,T55,I10))") &
                "DISTRIBUTION OF THE NEIGHBOR LISTS", &
                "Process   Number of particle pairs   Number of matrix elements", &
-               (ipe-1, nblock(ipe), nelement(ipe), ipe=1, npe)
+               (ipe - 1, nblock(ipe), nelement(ipe), ipe=1, npe)
             WRITE (UNIT=output_unit, FMT="(/,T7,A3,T27,I10,T55,I10)") &
                "Sum", SUM(nblock), SUM(nelement)
          ELSE
             WRITE (UNIT=output_unit, FMT="(/,T2,A)") "DISTRIBUTION OF THE NEIGHBOR LISTS"
             WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Total number of particle pairs:", nblock_sum
             WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Total number of matrix elements:", nelement_sum
-            WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Average number of particle pairs:", (nblock_sum+npe-1)/npe
+            WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Average number of particle pairs:", (nblock_sum + npe - 1)/npe
             WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Maximum number of particle pairs:", nblock_max
-            WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Average number of matrix element:", (nelement_sum+npe-1)/npe
+            WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Average number of matrix element:", (nelement_sum + npe - 1)/npe
             WRITE (UNIT=output_unit, FMT="(T15,A,T68,I13)") "Maximum number of matrix elements:", nelement_max
          ENDIF
       END IF
@@ -1666,10 +1666,10 @@ CONTAINS
          DO WHILE (neighbor_list_iterate(nl_iterator) == 0)
             CALL get_iterator_info(nl_iterator, inode=inode, nnode=nnode, &
                                    iatom=iatom, jatom=jatom, cell=cell_b, r=rab)
-            nneighbor = nneighbor+1
+            nneighbor = nneighbor + 1
             ra(:) = pbc(particle_set(iatom)%r, cell)
-            rb(:) = ra(:)+rab(:)
-            dab = SQRT(rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3))
+            rb(:) = ra(:) + rab(:)
+            dab = SQRT(rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3))
             IF (iw > 0) THEN
                IF (inode == 1) THEN
                   WRITE (UNIT=iw, FMT="(/,T2,I5,3X,I6,3X,3F12.6)") &

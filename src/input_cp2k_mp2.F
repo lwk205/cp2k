@@ -10,40 +10,40 @@
 !> \author MDB
 ! **************************************************************************************************
 MODULE input_cp2k_mp2
-   USE bibliography,                    ONLY: Bates2013,&
-                                              DelBen2012,&
-                                              DelBen2013,&
-                                              DelBen2015,&
-                                              DelBen2015b,&
-                                              Rybkin2016
-   USE cp_eri_mme_interface,            ONLY: create_eri_mme_section
-   USE cp_output_handling,              ONLY: add_last_numeric,&
-                                              cp_print_key_section_create,&
-                                              debug_print_level,&
-                                              high_print_level,&
-                                              low_print_level,&
-                                              medium_print_level,&
-                                              silent_print_level
-   USE input_constants,                 ONLY: &
-        do_eri_gpw, do_eri_mme, do_eri_os, do_hfx_potential_coulomb, do_mp2_potential_tshpsc, &
-        gaussian, gw_pade_approx, gw_two_pole_model, mp2_method_direct, mp2_method_gpw, &
-        mp2_method_none, mp2_ri_optimize_basis, numerical, ri_coulomb, ri_mp2_laplace, &
-        ri_mp2_method_gpw, ri_overlap, ri_rpa_g0w0_crossing_bisection, &
-        ri_rpa_g0w0_crossing_newton, ri_rpa_g0w0_crossing_none, ri_rpa_g0w0_crossing_z_shot, &
-        ri_rpa_method_gpw, wfc_mm_style_gemm, wfc_mm_style_syrk
-   USE input_cp2k_hfx,                  ONLY: create_hfx_section
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: integer_t,&
-                                              real_t
-   USE kinds,                           ONLY: dp
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: Bates2013, &
+                           DelBen2012, &
+                           DelBen2013, &
+                           DelBen2015, &
+                           DelBen2015b, &
+                           Rybkin2016
+   USE cp_eri_mme_interface, ONLY: create_eri_mme_section
+   USE cp_output_handling, ONLY: add_last_numeric, &
+                                 cp_print_key_section_create, &
+                                 debug_print_level, &
+                                 high_print_level, &
+                                 low_print_level, &
+                                 medium_print_level, &
+                                 silent_print_level
+   USE input_constants, ONLY: &
+      do_eri_gpw, do_eri_mme, do_eri_os, do_hfx_potential_coulomb, do_mp2_potential_tshpsc, &
+      gaussian, gw_pade_approx, gw_two_pole_model, mp2_method_direct, mp2_method_gpw, &
+      mp2_method_none, mp2_ri_optimize_basis, numerical, ri_coulomb, ri_mp2_laplace, &
+      ri_mp2_method_gpw, ri_overlap, ri_rpa_g0w0_crossing_bisection, &
+      ri_rpa_g0w0_crossing_newton, ri_rpa_g0w0_crossing_none, ri_rpa_g0w0_crossing_z_shot, &
+      ri_rpa_method_gpw, wfc_mm_style_gemm, wfc_mm_style_syrk
+   USE input_cp2k_hfx, ONLY: create_hfx_section
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: integer_t, &
+                              real_t
+   USE kinds, ONLY: dp
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -64,7 +64,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mp2_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection
@@ -289,7 +289,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mp2_direct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -372,7 +372,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_opt_ri_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -453,7 +453,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_ri_laplace', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1024,7 +1024,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_periodic_gw_correction_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1144,7 +1144,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_bse_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1191,7 +1191,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_ic_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1262,7 +1262,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_ri_im_time', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -1386,7 +1386,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mao_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1616,7 +1616,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mp2_potential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

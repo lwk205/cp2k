@@ -18,33 +18,33 @@
 
 MODULE rt_propagation_types
 
-   USE bibliography,                    ONLY: Kunert2003,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              rtp_control_type
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type,&
-                                              fm_pool_get_el_struct
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_get,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_deallocate_matrix,&
-                                              dbcsr_init_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE qs_matrix_pools,                 ONLY: mpools_get,&
-                                              qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE bibliography, ONLY: Kunert2003, &
+                           cite_reference
+   USE cp_control_types, ONLY: dft_control_type, &
+                               rtp_control_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type, &
+                               fm_pool_get_el_struct
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_get, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE cp_log_handling, ONLY: cp_to_string
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_deallocate_matrix, &
+                        dbcsr_init_p, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
+   USE qs_matrix_pools, ONLY: mpools_get, &
+                              qs_matrix_pools_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -200,23 +200,23 @@ CONTAINS
          END IF
          DO i = 1, nspin
             DO j = 1, 2
-               NULLIFY (rtp%mos%old(2*(i-1)+j)%matrix)
-               NULLIFY (rtp%mos%new(2*(i-1)+j)%matrix)
-               NULLIFY (rtp%mos%next(2*(i-1)+j)%matrix)
-               CALL cp_fm_create(rtp%mos%old(2*(i-1)+j)%matrix, &
+               NULLIFY (rtp%mos%old(2*(i - 1) + j)%matrix)
+               NULLIFY (rtp%mos%new(2*(i - 1) + j)%matrix)
+               NULLIFY (rtp%mos%next(2*(i - 1) + j)%matrix)
+               CALL cp_fm_create(rtp%mos%old(2*(i - 1) + j)%matrix, &
                                  matrix_struct=mos(i)%mo_set%mo_coeff%matrix_struct, &
-                                 name="mos_old"//TRIM(ADJUSTL(cp_to_string(2*(i-1)+j))))
-               CALL cp_fm_create(rtp%mos%new(2*(i-1)+j)%matrix, &
+                                 name="mos_old"//TRIM(ADJUSTL(cp_to_string(2*(i - 1) + j))))
+               CALL cp_fm_create(rtp%mos%new(2*(i - 1) + j)%matrix, &
                                  matrix_struct=mos(i)%mo_set%mo_coeff%matrix_struct, &
-                                 name="mos_new"//TRIM(ADJUSTL(cp_to_string(2*(i-1)+j))))
-               CALL cp_fm_create(rtp%mos%next(2*(i-1)+j)%matrix, &
+                                 name="mos_new"//TRIM(ADJUSTL(cp_to_string(2*(i - 1) + j))))
+               CALL cp_fm_create(rtp%mos%next(2*(i - 1) + j)%matrix, &
                                  matrix_struct=mos(i)%mo_set%mo_coeff%matrix_struct, &
-                                 name="mos_next"//TRIM(ADJUSTL(cp_to_string(2*(i-1)+j))))
+                                 name="mos_next"//TRIM(ADJUSTL(cp_to_string(2*(i - 1) + j))))
                IF (dft_control%do_admm) THEN
-                  NULLIFY (rtp%mos%admm(2*(i-1)+j)%matrix)
-                  CALL cp_fm_create(rtp%mos%admm(2*(i-1)+j)%matrix, &
+                  NULLIFY (rtp%mos%admm(2*(i - 1) + j)%matrix)
+                  CALL cp_fm_create(rtp%mos%admm(2*(i - 1) + j)%matrix, &
                                     matrix_struct=mos_aux(i)%mo_set%mo_coeff%matrix_struct, &
-                                    name="mos_admm"//TRIM(ADJUSTL(cp_to_string(2*(i-1)+j))))
+                                    name="mos_admm"//TRIM(ADJUSTL(cp_to_string(2*(i - 1) + j))))
                END IF
             END DO
          END DO
@@ -381,7 +381,7 @@ CONTAINS
       TYPE(rt_prop_type), INTENT(inout)                  :: rtp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rt_prop_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CALL dbcsr_deallocate_matrix_set(rtp%exp_H_old)
       CALL dbcsr_deallocate_matrix_set(rtp%exp_H_new)
@@ -436,7 +436,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: aspc_order
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rtp_history_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, nmat
       TYPE(rtp_history_type), POINTER                    :: history
@@ -486,7 +486,7 @@ CONTAINS
       TYPE(rt_prop_type), INTENT(inout)                  :: rtp
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rtp_history_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 

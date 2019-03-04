@@ -12,14 +12,14 @@
 ! **************************************************************************************************
 MODULE reftraj_types
 
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -140,7 +140,7 @@ CONTAINS
 
       IF (ASSOCIATED(reftraj)) THEN
          CPASSERT(reftraj%ref_count > 0)
-         reftraj%ref_count = reftraj%ref_count+1
+         reftraj%ref_count = reftraj%ref_count + 1
       END IF
 
    END SUBROUTINE retain_reftraj
@@ -157,11 +157,11 @@ CONTAINS
       TYPE(reftraj_type), POINTER                        :: reftraj
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_reftraj', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(reftraj)) THEN
          CPASSERT(reftraj%ref_count > 0)
-         reftraj%ref_count = reftraj%ref_count-1
+         reftraj%ref_count = reftraj%ref_count - 1
          IF (reftraj%ref_count < 1) THEN
             CALL parser_release(reftraj%info%traj_parser)
             CALL parser_release(reftraj%info%cell_parser)

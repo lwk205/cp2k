@@ -9,37 +9,37 @@
 !> \author fschiff (01.2007)
 ! **************************************************************************************************
 MODULE et_coupling
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_invert,&
-                                              cp_fm_transpose
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type,&
-                                              fm_pool_get_el_struct
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE mathlib,                         ONLY: diamat_all
-   USE message_passing,                 ONLY: mp_sum
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_matrix_pools,                 ONLY: mpools_get
-   USE qs_mo_types,                     ONLY: get_mo_set
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_invert, &
+                                 cp_fm_transpose
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type, &
+                               fm_pool_get_el_struct
+   USE cp_fm_struct, ONLY: cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE mathlib, ONLY: diamat_all
+   USE message_passing, ONLY: mp_sum
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_matrix_pools, ONLY: mpools_get
+   USE qs_mo_types, ONLY: get_mo_set
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -63,7 +63,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calc_et_coupling', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iw, j, k, nao, ncol_local, &
                                                             nmo, nrow_local
@@ -168,7 +168,7 @@ CONTAINS
 
          DO j = 1, ncol_local
             DO k = 1, nrow_local
-               b(i) = b(i)+rest_MO(2)%matrix%local_data(k, j)*inverse_mat%local_data(k, j)
+               b(i) = b(i) + rest_MO(2)%matrix%local_data(k, j)*inverse_mat%local_data(k, j)
             END DO
          END DO
 
@@ -176,7 +176,7 @@ CONTAINS
          a(i) = 0.0_dp
          DO j = 1, ncol_local
             DO k = 1, nrow_local
-               a(i) = a(i)+rest_MO(1)%matrix%local_data(k, j)*Tinverse%local_data(k, j)
+               a(i) = a(i) + rest_MO(1)%matrix%local_data(k, j)*Tinverse%local_data(k, j)
             END DO
          END DO
          IF (is_spin_constraint) THEN
@@ -200,10 +200,10 @@ CONTAINS
 
       IF (dft_control%nspins == 2) THEN
          Sda = S_det(1)*S_det(2)
-         Wda = ((a(1)+a(2))+(b(1)+b(2)))*0.5_dp*Sda
+         Wda = ((a(1) + a(2)) + (b(1) + b(2)))*0.5_dp*Sda
       ELSE
          Sda = S_det(1)**2
-         Wda = (a(1)+b(1))*Sda
+         Wda = (a(1) + b(1))*Sda
       END IF
 
       IF (dft_control%qs_control%ddapc_restraint) THEN
@@ -239,9 +239,9 @@ CONTAINS
       CALL get_qs_env(qs_env, energy=energy)
       W_mat(1, 1) = energy%total
       W_mat(2, 2) = qs_env%et_coupling%energy
-      a(1) = (energy%total+strength*Wbb)*Sda-strength*Wda
-      a(2) = (qs_env%et_coupling%energy+qs_env%et_coupling%e1*Waa)*Sda-qs_env%et_coupling%e1*Wda
-      W_mat(1, 2) = (a(1)+a(2))*0.5_dp
+      a(1) = (energy%total + strength*Wbb)*Sda - strength*Wda
+      a(2) = (qs_env%et_coupling%energy + qs_env%et_coupling%e1*Waa)*Sda - qs_env%et_coupling%e1*Wda
+      W_mat(1, 2) = (a(1) + a(2))*0.5_dp
       W_mat(2, 1) = W_mat(1, 2)
 
       S_mat = MATMUL(W_mat, (tmp_mat))

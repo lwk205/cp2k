@@ -17,12 +17,12 @@
 ! **************************************************************************************************
 MODULE neb_types
 
-   USE force_env_types,                 ONLY: force_env_type
-   USE input_constants,                 ONLY: do_band_cartesian,&
-                                              do_band_collective
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
+   USE force_env_types, ONLY: force_env_type
+   USE input_constants, ONLY: do_band_cartesian, &
+                              do_band_collective
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -124,7 +124,7 @@ CONTAINS
       TYPE(neb_var_type), POINTER                        :: neb_var
 
       CHARACTER(len=*), PARAMETER :: routineN = 'neb_var_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(neb_var))
       IF (ASSOCIATED(neb_var%xyz)) THEN

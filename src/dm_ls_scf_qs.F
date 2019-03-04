@@ -11,66 +11,66 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE dm_ls_scf_qs
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_complete_redistribute, dbcsr_copy, dbcsr_copy_into_existing, dbcsr_create, &
-        dbcsr_desymmetrize, dbcsr_distribution_get, dbcsr_distribution_hold, &
-        dbcsr_distribution_new, dbcsr_distribution_release, dbcsr_distribution_type, &
-        dbcsr_finalize, dbcsr_get_info, dbcsr_multiply, dbcsr_nblkrows_total, dbcsr_p_type, &
-        dbcsr_release, dbcsr_set, dbcsr_type, dbcsr_type_real_4, dbcsr_type_real_8
-   USE dm_ls_scf_types,                 ONLY: ls_cluster_atomic,&
-                                              ls_cluster_molecular,&
-                                              ls_mstruct_type,&
-                                              ls_scf_env_type
-   USE input_constants,                 ONLY: ls_cluster_atomic,&
-                                              ls_cluster_molecular
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_density_mixing_types,         ONLY: direct_mixing_nr,&
-                                              gspace_mixing_nr
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_gspace_mixing,                ONLY: gspace_mixing,&
-                                              mixing_allocate,&
-                                              mixing_init
-   USE qs_initial_guess,                ONLY: calculate_atomic_block_dm,&
-                                              calculate_mopac_dm
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_methods,                   ONLY: qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_did_change,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho_atom_types,               ONLY: rho_atom_type
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE dbcsr_api, ONLY: &
+      dbcsr_complete_redistribute, dbcsr_copy, dbcsr_copy_into_existing, dbcsr_create, &
+      dbcsr_desymmetrize, dbcsr_distribution_get, dbcsr_distribution_hold, &
+      dbcsr_distribution_new, dbcsr_distribution_release, dbcsr_distribution_type, &
+      dbcsr_finalize, dbcsr_get_info, dbcsr_multiply, dbcsr_nblkrows_total, dbcsr_p_type, &
+      dbcsr_release, dbcsr_set, dbcsr_type, dbcsr_type_real_4, dbcsr_type_real_8
+   USE dm_ls_scf_types, ONLY: ls_cluster_atomic, &
+                              ls_cluster_molecular, &
+                              ls_mstruct_type, &
+                              ls_scf_env_type
+   USE input_constants, ONLY: ls_cluster_atomic, &
+                              ls_cluster_molecular
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_density_mixing_types, ONLY: direct_mixing_nr, &
+                                      gspace_mixing_nr
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_gspace_mixing, ONLY: gspace_mixing, &
+                               mixing_allocate, &
+                               mixing_init
+   USE qs_initial_guess, ONLY: calculate_atomic_block_dm, &
+                               calculate_mopac_dm
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_methods, ONLY: qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: qs_ks_did_change, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho_atom_types, ONLY: rho_atom_type
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -100,7 +100,7 @@ CONTAINS
       TYPE(ls_mstruct_type), INTENT(IN)                  :: ls_mstruct
 
       CHARACTER(len=*), PARAMETER :: routineN = 'matrix_ls_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: name
       INTEGER                                            :: handle, iatom, imol, jatom, &
@@ -108,8 +108,8 @@ CONTAINS
       INTEGER, ALLOCATABLE, DIMENSION(:), TARGET         :: atom_to_cluster, atom_to_cluster_primus, &
                                                             clustered_blk_sizes, primus_of_mol
       INTEGER, DIMENSION(:), POINTER :: clustered_col_clusters, clustered_col_dist, &
-         clustered_row_clusters, clustered_row_dist, ls_blk_sizes, ls_col_cluster, ls_col_dist, &
-         ls_row_cluster, ls_row_dist
+                                        clustered_row_clusters, clustered_row_dist, ls_blk_sizes, ls_col_cluster, ls_col_dist, &
+                                        ls_row_cluster, ls_row_dist
       LOGICAL                                            :: ls_has_col_clusters, ls_has_row_clusters
       TYPE(dbcsr_distribution_type)                      :: ls_dist, ls_dist_clustered
 
@@ -188,7 +188,7 @@ CONTAINS
          ALLOCATE (clustered_blk_sizes(nmol))
          clustered_blk_sizes = 0
          DO iatom = 1, natom
-            clustered_blk_sizes(atom_to_cluster(iatom)) = clustered_blk_sizes(atom_to_cluster(iatom))+ &
+            clustered_blk_sizes(atom_to_cluster(iatom)) = clustered_blk_sizes(atom_to_cluster(iatom)) + &
                                                           ls_blk_sizes(iatom)
          ENDDO
          ls_blk_sizes => clustered_blk_sizes ! redirect pointer
@@ -509,7 +509,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ls_scf_qs_atomic_guess', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nspin, unit_nr
       INTEGER, DIMENSION(2)                              :: nelectron_spin
@@ -593,7 +593,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iscf
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ls_scf_dm_to_ks', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspin, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -631,7 +631,7 @@ CONTAINS
             IF (iscf .GT. MAX(ls_scf_env%mixing_store%nskip_mixing, 1)) THEN
                CALL gspace_mixing(qs_env, ls_scf_env%density_mixing_method, &
                                   ls_scf_env%mixing_store, rho, para_env, &
-                                  iscf-1)
+                                  iscf - 1)
                IF (unit_nr > 0) THEN
                   WRITE (unit_nr, '(A57)') &
                      "*********************************************************"
@@ -640,7 +640,7 @@ CONTAINS
                      " to mix rho: method=", ls_scf_env%mixing_store%iter_method, ", iscf=", iscf
                   WRITE (unit_nr, '(A8,F5.3,A6,F5.3,A8)') &
                      " rho_nw=", ls_scf_env%mixing_store%alpha, "*rho + ", &
-                     1.0_dp-ls_scf_env%mixing_store%alpha, "*rho_old"
+                     1.0_dp - ls_scf_env%mixing_store%alpha, "*rho_old"
                   WRITE (unit_nr, '(A57)') &
                      "*********************************************************"
                ENDIF
@@ -675,7 +675,7 @@ CONTAINS
       INTEGER, DIMENSION(:), POINTER                     :: stride
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_matrix_to_cube', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: tot_rho
@@ -751,7 +751,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rho_mixing_ls_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(dft_control_type), POINTER                    :: dft_control

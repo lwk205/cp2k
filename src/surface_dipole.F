@@ -6,32 +6,32 @@
 ! **************************************************************************************************
 MODULE surface_dipole
 
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE message_passing,                 ONLY: mp_sum
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_grid_types,                   ONLY: PW_MODE_LOCAL
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE message_passing, ONLY: mp_sum
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_grid_types, ONLY: PW_MODE_LOCAL
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_subsys_types, ONLY: qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -59,7 +59,7 @@ CONTAINS
       TYPE(qs_energy_type), POINTER                      :: energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calc_dipsurf_potential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, idir_surfdip, ilayer_min, &
                                                             ilow, irho, ispin, isurf, iup, jsurf
@@ -167,7 +167,7 @@ CONTAINS
          END DO
       ENDIF
 
-      surfarea = cell%hmat(isurf, isurf)*cell%hmat(jsurf, jsurf)- &
+      surfarea = cell%hmat(isurf, isurf)*cell%hmat(jsurf, jsurf) - &
                  cell%hmat(isurf, jsurf)*cell%hmat(jsurf, isurf)
       dsurf = surfarea/REAL(ngrid(isurf)*ngrid(jsurf), dp)
 
@@ -178,25 +178,25 @@ CONTAINS
 
       ! locate where the vacuum is, and set the reference point for the calculation of the dipole
       rhoavsurf(ilow:iup) = rhoavsurf(ilow:iup)/surfarea
-      ilayer_min = ilow-1+MINLOC(ABS(rhoavsurf(ilow:iup)), 1)
+      ilayer_min = ilow - 1 + MINLOC(ABS(rhoavsurf(ilow:iup)), 1)
       rhoav_min = ABS(rhoavsurf(ilayer_min))
       IF (rhoav_min >= 1.E-5_dp) &
          CPABORT(" Dipole correction needs more vacuum space above the surface ")
-      height_min = REAL((ilayer_min-ilow), dp)*dh(idir_surfdip, idir_surfdip)
+      height_min = REAL((ilayer_min - ilow), dp)*dh(idir_surfdip, idir_surfdip)
 
 !   surface dipole form average rhoavsurf
 !   \sum_i NjdjNkdkdi rhoav_i (i-imin)di
       dip_hh = 0.0_dp
       dip_fac = wf_r%pw%pw_grid%vol*dh(idir_surfdip, idir_surfdip)/REAL(ngrid(idir_surfdip), dp)
 
-      DO i = ilayer_min+1, ilayer_min+ngrid(idir_surfdip)
-         hh = REAL((i-ilayer_min), dp)
+      DO i = ilayer_min + 1, ilayer_min + ngrid(idir_surfdip)
+         hh = REAL((i - ilayer_min), dp)
          IF (i > iup) THEN
-            irho = i-ngrid(idir_surfdip)
+            irho = i - ngrid(idir_surfdip)
          ELSE
             irho = i
          END IF
-         dip_hh = dip_hh+rhoavsurf(irho)*hh*dip_fac
+         dip_hh = dip_hh + rhoavsurf(irho)*hh*dip_fac
       END DO
 
       DEALLOCATE (rhoavsurf)
@@ -205,27 +205,27 @@ CONTAINS
       CALL pw_zero(vdip_r%pw)
       vdip_fac = dip_hh*4.0_dp*pi
 
-      DO i = ilayer_min+1, ilayer_min+ngrid(idir_surfdip)
-         hh = REAL((i-ilayer_min), dp)*dh(idir_surfdip, idir_surfdip)
-         vdip = vdip_fac*(-0.5_dp+(hh/cell%hmat(idir_surfdip, idir_surfdip)))* &
+      DO i = ilayer_min + 1, ilayer_min + ngrid(idir_surfdip)
+         hh = REAL((i - ilayer_min), dp)*dh(idir_surfdip, idir_surfdip)
+         vdip = vdip_fac*(-0.5_dp + (hh/cell%hmat(idir_surfdip, idir_surfdip)))* &
                 v_hartree_rspace%pw_grid%dvol/surfarea
          IF (i > iup) THEN
-            irho = i-ngrid(idir_surfdip)
+            irho = i - ngrid(idir_surfdip)
          ELSE
             irho = i
          END IF
          IF (idir_surfdip == 3) THEN
             vdip_r%pw%cr3d(bo(1, 1):bo(2, 1), bo(1, 2):bo(2, 2), irho) = &
-               vdip_r%pw%cr3d(bo(1, 1):bo(2, 1), bo(1, 2):bo(2, 2), irho)+vdip
+               vdip_r%pw%cr3d(bo(1, 1):bo(2, 1), bo(1, 2):bo(2, 2), irho) + vdip
          ELSEIF (idir_surfdip == 2) THEN
             IF (irho >= bo(1, 2) .AND. irho <= bo(2, 2)) THEN
                vdip_r%pw%cr3d(bo(1, 1):bo(2, 1), irho, bo(1, 3):bo(2, 3)) = &
-                  vdip_r%pw%cr3d(bo(1, 1):bo(2, 1), irho, bo(1, 3):bo(2, 3))+vdip
+                  vdip_r%pw%cr3d(bo(1, 1):bo(2, 1), irho, bo(1, 3):bo(2, 3)) + vdip
             END IF
          ELSE
             IF (irho >= bo(1, 1) .AND. irho <= bo(2, 1)) THEN
                vdip_r%pw%cr3d(irho, bo(1, 2):bo(2, 2), bo(1, 3):bo(2, 3)) = &
-                  vdip_r%pw%cr3d(irho, bo(1, 2):bo(2, 2), bo(1, 3):bo(2, 3))+vdip
+                  vdip_r%pw%cr3d(irho, bo(1, 2):bo(2, 2), bo(1, 3):bo(2, 3)) + vdip
             END IF
          END IF
 

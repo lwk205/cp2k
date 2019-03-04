@@ -13,46 +13,46 @@
 !>      Teodoro Laino (05.2009) [tlaino] - Split and module reorganization
 ! **************************************************************************************************
 MODULE se_fock_matrix
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE atprop_types,                    ONLY: atprop_array_init,&
-                                              atprop_type
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              semi_empirical_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_copy,&
-                                              dbcsr_get_info,&
-                                              dbcsr_multiply,&
-                                              dbcsr_p_type,&
-                                              dbcsr_trace,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_mndo, do_method_mndod, do_method_pdg, do_method_pm3, &
-        do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE particle_types,                  ONLY: particle_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE se_fock_matrix_coulomb,          ONLY: build_fock_matrix_coul_lr_r3,&
-                                              build_fock_matrix_coulomb,&
-                                              build_fock_matrix_coulomb_lr
-   USE se_fock_matrix_dbg,              ONLY: dbg_energy_coulomb_lr
-   USE se_fock_matrix_exchange,         ONLY: build_fock_matrix_exchange
-   USE semi_empirical_store_int_types,  ONLY: semi_empirical_si_finalize,&
-                                              semi_empirical_si_initialize,&
-                                              semi_empirical_si_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE atprop_types, ONLY: atprop_array_init, &
+                           atprop_type
+   USE cp_control_types, ONLY: dft_control_type, &
+                               semi_empirical_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_copy, &
+                        dbcsr_get_info, &
+                        dbcsr_multiply, &
+                        dbcsr_p_type, &
+                        dbcsr_trace, &
+                        dbcsr_type
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_mndo, do_method_mndod, do_method_pdg, do_method_pm3, &
+      do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE particle_types, ONLY: particle_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE se_fock_matrix_coulomb, ONLY: build_fock_matrix_coul_lr_r3, &
+                                     build_fock_matrix_coulomb, &
+                                     build_fock_matrix_coulomb_lr
+   USE se_fock_matrix_dbg, ONLY: dbg_energy_coulomb_lr
+   USE se_fock_matrix_exchange, ONLY: build_fock_matrix_exchange
+   USE semi_empirical_store_int_types, ONLY: semi_empirical_si_finalize, &
+                                             semi_empirical_si_initialize, &
+                                             semi_empirical_si_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -80,7 +80,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_se_fock_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, natom, ncol_global, &
                                                             nspins, output_unit
@@ -192,7 +192,7 @@ CONTAINS
          ! NOTE: If we are performing SCP-NDDO, ks_matrix contains coulomb piece from SCP.
          DO ispin = 1, nspins
             CALL dbcsr_trace(ks_matrix(ispin)%matrix, matrix_p(ispin)%matrix, trace=ecoul)
-            energy%hartree = energy%hartree+ecoul
+            energy%hartree = energy%hartree + ecoul
          END DO
 !      WRITE ( *, * ) 'AFTER Hartree',  ecoul, energy%hartree
 
@@ -206,7 +206,7 @@ CONTAINS
                ! Compute QM/MM Energy
                CALL dbcsr_trace(qs_env%ks_qmmm_env%matrix_h(1)%matrix, &
                                 matrix_p(ispin)%matrix, trace=qmmm_el)
-               energy%qmmm_el = energy%qmmm_el+qmmm_el
+               energy%qmmm_el = energy%qmmm_el + qmmm_el
             END DO
          END IF
 
@@ -214,11 +214,11 @@ CONTAINS
          ! Collect all the energy terms
          energy%mulliken = 0.0_dp
          energy%exc = 0.0_dp
-         energy%total = energy%total+energy%core+ &
-                        energy%core_overlap+ &
-                        0.5_dp*energy%hartree+ &
-                        energy%qmmm_el+ &
-                        energy%dispersion+ &
+         energy%total = energy%total + energy%core + &
+                        energy%core_overlap + &
+                        0.5_dp*energy%hartree + &
+                        energy%qmmm_el + &
+                        energy%dispersion + &
                         energy%mulliken
 !      WRITE ( *, * ) ' AFTER TOTAL', energy%total
 

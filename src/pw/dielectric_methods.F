@@ -11,36 +11,36 @@
 ! **************************************************************************************************
 MODULE dielectric_methods
 
-   USE dct,                             ONLY: pw_expand
-   USE dielectric_types,                ONLY: &
-        derivative_cd3, derivative_cd5, derivative_cd7, derivative_fft, derivative_fft_use_deps, &
-        derivative_fft_use_drho, dielectric_parameters, dielectric_type, rho_dependent, &
-        spatially_dependent, spatially_rho_dependent
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: twopi
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_derive,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create,&
-                                              pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_release,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
-   USE realspace_grid_types,            ONLY: realspace_grid_type
-   USE rs_methods,                      ONLY: derive_fdm_cd3,&
-                                              derive_fdm_cd5,&
-                                              derive_fdm_cd7,&
-                                              pw_mollifier,&
-                                              setup_grid_axes
+   USE dct, ONLY: pw_expand
+   USE dielectric_types, ONLY: &
+      derivative_cd3, derivative_cd5, derivative_cd7, derivative_fft, derivative_fft_use_deps, &
+      derivative_fft_use_drho, dielectric_parameters, dielectric_type, rho_dependent, &
+      spatially_dependent, spatially_rho_dependent
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: twopi
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_derive, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create, &
+                            pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_release, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
+   USE realspace_grid_types, ONLY: realspace_grid_type
+   USE rs_methods, ONLY: derive_fdm_cd3, &
+                         derive_fdm_cd5, &
+                         derive_fdm_cd7, &
+                         pw_mollifier, &
+                         setup_grid_axes
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -71,7 +71,7 @@ CONTAINS
       TYPE(dielectric_parameters), INTENT(IN)            :: dielectric_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -123,7 +123,7 @@ CONTAINS
       TYPE(pw_type), INTENT(IN), OPTIONAL, POINTER       :: rho_core
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_compute_periodic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(dp), PARAMETER                                :: small_value = EPSILON(1.0_dp)
 
       INTEGER                                            :: derivative_method, dielec_functiontype, &
@@ -267,7 +267,7 @@ CONTAINS
 
       CALL pw_pool_give_back_pw(pw_pool, rho_elec_rs)
 
-      dielectric%params%times_called = dielectric%params%times_called+1
+      dielectric%params%times_called = dielectric%params%times_called + 1
 
       CALL timestop(handle)
 
@@ -309,7 +309,7 @@ CONTAINS
       TYPE(pw_type), INTENT(IN), OPTIONAL, POINTER       :: rho_core
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_compute_neumann', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(dp), PARAMETER                                :: small_value = EPSILON(1.0_dp)
 
       INTEGER                                            :: derivative_method, dielec_functiontype, &
@@ -469,7 +469,7 @@ CONTAINS
       CALL pw_pool_give_back_pw(pw_pool_xpndd, rho_elec_rs_xpndd)
       CALL pw_pool_release(pw_pool_xpndd)
 
-      dielectric%params%times_called = dielectric%params%times_called+1
+      dielectric%params%times_called = dielectric%params%times_called + 1
 
       CALL timestop(handle)
 
@@ -494,7 +494,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: eps0, rho_max, rho_min
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_constant_sccs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, k, lb1, lb2, lb3, ub1, &
                                                             ub2, ub3
@@ -512,7 +512,7 @@ CONTAINS
       lb2 = bounds_local(1, 2); ub2 = bounds_local(2, 2)
       lb3 = bounds_local(1, 3); ub3 = bounds_local(2, 3)
 
-      denom = LOG(rho_max)-LOG(rho_min)
+      denom = LOG(rho_max) - LOG(rho_min)
       DO k = lb3, ub3
          DO j = lb2, ub2
             DO i = lb1, ub1
@@ -523,9 +523,9 @@ CONTAINS
                   eps%cr3d(i, j, k) = 1.0_dp
                   deps_drho%cr3d(i, j, k) = 0.0_dp
                ELSE
-                  t = twopi*(LOG(rho_max)-LOG(rho%cr3d(i, j, k)))/denom
-                  eps%cr3d(i, j, k) = EXP(LOG(eps0)*(t-SIN(t))/twopi)
-                  deps_drho%cr3d(i, j, k) = -eps%cr3d(i, j, k)*LOG(eps0)*(1.0_dp-COS(t))/(denom*rho%cr3d(i, j, k))
+                  t = twopi*(LOG(rho_max) - LOG(rho%cr3d(i, j, k)))/denom
+                  eps%cr3d(i, j, k) = EXP(LOG(eps0)*(t - SIN(t))/twopi)
+                  deps_drho%cr3d(i, j, k) = -eps%cr3d(i, j, k)*LOG(eps0)*(1.0_dp - COS(t))/(denom*rho%cr3d(i, j, k))
                END IF
             END DO
          END DO
@@ -568,7 +568,7 @@ CONTAINS
                                                             z_locl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_constant_aa_cuboidal', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       LOGICAL, DIMENSION(6), PARAMETER                   :: test_forb_xtnts = .TRUE.
 
       INTEGER                                            :: handle, i, j, k, lb1, lb2, lb3, &
@@ -591,11 +591,11 @@ CONTAINS
       dx = pw_grid%dr(1); dy = pw_grid%dr(2); dz = pw_grid%dr(3)
 
       forb_xtnt1 = x_xtnt(1) .LT. x_glbl(LBOUND(x_glbl, 1))
-      forb_xtnt2 = x_xtnt(2) .GT. x_glbl(UBOUND(x_glbl, 1))+dx
+      forb_xtnt2 = x_xtnt(2) .GT. x_glbl(UBOUND(x_glbl, 1)) + dx
       forb_xtnt3 = y_xtnt(1) .LT. y_glbl(LBOUND(y_glbl, 1))
-      forb_xtnt4 = y_xtnt(2) .GT. y_glbl(UBOUND(y_glbl, 1))+dy
+      forb_xtnt4 = y_xtnt(2) .GT. y_glbl(UBOUND(y_glbl, 1)) + dy
       forb_xtnt5 = z_xtnt(1) .LT. z_glbl(LBOUND(z_glbl, 1))
-      forb_xtnt6 = z_xtnt(2) .GT. z_glbl(UBOUND(z_glbl, 1))+dz
+      forb_xtnt6 = z_xtnt(2) .GT. z_glbl(UBOUND(z_glbl, 1)) + dz
       n_forb_xtnts = COUNT((/forb_xtnt1, forb_xtnt2, forb_xtnt3, &
                              forb_xtnt4, forb_xtnt5, forb_xtnt6/) .EQV. test_forb_xtnts)
       IF (n_forb_xtnts .GT. 0) THEN
@@ -664,7 +664,7 @@ CONTAINS
                                                             z_locl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_constant_xaa_annular', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       LOGICAL, DIMENSION(6), PARAMETER                   :: test_forb_xtnts = .TRUE.
 
       INTEGER                                            :: handle, i, j, k, lb1, lb2, lb3, &
@@ -688,11 +688,11 @@ CONTAINS
       dx = pw_grid%dr(1); dy = pw_grid%dr(2); dz = pw_grid%dr(3)
 
       forb_xtnt1 = x_xtnt(1) .LT. x_glbl(LBOUND(x_glbl, 1))
-      forb_xtnt2 = x_xtnt(2) .GT. x_glbl(UBOUND(x_glbl, 1))+dx
-      forb_xtnt3 = bctry-MAXVAL(base_radii) .LT. y_glbl(LBOUND(y_glbl, 1))
-      forb_xtnt4 = bctry+MAXVAL(base_radii) .GT. y_glbl(UBOUND(y_glbl, 1))+dy
-      forb_xtnt5 = bctrz-MAXVAL(base_radii) .LT. z_glbl(LBOUND(z_glbl, 1))
-      forb_xtnt6 = bctrz+MAXVAL(base_radii) .GT. z_glbl(UBOUND(z_glbl, 1))+dz
+      forb_xtnt2 = x_xtnt(2) .GT. x_glbl(UBOUND(x_glbl, 1)) + dx
+      forb_xtnt3 = bctry - MAXVAL(base_radii) .LT. y_glbl(LBOUND(y_glbl, 1))
+      forb_xtnt4 = bctry + MAXVAL(base_radii) .GT. y_glbl(UBOUND(y_glbl, 1)) + dy
+      forb_xtnt5 = bctrz - MAXVAL(base_radii) .LT. z_glbl(LBOUND(z_glbl, 1))
+      forb_xtnt6 = bctrz + MAXVAL(base_radii) .GT. z_glbl(UBOUND(z_glbl, 1)) + dz
       n_forb_xtnts = COUNT((/forb_xtnt1, forb_xtnt2, forb_xtnt3, &
                              forb_xtnt4, forb_xtnt5, forb_xtnt6/) .EQV. test_forb_xtnts)
       IF (n_forb_xtnts .GT. 0) THEN
@@ -712,7 +712,7 @@ CONTAINS
       DO k = lb3, ub3
          DO j = lb2, ub2
             DO i = lb1, ub1
-               distsq = (y_locl(j)-bctry)**2+(z_locl(k)-bctrz)**2
+               distsq = (y_locl(j) - bctry)**2 + (z_locl(k) - bctrz)**2
                IF ((x_locl(i) .GE. x_xtnt(1)) .AND. (x_locl(i) .LE. x_xtnt(2)) .AND. &
                    (distsq .GE. MINVAL(base_radii)**2) .AND. (distsq .LE. MAXVAL(base_radii)**2)) THEN
                   eps_tmp%cr3d(i, j, k) = dielec_const
@@ -744,7 +744,7 @@ CONTAINS
       TYPE(dielectric_parameters), INTENT(IN)            :: dielectric_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_constant_spatially_dependent', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, j, n_aa_cuboidal, &
                                                             n_dielectric_region, n_xaa_annular
@@ -762,7 +762,7 @@ CONTAINS
       n_xaa_annular = dielectric_params%n_xaa_annular
       pw_grid => pw_pool%pw_grid
       CALL setup_grid_axes(pw_grid, x_glbl, y_glbl, z_glbl, x_locl, y_locl, z_locl)
-      n_dielectric_region = n_aa_cuboidal+n_xaa_annular
+      n_dielectric_region = n_aa_cuboidal + n_xaa_annular
 
       IF (n_dielectric_region .EQ. 0) THEN
          CPABORT("No density independent dielectric region is defined.")
@@ -818,7 +818,7 @@ CONTAINS
       TYPE(dielectric_parameters), INTENT(IN)            :: dielectric_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_constant_spatially_rho_dependent', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(pw_type), POINTER                             :: dswch_func_drho, eps_sptldep, swch_func
@@ -840,7 +840,7 @@ CONTAINS
       CALL dielectric_constant_sccs(rho, swch_func, dswch_func_drho, 2.0_dp, &
                                     dielectric_params%rho_max, dielectric_params%rho_min)
 
-      eps%cr3d = ((swch_func%cr3d-1.0_dp)*(eps_sptldep%cr3d-1.0_dp))+1.0_dp
+      eps%cr3d = ((swch_func%cr3d-1.0_dp)*(eps_sptldep%cr3d-1.0_dp)) + 1.0_dp
       deps_drho%cr3d = dswch_func_drho%cr3d*(eps_sptldep%cr3d-1.0_dp)
 
       CALL pw_pool_give_back_pw(pw_pool, dswch_func_drho)

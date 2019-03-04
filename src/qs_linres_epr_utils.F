@@ -18,47 +18,47 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE qs_linres_epr_utils
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi,&
-                                              twopi
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: a_fine,&
-                                              e_gfactor
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_linres_types,                 ONLY: deallocate_nablavks_atom_set,&
-                                              epr_env_create,&
-                                              epr_env_type,&
-                                              init_nablavks_atom_set,&
-                                              linres_control_type,&
-                                              nablavks_atom_type,&
-                                              set_epr_env
-   USE qs_matrix_pools,                 ONLY: qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: mo_set_p_type
-   USE qs_rho_atom_types,               ONLY: deallocate_rho_atom_set
-   USE qs_rho_types,                    ONLY: qs_rho_clear,&
-                                              qs_rho_create,&
-                                              qs_rho_set
-   USE scf_control_types,               ONLY: scf_control_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi, &
+                            twopi
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: a_fine, &
+                      e_gfactor
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_linres_types, ONLY: deallocate_nablavks_atom_set, &
+                              epr_env_create, &
+                              epr_env_type, &
+                              init_nablavks_atom_set, &
+                              linres_control_type, &
+                              nablavks_atom_type, &
+                              set_epr_env
+   USE qs_matrix_pools, ONLY: qs_matrix_pools_type
+   USE qs_mo_types, ONLY: mo_set_p_type
+   USE qs_rho_atom_types, ONLY: deallocate_rho_atom_set
+   USE qs_rho_types, ONLY: qs_rho_clear, &
+                           qs_rho_create, &
+                           qs_rho_set
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -165,8 +165,8 @@ CONTAINS
       ! Magical constant twopi/cell%deth just like in NMR shift (basically undo scale_fac in qs_linres_nmr_current.F)
       epr_env%g_free_factor = -1.0_dp*e_gfactor
       epr_env%g_zke_factor = e_gfactor*(a_fine)**2
-      epr_env%g_so_factor = (a_fine)**2*(-1.0_dp*e_gfactor-1.0_dp)/2.0_dp*twopi/cell%deth
-      epr_env%g_so_factor_gapw = (a_fine)**2*(-1.0_dp*e_gfactor-1.0_dp)/2.0_dp
+      epr_env%g_so_factor = (a_fine)**2*(-1.0_dp*e_gfactor - 1.0_dp)/2.0_dp*twopi/cell%deth
+      epr_env%g_so_factor_gapw = (a_fine)**2*(-1.0_dp*e_gfactor - 1.0_dp)/2.0_dp
       ! * 2 because B_ind = 2 * B_beta
       epr_env%g_soo_factor = 2.0_dp*fourpi*(a_fine)**2*twopi/cell%deth
       ! 2 * 2 * 1/4 * e^2 / m * a_0^2 * 2/3 * mu_0 / (omega * 1e-30 )
@@ -241,11 +241,11 @@ CONTAINS
       TYPE(epr_env_type)                                 :: epr_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'epr_env_cleanup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i_B, idir, ispin
 
-      epr_env%ref_count = epr_env%ref_count-1
+      epr_env%ref_count = epr_env%ref_count - 1
       IF (epr_env%ref_count == 0) THEN
          ! nablavks_set
          IF (ASSOCIATED(epr_env%nablavks_set)) THEN

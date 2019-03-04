@@ -10,22 +10,22 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_fm_basic_linalg
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_equivalent
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_p_type, &
-        cp_fm_release, cp_fm_set_all, cp_fm_set_element, cp_fm_set_submatrix, cp_fm_to_fm, &
-        cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE kahan_sum,                       ONLY: accurate_dot_product,&
-                                              accurate_sum
-   USE kinds,                           ONLY: dp,&
-                                              int_8,&
-                                              sp
-   USE machine,                         ONLY: m_memory
-   USE mathlib,                         ONLY: get_pseudo_inverse_svd,&
-                                              invert_matrix
-   USE message_passing,                 ONLY: mp_sum
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_equivalent
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_p_type, &
+      cp_fm_release, cp_fm_set_all, cp_fm_set_element, cp_fm_set_submatrix, cp_fm_to_fm, &
+      cp_fm_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE kahan_sum, ONLY: accurate_dot_product, &
+                        accurate_sum
+   USE kinds, ONLY: dp, &
+                    int_8, &
+                    sp
+   USE machine, ONLY: m_memory
+   USE mathlib, ONLY: get_pseudo_inverse_svd, &
+                      invert_matrix
+   USE message_passing, ONLY: mp_sum
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -90,7 +90,7 @@ CONTAINS
       TYPE(cp_fm_type), OPTIONAL, POINTER                :: matrix_b
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_scale_and_add', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, size_a
       REAL(KIND=dp)                                      :: my_beta
@@ -117,7 +117,7 @@ CONTAINS
          IF (matrix_a%id_nr == matrix_b%id_nr) THEN
             IF (matrix_a%id_nr == matrix_b%id_nr) &
                CPWARN("Bad use of routine. Call cp_fm_scale instead")
-            CALL cp_fm_scale(alpha+beta, matrix_a)
+            CALL cp_fm_scale(alpha + beta, matrix_a)
             CALL timestop(handle)
             RETURN
          END IF
@@ -238,13 +238,13 @@ CONTAINS
       CASE ('T')
          DO jj = 1, ncol_global
             DO ii = 1, nrow_global
-               bb(ii, jj) = beta*bb(ii, jj)+alpha*aa(jj, ii)
+               bb(ii, jj) = beta*bb(ii, jj) + alpha*aa(jj, ii)
             END DO
          END DO
       CASE DEFAULT
          DO jj = 1, ncol_global
             DO ii = 1, nrow_global
-               bb(ii, jj) = beta*bb(ii, jj)+alpha*aa(ii, jj)
+               bb(ii, jj) = beta*bb(ii, jj) + alpha*aa(ii, jj)
             END DO
          END DO
       END SELECT
@@ -293,7 +293,7 @@ CONTAINS
 
       a => matrix_a%local_data
       n = matrix_a%matrix_struct%nrow_global
-      ALLOCATE (ipivot(n+matrix_a%matrix_struct%nrow_block))
+      ALLOCATE (ipivot(n + matrix_a%matrix_struct%nrow_block))
 
 #if defined(__SCALAPACK)
       MARK_USED(correct_sign)
@@ -656,7 +656,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: matrix_a, matrix_b, matrix_c
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_schur_product', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icol_local, irow_local, mypcol, &
                                                             myprow, ncol_local, npcol, nprow, &
@@ -708,7 +708,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT)                         :: trace
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_trace_a0b0t0', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, handle, mypcol, myprow, &
                                                             ncol_local, npcol, nprow, nrow_local
@@ -780,7 +780,7 @@ CONTAINS
       REAL(kind=dp), DIMENSION(:), INTENT(out)           :: trace
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_trace_a1b0t1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, handle, imatrix, n_matrices, &
                                                             ncols_local, nrows_local
@@ -852,7 +852,7 @@ CONTAINS
       REAL(kind=dp), DIMENSION(:), INTENT(out)           :: trace
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_trace_a1b1t1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, handle, imatrix, n_matrices, &
                                                             ncols_local, nrows_local
@@ -908,7 +908,7 @@ CONTAINS
       REAL(kind=dp), DIMENSION(:, :), INTENT(out)        :: trace
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_contracted_trace_a2b2t2', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, handle, ia, ib, iz, na, nb, &
                                                             ncols_local, nrows_local, nz
@@ -937,9 +937,9 @@ CONTAINS
 !$OMP             PRIVATE(nrows_local, t, use_sp_a, use_sp_b), &
 !$OMP             SHARED(matrix_a, matrix_b, na, na8, nb, ntraces, nz, trace)
       DO itrace = 1, ntraces
-         ib8 = (itrace-1)/na8
-         ia = INT(itrace-ib8*na8)
-         ib = INT(ib8)+1
+         ib8 = (itrace - 1)/na8
+         ia = INT(itrace - ib8*na8)
+         ib = INT(ib8) + 1
 
          t = 0.0_dp
          DO iz = 1, nz
@@ -951,11 +951,11 @@ CONTAINS
             IF (.NOT. use_sp_a .AND. .NOT. use_sp_b) THEN
                ldata_a => matrix_a(iz, ia)%matrix%local_data(1:nrows_local, 1:ncols_local)
                ldata_b => matrix_b(iz, ib)%matrix%local_data(1:nrows_local, 1:ncols_local)
-               t = t+accurate_dot_product(ldata_a, ldata_b)
+               t = t + accurate_dot_product(ldata_a, ldata_b)
             ELSE IF (use_sp_a .AND. use_sp_b) THEN
                ldata_a_sp => matrix_a(iz, ia)%matrix%local_data_sp(1:nrows_local, 1:ncols_local)
                ldata_b_sp => matrix_b(iz, ib)%matrix%local_data_sp(1:nrows_local, 1:ncols_local)
-               t = t+accurate_dot_product(ldata_a_sp, ldata_b_sp)
+               t = t + accurate_dot_product(ldata_a_sp, ldata_b_sp)
             ELSE
                CPABORT("Matrices A and B are of different types")
             END IF
@@ -1015,7 +1015,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(in), OPTIONAL                :: alpha
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_fm_triangular_multiply', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER                                          :: side_char, transa, unit_diag, uplo
       INTEGER                                            :: handle, m, n
@@ -1277,7 +1277,7 @@ CONTAINS
       a => matrix%local_data
       a_sp => matrix%local_data_sp
       DO irow_global = 1, nrow_global
-         DO icol_global = irow_global+1, ncol_global
+         DO icol_global = irow_global + 1, ncol_global
             IF (matrix%use_sp) THEN
                a_sp(icol_global, irow_global) = a_sp(irow_global, icol_global)
             ELSE
@@ -1412,7 +1412,7 @@ CONTAINS
 
       a => matrix_lu%local_data
       n = matrix_lu%matrix_struct%nrow_global
-      ALLOCATE (ipivot(n+matrix_a%matrix_struct%nrow_block))
+      ALLOCATE (ipivot(n + matrix_a%matrix_struct%nrow_block))
       ipivot(:) = 0
 #if defined(__SCALAPACK)
       IF (my_eps_svd .EQ. 0.0_dp) THEN
@@ -1435,7 +1435,7 @@ CONTAINS
             DO i = 1, n
                determinant = determinant*diag(i)
                IF (ipivot(i) .NE. i) THEN
-                  exponent_of_minus_one = exponent_of_minus_one+1
+                  exponent_of_minus_one = exponent_of_minus_one + 1
                END IF
             ENDDO
             IF (PRESENT(eigval)) THEN
@@ -1482,7 +1482,7 @@ CONTAINS
                       1, 1, desca, vt%local_data, 1, 1, desca, work, lwork, info)
          ! info == n+1 implies homogeneity error when the number of procs is large
          ! this likely isnt a problem, but maybe we should handle it separately
-         IF (info /= 0 .AND. info /= n+1) &
+         IF (info /= 0 .AND. info /= n + 1) &
             CPABORT("Singular value decomposition of matrix failed.")
          ! (Pseudo)inverse and (pseudo)determinant
          CALL cp_fm_create(matrix=sigma, &
@@ -1668,7 +1668,7 @@ CONTAINS
       ALLOCATE (r_mat(ncol, ncol))
       CALL cp_fm_get_submatrix(matrix_a, r_mat, 1, 1, ncol, ncol)
       DO i = 1, ncol
-         DO j = i+1, ncol
+         DO j = i + 1, ncol
             r_mat(j, i) = 0.0_dp
          END DO
       END DO
@@ -1707,7 +1707,7 @@ CONTAINS
       a => matrix_a%local_data
       a_general => general_a%local_data
       n = matrix_a%matrix_struct%nrow_global
-      ALLOCATE (ipivot(n+matrix_a%matrix_struct%nrow_block))
+      ALLOCATE (ipivot(n + matrix_a%matrix_struct%nrow_block))
 
 #if defined(__SCALAPACK)
       desca(:) = matrix_a%matrix_struct%descriptor(:)
@@ -1770,7 +1770,7 @@ CONTAINS
                                                             b_first_row, c_first_col, c_first_row
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_complex_fm_gemm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -2074,13 +2074,13 @@ CONTAINS
       IF (matrix%use_sp) THEN
          res_sp = 0.0_sp
          DO ii = 1, nrows
-            res_sp = res_sp+aa_sp(ii, ii)
+            res_sp = res_sp + aa_sp(ii, ii)
          END DO
          res = REAL(res_sp, KIND=dp)
       ELSE
          res = 0.0_dp
          DO ii = 1, nrows
-            res = res+aa(ii, ii)
+            res = res + aa(ii, ii)
          END DO
       END IF
 #endif

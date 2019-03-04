@@ -15,114 +15,114 @@
 ! **************************************************************************************************
 MODULE pint_methods
 
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE bibliography,                    ONLY: Brieuc2016,&
-                                              Ceriotti2010,&
-                                              Ceriotti2012,&
-                                              cite_reference
-   USE cp_external_control,             ONLY: external_control
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_add_iter_level,&
-                                              cp_iterate,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr,&
-                                              cp_rm_iter_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k,&
-                                              cp_unit_to_cp2k
-   USE f77_interface,                   ONLY: f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE force_env_types,                 ONLY: force_env_get
-   USE gle_system_dynamics,             ONLY: gle_cholesky_stab,&
-                                              gle_matrix_exp,&
-                                              restart_gle
-   USE gle_system_types,                ONLY: gle_dealloc,&
-                                              gle_init,&
-                                              gle_thermo_create
-   USE global_types,                    ONLY: global_environment_type
-   USE helium_interactions,             ONLY: helium_intpot_scan
-   USE helium_io,                       ONLY: helium_write_cubefile
-   USE helium_methods,                  ONLY: helium_create,&
-                                              helium_init,&
-                                              helium_release
-   USE helium_sampling,                 ONLY: helium_do_run,&
-                                              helium_step
-   USE helium_types,                    ONLY: helium_solvent_p_type
-   USE input_constants,                 ONLY: integrate_exact,&
-                                              integrate_numeric,&
-                                              propagator_rpmd,&
-                                              transformation_normal,&
-                                              transformation_stage
-   USE input_cp2k_restarts,             ONLY: write_restart
-   USE input_section_types,             ONLY: &
-        section_type, section_vals_get, section_vals_get_subs_vals, section_vals_release, &
-        section_vals_retain, section_vals_type, section_vals_val_get, section_vals_val_set, &
-        section_vals_val_unset
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE mathconstants,                   ONLY: twopi
-   USE mathlib,                         ONLY: gcd
-   USE message_passing,                 ONLY: mp_bcast
-   USE parallel_rng_types,              ONLY: GAUSSIAN,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_random_number,&
-                                              next_rng_seed,&
-                                              rng_stream_type
-   USE particle_list_types,             ONLY: particle_list_type
-   USE pint_gle,                        ONLY: pint_calc_gle_energy,&
-                                              pint_gle_init,&
-                                              pint_gle_step
-   USE pint_io,                         ONLY: pint_write_action,&
-                                              pint_write_centroids,&
-                                              pint_write_com,&
-                                              pint_write_ener,&
-                                              pint_write_line,&
-                                              pint_write_rgyr,&
-                                              pint_write_step_info,&
-                                              pint_write_trajectory
-   USE pint_normalmode,                 ONLY: normalmode_calc_uf_h,&
-                                              normalmode_env_create,&
-                                              normalmode_init_masses,&
-                                              normalmode_release
-   USE pint_piglet,                     ONLY: pint_calc_piglet_energy,&
-                                              pint_piglet_create,&
-                                              pint_piglet_init,&
-                                              pint_piglet_release,&
-                                              pint_piglet_step
-   USE pint_pile,                       ONLY: pint_calc_pile_energy,&
-                                              pint_pile_init,&
-                                              pint_pile_release,&
-                                              pint_pile_step
-   USE pint_public,                     ONLY: pint_levy_walk
-   USE pint_qtb,                        ONLY: pint_calc_qtb_energy,&
-                                              pint_qtb_init,&
-                                              pint_qtb_release,&
-                                              pint_qtb_step
-   USE pint_staging,                    ONLY: staging_calc_uf_h,&
-                                              staging_env_create,&
-                                              staging_init_masses,&
-                                              staging_release
-   USE pint_transformations,            ONLY: pint_f2uf,&
-                                              pint_u2x,&
-                                              pint_x2u
-   USE pint_types,                      ONLY: &
-        e_conserved_id, e_kin_thermo_id, e_kin_virial_id, e_potential_id, pint_env_type, &
-        thermostat_gle, thermostat_none, thermostat_nose, thermostat_piglet, thermostat_pile, &
-        thermostat_qtb
-   USE replica_methods,                 ONLY: rep_env_calc_e_f,&
-                                              rep_env_create
-   USE replica_types,                   ONLY: rep_env_release,&
-                                              replica_env_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE bibliography, ONLY: Brieuc2016, &
+                           Ceriotti2010, &
+                           Ceriotti2012, &
+                           cite_reference
+   USE cp_external_control, ONLY: external_control
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_add_iter_level, &
+                                 cp_iterate, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr, &
+                                 cp_rm_iter_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k, &
+                       cp_unit_to_cp2k
+   USE f77_interface, ONLY: f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE force_env_types, ONLY: force_env_get
+   USE gle_system_dynamics, ONLY: gle_cholesky_stab, &
+                                  gle_matrix_exp, &
+                                  restart_gle
+   USE gle_system_types, ONLY: gle_dealloc, &
+                               gle_init, &
+                               gle_thermo_create
+   USE global_types, ONLY: global_environment_type
+   USE helium_interactions, ONLY: helium_intpot_scan
+   USE helium_io, ONLY: helium_write_cubefile
+   USE helium_methods, ONLY: helium_create, &
+                             helium_init, &
+                             helium_release
+   USE helium_sampling, ONLY: helium_do_run, &
+                              helium_step
+   USE helium_types, ONLY: helium_solvent_p_type
+   USE input_constants, ONLY: integrate_exact, &
+                              integrate_numeric, &
+                              propagator_rpmd, &
+                              transformation_normal, &
+                              transformation_stage
+   USE input_cp2k_restarts, ONLY: write_restart
+   USE input_section_types, ONLY: &
+      section_type, section_vals_get, section_vals_get_subs_vals, section_vals_release, &
+      section_vals_retain, section_vals_type, section_vals_val_get, section_vals_val_set, &
+      section_vals_val_unset
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE mathconstants, ONLY: twopi
+   USE mathlib, ONLY: gcd
+   USE message_passing, ONLY: mp_bcast
+   USE parallel_rng_types, ONLY: GAUSSIAN, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_random_number, &
+                                 next_rng_seed, &
+                                 rng_stream_type
+   USE particle_list_types, ONLY: particle_list_type
+   USE pint_gle, ONLY: pint_calc_gle_energy, &
+                       pint_gle_init, &
+                       pint_gle_step
+   USE pint_io, ONLY: pint_write_action, &
+                      pint_write_centroids, &
+                      pint_write_com, &
+                      pint_write_ener, &
+                      pint_write_line, &
+                      pint_write_rgyr, &
+                      pint_write_step_info, &
+                      pint_write_trajectory
+   USE pint_normalmode, ONLY: normalmode_calc_uf_h, &
+                              normalmode_env_create, &
+                              normalmode_init_masses, &
+                              normalmode_release
+   USE pint_piglet, ONLY: pint_calc_piglet_energy, &
+                          pint_piglet_create, &
+                          pint_piglet_init, &
+                          pint_piglet_release, &
+                          pint_piglet_step
+   USE pint_pile, ONLY: pint_calc_pile_energy, &
+                        pint_pile_init, &
+                        pint_pile_release, &
+                        pint_pile_step
+   USE pint_public, ONLY: pint_levy_walk
+   USE pint_qtb, ONLY: pint_calc_qtb_energy, &
+                       pint_qtb_init, &
+                       pint_qtb_release, &
+                       pint_qtb_step
+   USE pint_staging, ONLY: staging_calc_uf_h, &
+                           staging_env_create, &
+                           staging_init_masses, &
+                           staging_release
+   USE pint_transformations, ONLY: pint_f2uf, &
+                                   pint_u2x, &
+                                   pint_x2u
+   USE pint_types, ONLY: &
+      e_conserved_id, e_kin_thermo_id, e_kin_virial_id, e_potential_id, pint_env_type, &
+      thermostat_gle, thermostat_none, thermostat_nose, thermostat_piglet, thermostat_pile, &
+      thermostat_qtb
+   USE replica_methods, ONLY: rep_env_calc_e_f, &
+                              rep_env_create
+   USE replica_types, ONLY: rep_env_release, &
+                            replica_env_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -223,7 +223,7 @@ CONTAINS
       pint_env%logger => cp_get_default_logger()
       CALL cp_add_iter_level(pint_env%logger%iter_info, "PINT")
 
-      last_pint_id = last_pint_id+1
+      last_pint_id = last_pint_id + 1
       pint_env%id_nr = last_pint_id
       pint_env%ref_count = 1
       NULLIFY (pint_env%replicas, pint_env%input, pint_env%staging_env, &
@@ -245,12 +245,12 @@ CONTAINS
          CALL section_vals_val_get(input, "MOTION%PINT%MAX_STEP", &
                                    i_val=itmp)
          pint_env%last_step = itmp
-         pint_env%num_steps = pint_env%last_step-pint_env%first_step
+         pint_env%num_steps = pint_env%last_step - pint_env%first_step
       ELSE
          CALL section_vals_val_get(input, "MOTION%PINT%NUM_STEPS", &
                                    i_val=itmp)
          pint_env%num_steps = itmp
-         pint_env%last_step = pint_env%first_step+pint_env%num_steps
+         pint_env%last_step = pint_env%first_step + pint_env%num_steps
       END IF
 
       CALL section_vals_val_get(pint_section, "DT", &
@@ -408,7 +408,7 @@ CONTAINS
       DO iat = 1, pint_env%ndim/3
          CALL get_atomic_kind(particles%els(iat)%atomic_kind, mass=mass)
          DO idir = 1, 3
-            idim = idim+1
+            idim = idim + 1
             pint_env%mass(idim) = mass
          END DO
       END DO
@@ -455,8 +455,8 @@ CONTAINS
             CALL gle_matrix_exp((-pint_env%dt/pint_env%nrespa*0.5_dp)*pint_env%gle%a_mat, &
                                 pint_env%gle%ndim, 15, 15, pint_env%gle%gle_t)
             ! stochastic part
-            CALL gle_cholesky_stab(pint_env%gle%c_mat-MATMUL(pint_env%gle%gle_t, &
-                                                             MATMUL(pint_env%gle%c_mat, TRANSPOSE(pint_env%gle%gle_t))), &
+            CALL gle_cholesky_stab(pint_env%gle%c_mat - MATMUL(pint_env%gle%gle_t, &
+                                                               MATMUL(pint_env%gle%c_mat, TRANSPOSE(pint_env%gle%gle_t))), &
                                    pint_env%gle%gle_s, pint_env%gle%ndim)
             ! and initialize the additional momenta
             CALL pint_gle_init(pint_env)
@@ -612,7 +612,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(pint_env))
       CPASSERT(pint_env%ref_count > 0)
-      pint_env%ref_count = pint_env%ref_count+1
+      pint_env%ref_count = pint_env%ref_count + 1
       RETURN
    END SUBROUTINE pint_retain
 
@@ -630,7 +630,7 @@ CONTAINS
 
       IF (ASSOCIATED(pint_env)) THEN
          CPASSERT(pint_env%ref_count > 0)
-         pint_env%ref_count = pint_env%ref_count-1
+         pint_env%ref_count = pint_env%ref_count - 1
          IF (pint_env%ref_count == 0) THEN
             CALL rep_env_release(pint_env%replicas)
             CALL section_vals_release(pint_env%input)
@@ -733,7 +733,7 @@ CONTAINS
          CALL pint_u2x(pint_env)
          err = 0._dp
          DO i = 1, pint_env%ndim
-            err = MAX(err, ABS(x1(1, i)-pint_env%x(1, i)))
+            err = MAX(err, ABS(x1(1, i) - pint_env%x(1, i)))
          END DO
          IF (unit_nr > 0) WRITE (unit_nr, *) "diff_r1="//cp_to_string(err)
 
@@ -742,17 +742,17 @@ CONTAINS
          pint_env%f = 0._dp
          DO idim = 1, pint_env%ndim
             DO ib = 1, pint_env%p
-               pint_env%f(ib, idim) = pint_env%f(ib, idim)+ &
+               pint_env%f(ib, idim) = pint_env%f(ib, idim) + &
                                       c*(2._dp*pint_env%x(ib, idim) &
-                                         -pint_env%x(MODULO(ib-2, pint_env%p)+1, idim) &
-                                         -pint_env%x(MODULO(ib, pint_env%p)+1, idim))
+                                         - pint_env%x(MODULO(ib - 2, pint_env%p) + 1, idim) &
+                                         - pint_env%x(MODULO(ib, pint_env%p) + 1, idim))
             END DO
          END DO
          CALL pint_f2uf(pint_env)
          err = 0._dp
          DO idim = 1, pint_env%ndim
             DO ib = 1, pint_env%p
-               err = MAX(err, ABS(pint_env%uf(ib, idim)-pint_env%uf_h(ib, idim)))
+               err = MAX(err, ABS(pint_env%uf(ib, idim) - pint_env%uf_h(ib, idim)))
             END DO
          END DO
          IF (unit_nr > 0) WRITE (unit_nr, *) "diff_f_h="//cp_to_string(err)
@@ -1003,9 +1003,9 @@ CONTAINS
             DO ia = 1, pint_env%ndim/3
                var = SQRT(1.0_dp/(pint_env%kT*tcorr*pint_env%mass(3*ia)))
                DO ic = 1, 3
-                  idim = idim+1
+                  idim = idim + 1
                   DO ib = 1, pint_env%p
-                     pint_env%x(ib, idim) = pint_env%x(ib, idim)+bx(3*(ib-1)+ic)*var
+                     pint_env%x(ib, idim) = pint_env%x(ib, idim) + bx(3*(ib - 1) + ic)*var
                   END DO
                END DO
             END DO
@@ -1015,15 +1015,15 @@ CONTAINS
             ! uncorrelated bead initialization - distinct Levy walk for each atom
             idim = 0
             DO ia = 1, pint_env%ndim/3
-               x0(1) = pint_env%x(1, 3*(ia-1)+1)
-               x0(2) = pint_env%x(1, 3*(ia-1)+2)
-               x0(3) = pint_env%x(1, 3*(ia-1)+3)
+               x0(1) = pint_env%x(1, 3*(ia - 1) + 1)
+               x0(2) = pint_env%x(1, 3*(ia - 1) + 2)
+               x0(3) = pint_env%x(1, 3*(ia - 1) + 3)
                var = SQRT(1.0_dp/(pint_env%kT*tcorr*pint_env%mass(3*ia)))
                CALL pint_levy_walk(x0, pint_env%p, var, bx, rng_gaussian)
                DO ic = 1, 3
-                  idim = idim+1
+                  idim = idim + 1
                   DO ib = 1, pint_env%p
-                     pint_env%x(ib, idim) = pint_env%x(ib, idim)+bx(3*(ib-1)+ic)
+                     pint_env%x(ib, idim) = pint_env%x(ib, idim) + bx(3*(ib - 1) + ic)
                   END DO
                END DO
             END DO
@@ -1052,7 +1052,7 @@ CONTAINS
             ic = 0
             DO idim = 1, pint_env%ndim
                DO ib = 1, pint_env%p
-                  ic = ic+1
+                  ic = ic + 1
                   pint_env%x(ib, idim) = r_vals(ic)
                END DO
             END DO
@@ -1067,7 +1067,7 @@ CONTAINS
       IF (ltmp) THEN
          DO idim = 1, pint_env%ndim
             DO ib = 1, pint_env%p
-               pint_env%x(ib, idim) = pint_env%x(ib, idim)+ &
+               pint_env%x(ib, idim) = pint_env%x(ib, idim) + &
                                       next_random_number(rng_stream=pint_env%randomG, &
                                                          variance=pint_env%beta/ &
                                                          SQRT(12.0_dp*pint_env%mass(idim)))
@@ -1174,7 +1174,7 @@ CONTAINS
                CPABORT(msg)
             DO ib = 1, pint_env%p
                DO ic = 1, 3
-                  idim = 3*(ia-1)+ic
+                  idim = 3*(ia - 1) + ic
                   pint_env%v(ib, idim) = r_vals(ic)*unit_conv
                END DO
             END DO
@@ -1190,10 +1190,10 @@ CONTAINS
          DO ia = 1, pint_env%ndim/3
             rtmp = 0.0_dp
             DO ic = 1, 3
-               idim = 3*(ia-1)+ic
-               rtmp = rtmp+pint_env%v(1, idim)*pint_env%v(1, idim)
+               idim = 3*(ia - 1) + ic
+               rtmp = rtmp + pint_env%v(1, idim)*pint_env%v(1, idim)
             END DO
-            ek = ek+0.5_dp*pint_env%mass(idim)*rtmp
+            ek = ek + 0.5_dp*pint_env%mass(idim)*rtmp
          END DO
          actual_t = 2.0_dp*ek/pint_env%ndim
       ELSE
@@ -1213,7 +1213,7 @@ CONTAINS
             DO ia = 1, pint_env%ndim/3
                DO ib = 1, pint_env%p
                   DO ic = 1, 3
-                     idim = 3*(ia-1)+ic
+                     idim = 3*(ia - 1) + ic
                      pint_env%v(ib, idim) = rtmp*pint_env%v(ib, idim)
                   END DO
                END DO
@@ -1252,7 +1252,7 @@ CONTAINS
                                       variance=pint_env%mass(idim)*pint_env%kT) &
                    /pint_env%mass(idim)
             DO ib = 1, pint_env%p
-               pint_env%v(ib, idim) = pint_env%v(ib, idim)+rtmp
+               pint_env%v(ib, idim) = pint_env%v(ib, idim) + rtmp
             END DO
          END DO
          CALL pint_x2u(pint_env, ux=pint_env%uv, x=pint_env%v)
@@ -1294,7 +1294,7 @@ CONTAINS
             itmp = 0
             DO idim = 1, pint_env%ndim
                DO ib = 1, pint_env%p
-                  itmp = itmp+1
+                  itmp = itmp + 1
                   pint_env%v(ib, idim) = r_vals(itmp)
                END DO
             END DO
@@ -1397,7 +1397,7 @@ CONTAINS
                DO idim = 1, pint_env%ndim
                   DO ib = 1, pint_env%p
                      DO inos = 1, pint_env%nnos
-                        ii = ii+1
+                        ii = ii + 1
                         pint_env%tx(inos, ib, idim) = r_vals(ii)
                      END DO
                   END DO
@@ -1422,7 +1422,7 @@ CONTAINS
                DO idim = 1, pint_env%ndim
                   DO ib = 1, pint_env%p
                      DO inos = 1, pint_env%nnos
-                        ii = ii+1
+                        ii = ii + 1
                         pint_env%tv(inos, ib, idim) = r_vals(ii)
                      END DO
                   END DO
@@ -1480,7 +1480,7 @@ CONTAINS
       ! contains proper forces in force_avrg array at ionode
       IF (PRESENT(helium_env)) THEN
          IF (logger%para_env%ionode) THEN
-            pint_env%f(:, :) = pint_env%f(:, :)+helium_env(1)%helium%force_avrg(:, :)
+            pint_env%f(:, :) = pint_env%f(:, :) + helium_env(1)%helium%force_avrg(:, :)
          END IF
          CALL mp_bcast(pint_env%f, &
                        logger%para_env%source, &
@@ -1505,19 +1505,19 @@ CONTAINS
          DO idim = 1, SIZE(pint_env%uf_h, 2)
             DO ib = 1, SIZE(pint_env%uf_h, 1)
                pint_env%tf(1, ib, idim) = (pint_env%mass_fict(ib, idim)* &
-                                           pint_env%uv(ib, idim)**2-pint_env%kT)/pint_env%Q(ib)
+                                           pint_env%uv(ib, idim)**2 - pint_env%kT)/pint_env%Q(ib)
             END DO
          END DO
 
          DO idim = 1, pint_env%ndim
             DO ib = 1, pint_env%p
-               DO inos = 1, pint_env%nnos-1
-                  pint_env%tf(inos+1, ib, idim) = pint_env%tv(inos, ib, idim)**2- &
-                                                  pint_env%kT/pint_env%Q(ib)
+               DO inos = 1, pint_env%nnos - 1
+                  pint_env%tf(inos + 1, ib, idim) = pint_env%tv(inos, ib, idim)**2 - &
+                                                    pint_env%kT/pint_env%Q(ib)
                END DO
-               DO inos = 1, pint_env%nnos-1
+               DO inos = 1, pint_env%nnos - 1
                   pint_env%tf(inos, ib, idim) = pint_env%tf(inos, ib, idim) &
-                                                -pint_env%tv(inos, ib, idim)*pint_env%tv(inos+1, ib, idim)
+                                                - pint_env%tv(inos, ib, idim)*pint_env%tv(inos + 1, ib, idim)
                END DO
             END DO
          END DO
@@ -1605,18 +1605,18 @@ CONTAINS
       ! main PIMD loop
       DO step = 1, pint_env%num_steps
 
-         pint_env%iter = pint_env%iter+1
+         pint_env%iter = pint_env%iter + 1
          CALL cp_iterate(pint_env%logger%iter_info, &
                          last=(step == pint_env%num_steps), &
                          iter_nr=pint_env%iter)
          CALL cp_iterate(logger%iter_info, &
                          last=(step == pint_env%num_steps), &
                          iter_nr=pint_env%iter)
-         pint_env%t = pint_env%t+pint_env%dt
+         pint_env%t = pint_env%t + pint_env%dt
 
          IF (pint_env%t_tol > 0.0_dp) THEN
             IF (ABS(2._dp*pint_env%e_kin_beads/(pint_env%p*pint_env%ndim) &
-                    -pint_env%kT) > pint_env%t_tol) THEN
+                    - pint_env%kT) > pint_env%t_tol) THEN
                scal = SQRT(pint_env%kT*(pint_env%p*pint_env%ndim)/(2.0_dp*pint_env%e_kin_beads))
                pint_env%uv = scal*pint_env%uv
                CALL pint_init_f(pint_env, helium_env=helium_env)
@@ -1697,8 +1697,8 @@ CONTAINS
          CALL helium_write_cubefile( &
             unit_nr, &
             comment, &
-            helium_env(1)%helium%center-0.5_dp* &
-            (helium_env(1)%helium%rho_maxr-helium_env(1)%helium%rho_delr), &
+            helium_env(1)%helium%center - 0.5_dp* &
+            (helium_env(1)%helium%rho_maxr - helium_env(1)%helium%rho_delr), &
             helium_env(1)%helium%rho_delr, &
             helium_env(1)%helium%rho_nbin, &
             DATA)
@@ -1755,43 +1755,43 @@ CONTAINS
             ! Nose needs an extra step
             IF (pint_env%pimd_thermostat == thermostat_nose) THEN
                DO i = pint_env%first_propagated_mode, pint_env%p
-                  pint_env%ux(i, :) = pint_env%ux(i, :)- &
+                  pint_env%ux(i, :) = pint_env%ux(i, :) - &
                                       dti22*pint_env%uv(i, :)*pint_env%tv(1, i, :)
                END DO
-               pint_env%tx = pint_env%tx+dti*pint_env%tv+dti22*pint_env%tf
+               pint_env%tx = pint_env%tx + dti*pint_env%tv + dti22*pint_env%tf
             END IF
             !Integrate position in harmonic springs (uf_h) and physical potential
             !(uf)
             DO i = pint_env%first_propagated_mode, pint_env%p
-               pint_env%ux_t(i, :) = pint_env%ux(i, :)+ &
-                                     dti*pint_env%uv(i, :)+ &
-                                     dti22*(pint_env%uf_h(i, :)+ &
+               pint_env%ux_t(i, :) = pint_env%ux(i, :) + &
+                                     dti*pint_env%uv(i, :) + &
+                                     dti22*(pint_env%uf_h(i, :) + &
                                             pint_env%uf(i, :))
             END DO
 
             ! apply thermostats to velocities
             SELECT CASE (pint_env%pimd_thermostat)
             CASE (thermostat_nose)
-               pint_env%uv_t = pint_env%uv-dti2* &
+               pint_env%uv_t = pint_env%uv - dti2* &
                                pint_env%uv*pint_env%tv(1, :, :)
                tmp => pint_env%tv_t
                pint_env%tv_t => pint_env%tv
                pint_env%tv => tmp
-               pint_env%tv = pint_env%tv_old+tdti*pint_env%tf
+               pint_env%tv = pint_env%tv_old + tdti*pint_env%tf
                pint_env%tv_old = pint_env%tv_t
-               pint_env%tv_t = pint_env%tv_t+dti2*pint_env%tf
+               pint_env%tv_t = pint_env%tv_t + dti2*pint_env%tf
             CASE DEFAULT
                pint_env%uv_t = pint_env%uv
             END SELECT
 
             !Integrate hamonic velocities and physical velocities
-            pint_env%uv_t = pint_env%uv_t+dti2*(pint_env%uf_h+pint_env%uf)
+            pint_env%uv_t = pint_env%uv_t + dti2*(pint_env%uf_h + pint_env%uf)
             ! physical forces are only applied in first respa step.
             pint_env%uf = 0.0_dp
             ! calc harmonic forces at new pos
             pint_env%ux = pint_env%ux_t
             CALL pint_calc_uf_h(pint_env=pint_env, e_h=e_h)
-            pint_env%uv_t = pint_env%uv_t+dti2*(pint_env%uf_h+pint_env%uf)
+            pint_env%uv_t = pint_env%uv_t + dti2*(pint_env%uf_h + pint_env%uf)
 
             ! For last respa step include integration of physical and helium
             ! forces
@@ -1803,7 +1803,7 @@ CONTAINS
                   CALL helium_step(helium_env, pint_env)
                   !Update force of solute in pint_env
                   IF (pint_env%logger%para_env%ionode) THEN
-                     pint_env%f(:, :) = pint_env%f(:, :)+helium_env(1)%helium%force_avrg(:, :)
+                     pint_env%f(:, :) = pint_env%f(:, :) + helium_env(1)%helium%force_avrg(:, :)
                   END IF
                   CALL mp_bcast(pint_env%f, &
                                 pint_env%logger%para_env%source, &
@@ -1818,7 +1818,7 @@ CONTAINS
                !Scale physical forces and integrate velocities with physical
                !forces
                pint_env%uf = pint_env%uf*rn
-               pint_env%uv_t = pint_env%uv_t+dti2*pint_env%uf
+               pint_env%uv_t = pint_env%uv_t + dti2*pint_env%uf
             END IF
 
             ! Apply second half of thermostats
@@ -1830,30 +1830,30 @@ CONTAINS
                   DO idim = 1, pint_env%ndim
                      DO ib = 1, pint_env%p
                         pint_env%tf(1, ib, idim) = (pint_env%mass_fict(ib, idim)* &
-                                                    pint_env%uv_new(ib, idim)**2-pint_env%kT)/ &
+                                                    pint_env%uv_new(ib, idim)**2 - pint_env%kT)/ &
                                                    pint_env%Q(ib)
                      END DO
                   END DO
 
                   DO idim = 1, pint_env%ndim
                      DO ib = 1, pint_env%p
-                        DO inos = 1, pint_env%nnos-1
+                        DO inos = 1, pint_env%nnos - 1
                            pint_env%tv_new(inos, ib, idim) = &
-                              (pint_env%tv_t(inos, ib, idim)+dti2*pint_env%tf(inos, ib, idim))/ &
-                              (1._dp+dti2*pint_env%tv(inos+1, ib, idim))
-                           pint_env%tf(inos+1, ib, idim) = &
-                              (pint_env%tv_new(inos, ib, idim)**2- &
+                              (pint_env%tv_t(inos, ib, idim) + dti2*pint_env%tf(inos, ib, idim))/ &
+                              (1._dp + dti2*pint_env%tv(inos + 1, ib, idim))
+                           pint_env%tf(inos + 1, ib, idim) = &
+                              (pint_env%tv_new(inos, ib, idim)**2 - &
                                pint_env%kT/pint_env%Q(ib))
                            tol = MAX(tol, ABS(pint_env%tv(inos, ib, idim) &
-                                              -pint_env%tv_new(inos, ib, idim)))
+                                              - pint_env%tv_new(inos, ib, idim)))
                         END DO
                         pint_env%tv_new(pint_env%nnos, ib, idim) = &
-                           pint_env%tv_t(pint_env%nnos, ib, idim)+ &
+                           pint_env%tv_t(pint_env%nnos, ib, idim) + &
                            dti2*pint_env%tf(pint_env%nnos, ib, idim)
                         tol = MAX(tol, ABS(pint_env%tv(pint_env%nnos, ib, idim) &
-                                           -pint_env%tv_new(pint_env%nnos, ib, idim)))
+                                           - pint_env%tv_new(pint_env%nnos, ib, idim)))
                         tol = MAX(tol, ABS(pint_env%uv(ib, idim) &
-                                           -pint_env%uv_new(ib, idim)))
+                                           - pint_env%uv_new(ib, idim)))
                      END DO
                   END DO
 
@@ -1861,9 +1861,9 @@ CONTAINS
                   pint_env%tv = pint_env%tv_new
                   IF (tol <= pint_env%v_tol) EXIT
                END DO
-               DO inos = 1, pint_env%nnos-1
+               DO inos = 1, pint_env%nnos - 1
                   pint_env%tf(inos, :, :) = pint_env%tf(inos, :, :) &
-                                            -pint_env%tv(inos, :, :)*pint_env%tv(inos+1, :, :)
+                                            - pint_env%tv(inos, :, :)*pint_env%tv(inos + 1, :, :)
                END DO
             CASE (thermostat_gle)
                CALL pint_gle_step(pint_env)
@@ -1908,15 +1908,15 @@ CONTAINS
          END SELECT
 
          ! 2. 1/2*Physical integration
-         pint_env%uv_t = pint_env%uv_t+dti2*pint_env%uf
+         pint_env%uv_t = pint_env%uv_t + dti2*pint_env%uf
 
          ! 3. Exact harmonic integration
          IF (pint_env%first_propagated_mode == 1) THEN
             ! The centroid is integrated via standard velocity-verlet
-            pint_env%ux_t(1, :) = pint_env%ux(1, :)+ &
-                                  dti*pint_env%uv_t(1, :)+ &
+            pint_env%ux_t(1, :) = pint_env%ux(1, :) + &
+                                  dti*pint_env%uv_t(1, :) + &
                                   dti22*pint_env%uf_h(1, :)
-            pint_env%uv_t(1, :) = pint_env%uv_t(1, :)+ &
+            pint_env%uv_t(1, :) = pint_env%uv_t(1, :) + &
                                   dti2*pint_env%uf_h(1, :)
 
          ELSE
@@ -1927,9 +1927,9 @@ CONTAINS
 
          DO i = 2, pint_env%p
             pint_env%ux_t(i, :) = pint_env%cosex(i)*pint_env%ux(i, :) &
-                                  +pint_env%iwsinex(i)*pint_env%uv_t(i, :)
+                                  + pint_env%iwsinex(i)*pint_env%uv_t(i, :)
             pint_env%uv_t(i, :) = pint_env%cosex(i)*pint_env%uv_t(i, :) &
-                                  -pint_env%wsinex(i)*pint_env%ux(i, :)
+                                  - pint_env%wsinex(i)*pint_env%ux(i, :)
          END DO
          pint_env%ux = pint_env%ux_t
 
@@ -1942,7 +1942,7 @@ CONTAINS
             CALL helium_step(helium_env, pint_env)
             !Update force of solute in pint_env
             IF (pint_env%logger%para_env%ionode) THEN
-               pint_env%f(:, :) = pint_env%f(:, :)+helium_env(1)%helium%force_avrg(:, :)
+               pint_env%f(:, :) = pint_env%f(:, :) + helium_env(1)%helium%force_avrg(:, :)
             END IF
             CALL mp_bcast(pint_env%f, &
                           pint_env%logger%para_env%source, &
@@ -1953,7 +1953,7 @@ CONTAINS
          IF (pint_env%first_propagated_mode .EQ. 2) THEN
             pint_env%uf(1, :) = 0.0_dp
          END IF
-         pint_env%uv_t = pint_env%uv_t+dti2*pint_env%uf
+         pint_env%uv_t = pint_env%uv_t + dti2*pint_env%uf
 
          ! 5. Apply thermostats
          SELECT CASE (pint_env%pimd_thermostat)
@@ -2000,7 +2000,7 @@ CONTAINS
 !     CALL f_env_rm_defaults(f_env,new_error,ierr)
 
       time_stop = m_walltime()
-      pint_env%time_per_step = time_stop-time_start
+      pint_env%time_per_step = time_stop - time_start
       CALL pint_write_step_info(pint_env)
       CALL timestop(handle)
 
@@ -2018,7 +2018,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CALL pint_calc_e_kin_beads_u(pint_env)
       CALL pint_calc_e_vir(pint_env)
@@ -2037,18 +2037,18 @@ CONTAINS
       END SELECT
 
       pint_env%energy(e_kin_thermo_id) = &
-         0.5_dp*REAL(pint_env%p, dp)*REAL(pint_env%ndim, dp)*pint_env%kT- &
+         0.5_dp*REAL(pint_env%p, dp)*REAL(pint_env%ndim, dp)*pint_env%kT - &
          pint_env%e_pot_h
 
       pint_env%energy(e_potential_id) = SUM(pint_env%e_pot_bead)
 
       pint_env%energy(e_conserved_id) = &
-         pint_env%energy(e_potential_id)*pint_env%propagator%physpotscale+ &
-         pint_env%e_pot_h+ &
-         pint_env%e_kin_beads+ &
-         pint_env%e_pot_t+ &
-         pint_env%e_kin_t+ &
-         pint_env%e_gle+pint_env%e_pile+pint_env%e_piglet+pint_env%e_qtb
+         pint_env%energy(e_potential_id)*pint_env%propagator%physpotscale + &
+         pint_env%e_pot_h + &
+         pint_env%e_kin_beads + &
+         pint_env%e_pot_t + &
+         pint_env%e_kin_t + &
+         pint_env%e_gle + pint_env%e_pile + pint_env%e_piglet + pint_env%e_qtb
 
       pint_env%energy(e_potential_id) = &
          pint_env%energy(e_potential_id)/REAL(pint_env%p, dp)
@@ -2157,7 +2157,7 @@ CONTAINS
       REAL(kind=dp), INTENT(out), OPTIONAL               :: e_k
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_e_kin_beads_u', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ib, idim
       REAL(kind=dp)                                      :: res
@@ -2171,7 +2171,7 @@ CONTAINS
       res = 0._dp
       DO idim = 1, pint_env%ndim
          DO ib = 1, pint_env%p
-            res = res+pint_env%mass_fict(ib, idim)*my_uv(ib, idim)**2
+            res = res + pint_env%mass_fict(ib, idim)*my_uv(ib, idim)**2
          END DO
       END DO
       res = res*0.5
@@ -2193,7 +2193,7 @@ CONTAINS
       REAL(kind=dp), INTENT(out), OPTIONAL               :: e_vir
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_e_vir', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ib, idim
       REAL(kind=dp)                                      :: res, xcentroid
@@ -2206,15 +2206,15 @@ CONTAINS
          ! calculate the centroid
          xcentroid = 0._dp
          DO ib = 1, pint_env%p
-            xcentroid = xcentroid+pint_env%x(ib, idim)
+            xcentroid = xcentroid + pint_env%x(ib, idim)
          END DO
          xcentroid = xcentroid/REAL(pint_env%p, dp)
          DO ib = 1, pint_env%p
-            res = res+(pint_env%x(ib, idim)-xcentroid)*pint_env%f(ib, idim)
+            res = res + (pint_env%x(ib, idim) - xcentroid)*pint_env%f(ib, idim)
          END DO
       END DO
       res = 0.5_dp*(REAL(pint_env%ndim, dp)* &
-                    (pint_env%kT*pint_env%propagator%temp_sim2phys)-res/REAL(pint_env%p, dp))
+                    (pint_env%kT*pint_env%propagator%temp_sim2phys) - res/REAL(pint_env%p, dp))
       pint_env%energy(e_kin_virial_id) = res
       IF (PRESENT(e_vir)) e_vir = res
       RETURN
@@ -2230,7 +2230,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_nh_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ib, idim, inos
       REAL(kind=dp)                                      :: ekin, epot
@@ -2241,7 +2241,7 @@ CONTAINS
       DO idim = 1, pint_env%ndim
          DO ib = 1, pint_env%p
             DO inos = 1, pint_env%nnos
-               ekin = ekin+pint_env%Q(ib)*pint_env%tv(inos, ib, idim)**2
+               ekin = ekin + pint_env%Q(ib)*pint_env%tv(inos, ib, idim)**2
             END DO
          END DO
       END DO
@@ -2250,7 +2250,7 @@ CONTAINS
       DO idim = 1, pint_env%ndim
          DO ib = 1, pint_env%p
             DO inos = 1, pint_env%nnos
-               epot = epot+pint_env%tx(inos, ib, idim)
+               epot = epot + pint_env%tx(inos, ib, idim)
             END DO
          END DO
       END DO
@@ -2269,7 +2269,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: link_action
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_total_link_action', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, ibead, idim, indx
       REAL(KIND=dp)                                      :: hb2m, tau, tmp_link_action
@@ -2283,21 +2283,21 @@ CONTAINS
       link_action = 0.0_dp
       DO iatom = 1, pint_env%ndim/3
          ! hbar / (2.0*m)
-         hb2m = 1.0_dp/pint_env%mass((iatom-1)*3+1)
+         hb2m = 1.0_dp/pint_env%mass((iatom - 1)*3 + 1)
          tmp_link_action = 0.0_dp
-         DO ibead = 1, pint_env%p-1
+         DO ibead = 1, pint_env%p - 1
             DO idim = 1, 3
-               indx = (iatom-1)*3+idim
-               r(idim) = pint_env%x(ibead, indx)-pint_env%x(ibead+1, indx)
+               indx = (iatom - 1)*3 + idim
+               r(idim) = pint_env%x(ibead, indx) - pint_env%x(ibead + 1, indx)
             END DO
-            tmp_link_action = tmp_link_action+(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
+            tmp_link_action = tmp_link_action + (r(1)*r(1) + r(2)*r(2) + r(3)*r(3))
          END DO
          DO idim = 1, 3
-            indx = (iatom-1)*3+idim
-            r(idim) = pint_env%x(pint_env%p, indx)-pint_env%x(1, indx)
+            indx = (iatom - 1)*3 + idim
+            r(idim) = pint_env%x(pint_env%p, indx) - pint_env%x(1, indx)
          END DO
-         tmp_link_action = tmp_link_action+(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
-         link_action = link_action+tmp_link_action/hb2m
+         tmp_link_action = tmp_link_action + (r(1)*r(1) + r(2)*r(2) + r(3)*r(3))
+         link_action = link_action + tmp_link_action/hb2m
       END DO
 
       link_action = link_action/(2.0_dp*tau)
@@ -2317,7 +2317,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: pot_action
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_total_pot_action', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: tau
 
@@ -2340,7 +2340,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pint_calc_total_action', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(pint_env))
       CPASSERT(pint_env%ref_count > 0)

@@ -10,41 +10,41 @@
 !>      - full rewrite [jhu, 2009-01-23]
 ! **************************************************************************************************
 MODULE core_ppnl
-   USE ai_overlap,                      ONLY: overlap
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_p_type
-   USE external_potential_types,        ONLY: gth_potential_p_type,&
-                                              gth_potential_type,&
-                                              sgp_potential_p_type,&
-                                              sgp_potential_type
-   USE kinds,                           ONLY: dp
-   USE orbital_pointers,                ONLY: init_orbital_pointers,&
-                                              nco,&
-                                              ncoset
-   USE particle_types,                  ONLY: particle_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE sap_kind_types,                  ONLY: alist_type,&
-                                              clist_type,&
-                                              get_alist,&
-                                              release_sap_int,&
-                                              sap_int_type,&
-                                              sap_sort
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE ai_overlap, ONLY: overlap
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_get_block_p, &
+                        dbcsr_p_type
+   USE external_potential_types, ONLY: gth_potential_p_type, &
+                                       gth_potential_type, &
+                                       sgp_potential_p_type, &
+                                       sgp_potential_type
+   USE kinds, ONLY: dp
+   USE orbital_pointers, ONLY: init_orbital_pointers, &
+                               nco, &
+                               ncoset
+   USE particle_types, ONLY: particle_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE sap_kind_types, ONLY: alist_type, &
+                             clist_type, &
+                             get_alist, &
+                             release_sap_int, &
+                             sap_int_type, &
+                             sap_sort
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num, omp_get_num_threads
 
@@ -100,13 +100,13 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: basis_type
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_core_ppnl', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_a, atom_b, atom_c, first_col, handle, i, iab, iac, iatom, ibc, icol, ikind, &
-         ilist, img, inode, irow, iset, j, jatom, jkind, jneighbor, kac, katom, kbc, kkind, l, &
-         lc_max, lc_min, ldai, ldsab, lppnl, maxco, maxder, maxl, maxlgto, maxlppnl, maxppnl, &
-         maxsgf, mepos, na, natom, nb, ncoa, ncoc, nkind, nlist, nneighbor, nnl, nnode, np, nppnl, &
-         nprjc, nseta, nsgfa, nthread, prjc, sgfa
+                 ilist, img, inode, irow, iset, j, jatom, jkind, jneighbor, kac, katom, kbc, kkind, l, &
+                 lc_max, lc_min, ldai, ldsab, lppnl, maxco, maxder, maxl, maxlgto, maxlppnl, maxppnl, &
+                 maxsgf, mepos, na, natom, nb, ncoa, ncoc, nkind, nlist, nneighbor, nnl, nnode, np, nppnl, &
+                 nprjc, nseta, nsgfa, nthread, prjc, sgfa
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind
       INTEGER, DIMENSION(3)                              :: cell_b, cell_c
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, npgfa, nprj_ppnl, &
@@ -176,10 +176,10 @@ CONTAINS
                               basis_type=basis_type)
 
          maxl = MAX(maxlgto, maxlppnl)
-         CALL init_orbital_pointers(maxl+nder+1)
+         CALL init_orbital_pointers(maxl + nder + 1)
 
          ldsab = MAX(maxco, ncoset(maxlppnl), maxsgf, maxppnl)
-         ldai = ncoset(maxl+nder+1)
+         ldai = ncoset(maxl + nder + 1)
 
          !sap_int needs to be shared as multiple threads need to access this
          ALLOCATE (sap_int(nkind*nkind))
@@ -228,14 +228,14 @@ CONTAINS
 
          ALLOCATE (sab(ldsab, ldsab*maxder), work(ldsab, ldsab*maxder))
          sab = 0.0_dp
-         ALLOCATE (ai_work(ldai, ldai, ncoset(nder+1)))
+         ALLOCATE (ai_work(ldai, ldai, ncoset(nder + 1)))
          ai_work = 0.0_dp
 
          DO WHILE (neighbor_list_iterate(nl_iterator, mepos=mepos) == 0)
             CALL get_iterator_info(nl_iterator, mepos=mepos, ikind=ikind, jkind=kkind, iatom=iatom, &
                                    jatom=katom, nlist=nlist, ilist=ilist, nnode=nneighbor, &
                                    inode=jneighbor, cell=cell_c, r=rac)
-            iac = ikind+nkind*(kkind-1)
+            iac = ikind + nkind*(kkind - 1)
             IF (.NOT. ASSOCIATED(basis_set(ikind)%gto_basis_set)) CYCLE
             ! get definition of basis set
             first_sgfa => basis_set(ikind)%gto_basis_set%first_sgf
@@ -325,8 +325,8 @@ CONTAINS
                      nprjc = nprj_ppnl(l)*nco(l)
                      IF (nprjc == 0) CYCLE
                      rprjc(1) = ppnl_radius
-                     IF (set_radius_a(iset)+rprjc(1) < dac) CYCLE
-                     lc_max = l+2*(nprj_ppnl(l)-1)
+                     IF (set_radius_a(iset) + rprjc(1) < dac) CYCLE
+                     lc_max = l + 2*(nprj_ppnl(l) - 1)
                      lc_min = l
                      zetc(1) = alpha_ppnl(l)
                      ncoc = ncoset(lc_max)
@@ -336,14 +336,14 @@ CONTAINS
                                   lc_max, lc_min, 1, rprjc, zetc, rac, dac, sab, nder, .TRUE., ai_work, ldai)
                      ! *** Transformation step projector functions (cartesian->spherical) ***
                      DO i = 1, maxder
-                        first_col = (i-1)*SIZE(work, 1)
-                        CALL dgemm("N", "N", ncoa, nprjc, ncoc, 1.0_dp, sab(1, first_col+1), SIZE(sab, 1), &
-                                   cprj(1, prjc), SIZE(cprj, 1), 0.0_dp, work(1, first_col+prjc), SIZE(work, 1))
+                        first_col = (i - 1)*SIZE(work, 1)
+                        CALL dgemm("N", "N", ncoa, nprjc, ncoc, 1.0_dp, sab(1, first_col + 1), SIZE(sab, 1), &
+                                   cprj(1, prjc), SIZE(cprj, 1), 0.0_dp, work(1, first_col + prjc), SIZE(work, 1))
                      END DO
-                     prjc = prjc+nprjc
+                     prjc = prjc + nprjc
                   END DO
                   DO i = 1, maxder
-                     first_col = (i-1)*SIZE(work, 1)+1
+                     first_col = (i - 1)*SIZE(work, 1) + 1
                      ! *** Contraction step (basis functions) ***
                      CALL dgemm("T", "N", nsgf_seta(iset), nppnl, ncoa, 1.0_dp, sphi_a(1, sgfa), SIZE(sphi_a, 1), &
                                 work(1, first_col), SIZE(work, 1), 0.0_dp, clist%acint(sgfa, 1, i), nsgfa)
@@ -358,15 +358,15 @@ CONTAINS
                   CALL overlap(la_max(iset), la_min(iset), npgfa(iset), rpgfa(:, iset), zeta(:, iset), &
                                lppnl, 0, nnl, radp, a_nl, rac, dac, sab, nder, .TRUE., ai_work, ldai)
                   DO i = 1, maxder
-                     first_col = (i-1)*nppnl
+                     first_col = (i - 1)*nppnl
                      ! *** Transformation step projector functions (cartesian->spherical) ***
-                     CALL dgemm("N", "N", ncoa, nppnl, nprjc, 1.0_dp, sab(1, first_col+1), SIZE(sab, 1), &
-                                cprj(1, 1), SIZE(cprj, 1), 0.0_dp, work(1, first_col+1), SIZE(work, 1))
+                     CALL dgemm("N", "N", ncoa, nppnl, nprjc, 1.0_dp, sab(1, first_col + 1), SIZE(sab, 1), &
+                                cprj(1, 1), SIZE(cprj, 1), 0.0_dp, work(1, first_col + 1), SIZE(work, 1))
                      ! *** Contraction step (basis functions) ***
                      CALL dgemm("T", "N", nsgf_seta(iset), nprjc, ncoa, 1.0_dp, sphi_a(1, sgfa), SIZE(sphi_a, 1), &
                                 work(1, first_col), SIZE(work, 1), 0.0_dp, clist%acint(sgfa, 1, i), nsgfa)
                      ! *** Multiply with interaction matrix(h) ***
-                     ncoc = sgfa+nsgf_seta(iset)-1
+                     ncoc = sgfa + nsgf_seta(iset) - 1
                      DO j = 1, nprjc
                         clist%achint(sgfa:ncoc, j, i) = clist%acint(sgfa:ncoc, j, i)*hprj(j)
                      END DO
@@ -408,7 +408,7 @@ CONTAINS
                                    jatom=jatom, nlist=nlist, ilist=ilist, nnode=nnode, inode=inode, cell=cell_b, r=rab)
             IF (.NOT. ASSOCIATED(basis_set(ikind)%gto_basis_set)) CYCLE
             IF (.NOT. ASSOCIATED(basis_set(jkind)%gto_basis_set)) CYCLE
-            iab = ikind+nkind*(jkind-1)
+            iab = ikind + nkind*(jkind - 1)
             atom_a = atom_of_kind(iatom)
             atom_b = atom_of_kind(jatom)
 
@@ -443,8 +443,8 @@ CONTAINS
             ! loop over all kinds for projector atom
             IF (ASSOCIATED(h_block)) THEN
                DO kkind = 1, nkind
-                  iac = ikind+nkind*(kkind-1)
-                  ibc = jkind+nkind*(kkind-1)
+                  iac = ikind + nkind*(kkind - 1)
+                  ibc = jkind + nkind*(kkind - 1)
                   IF (.NOT. ASSOCIATED(sap_int(iac)%alist)) CYCLE
                   IF (.NOT. ASSOCIATED(sap_int(ibc)%alist)) CYCLE
                   CALL get_alist(sap_int(iac), alist_ac, iatom)
@@ -454,7 +454,7 @@ CONTAINS
                   DO kac = 1, alist_ac%nclist
                      DO kbc = 1, alist_bc%nclist
                         IF (alist_ac%clist(kac)%catom /= alist_bc%clist(kbc)%catom) CYCLE
-                        IF (ALL(cell_b+alist_bc%clist(kbc)%cell-alist_ac%clist(kac)%cell == 0)) THEN
+                        IF (ALL(cell_b + alist_bc%clist(kbc)%cell - alist_ac%clist(kac)%cell == 0)) THEN
                            IF (alist_ac%clist(kac)%maxac*alist_bc%clist(kbc)%maxach < eps_ppnl) CYCLE
                            acint => alist_ac%clist(kac)%acint
                            bcint => alist_bc%clist(kbc)%acint
@@ -477,7 +477,7 @@ CONTAINS
                                  katom = alist_ac%clist(kac)%catom
                                  atom_c = atom_of_kind(katom)
                                  DO i = 1, 3
-                                    j = i+1
+                                    j = i + 1
                                     IF (iatom <= jatom) THEN
                                        fa(i) = SUM(p_block(1:na, 1:nb)* &
                                                    MATMUL(acint(1:na, 1:np, j), TRANSPOSE(bchint(1:nb, 1:np, 1))))
@@ -490,10 +490,10 @@ CONTAINS
                                                    MATMUL(bcint(1:nb, 1:np, j), TRANSPOSE(achint(1:na, 1:np, 1))))
                                     END IF
 !$OMP CRITICAL(force_critical)
-                                    force(ikind)%gth_ppnl(i, atom_a) = force(ikind)%gth_ppnl(i, atom_a)+f0*fa(i)
-                                    force(kkind)%gth_ppnl(i, atom_c) = force(kkind)%gth_ppnl(i, atom_c)-f0*fa(i)
-                                    force(jkind)%gth_ppnl(i, atom_b) = force(jkind)%gth_ppnl(i, atom_b)+f0*fb(i)
-                                    force(kkind)%gth_ppnl(i, atom_c) = force(kkind)%gth_ppnl(i, atom_c)-f0*fb(i)
+                                    force(ikind)%gth_ppnl(i, atom_a) = force(ikind)%gth_ppnl(i, atom_a) + f0*fa(i)
+                                    force(kkind)%gth_ppnl(i, atom_c) = force(kkind)%gth_ppnl(i, atom_c) - f0*fa(i)
+                                    force(jkind)%gth_ppnl(i, atom_b) = force(jkind)%gth_ppnl(i, atom_b) + f0*fb(i)
+                                    force(kkind)%gth_ppnl(i, atom_c) = force(kkind)%gth_ppnl(i, atom_c) - f0*fb(i)
 !$OMP END CRITICAL(force_critical)
                                  END DO
 

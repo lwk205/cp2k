@@ -15,98 +15,98 @@
 ! **************************************************************************************************
 MODULE library_tests
 
-   USE ai_coulomb_test,                 ONLY: eri_test
-   USE cell_types,                      ONLY: cell_create,&
-                                              cell_release,&
-                                              cell_type,&
-                                              init_cell
-   USE cg_test,                         ONLY: clebsch_gordon_test
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_eri_mme_interface,            ONLY: cp_eri_mme_perf_acc_test
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_gemm
-   USE cp_fm_diag,                      ONLY: cp_fm_syevd,&
-                                              cp_fm_syevx
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_get,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_set_submatrix,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_init,          ONLY: init_input_type
-   USE dbcsr_api,                       ONLY: dbcsr_reset_randmat_seed,&
-                                              dbcsr_run_tests
-   USE fft_tools,                       ONLY: BWFFT,&
-                                              FFT_RADIX_CLOSEST,&
-                                              FWFFT,&
-                                              fft3d,&
-                                              fft_radix_operations,&
-                                              finalize_fft,&
-                                              init_fft
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: do_diag_syevd,&
-                                              do_diag_syevx,&
-                                              do_mat_random,&
-                                              do_mat_read,&
-                                              do_pwgrid_ns_fullspace,&
-                                              do_pwgrid_ns_halfspace,&
-                                              do_pwgrid_spherical
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_max,&
-                                              mp_sum,&
-                                              mp_sync,&
-                                              mpi_perf_test
-   USE minimax_exp,                     ONLY: validate_exp_minimax
-   USE parallel_rng_types,              ONLY: GAUSSIAN,&
-                                              UNIFORM,&
-                                              check_rng,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_random_number,&
-                                              rng_stream_type,&
-                                              write_rng_stream
-   USE pw_grid_types,                   ONLY: FULLSPACE,&
-                                              HALFSPACE,&
-                                              pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_create,&
-                                              pw_grid_release,&
-                                              pw_grid_setup
-   USE pw_methods,                      ONLY: pw_transfer,&
-                                              pw_zero
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              COMPLEXDATA3D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_create,&
-                                              pw_p_type,&
-                                              pw_release
-   USE realspace_grid_types,            ONLY: &
-        pw2rs, realspace_grid_desc_type, realspace_grid_input_type, realspace_grid_type, rs2pw, &
-        rs_grid_create, rs_grid_create_descriptor, rs_grid_print, rs_grid_release, &
-        rs_grid_release_descriptor, rs_grid_zero, rs_pw_transfer
-   USE rpa_ri_gpw,                      ONLY: test_least_square_ft
-   USE shg_integrals_test,              ONLY: shg_integrals_perf_acc_test
+   USE ai_coulomb_test, ONLY: eri_test
+   USE cell_types, ONLY: cell_create, &
+                         cell_release, &
+                         cell_type, &
+                         init_cell
+   USE cg_test, ONLY: clebsch_gordon_test
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_eri_mme_interface, ONLY: cp_eri_mme_perf_acc_test
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_basic_linalg, ONLY: cp_fm_gemm
+   USE cp_fm_diag, ONLY: cp_fm_syevd, &
+                         cp_fm_syevx
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_get, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_set_submatrix, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_init, ONLY: init_input_type
+   USE dbcsr_api, ONLY: dbcsr_reset_randmat_seed, &
+                        dbcsr_run_tests
+   USE fft_tools, ONLY: BWFFT, &
+                        FFT_RADIX_CLOSEST, &
+                        FWFFT, &
+                        fft3d, &
+                        fft_radix_operations, &
+                        finalize_fft, &
+                        init_fft
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: do_diag_syevd, &
+                              do_diag_syevx, &
+                              do_mat_random, &
+                              do_mat_read, &
+                              do_pwgrid_ns_fullspace, &
+                              do_pwgrid_ns_halfspace, &
+                              do_pwgrid_spherical
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_max, &
+                              mp_sum, &
+                              mp_sync, &
+                              mpi_perf_test
+   USE minimax_exp, ONLY: validate_exp_minimax
+   USE parallel_rng_types, ONLY: GAUSSIAN, &
+                                 UNIFORM, &
+                                 check_rng, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_random_number, &
+                                 rng_stream_type, &
+                                 write_rng_stream
+   USE pw_grid_types, ONLY: FULLSPACE, &
+                            HALFSPACE, &
+                            pw_grid_type
+   USE pw_grids, ONLY: pw_grid_create, &
+                       pw_grid_release, &
+                       pw_grid_setup
+   USE pw_methods, ONLY: pw_transfer, &
+                         pw_zero
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       COMPLEXDATA3D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_create, &
+                       pw_p_type, &
+                       pw_release
+   USE realspace_grid_types, ONLY: &
+      pw2rs, realspace_grid_desc_type, realspace_grid_input_type, realspace_grid_type, rs2pw, &
+      rs_grid_create, rs_grid_create_descriptor, rs_grid_print, rs_grid_release, &
+      rs_grid_release_descriptor, rs_grid_zero, rs_pw_transfer
+   USE rpa_ri_gpw, ONLY: test_least_square_ft
+   USE shg_integrals_test, ONLY: shg_integrals_perf_acc_test
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -142,8 +142,8 @@ CONTAINS
       LOGICAL                                            :: explicit
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(section_vals_type), POINTER :: cp_dbcsr_test_section, cp_fm_gemm_test_section, &
-         eigensolver_section, eri_mme_test_section, pw_transfer_section, rs_pw_transfer_section, &
-         shg_integrals_test_section
+                                          eigensolver_section, eri_mme_test_section, pw_transfer_section, rs_pw_transfer_section, &
+                                          shg_integrals_test_section
 
       CALL timeset(routineN, handle)
 
@@ -327,7 +327,7 @@ CONTAINS
             ca(1) = REAL(j, KIND=dp)
          END DO
          tend = m_walltime()
-         t = tend-tstart+threshold
+         t = tend - tstart + threshold
          IF (t > 0.0_dp) THEN
             perf = REAL(ntim, KIND=dp)*REAL(len, KIND=dp)*1.e-6_dp/t
          ELSE
@@ -373,7 +373,7 @@ CONTAINS
          siz = ABS(runtest(2))
          IF (para_env%ionode) WRITE (iw, '(//,A,/)') " Test of matmul ( F95 ) "
          DO i = 5, siz, 2
-            len = 2**i+1
+            len = 2**i + 1
             IF (8.0_dp*REAL(len*len, KIND=dp) > max_memory*0.3_dp) EXIT
             ALLOCATE (ma(len, len), STAT=ierr)
             IF (ierr /= 0) EXIT
@@ -396,7 +396,7 @@ CONTAINS
                ma(1, 1) = REAL(j, KIND=dp)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             IF (para_env%ionode) THEN
                WRITE (iw, '(A,i6,T59,F14.4,A)') &
@@ -404,11 +404,11 @@ CONTAINS
             END IF
             tstart = m_walltime()
             DO j = 1, ntim
-               mc(:, :) = mc+MATMUL(ma, mb)
+               mc(:, :) = mc + MATMUL(ma, mb)
                ma(1, 1) = REAL(j, KIND=dp)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -422,11 +422,11 @@ CONTAINS
 
             tstart = m_walltime()
             DO j = 1, ntim
-               mc(:, :) = mc+MATMUL(ma, TRANSPOSE(mb))
+               mc(:, :) = mc + MATMUL(ma, TRANSPOSE(mb))
                ma(1, 1) = REAL(j, KIND=dp)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -440,11 +440,11 @@ CONTAINS
 
             tstart = m_walltime()
             DO j = 1, ntim
-               mc(:, :) = mc+MATMUL(TRANSPOSE(ma), mb)
+               mc(:, :) = mc + MATMUL(TRANSPOSE(ma), mb)
                ma(1, 1) = REAL(j, KIND=dp)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -467,7 +467,7 @@ CONTAINS
          siz = ABS(runtest(5))
          IF (para_env%ionode) WRITE (iw, '(//,A,/)') " Test of matmul ( BLAS ) "
          DO i = 5, siz, 2
-            len = 2**i+1
+            len = 2**i + 1
             IF (8.0_dp*REAL(len*len, KIND=dp) > max_memory*0.3_dp) EXIT
             ALLOCATE (ma(len, len), STAT=ierr)
             IF (ierr /= 0) EXIT
@@ -490,7 +490,7 @@ CONTAINS
                CALL dgemm("N", "N", len, len, len, 1.0_dp, ma, len, mb, len, 1.0_dp, mc, len)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -507,7 +507,7 @@ CONTAINS
                CALL dgemm("N", "N", len, len, len, 1.0_dp, ma, len, mb, len, 1.0_dp, mc, len)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -524,7 +524,7 @@ CONTAINS
                CALL dgemm("N", "T", len, len, len, 1.0_dp, ma, len, mb, len, 1.0_dp, mc, len)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -541,7 +541,7 @@ CONTAINS
                CALL dgemm("T", "N", len, len, len, 1.0_dp, ma, len, mb, len, 1.0_dp, mc, len)
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(ntim, KIND=dp)*2.0_dp*REAL(len, KIND=dp)**3*1.e-6_dp/t
             ELSE
@@ -626,7 +626,7 @@ CONTAINS
                CALL RANDOM_NUMBER(ra)
                ca(:, :, :) = ra
                CALL RANDOM_NUMBER(ra)
-               ca(:, :, :) = ca+CMPLX(0.0_dp, 1.0_dp, KIND=dp)*ra
+               ca(:, :, :) = ca + CMPLX(0.0_dp, 1.0_dp, KIND=dp)*ra
                flops = REAL(len**3, KIND=dp)*15.0_dp*LOG(REAL(len, KIND=dp))
                ntim = NINT(siz*1.e7_dp/flops)
                ntim = MAX(ntim, 1)
@@ -638,7 +638,7 @@ CONTAINS
                   CALL fft3d(BWFFT, n, ca, SCALE=scale)
                END DO
                tend = m_walltime()
-               t = tend-tstart+threshold
+               t = tend - tstart + threshold
                IF (t > 0.0_dp) THEN
                   perf = REAL(ntim, KIND=dp)*2.0_dp*flops*1.e-6_dp/t
                ELSE
@@ -663,10 +663,10 @@ CONTAINS
             CALL RANDOM_NUMBER(ra)
             ca(:, :, :) = ra
             CALL RANDOM_NUMBER(ra)
-            ca(:, :, :) = ca+CMPLX(0.0_dp, 1.0_dp, KIND=dp)*ra
+            ca(:, :, :) = ca + CMPLX(0.0_dp, 1.0_dp, KIND=dp)*ra
             cc(:, :, :) = ca
             CALL fft3d(FWFFT, n, ca, cb)
-            tdiff = MAXVAL(ABS(ca-cc))
+            tdiff = MAXVAL(ABS(ca - cc))
             IF (tdiff > 1.0E-12_dp) THEN
                IF (para_env%ionode) &
                   WRITE (iw, '(T2,A,A,A)') ADJUSTR(method), "         FWFFT ", &
@@ -678,7 +678,7 @@ CONTAINS
             END IF
             ca(:, :, :) = cc
             CALL fft3d(BWFFT, n, ca, cb)
-            tdiff = MAXVAL(ABS(ca-cc))
+            tdiff = MAXVAL(ABS(ca - cc))
             IF (tdiff > 1.0E-12_dp) THEN
                IF (para_env%ionode) &
                   WRITE (iw, '(T2,A,A,A)') ADJUSTR(method), "         BWFFT ", &
@@ -718,7 +718,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: rs_pw_transfer_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rs_pw_transfer_test', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dir, halo_size, handle, i_loop, n_loop, &
                                                             ns_max
@@ -765,7 +765,7 @@ CONTAINS
       ! .. rs input setting type
       CALL section_vals_val_get(rs_pw_transfer_section, "HALO_SIZE", i_val=halo_size)
       rs_grid_section => section_vals_get_subs_vals(rs_pw_transfer_section, "RS_GRID")
-      ns_max = 2*halo_size+1
+      ns_max = 2*halo_size + 1
       CALL init_input_type(input_settings, ns_max, rs_grid_section, 1, (/-1, -1, -1/))
 
       ! .. rs type
@@ -801,7 +801,7 @@ CONTAINS
          CALL mp_sync(para_env%group)
          tend = m_walltime()
          IF (para_env%ionode) THEN
-            WRITE (iw, '(T2,I9,1X,F12.6)') i_loop, tend-tstart
+            WRITE (iw, '(T2,I9,1X,F12.6)') i_loop, tend - tstart
          ENDIF
       ENDDO
 
@@ -893,7 +893,7 @@ CONTAINS
             DO p = 2, para_env%num_pe
                q = para_env%num_pe/p
                IF (p*q == para_env%num_pe) THEN
-                  itmp = itmp+1
+                  itmp = itmp + 1
                ENDIF
             ENDDO
             ! build list
@@ -902,7 +902,7 @@ CONTAINS
             DO p = 2, para_env%num_pe
                q = para_env%num_pe/p
                IF (p*q == para_env%num_pe) THEN
-                  itmp = itmp+1
+                  itmp = itmp + 1
                   layouts(:, itmp) = (/p, q/)
                ENDIF
             ENDDO
@@ -988,19 +988,19 @@ CONTAINS
                t_end(ip) = m_walltime()
             END DO
             tend = m_walltime()
-            t = tend-tstart+threshold
+            t = tend - tstart + threshold
             IF (t > 0.0_dp) THEN
                perf = REAL(n_loop, KIND=dp)*2.0_dp*flops*1.e-6_dp/t
             ELSE
                perf = 0.0_dp
             END IF
 
-            em = MAXVAL(ABS(ca%pw%cc(:)-cc%pw%cc(:)))
+            em = MAXVAL(ABS(ca%pw%cc(:) - cc%pw%cc(:)))
             CALL mp_max(em, para_env%group)
-            et = SUM(ABS(ca%pw%cc(:)-cc%pw%cc(:)))
+            et = SUM(ABS(ca%pw%cc(:) - cc%pw%cc(:)))
             CALL mp_sum(et, para_env%group)
-            t_min = MINVAL(t_end-t_start)
-            t_max = MAXVAL(t_end-t_start)
+            t_min = MINVAL(t_end - t_start)
+            t_max = MAXVAL(t_end - t_start)
 
             IF (para_env%ionode) THEN
                WRITE (iw, *)
@@ -1094,8 +1094,8 @@ CONTAINS
       tstart = m_walltime()
       DO i = 1, n
          t = next_random_number(rng_stream)
-         tsum = tsum+t
-         tsum2 = tsum2+t*t
+         tsum = tsum + t
+         tsum2 = tsum2 + t*t
          IF (t > tmax) tmax = t
          IF (t < tmin) tmin = t
       END DO
@@ -1107,7 +1107,7 @@ CONTAINS
             "Maximum: ", tmax, &
             "Average: ", tsum/REAL(n, KIND=dp), &
             "Variance:", tsum2/REAL(n, KIND=dp), &
-            "Time [s]:", tend-tstart
+            "Time [s]:", tend - tstart
       END IF
 
       CALL delete_rng_stream(rng_stream)
@@ -1127,8 +1127,8 @@ CONTAINS
       tstart = m_walltime()
       DO i = 1, n
          t = next_random_number(rng_stream)
-         tsum = tsum+t
-         tsum2 = tsum2+t*t
+         tsum = tsum + t
+         tsum2 = tsum2 + t*t
          IF (t > tmax) tmax = t
          IF (t < tmin) tmin = t
       END DO
@@ -1141,7 +1141,7 @@ CONTAINS
             "Maximum: ", tmax, &
             "Average: ", tsum/REAL(n, KIND=dp), &
             "Variance:", tsum2/REAL(n, KIND=dp), &
-            "Time [s]:", tend-tstart
+            "Time [s]:", tend - tstart
       END IF
 
       CALL delete_rng_stream(rng_stream)
@@ -1164,7 +1164,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: eigensolver_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'eigensolver_test', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: diag_method, group, i, i_loop, i_rep, &
                                                             init_method, j, n, n_loop, n_rep, &
@@ -1282,7 +1282,7 @@ CONTAINS
                SELECT CASE (init_method)
                CASE (do_mat_random)
                   DO j = i, n
-                     buffer(1, j) = next_random_number(rng_stream)-0.5_dp
+                     buffer(1, j) = next_random_number(rng_stream) - 0.5_dp
                   END DO
                   !MK activate/modify for a diagonal dominant symmetric matrix:
                   !MK buffer(1,i) = 10.0_dp*buffer(1,i)
@@ -1298,7 +1298,7 @@ CONTAINS
                                         start_row=i, &
                                         start_col=i, &
                                         n_rows=1, &
-                                        n_cols=n-i+1, &
+                                        n_cols=n - i + 1, &
                                         alpha=1.0_dp, &
                                         beta=0.0_dp, &
                                         transpose=.FALSE.)
@@ -1306,7 +1306,7 @@ CONTAINS
                                         new_values=buffer, &
                                         start_row=i, &
                                         start_col=i, &
-                                        n_rows=n-i+1, &
+                                        n_rows=n - i + 1, &
                                         n_cols=1, &
                                         alpha=1.0_dp, &
                                         beta=0.0_dp, &
@@ -1356,7 +1356,7 @@ CONTAINS
                                 work_syevx=1.0_dp)
             END SELECT
             t2 = m_walltime()
-            IF (iw > 0) WRITE (iw, *) "Timing for loop ", i_loop, " : ", t2-t1
+            IF (iw > 0) WRITE (iw, *) "Timing for loop ", i_loop, " : ", t2 - t1
          ENDDO
 
          IF (iw > 0) THEN
@@ -1517,17 +1517,17 @@ CONTAINS
             CALL cp_gemm(transa, transb, k, n, m, 1.0_dp, matrix_a, matrix_b, 0.0_dp, matrix_c)
             t4 = m_walltime()
             IF (iw > 0) THEN
-               WRITE (iw, '(T2,A,T50,F12.6)') "cp_fm_gemm timing: ", (t4-t3)
+               WRITE (iw, '(T2,A,T50,F12.6)') "cp_fm_gemm timing: ", (t4 - t3)
                CALL m_flush(iw)
             ENDIF
          ENDDO
          t2 = m_walltime()
 
          IF (iw > 0) THEN
-            WRITE (iw, '(T2,A,T50,F12.6)') "average cp_fm_gemm timing: ", (t2-t1)/N_loop
+            WRITE (iw, '(T2,A,T50,F12.6)') "average cp_fm_gemm timing: ", (t2 - t1)/N_loop
             IF (t2 > t1) THEN
                WRITE (iw, '(T2,A,T50,F12.6)') "cp_fm_gemm Gflops per MPI task: ", &
-                  2*REAL(m, kind=dp)*REAL(n, kind=dp)*REAL(k, kind=dp)*N_loop/MAX(0.001_dp, t2-t1)/1.0E9_dp/para_env%num_pe
+                  2*REAL(m, kind=dp)*REAL(n, kind=dp)*REAL(k, kind=dp)*N_loop/MAX(0.001_dp, t2 - t1)/1.0E9_dp/para_env%num_pe
             ENDIF
          ENDIF
 

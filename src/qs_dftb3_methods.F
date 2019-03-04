@@ -8,44 +8,44 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE qs_dftb3_methods
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE atprop_types,                    ONLY: atprop_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_iterator_blocks_left,&
-                                              dbcsr_iterator_next_block,&
-                                              dbcsr_iterator_start,&
-                                              dbcsr_iterator_stop,&
-                                              dbcsr_iterator_type,&
-                                              dbcsr_p_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE virial_methods,                  ONLY: virial_pair_force
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE atprop_types, ONLY: atprop_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_get_block_p, &
+                        dbcsr_iterator_blocks_left, &
+                        dbcsr_iterator_next_block, &
+                        dbcsr_iterator_start, &
+                        dbcsr_iterator_stop, &
+                        dbcsr_iterator_type, &
+                        dbcsr_p_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE virial_methods, ONLY: virial_pair_force
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -79,7 +79,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb3_diagonal', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_i, atom_j, blk, handle, i, ia, &
                                                             iatom, ic, icol, ikind, irow, is, &
@@ -124,11 +124,11 @@ CONTAINS
          DO ia = 1, local_particles%n_el(ikind)
             iatom = local_particles%list(ikind)%array(ia)
             eloc = -1.0_dp/6.0_dp*ua*mcharge(iatom)**3
-            eb3 = eb3+eloc
+            eb3 = eb3 + eloc
             IF (atprop%energy) THEN
                ! we have to add the part not covered by 0.5*Tr(FP)
-               eloc = -0.5_dp*eloc-0.25_dp*ua*zeff*mcharge(iatom)**2
-               atprop%atecoul(iatom) = atprop%atecoul(iatom)+eloc
+               eloc = -0.5_dp*eloc - 0.25_dp*ua*zeff*mcharge(iatom)**2
+               atprop%atecoul(iatom) = atprop%atecoul(iatom) + eloc
             END IF
          END DO
       END DO
@@ -175,7 +175,7 @@ CONTAINS
                CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
                CALL get_dftb_atom_param(dftb_kind, dudq=uj)
                !
-               gmij = -0.5_dp*(ui*mcharge(irow)**2+uj*mcharge(icol)**2)
+               gmij = -0.5_dp*(ui*mcharge(irow)**2 + uj*mcharge(icol)**2)
                !
                NULLIFY (pblock)
                CALL dbcsr_get_block_p(matrix=matrix_p(1, 1)%matrix, &
@@ -183,17 +183,17 @@ CONTAINS
                CPASSERT(found)
                DO i = 1, 3
                   NULLIFY (dsblock)
-                  CALL dbcsr_get_block_p(matrix=matrix_s(1+i, 1)%matrix, &
+                  CALL dbcsr_get_block_p(matrix=matrix_s(1 + i, 1)%matrix, &
                                          row=irow, col=icol, block=dsblock, found=found)
                   CPASSERT(found)
                   fi = -gmij*SUM(pblock*dsblock)
-                  force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i)+fi
-                  force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j)-fi
+                  force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i) + fi
+                  force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j) - fi
                   fij(i) = fi
                END DO
                ! probably only correct for MIC cases (large enough unit cells)
                IF (use_virial) THEN
-                  rij = particle_set(irow)%r-particle_set(icol)%r
+                  rij = particle_set(irow)%r - particle_set(icol)%r
                   rij = pbc(rij, cell)
                   CALL virial_pair_force(virial%pv_virial, -1._dp, fij, rij)
                   IF (atprop%stress) THEN
@@ -229,7 +229,7 @@ CONTAINS
                CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
                CALL get_dftb_atom_param(dftb_kind, dudq=uj)
                !
-               gmij = -0.5_dp*(ui*mcharge(iatom)**2+uj*mcharge(jatom)**2)
+               gmij = -0.5_dp*(ui*mcharge(iatom)**2 + uj*mcharge(jatom)**2)
                !
                NULLIFY (pblock)
                CALL dbcsr_get_block_p(matrix=matrix_p(1, ic)%matrix, &
@@ -237,7 +237,7 @@ CONTAINS
                CPASSERT(found)
                DO i = 1, 3
                   NULLIFY (dsblock)
-                  CALL dbcsr_get_block_p(matrix=matrix_s(1+i, ic)%matrix, &
+                  CALL dbcsr_get_block_p(matrix=matrix_s(1 + i, ic)%matrix, &
                                          row=irow, col=icol, block=dsblock, found=found)
                   CPASSERT(found)
                   IF (irow == iatom) THEN
@@ -245,8 +245,8 @@ CONTAINS
                   ELSE
                      fi = gmij*SUM(pblock*dsblock)
                   END IF
-                  force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i)+fi
-                  force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j)-fi
+                  force(ikind)%rho_elec(i, atom_i) = force(ikind)%rho_elec(i, atom_i) + fi
+                  force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j) - fi
                   fij(i) = fi
                END DO
                IF (use_virial) THEN
@@ -296,13 +296,13 @@ CONTAINS
                jkind = kind_of(icol)
                CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
                CALL get_dftb_atom_param(dftb_kind, dudq=uj)
-               gmij = -0.5_dp*(ui*mcharge(irow)**2+uj*mcharge(icol)**2)
+               gmij = -0.5_dp*(ui*mcharge(irow)**2 + uj*mcharge(icol)**2)
                DO is = 1, SIZE(ks_matrix, 1)
                   NULLIFY (ksblock)
                   CALL dbcsr_get_block_p(matrix=ks_matrix(is, 1)%matrix, &
                                          row=irow, col=icol, block=ksblock, found=found)
                   CPASSERT(found)
-                  ksblock = ksblock-0.5_dp*gmij*sblock
+                  ksblock = ksblock - 0.5_dp*gmij*sblock
                END DO
             ENDDO
             CALL dbcsr_iterator_stop(iter)
@@ -326,7 +326,7 @@ CONTAINS
                jkind = kind_of(jatom)
                CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
                CALL get_dftb_atom_param(dftb_kind, dudq=uj)
-               gmij = -0.5_dp*(ui*mcharge(iatom)**2+uj*mcharge(jatom)**2)
+               gmij = -0.5_dp*(ui*mcharge(iatom)**2 + uj*mcharge(jatom)**2)
                !
                NULLIFY (sblock)
                CALL dbcsr_get_block_p(matrix=matrix_s(1, ic)%matrix, &
@@ -337,7 +337,7 @@ CONTAINS
                   CALL dbcsr_get_block_p(matrix=ks_matrix(is, ic)%matrix, &
                                          row=irow, col=icol, block=ksblock, found=found)
                   CPASSERT(found)
-                  ksblock = ksblock-0.5_dp*gmij*sblock
+                  ksblock = ksblock - 0.5_dp*gmij*sblock
                END DO
 
             END DO

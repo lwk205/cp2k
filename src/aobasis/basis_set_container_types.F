@@ -10,9 +10,9 @@
 ! **************************************************************************************************
 MODULE basis_set_container_types
 
-   USE basis_set_types,                 ONLY: deallocate_gto_basis_set,&
-                                              gto_basis_set_type
-   USE kinds,                           ONLY: default_string_length
+   USE basis_set_types, ONLY: deallocate_gto_basis_set, &
+                              gto_basis_set_type
+   USE kinds, ONLY: default_string_length
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,7 +65,7 @@ CONTAINS
          INTENT(inout)                                   :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'remove_basis_set_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -132,7 +132,7 @@ CONTAINS
       CHARACTER(len=*)                                   :: basis_set_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'add_basis_set_to_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       LOGICAL                                            :: success
@@ -164,7 +164,7 @@ CONTAINS
       CHARACTER(len=*), OPTIONAL                         :: basis_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'remove_basis_from_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: basis_nr, i, ibas
 
@@ -193,11 +193,11 @@ CONTAINS
          END IF
       END IF
       ! shift other basis sets
-      DO i = ibas+1, SIZE(container)
+      DO i = ibas + 1, SIZE(container)
          IF (container(i)%basis_type_nr == 0) CYCLE
-         container(i-1)%basis_type = container(i)%basis_type
-         container(i-1)%basis_set => container(i)%basis_set
-         container(i-1)%basis_type_nr = container(i)%basis_type_nr
+         container(i - 1)%basis_type = container(i)%basis_type
+         container(i - 1)%basis_set => container(i)%basis_set
+         container(i - 1)%basis_type_nr = container(i)%basis_type_nr
          container(i)%basis_type = ""
          container(i)%basis_type_nr = 0
          NULLIFY (container(i)%basis_set)
@@ -220,7 +220,7 @@ CONTAINS
       CHARACTER(len=*), OPTIONAL                         :: basis_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_basis_from_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: basis_nr, i
 

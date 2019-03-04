@@ -13,35 +13,35 @@
 ! **************************************************************************************************
 MODULE qs_oce_methods
 
-   USE ai_overlap,                      ONLY: overlap
-   USE ao_util,                         ONLY: exp_radius
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE block_p_types,                   ONLY: block_p_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: dfac,&
-                                              pi
-   USE orbital_pointers,                ONLY: indco,&
-                                              init_orbital_pointers,&
-                                              nco,&
-                                              ncoset,&
-                                              nso
+   USE ai_overlap, ONLY: overlap
+   USE ao_util, ONLY: exp_radius
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE block_p_types, ONLY: block_p_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: dfac, &
+                            pi
+   USE orbital_pointers, ONLY: indco, &
+                               init_orbital_pointers, &
+                               nco, &
+                               ncoset, &
+                               nso
    USE orbital_transformation_matrices, ONLY: orbtramat
-   USE particle_types,                  ONLY: particle_type
-   USE paw_proj_set_types,              ONLY: get_paw_proj_set,&
-                                              paw_proj_set_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE sap_kind_types,                  ONLY: clist_type,&
-                                              sap_int_type,&
-                                              sap_sort
+   USE particle_types, ONLY: particle_type
+   USE paw_proj_set_types, ONLY: get_paw_proj_set, &
+                                 paw_proj_set_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE sap_kind_types, ONLY: clist_type, &
+                             sap_int_type, &
+                             sap_sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -83,12 +83,12 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: eps_fit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_oce_block', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: first_col, ic, ico, ider, ig1, igau, ip, ipgf, is, isgfb, isgfb_cnt, iso, isp, &
-         jc, jset, lds, lm, lpoint, lprj, lsgfb, lsgfb_cnt, lshell, lx, ly, lz, m, m1, maxcob, &
-         maxder, maxlb, maxlprj, maxnprja, maxsoa, msab, n, ncob, np_car, np_sph, nsatbas, nseta, &
-         nsetb, nsoatot, ntotsgfb, sgf_hard_only
+                 jc, jset, lds, lm, lpoint, lprj, lsgfb, lsgfb_cnt, lshell, lx, ly, lz, m, m1, maxcob, &
+                 maxder, maxlb, maxlprj, maxnprja, maxsoa, msab, n, ncob, np_car, np_sph, nsatbas, nseta, &
+                 nsetb, nsoatot, ntotsgfb, sgf_hard_only
       INTEGER, DIMENSION(:), POINTER                     :: fp_cara, fp_spha, lb_max, lb_min, npgfb, &
                                                             nprjla, nsgfb
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgfb
@@ -143,11 +143,11 @@ CONTAINS
       ENDIF
 
       lm = MAX(maxlb, maxlprj)
-      lds = ncoset(lm+nder+1)
+      lds = ncoset(lm + nder + 1)
       msab = MAX(maxnprja*ncoset(maxlprj), maxcob)
 
       ALLOCATE (c2s(lds, lds))
-      ALLOCATE (s(lds, lds, ncoset(nder+1)))
+      ALLOCATE (s(lds, lds, ncoset(nder + 1)))
       ALLOCATE (spa_sb(np_car, ntotsgfb))
       ALLOCATE (spa_tmp(msab, msab*maxder))
       ALLOCATE (ovs(np_sph, maxcob*nsetb*maxder))
@@ -159,17 +159,17 @@ CONTAINS
       DO jset = 1, nsetb
          !
          ! Set the contribution list
-         IF (hard_radius_a+set_radius_b(jset) >= dab) THEN
+         IF (hard_radius_a + set_radius_b(jset) >= dab) THEN
             isgfb = first_sgfb(1, jset)
-            lsgfb = isgfb-1+nsgfb(jset)
+            lsgfb = isgfb - 1 + nsgfb(jset)
             DO jc = isgfb, lsgfb
-               nsgf_cnt = nsgf_cnt+1
+               nsgf_cnt = nsgf_cnt + 1
                sgf_list(nsgf_cnt) = jc
             ENDDO
 
             ! check if this function is hard
             radius = exp_radius(lb_max(jset), MAXVAL(zetb(1:npgfb(jset), jset)), eps_fit, 1.0_dp)
-            IF (radius .LE. hard_radius_b) sgf_hard_only = sgf_hard_only+1
+            IF (radius .LE. hard_radius_b) sgf_hard_only = sgf_hard_only + 1
 
             ! ***integral between proj of iatom and primitives of jatom
             ! *** Calculate the primitives overlap ***
@@ -178,9 +178,9 @@ CONTAINS
             s = 0.0_dp
             ncob = npgfb(jset)*ncoset(lb_max(jset))
             isgfb = first_sgfb(1, jset)
-            lsgfb = isgfb-1+nsgfb(jset)
+            lsgfb = isgfb - 1 + nsgfb(jset)
 
-            lsgfb_cnt = isgfb_cnt-1+nsgfb(jset)
+            lsgfb_cnt = isgfb_cnt - 1 + nsgfb(jset)
 
             DO lprj = 0, maxlprj
                CALL overlap(lprj, lprj, nprjla(lprj), &
@@ -191,24 +191,24 @@ CONTAINS
                             nder, .TRUE., s, lds)
                DO iso = 1, nso(lprj)
                   DO ico = 1, nco(lprj)
-                     lx = indco(1, ico+ncoset(lprj-1))
-                     ly = indco(2, ico+ncoset(lprj-1))
-                     lz = indco(3, ico+ncoset(lprj-1))
-                     c2s(iso, ico) = orbtramat(lprj)%c2s(iso, ico)/SQRT((4.0_dp*pi)/dfac(2*lprj+1)* &
-                                                                        dfac(2*lx-1)*dfac(2*ly-1)*dfac(2*lz-1))
+                     lx = indco(1, ico + ncoset(lprj - 1))
+                     ly = indco(2, ico + ncoset(lprj - 1))
+                     lz = indco(3, ico + ncoset(lprj - 1))
+                     c2s(iso, ico) = orbtramat(lprj)%c2s(iso, ico)/SQRT((4.0_dp*pi)/dfac(2*lprj + 1)* &
+                                                                        dfac(2*lx - 1)*dfac(2*ly - 1)*dfac(2*lz - 1))
                   ENDDO
                ENDDO
                DO ider = 1, maxder
-                  is = (ider-1)*SIZE(spa_tmp, 1)
-                  isp = (ider-1)*maxcob*nsetb
+                  is = (ider - 1)*SIZE(spa_tmp, 1)
+                  isp = (ider - 1)*maxcob*nsetb
                   DO ipgf = 1, nprjla(lprj)
-                     lpoint = ncoset(lprj-1)+1+(ipgf-1)*ncoset(lprj)
-                     m = fp_spha(lprj)+(ipgf-1)*nso(lprj)
+                     lpoint = ncoset(lprj - 1) + 1 + (ipgf - 1)*ncoset(lprj)
+                     m = fp_spha(lprj) + (ipgf - 1)*nso(lprj)
                      DO ip = 1, npgfb(jset)
-                        ic = (ip-1)*ncoset(lb_max(jset))
-                        igau = isp+ic+m1+ncoset(lb_min(jset)-1)+1
-                        ig1 = is+ic+ncoset(lb_min(jset)-1)+1
-                        n = ncoset(lb_max(jset))-ncoset(lb_min(jset)-1)
+                        ic = (ip - 1)*ncoset(lb_max(jset))
+                        igau = isp + ic + m1 + ncoset(lb_min(jset) - 1) + 1
+                        ig1 = is + ic + ncoset(lb_min(jset) - 1) + 1
+                        n = ncoset(lb_max(jset)) - ncoset(lb_min(jset) - 1)
                         CALL DGEMM("N", "N", nso(lprj), n, nco(lprj), 1._dp, c2s, lds, spa_tmp(lpoint, ig1), msab, &
                                    0._dp, ovs(m, igau), np_sph)
                      ENDDO
@@ -221,11 +221,11 @@ CONTAINS
                DO ipgf = 1, npgfb(jset)
                   DO lshell = lb_min(jset), lb_max(jset)
                      IF (zetb(ipgf, jset) >= zisominb(lshell)) THEN
-                        igau = n*(ipgf-1)+ncoset(lshell-1)
+                        igau = n*(ipgf - 1) + ncoset(lshell - 1)
                         DO ider = 1, maxder
-                           is = maxcob*(ider-1)
-                           isp = (ider-1)*maxcob*nsetb
-                           ovs(:, igau+1+isp+m1:igau+nco(lshell)+isp+m1) = 0.0_dp
+                           is = maxcob*(ider - 1)
+                           isp = (ider - 1)*maxcob*nsetb
+                           ovs(:, igau + 1 + isp + m1:igau + nco(lshell) + isp + m1) = 0.0_dp
                         ENDDO
                      ENDIF
                   ENDDO
@@ -234,7 +234,7 @@ CONTAINS
 
             ! *** Contraction step (integrals and derivatives)
             DO ider = 1, maxder
-               first_col = (ider-1)*maxcob*nsetb+1+m1
+               first_col = (ider - 1)*maxcob*nsetb + 1 + m1
                CALL dgemm("N", "N", np_sph, nsgfb(jset), ncob, &
                           1.0_dp, ovs(1, first_col), SIZE(ovs, 1), &
                           sphi_b(1, isgfb), SIZE(sphi_b, 1), &
@@ -245,9 +245,9 @@ CONTAINS
                           spa_sb(1, isgfb), SIZE(spa_sb, 1), &
                           1.0_dp, oces(ider)%block(1, isgfb_cnt), SIZE(oces(ider)%block, 1))
             ENDDO
-            isgfb_cnt = isgfb_cnt+nsgfb(jset)
+            isgfb_cnt = isgfb_cnt + nsgfb(jset)
          END IF ! radius
-         m1 = m1+maxcob
+         m1 = m1 + maxcob
       ENDDO !jset
 
       ! check if the screened functions are all soft
@@ -274,7 +274,7 @@ CONTAINS
       INTEGER, INTENT(OUT)                               :: nsgf_cnt
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_oce_block_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iset, isgfa, j, jc, lsgfa, maxlprj, &
                                                             maxsoa, n, nsatbas, nseta, nsgfa
@@ -310,15 +310,15 @@ CONTAINS
       nsgf_cnt = 0
       DO iset = 1, nseta
          isgfa = first_sgfa(1, iset)
-         lsgfa = isgfa-1+nsgf_seta(iset)
+         lsgfa = isgfa - 1 + nsgf_seta(iset)
          DO jc = isgfa, lsgfa
-            nsgf_cnt = nsgf_cnt+1
+            nsgf_cnt = nsgf_cnt + 1
             sgf_list(nsgf_cnt) = jc
          ENDDO
-         n = maxsoa*(iset-1)
+         n = maxsoa*(iset - 1)
 
-         prjloc_h(n+1:n+maxsoa, isgfa:lsgfa) = local_oce_h(1:maxsoa, isgfa:lsgfa)
-         prjloc_s(n+1:n+maxsoa, isgfa:lsgfa) = local_oce_s(1:maxsoa, isgfa:lsgfa)
+         prjloc_h(n + 1:n + maxsoa, isgfa:lsgfa) = local_oce_h(1:maxsoa, isgfa:lsgfa)
+         prjloc_s(n + 1:n + maxsoa, isgfa:lsgfa) = local_oce_s(1:maxsoa, isgfa:lsgfa)
       ENDDO
 
       DO i = 1, nsgfa
@@ -360,11 +360,11 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: eps_fit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_oce_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_a, atom_b, handle, i, iac, ikind, ilist, jkind, jneighbor, ldai, ldsab, &
-         maxco, maxder, maxl, maxlgto, maxlprj, maxprj, maxsgf, maxsoa, maxsob, mlprj, natom, &
-         ncoa_sum, nkind, nlist, nneighbor, nsatbas, nseta, nsetb, nsgf_cnt, nsgfa, nsobtot
+                 maxco, maxder, maxl, maxlgto, maxlprj, maxprj, maxsgf, maxsoa, maxsob, mlprj, natom, &
+                 ncoa_sum, nkind, nlist, nneighbor, nsatbas, nseta, nsetb, nsgf_cnt, nsgfa, nsobtot
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: sgf_list
       INTEGER, DIMENSION(3)                              :: cell_b
       INTEGER, DIMENSION(:), POINTER                     :: fp_car, fp_sph, la_max, la_min, npgfa, &
@@ -406,13 +406,13 @@ CONTAINS
                               maxsgf=maxsgf)
 
          maxl = MAX(maxlgto, maxlprj)
-         CALL init_orbital_pointers(maxl+nder+1)
+         CALL init_orbital_pointers(maxl + nder + 1)
 
          ldsab = MAX(maxco, ncoset(maxlprj), maxsgf, maxprj)
-         ldai = ncoset(maxl+nder+1)
+         ldai = ncoset(maxl + nder + 1)
          ALLOCATE (sab(ldsab, ldsab*maxder), work(ldsab, ldsab*maxder))
          sab = 0.0_dp
-         ALLOCATE (ai_work(ldai, ldai, ncoset(nder+1)))
+         ALLOCATE (ai_work(ldai, ldai, ncoset(nder + 1)))
          ai_work = 0.0_dp
 
          ALLOCATE (oceh(maxder), oces(maxder))
@@ -428,7 +428,7 @@ CONTAINS
             CALL get_iterator_info(nl_iterator, ikind=ikind, jkind=jkind, iatom=atom_a, jatom=atom_b, &
                                    nlist=nlist, ilist=ilist, nnode=nneighbor, inode=jneighbor, cell=cell_b, r=rab)
 
-            iac = ikind+nkind*(jkind-1)
+            iac = ikind + nkind*(jkind - 1)
             dab = SQRT(SUM(rab*rab))
 
             qs_kind => qs_kind_set(ikind)
@@ -700,7 +700,7 @@ CONTAINS
          ip = n2oindex(i)
          DO j = 1, nbas
             jp = n2oindex(j)
-            aout(jp, ip) = aout(jp, ip)+ain(j, i)
+            aout(jp, ip) = aout(jp, ip) + ain(j, i)
          END DO
       END DO
 

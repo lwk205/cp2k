@@ -40,7 +40,7 @@ CONTAINS
       TYPE(ilist_type), POINTER                          :: ilist
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_ilist_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(ilist))
       ALLOCATE (ilist)
@@ -62,7 +62,7 @@ CONTAINS
       TYPE(ilist_type), POINTER                          :: ilist
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_ilist_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ilist))
       DEALLOCATE (ilist)

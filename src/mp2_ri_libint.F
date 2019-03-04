@@ -11,61 +11,61 @@
 !> \author Mauro Del Ben
 ! **************************************************************************************************
 MODULE mp2_ri_libint
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type,&
-                                              init_aux_basis_set
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_triangular_invert
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_submatrix,&
-                                              cp_fm_release,&
-                                              cp_fm_set_submatrix,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE gamma,                           ONLY: init_md_ftable
-   USE hfx_energy_potential,            ONLY: coulomb4
-   USE hfx_libint_wrapper_types,        ONLY: lib_int
-   USE hfx_pair_list_methods,           ONLY: build_pair_list_mp2
-   USE hfx_screening_methods,           ONLY: calc_pair_dist_radii,&
-                                              calc_screening_functions
-   USE hfx_types,                       ONLY: &
-        hfx_basis_info_type, hfx_basis_type, hfx_create_neighbor_cells, hfx_general_type, &
-        hfx_load_balance_type, hfx_memory_type, hfx_pgf_list, hfx_pgf_product_list, &
-        hfx_potential_type, hfx_screen_coeff_type, hfx_screening_type, hfx_type, log_zero, &
-        pair_set_list_type
-   USE input_constants,                 ONLY: do_mp2_potential_TShPSC
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE message_passing,                 ONLY: mp_sum
-   USE mp2_types,                       ONLY: init_TShPSC_lmax,&
-                                              mp2_biel_type,&
-                                              mp2_type,&
-                                              pair_list_type_mp2
-   USE orbital_pointers,                ONLY: nco,&
-                                              ncoset,&
-                                              nso
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE t_sh_p_s_c,                      ONLY: free_C0,&
-                                              init
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type, &
+                              init_aux_basis_set
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_basic_linalg, ONLY: cp_fm_triangular_invert
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_submatrix, &
+                          cp_fm_release, &
+                          cp_fm_set_submatrix, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE gamma, ONLY: init_md_ftable
+   USE hfx_energy_potential, ONLY: coulomb4
+   USE hfx_libint_wrapper_types, ONLY: lib_int
+   USE hfx_pair_list_methods, ONLY: build_pair_list_mp2
+   USE hfx_screening_methods, ONLY: calc_pair_dist_radii, &
+                                    calc_screening_functions
+   USE hfx_types, ONLY: &
+      hfx_basis_info_type, hfx_basis_type, hfx_create_neighbor_cells, hfx_general_type, &
+      hfx_load_balance_type, hfx_memory_type, hfx_pgf_list, hfx_pgf_product_list, &
+      hfx_potential_type, hfx_screen_coeff_type, hfx_screening_type, hfx_type, log_zero, &
+      pair_set_list_type
+   USE input_constants, ONLY: do_mp2_potential_TShPSC
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE message_passing, ONLY: mp_sum
+   USE mp2_types, ONLY: init_TShPSC_lmax, &
+                        mp2_biel_type, &
+                        mp2_type, &
+                        pair_list_type_mp2
+   USE orbital_pointers, ONLY: nco, &
+                               ncoset, &
+                               nso
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE t_sh_p_s_c, ONLY: free_C0, &
+                         init
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -167,11 +167,11 @@ CONTAINS
       TYPE(hfx_basis_type), DIMENSION(:), POINTER        :: basis_S0
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_RI_basis_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: co_counter, counter, i, iatom, ikind, ipgf, iset, j, k, la, max_am_kind, &
-         max_coeff, max_nsgfl, max_pgf, max_pgf_kind, max_set, nl_count, nset, nseta, offset_a, &
-         offset_a1, s_offset_nl_a, sgfa, so_counter
+                 max_coeff, max_nsgfl, max_pgf, max_pgf_kind, max_set, nl_count, nset, nseta, offset_a, &
+                 offset_a1, s_offset_nl_a, sgfa, so_counter
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, npgfa, nshell
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgfa, nl_a
       REAL(dp), DIMENSION(:, :), POINTER                 :: sphi_a
@@ -268,7 +268,7 @@ CONTAINS
             DO i = 0, RI_basis_info%max_am
                nl_count = 0
                DO j = 1, nshell(iset)
-                  IF (RI_basis_parameter(ikind)%nl(j, iset) == i) nl_count = nl_count+1
+                  IF (RI_basis_parameter(ikind)%nl(j, iset) == i) nl_count = nl_count + 1
                END DO
                RI_basis_parameter(ikind)%nsgfl(i, iset) = nl_count
             END DO
@@ -310,20 +310,20 @@ CONTAINS
          DO iset = 1, nseta
             sgfa = first_sgfa(1, iset)
             DO ipgf = 1, npgfa(iset)
-               offset_a1 = (ipgf-1)*ncoset(la_max(iset))
+               offset_a1 = (ipgf - 1)*ncoset(la_max(iset))
                s_offset_nl_a = 0
                DO la = la_min(iset), la_max(iset)
-                  offset_a = offset_a1+ncoset(la-1)
+                  offset_a = offset_a1 + ncoset(la - 1)
                   co_counter = 0
-                  co_counter = co_counter+1
+                  co_counter = co_counter + 1
                   so_counter = 0
-                  DO k = sgfa+s_offset_nl_a, sgfa+s_offset_nl_a+nso(la)*nl_a(la, iset)-1
-                     DO i = offset_a+1, offset_a+nco(la)
-                        so_counter = so_counter+1
+                  DO k = sgfa + s_offset_nl_a, sgfa + s_offset_nl_a + nso(la)*nl_a(la, iset) - 1
+                     DO i = offset_a + 1, offset_a + nco(la)
+                        so_counter = so_counter + 1
                         RI_basis_parameter(ikind)%sphi_ext(so_counter, la, ipgf, iset) = sphi_a(i, k)
                      END DO
                   END DO
-                  s_offset_nl_a = s_offset_nl_a+nso(la)*(nl_a(la, iset))
+                  s_offset_nl_a = s_offset_nl_a + nso(la)*(nl_a(la, iset))
                END DO
             END DO
          END DO
@@ -337,9 +337,9 @@ CONTAINS
          ikind = kind_of(iatom)
          nset = RI_basis_parameter(ikind)%nset
          DO iset = 1, nset
-            RI_index_table(iatom, iset) = counter+1
-            counter = counter+RI_basis_parameter(ikind)%nsgf(iset)
-            RI_dimen = RI_dimen+RI_basis_parameter(ikind)%nsgf(iset)
+            RI_index_table(iatom, iset) = counter + 1
+            counter = counter + RI_basis_parameter(ikind)%nsgf(iset)
+            RI_dimen = RI_dimen + RI_basis_parameter(ikind)%nsgf(iset)
          END DO
       END DO
 
@@ -358,7 +358,7 @@ CONTAINS
       TYPE(hfx_basis_type), DIMENSION(:), POINTER        :: RI_basis_parameter, basis_S0
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'release_RI_basis_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -429,26 +429,26 @@ CONTAINS
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: Lai
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_lai_libint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: bits_max_val, cache_size, counter_L_blocks, handle, i, i_list_kl, i_set_list_kl, &
-         i_set_list_kl_start, i_set_list_kl_stop, i_thread, iatom, iatom_end, iatom_start, iiB, &
-         ikind, info_chol, irep, iset, jatom, jatom_end, jatom_start, jjB, jkind, jset, katom, &
-         katom_end, katom_start, kkB, kkind, kset, kset_start, L_B_i_end, L_B_i_start, L_B_k_end, &
-         L_B_k_start, l_max, latom, latom_end, latom_start, lkind, llB, lset, max_am, max_pgf, &
-         max_set, n_threads, natom, ncob, ncos_max, nints, nkind, nneighbors, nseta, nsetb, nsetc, &
-         nsetd, nsgf_max, nspins, orb_k_end, orb_k_start, orb_l_end
+                 i_set_list_kl_start, i_set_list_kl_stop, i_thread, iatom, iatom_end, iatom_start, iiB, &
+                 ikind, info_chol, irep, iset, jatom, jatom_end, jatom_start, jjB, jkind, jset, katom, &
+                 katom_end, katom_start, kkB, kkind, kset, kset_start, L_B_i_end, L_B_i_start, L_B_k_end, &
+                 L_B_k_start, l_max, latom, latom_end, latom_start, lkind, llB, lset, max_am, max_pgf, &
+                 max_set, n_threads, natom, ncob, ncos_max, nints, nkind, nneighbors, nseta, nsetb, nsetc, &
+                 nsetd, nsgf_max, nspins, orb_k_end, orb_k_start, orb_l_end
       INTEGER :: orb_l_start, primitive_counter, sgfb, sphi_a_u1, sphi_a_u2, sphi_a_u3, sphi_b_u1, &
-         sphi_b_u2, sphi_b_u3, sphi_c_u1, sphi_c_u2, sphi_c_u3, sphi_d_u1, sphi_d_u2, sphi_d_u3, &
-         unit_id, virtual
+                 sphi_b_u2, sphi_b_u3, sphi_c_u1, sphi_c_u2, sphi_c_u3, sphi_d_u1, sphi_d_u2, sphi_d_u3, &
+                 unit_id, virtual
       INTEGER(int_8) :: estimate_to_store_int, max_val_memory, mem_eris, mem_eris_disk, &
-         mem_max_val, n_processes, ncpu, neris_disk, neris_incore, neris_onthefly, neris_tmp, &
-         neris_total, nprim_ints, shm_neris_disk, shm_neris_incore, shm_neris_onthefly, &
-         shm_neris_total, shm_nprim_ints, shm_stor_count_int_disk, shm_stor_count_max_val, &
-         shm_storage_counter_integrals
+                        mem_max_val, n_processes, ncpu, neris_disk, neris_incore, neris_onthefly, neris_tmp, &
+                        neris_total, nprim_ints, shm_neris_disk, shm_neris_incore, shm_neris_onthefly, &
+                        shm_neris_total, shm_nprim_ints, shm_stor_count_int_disk, shm_stor_count_max_val, &
+                        shm_storage_counter_integrals
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: kind_of, last_sgf_global, nimages
       INTEGER, DIMENSION(:), POINTER :: la_max, la_min, lb_max, lb_min, lc_max, lc_min, ld_max, &
-         ld_min, npgfa, npgfb, npgfc, npgfd, nsgfa, nsgfb, nsgfc, nsgfd, shm_block_offset
+                                        ld_min, npgfa, npgfb, npgfc, npgfd, nsgfa, nsgfb, nsgfc, nsgfd, shm_block_offset
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgfb, nsgfl_a, nsgfl_b, nsgfl_c, &
                                                             nsgfl_d, shm_atomic_block_offset
       INTEGER, DIMENSION(:, :), POINTER, SAVE            :: shm_is_assoc_atomic_block
@@ -457,9 +457,9 @@ CONTAINS
       LOGICAL                                            :: do_periodic, treat_lsd_in_core
       LOGICAL, DIMENSION(:, :), POINTER                  :: shm_atomic_pair_list
       REAL(KIND=dp) :: cartesian_estimate, coeffs_kind_max0, compression_factor, &
-         compression_factor_disk, eps_schwarz, eps_storage, hf_fraction, ln_10, log10_eps_schwarz, &
-         log10_pmax, max_contraction_val, pmax_atom, pmax_entry, ra(3), rab2, rb(3), rc(3), rcd2, &
-         rd(3)
+                       compression_factor_disk, eps_schwarz, eps_storage, hf_fraction, ln_10, log10_eps_schwarz, &
+                       log10_pmax, max_contraction_val, pmax_atom, pmax_entry, ra(3), rab2, rb(3), rc(3), rcd2, &
+                       rd(3)
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: ee_buffer1, ee_buffer2, &
                                                             ee_primitives_tmp, ee_work, ee_work2, &
                                                             primitive_integrals
@@ -562,7 +562,7 @@ CONTAINS
       ln_10 = LOG(10.0_dp)
       i_thread = 0
 
-      actual_x_data => qs_env%x_data(irep, i_thread+1)
+      actual_x_data => qs_env%x_data(irep, i_thread + 1)
 
       shm_master_x_data => qs_env%x_data(irep, 1)
 
@@ -672,7 +672,7 @@ CONTAINS
             sgfb = first_sgfb(1, jset)
             ! if the primitives are assumed to be all of max_val2, max_val2*p2s_b becomes
             ! the maximum value after multiplication with sphi_b
-            max_contraction(jset, jatom) = MAXVAL((/(SUM(ABS(sphi_b(1:ncob, i))), i=sgfb, sgfb+nsgfb(jset)-1)/))
+            max_contraction(jset, jatom) = MAXVAL((/(SUM(ABS(sphi_b(1:ncob, i))), i=sgfb, sgfb + nsgfb(jset) - 1)/))
             max_pgf = MAX(max_pgf, npgfb(jset))
          ENDDO
       ENDDO
@@ -725,7 +725,7 @@ CONTAINS
       last_sgf_global(0) = 0
       DO iatom = 1, natom
          ikind = kind_of(iatom)
-         last_sgf_global(iatom) = last_sgf_global(iatom-1)+basis_parameter(ikind)%nsgf_total
+         last_sgf_global(iatom) = last_sgf_global(iatom - 1) + basis_parameter(ikind)%nsgf_total
       END DO
 
       IF (.NOT. shm_master_x_data%screen_funct_is_initialized) THEN
@@ -856,13 +856,13 @@ CONTAINS
                sphi_b_ext_set => sphi_b_ext(:, :, :, jset)
 
                L_B_i_start = RI_index_table(iatom, iset)
-               L_B_i_end = RI_index_table(iatom, iset)+nsgfa(iset)-1
+               L_B_i_end = RI_index_table(iatom, iset) + nsgfa(iset) - 1
 
                kset_start = 1
                IF (iatom == katom) kset_start = iset
                DO kset = kset_start, nsetc
 
-                  counter_L_blocks = counter_L_blocks+1
+                  counter_L_blocks = counter_L_blocks + 1
                   IF (MOD(counter_L_blocks, para_env%num_pe) /= para_env%mepos) CYCLE
                   !max_val2_set = (screen_coeffs_set(lset,kset,lkind,kkind)%x(1)*rcd2 + &
                   !                screen_coeffs_set(lset,kset,lkind,kkind)%x(2) )
@@ -874,7 +874,7 @@ CONTAINS
                   sphi_d_ext_set => sphi_d_ext(:, :, :, lset)
 
                   L_B_k_start = RI_index_table(katom, kset)
-                  L_B_k_end = RI_index_table(katom, kset)+nsgfc(kset)-1
+                  L_B_k_end = RI_index_table(katom, kset) + nsgfc(kset) - 1
 
                   pmax_entry = 0.0_dp
                   log10_pmax = pmax_entry
@@ -923,7 +923,7 @@ CONTAINS
                      DO kkB = 1, nsgfc(kset)
                         DO jjB = 1, nsgfb(jset)
                            DO iiB = 1, nsgfa(iset)
-                              primitive_counter = primitive_counter+1
+                              primitive_counter = primitive_counter + 1
                               L_block(iiB, kkB) = primitive_integrals(primitive_counter)
                               ! WRITE(1001,*) L_B_i_start+iiB-1, L_B_k_start+kkB-1, L_block(iiB,kkB)
                            END DO
@@ -974,7 +974,7 @@ CONTAINS
 
       ! clean lower part
       DO iiB = 1, RI_dimen
-         L_full_matrix(iiB+1:RI_dimen, iiB) = 0.0_dp
+         L_full_matrix(iiB + 1:RI_dimen, iiB) = 0.0_dp
       END DO
 
       ALLOCATE (list_kl%elements(natom**2))
@@ -1004,7 +1004,7 @@ CONTAINS
                                coeffs_kind_max0, log10_eps_schwarz, cell, 0.D+00, &
                                shm_atomic_pair_list)
 
-      virtual = dimen-occupied
+      virtual = dimen - occupied
 
       ALLOCATE (Lai(RI_dimen, virtual, occupied))
       Lai = 0.0_dp
@@ -1046,7 +1046,7 @@ CONTAINS
          jset = 1
          DO iset = 1, nseta
 
-            counter_L_blocks = counter_L_blocks+1
+            counter_L_blocks = counter_L_blocks + 1
             IF (MOD(counter_L_blocks, para_env%num_pe) /= para_env%mepos) CYCLE
 
             ncob = npgfb(jset)*ncoset(lb_max(jset))
@@ -1056,7 +1056,7 @@ CONTAINS
             sphi_b_ext_set => sphi_b_ext(:, :, :, jset)
 
             L_B_i_start = RI_index_table(iatom, iset)
-            L_B_i_end = RI_index_table(iatom, iset)+nsgfa(iset)-1
+            L_B_i_end = RI_index_table(iatom, iset) + nsgfa(iset) - 1
 
             ALLOCATE (BI1(dimen, dimen, nsgfa(iset)))
             BI1 = 0.0_dp
@@ -1115,9 +1115,9 @@ CONTAINS
                   IF (katom == latom .AND. lset < kset) CYCLE
 
                   orb_k_start = mp2_biel%index_table(katom, kset)
-                  orb_k_end = orb_k_start+nsgfc(kset)-1
+                  orb_k_end = orb_k_start + nsgfc(kset) - 1
                   orb_l_start = mp2_biel%index_table(latom, lset)
-                  orb_l_end = orb_l_start+nsgfd(lset)-1
+                  orb_l_end = orb_l_start + nsgfd(lset) - 1
 
                   !max_val2_set = (screen_coeffs_set(lset,kset,lkind,kkind)%x(1)*rcd2 + &
                   !                screen_coeffs_set(lset,kset,lkind,kkind)%x(2) )
@@ -1185,12 +1185,12 @@ CONTAINS
                                 nimages, do_periodic, p_work)
 
                   nints = nsgfa(iset)*nsgfb(jset)*nsgfc(kset)*nsgfd(lset)
-                  neris_total = neris_total+nints
-                  nprim_ints = nprim_ints+neris_tmp
+                  neris_total = neris_total + nints
+                  nprim_ints = nprim_ints + neris_tmp
                   IF (cartesian_estimate == 0.0_dp) cartesian_estimate = TINY(cartesian_estimate)
                   estimate_to_store_int = EXPONENT(cartesian_estimate)
                   estimate_to_store_int = MAX(estimate_to_store_int, -15_int_8)
-                  cartesian_estimate = SET_EXPONENT(1.0_dp, estimate_to_store_int+1)
+                  cartesian_estimate = SET_EXPONENT(1.0_dp, estimate_to_store_int + 1)
 
                   !IF(cartesian_estimate<eps_schwarz) CYCLE
 
@@ -1201,7 +1201,7 @@ CONTAINS
                      DO kkB = 1, nsgfc(kset)
                         DO jjB = 1, nsgfb(jset)
                            DO iiB = 1, nsgfa(iset)
-                              primitive_counter = primitive_counter+1
+                              primitive_counter = primitive_counter + 1
                               MNRS(llB, kkB, iiB) = primitive_integrals(primitive_counter)
                               ! WRITE(1111,*) orb_l_start+llB-1,orb_k_start+kkB-1,L_B_i_start+iiB-1,MNRS(llB,kkB,iiB)
                            END DO
@@ -1218,9 +1218,9 @@ CONTAINS
             END DO ! i_list_kl
 
             DO iiB = 1, nsgfa(iset)
-               BI1(1:virtual, 1:occupied, iiB) = MATMUL(TRANSPOSE(C(1:dimen, occupied+1:dimen)), &
+               BI1(1:virtual, 1:occupied, iiB) = MATMUL(TRANSPOSE(C(1:dimen, occupied + 1:dimen)), &
                                                         MATMUL(BI1(1:dimen, 1:dimen, iiB), C(1:dimen, 1:occupied)))
-               Lai(L_B_i_start+iiB-1, 1:virtual, 1:occupied) = BI1(1:virtual, 1:occupied, iiB)
+               Lai(L_B_i_start + iiB - 1, 1:virtual, 1:occupied) = BI1(1:virtual, 1:occupied, iiB)
             END DO
 
             DEALLOCATE (BI1)

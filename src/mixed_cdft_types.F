@@ -10,23 +10,23 @@
 !> \author Nico Holmberg [01.2017]
 ! **************************************************************************************************
 MODULE mixed_cdft_types
-   USE cp_array_utils,                  ONLY: cp_1d_r_p_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release
-   USE cp_log_handling,                 ONLY: cp_logger_p_type,&
-                                              cp_logger_release
-   USE dbcsr_api,                       ONLY: dbcsr_p_type,&
-                                              dbcsr_release_p,&
-                                              dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE pw_env_types,                    ONLY: pw_env_release,&
-                                              pw_env_type
-   USE qs_cdft_types,                   ONLY: cdft_control_release,&
-                                              cdft_control_type
-   USE qs_kind_types,                   ONLY: deallocate_qs_kind_set,&
-                                              qs_kind_type
+   USE cp_array_utils, ONLY: cp_1d_r_p_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release
+   USE cp_log_handling, ONLY: cp_logger_p_type, &
+                              cp_logger_release
+   USE dbcsr_api, ONLY: dbcsr_p_type, &
+                        dbcsr_release_p, &
+                        dbcsr_type
+   USE kinds, ONLY: dp
+   USE pw_env_types, ONLY: pw_env_release, &
+                           pw_env_type
+   USE qs_cdft_types, ONLY: cdft_control_release, &
+                            cdft_control_type
+   USE qs_kind_types, ONLY: deallocate_qs_kind_set, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -288,7 +288,7 @@ CONTAINS
       TYPE(mixed_cdft_type), POINTER                     :: cdft_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_type_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       NULLIFY (cdft_control%pw_env, cdft_control%blacs_env, cdft_control%qs_kind_set)
       NULLIFY (cdft_control%dlb_control, cdft_control%dest_list_bo, cdft_control%dest_list)
@@ -309,7 +309,7 @@ CONTAINS
       TYPE(mixed_cdft_type), POINTER                     :: cdft_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_type_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 
@@ -382,7 +382,7 @@ CONTAINS
       TYPE(mixed_cdft_dlb_type), POINTER                 :: dlb_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_dlb_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -436,7 +436,7 @@ CONTAINS
       TYPE(buffers)                                      :: buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_buffers_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(buffer%cavity)) &
          DEALLOCATE (buffer%cavity)
@@ -456,7 +456,7 @@ CONTAINS
       TYPE(p_buffers)                                    :: p_buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_p_buffers_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -498,7 +498,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), OPTIONAL           :: strength, S_minushalf
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_result_type_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(lowdin)) THEN
          IF (ALLOCATED(results%lowdin)) DEALLOCATE (results%lowdin)
@@ -577,7 +577,7 @@ CONTAINS
       TYPE(mixed_cdft_result_type)                       :: results
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_result_type_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ALLOCATED(results%lowdin)) DEALLOCATE (results%lowdin)
       IF (ALLOCATED(results%wfn)) DEALLOCATE (results%wfn)
@@ -604,7 +604,7 @@ CONTAINS
       TYPE(mixed_cdft_work_type)                         :: matrix
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_work_type_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       NULLIFY (matrix%w_matrix)
       NULLIFY (matrix%mixed_matrix_s)
@@ -622,7 +622,7 @@ CONTAINS
       TYPE(mixed_cdft_work_type)                         :: matrix
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixed_cdft_work_type_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 

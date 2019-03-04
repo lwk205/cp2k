@@ -11,74 +11,74 @@
 !> \author Joost VandeVondele
 ! **************************************************************************************************
 MODULE dm_ls_scf
-   USE arnoldi_api,                     ONLY: arnoldi_extremal
-   USE bibliography,                    ONLY: Kolafa2004,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_external_control,             ONLY: external_control
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_binary_read, dbcsr_binary_write, dbcsr_checksum, dbcsr_copy, &
-        dbcsr_create, dbcsr_distribution_type, dbcsr_filter, dbcsr_get_info, dbcsr_get_occupation, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_scale, dbcsr_set, dbcsr_type, &
-        dbcsr_type_no_symmetry
-   USE dm_ls_chebyshev,                 ONLY: compute_chebyshev
-   USE dm_ls_scf_curvy,                 ONLY: deallocate_curvy_data,&
-                                              dm_ls_curvy_optimization
-   USE dm_ls_scf_methods,               ONLY: apply_matrix_preconditioner,&
-                                              compute_homo_lumo,&
-                                              density_matrix_sign,&
-                                              density_matrix_sign_fixed_mu,&
-                                              density_matrix_tc2,&
-                                              density_matrix_trs4,&
-                                              ls_scf_init_matrix_S
-   USE dm_ls_scf_qs,                    ONLY: ls_scf_dm_to_ks,&
-                                              ls_scf_init_qs,&
-                                              ls_scf_qs_atomic_guess,&
-                                              matrix_ls_create,&
-                                              matrix_ls_to_qs,&
-                                              matrix_qs_to_ls,&
-                                              rho_mixing_ls_init
-   USE dm_ls_scf_types,                 ONLY: ls_scf_env_type
-   USE input_constants,                 ONLY: ls_cluster_atomic,&
-                                              ls_scf_ns,&
-                                              ls_scf_pexsi,&
-                                              ls_scf_tc2,&
-                                              ls_scf_trs4,&
-                                              transport_transmission
-   USE input_section_types,             ONLY: section_vals_type
-   USE iterate_matrix,                  ONLY: purify_mcweeny
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush,&
-                                              m_walltime
-   USE mathlib,                         ONLY: binomial
-   USE molecule_types,                  ONLY: molecule_type
-   USE pao_main,                        ONLY: pao_optimization_end,&
-                                              pao_optimization_start,&
-                                              pao_post_scf,&
-                                              pao_update
-   USE pexsi_methods,                   ONLY: density_matrix_pexsi,&
-                                              pexsi_finalize_scf,&
-                                              pexsi_init_scf,&
-                                              pexsi_set_convergence_tolerance,&
-                                              pexsi_to_qs
-   USE qs_diis,                         ONLY: qs_diis_b_clear_sparse,&
-                                              qs_diis_b_create_sparse,&
-                                              qs_diis_b_step_4lscf
-   USE qs_diis_types,                   ONLY: qs_diis_b_release_sparse,&
-                                              qs_diis_buffer_type_sparse
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_scf_post_gpw,                 ONLY: qs_scf_post_moments,&
-                                              write_mo_free_results
-   USE transport,                       ONLY: external_scf_method,&
-                                              transport_initialize
-   USE transport_env_types,             ONLY: transport_env_type
+   USE arnoldi_api, ONLY: arnoldi_extremal
+   USE bibliography, ONLY: Kolafa2004, &
+                           cite_reference
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_external_control, ONLY: external_control
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_binary_read, dbcsr_binary_write, dbcsr_checksum, dbcsr_copy, &
+      dbcsr_create, dbcsr_distribution_type, dbcsr_filter, dbcsr_get_info, dbcsr_get_occupation, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_scale, dbcsr_set, dbcsr_type, &
+      dbcsr_type_no_symmetry
+   USE dm_ls_chebyshev, ONLY: compute_chebyshev
+   USE dm_ls_scf_curvy, ONLY: deallocate_curvy_data, &
+                              dm_ls_curvy_optimization
+   USE dm_ls_scf_methods, ONLY: apply_matrix_preconditioner, &
+                                compute_homo_lumo, &
+                                density_matrix_sign, &
+                                density_matrix_sign_fixed_mu, &
+                                density_matrix_tc2, &
+                                density_matrix_trs4, &
+                                ls_scf_init_matrix_S
+   USE dm_ls_scf_qs, ONLY: ls_scf_dm_to_ks, &
+                           ls_scf_init_qs, &
+                           ls_scf_qs_atomic_guess, &
+                           matrix_ls_create, &
+                           matrix_ls_to_qs, &
+                           matrix_qs_to_ls, &
+                           rho_mixing_ls_init
+   USE dm_ls_scf_types, ONLY: ls_scf_env_type
+   USE input_constants, ONLY: ls_cluster_atomic, &
+                              ls_scf_ns, &
+                              ls_scf_pexsi, &
+                              ls_scf_tc2, &
+                              ls_scf_trs4, &
+                              transport_transmission
+   USE input_section_types, ONLY: section_vals_type
+   USE iterate_matrix, ONLY: purify_mcweeny
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush, &
+                      m_walltime
+   USE mathlib, ONLY: binomial
+   USE molecule_types, ONLY: molecule_type
+   USE pao_main, ONLY: pao_optimization_end, &
+                       pao_optimization_start, &
+                       pao_post_scf, &
+                       pao_update
+   USE pexsi_methods, ONLY: density_matrix_pexsi, &
+                            pexsi_finalize_scf, &
+                            pexsi_init_scf, &
+                            pexsi_set_convergence_tolerance, &
+                            pexsi_to_qs
+   USE qs_diis, ONLY: qs_diis_b_clear_sparse, &
+                      qs_diis_b_create_sparse, &
+                      qs_diis_b_step_4lscf
+   USE qs_diis_types, ONLY: qs_diis_b_release_sparse, &
+                            qs_diis_buffer_type_sparse
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_scf_post_gpw, ONLY: qs_scf_post_moments, &
+                              write_mo_free_results
+   USE transport, ONLY: external_scf_method, &
+                        transport_initialize
+   USE transport_env_types, ONLY: transport_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -140,7 +140,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ls_scf_init_scf', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspin, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -237,7 +237,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ls_scf_initial_guess', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: aspc_guess = 2, atomic_guess = 1, &
                                                             restart_guess = 3
 
@@ -298,9 +298,9 @@ CONTAINS
             ! actual extrapolation
             CALL dbcsr_set(ls_scf_env%matrix_p(ispin), 0.0_dp)
             DO iaspc = 1, naspc
-               alpha = (-1.0_dp)**(iaspc+1)*REAL(iaspc, KIND=dp)* &
-                       binomial(2*naspc, naspc-iaspc)/binomial(2*naspc-2, naspc-1)
-               istore = MOD(ls_scf_env%scf_history%istore-iaspc, ls_scf_env%scf_history%nstore)+1
+               alpha = (-1.0_dp)**(iaspc + 1)*REAL(iaspc, KIND=dp)* &
+                       binomial(2*naspc, naspc - iaspc)/binomial(2*naspc - 2, naspc - 1)
+               istore = MOD(ls_scf_env%scf_history%istore - iaspc, ls_scf_env%scf_history%nstore) + 1
                CALL dbcsr_add(ls_scf_env%matrix_p(ispin), ls_scf_env%scf_history%matrix(ispin, istore), 1.0_dp, alpha)
             ENDDO
          ENDDO
@@ -365,7 +365,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ls_scf_store_result', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, project_name
       INTEGER                                            :: handle, ispin, istore, unit_nr
@@ -402,9 +402,9 @@ CONTAINS
       END IF
 
       IF (ls_scf_env%scf_history%nstore > 0) THEN
-         ls_scf_env%scf_history%istore = ls_scf_env%scf_history%istore+1
+         ls_scf_env%scf_history%istore = ls_scf_env%scf_history%istore + 1
          DO ispin = 1, SIZE(ls_scf_env%matrix_p)
-            istore = MOD(ls_scf_env%scf_history%istore-1, ls_scf_env%scf_history%nstore)+1
+            istore = MOD(ls_scf_env%scf_history%istore - 1, ls_scf_env%scf_history%nstore) + 1
             CALL dbcsr_copy(ls_scf_env%scf_history%matrix(ispin, istore), ls_scf_env%matrix_p(ispin))
 
             ! if we have the sqrt around, we use it to go to the orthogonal basis
@@ -451,7 +451,7 @@ CONTAINS
                                                             nelectron_spin_real, nmixing, nspin, &
                                                             unit_nr
       LOGICAL :: check_convergence, diis_step, do_transport, extra_scf, maxscf_reached, &
-         scf_converged, should_stop, transm_maxscf_reached, transm_scf_converged
+                 scf_converged, should_stop, transm_maxscf_reached, transm_scf_converged
       REAL(KIND=dp)                                      :: energy_diff, energy_new, energy_old, &
                                                             eps_diis, t1, t2
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -533,7 +533,7 @@ CONTAINS
          END IF
 
          t1 = m_walltime()
-         iscf = iscf+1
+         iscf = iscf + 1
 
          ! first get a copy of the current KS matrix
          CALL get_qs_env(qs_env, matrix_ks=matrix_ks)
@@ -560,7 +560,7 @@ CONTAINS
                      CALL dbcsr_copy(matrix_mixing_old(ispin), ls_scf_env%matrix_ks(ispin))
                   ELSE
                      IF (ls_scf_env%ls_diis) THEN ! ------- IF-DIIS+MIX--- START
-                        IF (diis_step .AND. (iscf-1) .GE. ls_scf_env%iter_ini_diis) THEN
+                        IF (diis_step .AND. (iscf - 1) .GE. ls_scf_env%iter_ini_diis) THEN
                            IF (unit_nr > 0) THEN
                               WRITE (unit_nr, '(A61)') &
                                  '*************************************************************'
@@ -583,14 +583,14 @@ CONTAINS
                                  " to mix KS matrix:  iscf=", iscf
                               WRITE (unit_nr, '(A7,F5.3,A6,F5.3,A7)') &
                                  " KS_nw=", ls_scf_env%mixing_fraction, "*KS + ", &
-                                 1.0_dp-ls_scf_env%mixing_fraction, "*KS_old"
+                                 1.0_dp - ls_scf_env%mixing_fraction, "*KS_old"
                               WRITE (unit_nr, '(A57)') &
                                  "*********************************************************"
                            ENDIF
                            ! perform the mixing of ks matrices
                            CALL dbcsr_add(matrix_mixing_old(ispin), &
                                           ls_scf_env%matrix_ks(ispin), &
-                                          1.0_dp-ls_scf_env%mixing_fraction, &
+                                          1.0_dp - ls_scf_env%mixing_fraction, &
                                           ls_scf_env%mixing_fraction)
                         ENDIF
                      ELSE ! otherwise
@@ -602,14 +602,14 @@ CONTAINS
                               " to mix KS matrix:  iscf=", iscf
                            WRITE (unit_nr, '(A7,F5.3,A6,F5.3,A7)') &
                               " KS_nw=", ls_scf_env%mixing_fraction, "*KS + ", &
-                              1.0_dp-ls_scf_env%mixing_fraction, "*KS_old"
+                              1.0_dp - ls_scf_env%mixing_fraction, "*KS_old"
                            WRITE (unit_nr, '(A57)') &
                               "*********************************************************"
                         ENDIF
                         ! perform the mixing of ks matrices
                         CALL dbcsr_add(matrix_mixing_old(ispin), &
                                        ls_scf_env%matrix_ks(ispin), &
-                                       1.0_dp-ls_scf_env%mixing_fraction, &
+                                       1.0_dp - ls_scf_env%mixing_fraction, &
                                        ls_scf_env%mixing_fraction)
                      ENDIF ! ------- IF-DIIS+MIX--- END
                   ENDIF
@@ -683,13 +683,13 @@ CONTAINS
          ENDIF
 
          ! report current SCF loop
-         energy_diff = energy_new-energy_old
+         energy_diff = energy_new - energy_old
          energy_old = energy_new
 
          t2 = m_walltime()
          IF (unit_nr > 0) THEN
             WRITE (unit_nr, *)
-            WRITE (unit_nr, '(T2,A,I6,F20.9,F20.9,F12.6)') "SCF", iscf, energy_new, energy_diff, t2-t1
+            WRITE (unit_nr, '(T2,A,I6,F20.9,F20.9,F12.6)') "SCF", iscf, energy_new, energy_diff, t2 - t1
             WRITE (unit_nr, *)
             CALL m_flush(unit_nr)
          ENDIF
@@ -854,7 +854,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'post_scf_homo_lumo', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspin, unit_nr
       LOGICAL                                            :: converged
@@ -926,7 +926,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'post_scf_mu_scan', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, imu, ispin, nelectron_spin_real, &
                                                             nmu, nspin, unit_nr
@@ -953,7 +953,7 @@ CONTAINS
 
          t1 = m_walltime()
 
-         mu = -0.4_dp+imu*(0.1_dp+0.4_dp)/nmu
+         mu = -0.4_dp + imu*(0.1_dp + 0.4_dp)/nmu
 
          IF (unit_nr > 0) WRITE (unit_nr, *) "------- starting with mu ", mu
 
@@ -969,7 +969,7 @@ CONTAINS
 
          t2 = m_walltime()
 
-         IF (unit_nr > 0) WRITE (unit_nr, *) " obtained ", mu, trace, t2-t1
+         IF (unit_nr > 0) WRITE (unit_nr, *) " obtained ", mu, trace, t2 - t1
 
       ENDDO
 
@@ -991,7 +991,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'post_scf_sparsities', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: title
       INTEGER                                            :: handle, ispin, nspin, unit_nr
@@ -1109,7 +1109,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: eps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'report_matrix_sparsity', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: eps_local, occ
@@ -1151,7 +1151,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_w_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       REAL(KIND=dp)                                      :: scaling
@@ -1202,7 +1202,7 @@ CONTAINS
    SUBROUTINE post_scf_experiment()
 
       CHARACTER(len=*), PARAMETER :: routineN = 'post_scf_experiment', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger

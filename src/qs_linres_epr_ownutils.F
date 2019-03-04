@@ -9,75 +9,75 @@
 !> \author RD
 ! **************************************************************************************************
 MODULE qs_linres_epr_ownutils
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathlib,                         ONLY: diamat_all
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_integral_ab,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_spline_utils,                 ONLY: Eval_Interp_Spl3_pbc,&
-                                              find_coeffs,&
-                                              pw_spline_do_precond,&
-                                              pw_spline_precond_create,&
-                                              pw_spline_precond_release,&
-                                              pw_spline_precond_set_kind,&
-                                              pw_spline_precond_type,&
-                                              spl3_pbc
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_core_energies,                ONLY: calculate_ptrace
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_harmonics_atom,               ONLY: harmonics_atom_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_linres_nmr_epr_common_utils,  ONLY: mult_G_ov_G2_grid
-   USE qs_linres_op,                    ONLY: fac_vecp,&
-                                              set_vecp,&
-                                              set_vecp_rev
-   USE qs_linres_types,                 ONLY: current_env_type,&
-                                              epr_env_type,&
-                                              get_current_env,&
-                                              get_epr_env,&
-                                              jrho_atom_type,&
-                                              nablavks_atom_type
-   USE qs_rho_atom_types,               ONLY: get_rho_atom,&
-                                              rho_atom_coeff,&
-                                              rho_atom_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_p_type,&
-                                              qs_rho_type
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_type
-   USE util,                            ONLY: get_limit
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathlib, ONLY: diamat_all
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_integral_ab, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_spline_utils, ONLY: Eval_Interp_Spl3_pbc, &
+                              find_coeffs, &
+                              pw_spline_do_precond, &
+                              pw_spline_precond_create, &
+                              pw_spline_precond_release, &
+                              pw_spline_precond_set_kind, &
+                              pw_spline_precond_type, &
+                              spl3_pbc
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_core_energies, ONLY: calculate_ptrace
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_harmonics_atom, ONLY: harmonics_atom_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_linres_nmr_epr_common_utils, ONLY: mult_G_ov_G2_grid
+   USE qs_linres_op, ONLY: fac_vecp, &
+                           set_vecp, &
+                           set_vecp_rev
+   USE qs_linres_types, ONLY: current_env_type, &
+                              epr_env_type, &
+                              get_current_env, &
+                              get_epr_env, &
+                              jrho_atom_type, &
+                              nablavks_atom_type
+   USE qs_rho_atom_types, ONLY: get_rho_atom, &
+                                rho_atom_coeff, &
+                                rho_atom_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_p_type, &
+                           qs_rho_type
+   USE realspace_grid_types, ONLY: realspace_grid_desc_type
+   USE util, ONLY: get_limit
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -122,7 +122,7 @@ CONTAINS
 
       DO idir1 = 1, 3
          DO idir2 = 1, 3
-            gsum = gsum+epr_env%g_total(idir1, idir2)
+            gsum = gsum + epr_env%g_total(idir1, idir2)
          END DO
       END DO
 
@@ -171,27 +171,27 @@ CONTAINS
                " ZY=", epr_env%g_soo(3, 2), " ZZ=", epr_env%g_soo(3, 3)
 
             WRITE (unit_nr, "(T2,A)") "gmatrix_total"
-            WRITE (unit_nr, "(3(A,f15.10))") " XX=", epr_env%g_total(1, 1)+epr_env%g_free_factor, &
+            WRITE (unit_nr, "(3(A,f15.10))") " XX=", epr_env%g_total(1, 1) + epr_env%g_free_factor, &
                " XY=", epr_env%g_total(1, 2), " XZ=", epr_env%g_total(1, 3)
             WRITE (unit_nr, "(3(A,f15.10))") " YX=", epr_env%g_total(2, 1), &
-               " YY=", epr_env%g_total(2, 2)+epr_env%g_free_factor, " YZ=", epr_env%g_total(2, 3)
+               " YY=", epr_env%g_total(2, 2) + epr_env%g_free_factor, " YZ=", epr_env%g_total(2, 3)
             WRITE (unit_nr, "(3(A,f15.10))") " ZX=", epr_env%g_total(3, 1), &
-               " ZY=", epr_env%g_total(3, 2), " ZZ=", epr_env%g_total(3, 3)+epr_env%g_free_factor
+               " ZY=", epr_env%g_total(3, 2), " ZZ=", epr_env%g_total(3, 3) + epr_env%g_free_factor
 
             DO idir1 = 1, 3
                DO idir2 = 1, 3
-                  g_sym(idir1, idir2) = (epr_env%g_total(idir1, idir2)+ &
+                  g_sym(idir1, idir2) = (epr_env%g_total(idir1, idir2) + &
                                          epr_env%g_total(idir2, idir1))/2.0_dp
                END DO
             END DO
 
             WRITE (unit_nr, "(T2,A)") "gtensor_total"
-            WRITE (unit_nr, "(3(A,f15.10))") " XX=", g_sym(1, 1)+epr_env%g_free_factor, &
+            WRITE (unit_nr, "(3(A,f15.10))") " XX=", g_sym(1, 1) + epr_env%g_free_factor, &
                " XY=", g_sym(1, 2), " XZ=", g_sym(1, 3)
             WRITE (unit_nr, "(3(A,f15.10))") " YX=", g_sym(2, 1), &
-               " YY=", g_sym(2, 2)+epr_env%g_free_factor, " YZ=", g_sym(2, 3)
+               " YY=", g_sym(2, 2) + epr_env%g_free_factor, " YZ=", g_sym(2, 3)
             WRITE (unit_nr, "(3(A,f15.10))") " ZX=", g_sym(3, 1), &
-               " ZY=", g_sym(3, 2), " ZZ=", g_sym(3, 3)+epr_env%g_free_factor
+               " ZY=", g_sym(3, 2), " ZZ=", g_sym(3, 3) + epr_env%g_free_factor
 
             CALL diamat_all(g_sym, eigenv_g)
             eigenv_g(:) = eigenv_g(:)*1.0e6_dp
@@ -255,9 +255,9 @@ CONTAINS
                                ecore=epr_g_zke_temp(ispin))
       END DO
 
-      epr_env%g_zke = epr_env%g_zke_factor*(epr_g_zke_temp(1)-epr_g_zke_temp(2))
+      epr_env%g_zke = epr_env%g_zke_factor*(epr_g_zke_temp(1) - epr_g_zke_temp(2))
       DO i1 = 1, 3
-         epr_env%g_total(i1, i1) = epr_env%g_total(i1, i1)+epr_env%g_zke
+         epr_env%g_total(i1, i1) = epr_env%g_total(i1, i1) + epr_env%g_zke
       END DO
 
       IF (output_unit > 0) THEN
@@ -361,8 +361,8 @@ CONTAINS
             CALL qs_rho_get(jrho1_set(idir3)%rho, rho_r=jrho3_r)
             CALL qs_rho_get(nablavks_set(idir2, ispin)%rho, rho_r=nrho2_r)
             CALL qs_rho_get(nablavks_set(idir3, ispin)%rho, rho_r=nrho3_r)
-            temp_so_soft = temp_so_soft+(-1.0_dp)**(1+ispin)*( &
-                           pw_integral_ab(jrho2_r(ispin)%pw, nrho3_r(1)%pw)- &
+            temp_so_soft = temp_so_soft + (-1.0_dp)**(1 + ispin)*( &
+                           pw_integral_ab(jrho2_r(ispin)%pw, nrho3_r(1)%pw) - &
                            pw_integral_ab(jrho3_r(ispin)%pw, nrho2_r(1)%pw))
          END DO
          temp_so_soft = -1.0_dp*epr_env%g_so_factor*temp_so_soft
@@ -441,7 +441,7 @@ CONTAINS
                         DO ia = 1, grid_atom%ng_sphere
 
                            ra = particle_set(iatom)%r
-                           ra(:) = ra(:)+grid_atom%rad(ir)*harmonics%a(:, ia)
+                           ra(:) = ra(:) + grid_atom%rad(ir)*harmonics%a(:, ia)
                            vks_ra_idir2 = Eval_Interp_Spl3_pbc(ra, &
                                                                vks_pw_spline(idir2, ispin)%pw)
                            vks_ra_idir3 = Eval_Interp_Spl3_pbc(ra, &
@@ -451,37 +451,37 @@ CONTAINS
                            !                                    !here take care of the partition
 
                            ! + sum_A j_loc_h_A x nabla_vks_s_A
-                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1)+ &
-                                                     (-1.0_dp)**(1+ispin)*( &
+                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1) + &
+                                                     (-1.0_dp)**(1 + ispin)*( &
                                                      jrho1_atom%jrho_vec_rad_h(idir2, ispin)%r_coef(ir, ia)* &
-                                                     vks_ra_idir3- &
+                                                     vks_ra_idir3 - &
                                                      jrho1_atom%jrho_vec_rad_h(idir3, ispin)%r_coef(ir, ia)* &
                                                      vks_ra_idir2 &
                                                      )*grid_atom%wr(ir)*grid_atom%wa(ia)
 
                            ! - sum_A j_loc_s_A x nabla_vks_s_A
-                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1)- &
-                                                     (-1.0_dp)**(1+ispin)*( &
+                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1) - &
+                                                     (-1.0_dp)**(1 + ispin)*( &
                                                      jrho1_atom%jrho_vec_rad_s(idir2, ispin)%r_coef(ir, ia)* &
-                                                     vks_ra_idir3- &
+                                                     vks_ra_idir3 - &
                                                      jrho1_atom%jrho_vec_rad_s(idir3, ispin)%r_coef(ir, ia)* &
                                                      vks_ra_idir2 &
                                                      )*grid_atom%wr(ir)*grid_atom%wa(ia)
 
                            ! + sum_A j_loc_h_A x nabla_vks_loc_h_A
-                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1)+ &
-                                                     (-1.0_dp)**(1+ispin)*( &
+                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1) + &
+                                                     (-1.0_dp)**(1 + ispin)*( &
                                                      jrho1_atom%jrho_vec_rad_h(idir2, ispin)%r_coef(ir, ia)* &
-                                                     nablavks_atom%nablavks_vec_rad_h(idir3, ispin)%r_coef(ir, ia)- &
+                                                     nablavks_atom%nablavks_vec_rad_h(idir3, ispin)%r_coef(ir, ia) - &
                                                      jrho1_atom%jrho_vec_rad_h(idir3, ispin)%r_coef(ir, ia)* &
                                                      nablavks_atom%nablavks_vec_rad_h(idir2, ispin)%r_coef(ir, ia) &
                                                      )*grid_atom%wr(ir)*grid_atom%wa(ia)
 
                            ! - sum_A j_loc_h_A x nabla_vks_loc_s_A
-                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1)- &
-                                                     (-1.0_dp)**(1+ispin)*( &
+                           temp_so_gapw(iB, idir1) = temp_so_gapw(iB, idir1) - &
+                                                     (-1.0_dp)**(1 + ispin)*( &
                                                      jrho1_atom%jrho_vec_rad_h(idir2, ispin)%r_coef(ir, ia)* &
-                                                     nablavks_atom%nablavks_vec_rad_s(idir3, ispin)%r_coef(ir, ia)- &
+                                                     nablavks_atom%nablavks_vec_rad_s(idir3, ispin)%r_coef(ir, ia) - &
                                                      jrho1_atom%jrho_vec_rad_h(idir3, ispin)%r_coef(ir, ia)* &
                                                      nablavks_atom%nablavks_vec_rad_s(idir2, ispin)%r_coef(ir, ia) &
                                                      )*grid_atom%wr(ir)*grid_atom%wa(ia)
@@ -520,7 +520,7 @@ CONTAINS
             END DO
          END IF
 
-         g_so(iB, :) = g_so(iB, :)+temp_so_gapw(iB, :)
+         g_so(iB, :) = g_so(iB, :) + temp_so_gapw(iB, :)
 
          DO ispin = 1, nspins
             DO idir1 = 1, 3
@@ -532,7 +532,7 @@ CONTAINS
 
       END IF ! gapw
 
-      g_total(iB, :) = g_total(iB, :)+g_so(iB, :)
+      g_total(iB, :) = g_total(iB, :) + g_so(iB, :)
 
       CALL cp_print_key_finished_output(output_unit, logger, lr_section, &
                                         "PRINT%PROGRAM_RUN_INFO")
@@ -626,7 +626,7 @@ CONTAINS
          temp_soo_soft = 0.0_dp
          DO ispin = 1, nspins
             CALL qs_rho_get(bind_set(idir1, iB)%rho, rho_r=brho1_r)
-            temp_soo_soft = temp_soo_soft+(-1.0_dp)**(1+ispin)* &
+            temp_soo_soft = temp_soo_soft + (-1.0_dp)**(1 + ispin)* &
                             pw_integral_ab(brho1_r(1)%pw, rho_r(ispin)%pw)
          END DO
          temp_soo_soft = 1.0_dp*epr_env%g_soo_factor*temp_soo_soft
@@ -639,12 +639,12 @@ CONTAINS
 
       DO idir1 = 1, 3
          temp_soo_soft = 1.0_dp*epr_env%g_soo_chicorr_factor*chi_tensor(idir1, iB, 2)* &
-                         (REAL(dft_control%multiplicity, KIND=dp)-1.0_dp)
+                         (REAL(dft_control%multiplicity, KIND=dp) - 1.0_dp)
          IF (output_unit > 0) THEN
             WRITE (UNIT=output_unit, FMT="(T2,A,T18,i1,i1,T56,E24.16)") &
                "epr|SOO:soft_g0", iB, idir1, temp_soo_soft
          END IF
-         g_soo(iB, idir1) = g_soo(iB, idir1)+temp_soo_soft
+         g_soo(iB, idir1) = g_soo(iB, idir1) + temp_soo_soft
       END DO
 
       IF (gapw .AND. soo_rho_hard) THEN
@@ -713,7 +713,7 @@ CONTAINS
                         DO ia = 1, grid_atom%ng_sphere
 
                            ra = particle_set(iatom)%r
-                           ra(:) = ra(:)+grid_atom%rad(ir)*harmonics%a(:, ia)
+                           ra(:) = ra(:) + grid_atom%rad(ir)*harmonics%a(:, ia)
                            bind_ra_idir1 = Eval_Interp_Spl3_pbc(ra, &
                                                                 bind_pw_spline(idir1, iB)%pw)
 
@@ -723,14 +723,14 @@ CONTAINS
                            rho_spin = 0.0_dp
 
                            DO iso = 1, harmonics%max_iso_not0
-                              rho_spin = rho_spin+ &
-                                         (rho_rad_h(ispin)%r_coef(ir, iso)- &
+                              rho_spin = rho_spin + &
+                                         (rho_rad_h(ispin)%r_coef(ir, iso) - &
                                           rho_rad_s(ispin)%r_coef(ir, iso))* &
                                          harmonics%slm(ia, iso)
                            END DO
 
-                           temp_soo_gapw(iB, idir1) = temp_soo_gapw(iB, idir1)+ &
-                                                      (-1.0_dp)**(1+ispin)*( &
+                           temp_soo_gapw(iB, idir1) = temp_soo_gapw(iB, idir1) + &
+                                                      (-1.0_dp)**(1 + ispin)*( &
                                                       bind_ra_idir1*rho_spin &
                                                       )*grid_atom%wr(ir)*grid_atom%wa(ia)
 
@@ -751,7 +751,7 @@ CONTAINS
             END DO
          END IF
 
-         g_soo(iB, :) = g_soo(iB, :)+temp_soo_gapw(iB, :)
+         g_soo(iB, :) = g_soo(iB, :) + temp_soo_gapw(iB, :)
 
          DO idir1 = 1, 3
             CALL pw_pool_give_back_pw(auxbas_pw_pool, bind_pw_spline(idir1, iB)%pw)
@@ -761,7 +761,7 @@ CONTAINS
 
       END IF ! gapw
 
-      g_total(iB, :) = g_total(iB, :)+g_soo(iB, :)
+      g_total(iB, :) = g_total(iB, :) + g_soo(iB, :)
 
       CALL cp_print_key_finished_output(output_unit, logger, lr_section, &
                                         "PRINT%PROGRAM_RUN_INFO")
@@ -783,7 +783,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iB
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'epr_ind_magnetic_field', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, idir, idir2, idir3, iiB, iiiB, &
                                                             ispin, natom, nspins

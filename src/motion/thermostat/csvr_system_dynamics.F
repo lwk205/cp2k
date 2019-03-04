@@ -8,23 +8,23 @@
 ! **************************************************************************************************
 MODULE csvr_system_dynamics
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE csvr_system_types,               ONLY: csvr_system_type
-   USE csvr_system_utils,               ONLY: rescaling_factor
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE extended_system_types,           ONLY: map_info_type,&
-                                              npt_info_type
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE parallel_rng_types,              ONLY: rng_stream_type
-   USE particle_types,                  ONLY: particle_type
-   USE thermostat_utils,                ONLY: ke_region_baro,&
-                                              ke_region_particles,&
-                                              ke_region_shells,&
-                                              vel_rescale_baro,&
-                                              vel_rescale_particles,&
-                                              vel_rescale_shells
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE csvr_system_types, ONLY: csvr_system_type
+   USE csvr_system_utils, ONLY: rescaling_factor
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE extended_system_types, ONLY: map_info_type, &
+                                    npt_info_type
+   USE kinds, ONLY: dp
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: molecule_type
+   USE parallel_rng_types, ONLY: rng_stream_type
+   USE particle_types, ONLY: particle_type
+   USE thermostat_utils, ONLY: ke_region_baro, &
+                               ke_region_particles, &
+                               ke_region_shells, &
+                               vel_rescale_baro, &
+                               vel_rescale_particles, &
+                               vel_rescale_shells
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -242,7 +242,7 @@ CONTAINS
       TYPE(map_info_type), POINTER                       :: map_info
 
       CHARACTER(len=*), PARAMETER :: routineN = 'do_csvr_eval_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, imap
       REAL(KIND=dp)                                      :: kin_energy_ar, kin_energy_br
@@ -251,8 +251,8 @@ CONTAINS
          imap = map_info%map_index(i)
          kin_energy_br = csvr%nvt(i)%region_kin_energy
          kin_energy_ar = map_info%s_kin(imap)
-         csvr%nvt(i)%thermostat_energy = csvr%nvt(i)%thermostat_energy+ &
-                                         0.5_dp*(kin_energy_br-kin_energy_ar)
+         csvr%nvt(i)%thermostat_energy = csvr%nvt(i)%thermostat_energy + &
+                                         0.5_dp*(kin_energy_br - kin_energy_ar)
       END DO
 
    END SUBROUTINE do_csvr_eval_energy

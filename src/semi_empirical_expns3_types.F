@@ -9,7 +9,7 @@
 ! **************************************************************************************************
 MODULE semi_empirical_expns3_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -51,7 +51,7 @@ CONTAINS
       TYPE(semi_empirical_expns3_type), POINTER          :: expns3
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_expns3_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(expns3))
       ALLOCATE (expns3)
@@ -70,7 +70,7 @@ CONTAINS
       TYPE(semi_empirical_expns3_type), POINTER          :: expns3
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_expns3_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(expns3)) THEN
          DEALLOCATE (expns3)

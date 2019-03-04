@@ -4,48 +4,48 @@
 !--------------------------------------------------------------------------------------------------!
 ! **************************************************************************************************
 MODULE hartree_local_methods
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE atprop_types,                    ONLY: atprop_array_init,&
-                                              atprop_type
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE hartree_local_types,             ONLY: allocate_ecoul_1center,&
-                                              ecoul_1center_type,&
-                                              hartree_local_type,&
-                                              set_ecoul_1c
-   USE input_constants,                 ONLY: tddfpt_singlet
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi,&
-                                              pi
-   USE message_passing,                 ONLY: mp_sum
-   USE orbital_pointers,                ONLY: indso,&
-                                              nsoset
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_poisson_types,                ONLY: pw_poisson_periodic,&
-                                              pw_poisson_type
-   USE qs_charges_types,                ONLY: qs_charges_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_harmonics_atom,               ONLY: get_none0_cg_list,&
-                                              harmonics_atom_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_local_rho_types,              ONLY: rhoz_type
-   USE qs_p_env_types,                  ONLY: qs_p_env_type
-   USE qs_rho0_types,                   ONLY: get_rho0_mpole,&
-                                              rho0_atom_type,&
-                                              rho0_mpole_type
-   USE qs_rho_atom_types,               ONLY: get_rho_atom,&
-                                              rho_atom_coeff,&
-                                              rho_atom_type
-   USE util,                            ONLY: get_limit
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE atprop_types, ONLY: atprop_array_init, &
+                           atprop_type
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE hartree_local_types, ONLY: allocate_ecoul_1center, &
+                                  ecoul_1center_type, &
+                                  hartree_local_type, &
+                                  set_ecoul_1c
+   USE input_constants, ONLY: tddfpt_singlet
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi, &
+                            pi
+   USE message_passing, ONLY: mp_sum
+   USE orbital_pointers, ONLY: indso, &
+                               nsoset
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_poisson_types, ONLY: pw_poisson_periodic, &
+                               pw_poisson_type
+   USE qs_charges_types, ONLY: qs_charges_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_harmonics_atom, ONLY: get_none0_cg_list, &
+                                harmonics_atom_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_local_rho_types, ONLY: rhoz_type
+   USE qs_p_env_types, ONLY: qs_p_env_type
+   USE qs_rho0_types, ONLY: get_rho0_mpole, &
+                            rho0_atom_type, &
+                            rho0_mpole_type
+   USE qs_rho_atom_types, ONLY: get_rho_atom, &
+                                rho_atom_coeff, &
+                                rho_atom_type
+   USE util, ONLY: get_limit
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -71,7 +71,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: natom
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_coulomb_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(ecoul_1center_type), DIMENSION(:), POINTER    :: ecoul_1c
@@ -110,7 +110,7 @@ CONTAINS
       TYPE(grid_atom_type), POINTER                      :: grid_atom
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_Vh_1center', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ir, iso, ispin, l_ang, &
                                                             max_s_harm, nchannels, nr, nspins
@@ -144,12 +144,12 @@ CONTAINS
 
       DO iso = 1, max_s_harm
          DO ispin = 1, nspins
-            rho_1(:, iso) = rho_1(:, iso)+rrad_h(ispin)%r_coef(:, iso)
-            rho_2(:, iso) = rho_2(:, iso)+rrad_s(ispin)%r_coef(:, iso)
+            rho_1(:, iso) = rho_1(:, iso) + rrad_h(ispin)%r_coef(:, iso)
+            rho_2(:, iso) = rho_2(:, iso) + rrad_s(ispin)%r_coef(:, iso)
          END DO
 
          l_ang = indso(1, iso)
-         prefactor = fourpi/(2._dp*l_ang+1._dp)
+         prefactor = fourpi/(2._dp*l_ang + 1._dp)
 
          rho_1(:, iso) = rho_1(:, iso)*wr(:)
          rho_2(:, iso) = rho_2(:, iso)*wr(:)
@@ -162,26 +162,26 @@ CONTAINS
          I1_up = r2l(nr, l_ang)*rho_1(nr, iso)
          I2_up = r2l(nr, l_ang)*rho_2(nr, iso)
 
-         DO ir = nr-1, 1, -1
-            I1_down = I1_down+oor2l(ir, l_ang+1)*rho_1(ir, iso)
-            I2_down = I2_down+oor2l(ir, l_ang+1)*rho_2(ir, iso)
+         DO ir = nr - 1, 1, -1
+            I1_down = I1_down + oor2l(ir, l_ang + 1)*rho_1(ir, iso)
+            I2_down = I2_down + oor2l(ir, l_ang + 1)*rho_2(ir, iso)
          END DO
 
-         vrad_h(nr, iso) = vrad_h(nr, iso)+prefactor* &
-                           (oor2l(nr, l_ang+1)*I1_up+r2l(nr, l_ang)*I1_down)
-         vrad_s(nr, iso) = vrad_s(nr, iso)+prefactor* &
-                           (oor2l(nr, l_ang+1)*I2_up+r2l(nr, l_ang)*I2_down)
+         vrad_h(nr, iso) = vrad_h(nr, iso) + prefactor* &
+                           (oor2l(nr, l_ang + 1)*I1_up + r2l(nr, l_ang)*I1_down)
+         vrad_s(nr, iso) = vrad_s(nr, iso) + prefactor* &
+                           (oor2l(nr, l_ang + 1)*I2_up + r2l(nr, l_ang)*I2_down)
 
-         DO ir = nr-1, 1, -1
-            I1_up = I1_up+r2l(ir, l_ang)*rho_1(ir, iso)
-            I1_down = I1_down-oor2l(ir, l_ang+1)*rho_1(ir, iso)
-            I2_up = I2_up+r2l(ir, l_ang)*rho_2(ir, iso)
-            I2_down = I2_down-oor2l(ir, l_ang+1)*rho_2(ir, iso)
+         DO ir = nr - 1, 1, -1
+            I1_up = I1_up + r2l(ir, l_ang)*rho_1(ir, iso)
+            I1_down = I1_down - oor2l(ir, l_ang + 1)*rho_1(ir, iso)
+            I2_up = I2_up + r2l(ir, l_ang)*rho_2(ir, iso)
+            I2_down = I2_down - oor2l(ir, l_ang + 1)*rho_2(ir, iso)
 
-            vrad_h(ir, iso) = vrad_h(ir, iso)+prefactor* &
-                              (oor2l(ir, l_ang+1)*I1_up+r2l(ir, l_ang)*I1_down)
-            vrad_s(ir, iso) = vrad_s(ir, iso)+prefactor* &
-                              (oor2l(ir, l_ang+1)*I2_up+r2l(ir, l_ang)*I2_down)
+            vrad_h(ir, iso) = vrad_h(ir, iso) + prefactor* &
+                              (oor2l(ir, l_ang + 1)*I1_up + r2l(ir, l_ang)*I1_down)
+            vrad_s(ir, iso) = vrad_s(ir, iso) + prefactor* &
+                              (oor2l(ir, l_ang + 1)*I2_up + r2l(ir, l_ang)*I2_down)
 
          END DO
 
@@ -215,11 +215,11 @@ CONTAINS
       TYPE(qs_p_env_type), OPTIONAL, POINTER             :: p_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'Vh_1c_gg_integrals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: bo(2), handle, iat, iatom, ikind, ipgf1, is1, iset1, iso, l_ang, llmax, lmax0, &
-         lmax_0, m1, max_iso, max_iso_not0, max_s_harm, maxl, maxso, mepos, n1, nat, natom, &
-         nchan_0, nkind, nr, nset, nsotot, nspins, num_pe
+                 lmax_0, m1, max_iso, max_iso_not0, max_s_harm, maxl, maxso, mepos, n1, nat, natom, &
+                 nchan_0, nkind, nr, nset, nsotot, nspins, num_pe
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: cg_n_list
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: cg_list
       INTEGER, DIMENSION(:), POINTER                     :: atom_list, lmax, lmin, npgf
@@ -377,13 +377,13 @@ CONTAINS
                n1 = nsoset(lmax(iset1))
                DO ipgf1 = 1, npgf(iset1)
                   gexp(1:nr) = EXP(-zet(ipgf1, iset1)*grid_atom%rad2(1:nr))*sqrtwr(1:nr)
-                  DO is1 = nsoset(lmin(iset1)-1)+1, nsoset(lmax(iset1))
-                     iso = is1+(ipgf1-1)*n1+m1
+                  DO is1 = nsoset(lmin(iset1) - 1) + 1, nsoset(lmax(iset1))
+                     iso = is1 + (ipgf1 - 1)*n1 + m1
                      l_ang = indso(1, is1)
                      gsph(1:nr, iso) = grid_atom%rad2l(1:nr, l_ang)*gexp(1:nr)
                   END DO ! is1
                END DO ! ipgf1
-               m1 = m1+maxso
+               m1 = m1 + maxso
             END DO ! iset1
 
             !     Distribute the atoms of this kind
@@ -475,7 +475,7 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: bfactor
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'Vh_1c_atom_potential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ir, iso, ispin, nr
       TYPE(rho_atom_coeff), DIMENSION(:), POINTER        :: vr_h, vr_s
@@ -496,15 +496,15 @@ CONTAINS
 
       DO ispin = 1, nspins
          DO iso = 1, max_iso_not0
-            Vh1_h(:, iso) = Vh1_h(:, iso)+vr_h(ispin)%r_coef(:, iso)
-            Vh1_s(:, iso) = Vh1_s(:, iso)+vr_s(ispin)%r_coef(:, iso)
+            Vh1_h(:, iso) = Vh1_h(:, iso) + vr_h(ispin)%r_coef(:, iso)
+            Vh1_s(:, iso) = Vh1_s(:, iso) + vr_s(ispin)%r_coef(:, iso)
          END DO
       END DO
 
       IF (bfactor /= 0._dp) THEN
          DO ir = 1, nr
-            Vh1_h(ir, 1) = Vh1_h(ir, 1)+bfactor*grid_atom%rad2(ir)*grid_atom%wr(ir)
-            Vh1_s(ir, 1) = Vh1_s(ir, 1)+bfactor*grid_atom%rad2(ir)*grid_atom%wr(ir)
+            Vh1_h(ir, 1) = Vh1_h(ir, 1) + bfactor*grid_atom%rad2(ir)*grid_atom%wr(ir)
+            Vh1_s(ir, 1) = Vh1_s(ir, 1) + bfactor*grid_atom%rad2(ir)*grid_atom%wr(ir)
          END DO
       END IF
 
@@ -548,7 +548,7 @@ CONTAINS
       REAL(dp), DIMENSION(:), POINTER                    :: ate1c
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'Vh_1c_atom_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iso, ispin, nr
       REAL(dp)                                           :: ecoul_1_0, ecoul_1_h, ecoul_1_s, &
@@ -569,7 +569,7 @@ CONTAINS
       !       Calculate the contributions to Ecoul coming from  Vh1_s*rho0
       ecoul_1_0 = 0.0_dp
       DO iso = 1, nchan_0
-         ecoul_1_0 = ecoul_1_0+0.5_dp*SUM(Vh1_s(:, iso)*rrad_0(:, iso)*grid_atom%wr(:))
+         ecoul_1_0 = ecoul_1_0 + 0.5_dp*SUM(Vh1_s(:, iso)*rrad_0(:, iso)*grid_atom%wr(:))
       END DO
 
       !       Calculate the contributions to Ecoul coming from Vh1_h*rho1_h and Vh1_s*rho1_s
@@ -577,20 +577,20 @@ CONTAINS
       ecoul_1_h = 0.0_dp
       DO ispin = 1, nspins
          DO iso = 1, max_iso_not0
-            ecoul_1_s = ecoul_1_s+0.5_dp*SUM(Vh1_s(:, iso)*r_s(ispin)%r_coef(:, iso)*grid_atom%wr(:))
-            ecoul_1_h = ecoul_1_h+0.5_dp*SUM(Vh1_h(:, iso)*r_h(ispin)%r_coef(:, iso)*grid_atom%wr(:))
+            ecoul_1_s = ecoul_1_s + 0.5_dp*SUM(Vh1_s(:, iso)*r_s(ispin)%r_coef(:, iso)*grid_atom%wr(:))
+            ecoul_1_h = ecoul_1_h + 0.5_dp*SUM(Vh1_h(:, iso)*r_h(ispin)%r_coef(:, iso)*grid_atom%wr(:))
          END DO
       END DO
 
       CALL set_ecoul_1c(ecoul_1c, iatom, ecoul_1_z=ecoul_1_z, ecoul_1_0=ecoul_1_0)
       CALL set_ecoul_1c(ecoul_1c=ecoul_1c, iatom=iatom, ecoul_1_h=ecoul_1_h, ecoul_1_s=ecoul_1_s)
 
-      energy_hartree_1c = energy_hartree_1c+ecoul_1_z-ecoul_1_0
-      energy_hartree_1c = energy_hartree_1c+ecoul_1_h-ecoul_1_s
+      energy_hartree_1c = energy_hartree_1c + ecoul_1_z - ecoul_1_0
+      energy_hartree_1c = energy_hartree_1c + ecoul_1_h - ecoul_1_s
 
       ! atomic energy contribution
       IF (atenergy) THEN
-         ate1c(iatom) = ate1c(iatom)+ecoul_1_z-ecoul_1_0
+         ate1c(iatom) = ate1c(iatom) + ecoul_1_z - ecoul_1_0
       END IF
 
    END SUBROUTINE Vh_1c_atom_energy
@@ -642,7 +642,7 @@ CONTAINS
       REAL(dp), DIMENSION(:, :, :), POINTER              :: my_CG, Qlm_gg
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'Vh_1c_atom_integrals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: icg, ipgf1, ipgf2, ir, is1, is2, iset1, &
                                                             iset2, iso, iso1, iso2, ispin, l_ang, &
@@ -681,48 +681,48 @@ CONTAINS
                         is1 = cg_list(1, icg, iso)
                         is2 = cg_list(2, icg, iso)
 
-                        iso1 = is1+n1*(ipgf1-1)+m1
-                        iso2 = is2+n2*(ipgf2-1)+m2
+                        iso1 = is1 + n1*(ipgf1 - 1) + m1
+                        iso2 = is2 + n2*(ipgf2 - 1) + m2
                         gVg_h = 0.0_dp
                         gVg_s = 0.0_dp
 
                         DO ir = 1, nr
-                           gVg_h = gVg_h+gsph(ir, iso1)*gsph(ir, iso2)*Vh1_h(ir, iso)
-                           gVg_s = gVg_s+gsph(ir, iso1)*gsph(ir, iso2)*Vh1_s(ir, iso)
+                           gVg_h = gVg_h + gsph(ir, iso1)*gsph(ir, iso2)*Vh1_h(ir, iso)
+                           gVg_s = gVg_s + gsph(ir, iso1)*gsph(ir, iso2)*Vh1_s(ir, iso)
                         END DO ! ir
 
-                        aVh1b_hh(iso1, iso2) = aVh1b_hh(iso1, iso2)+gVg_h*my_CG(is1, is2, iso)
-                        aVh1b_ss(iso1, iso2) = aVh1b_ss(iso1, iso2)+gVg_s*my_CG(is1, is2, iso)
-                        aVh1b_00(iso1, iso2) = aVh1b_00(iso1, iso2)+gVg_0*Qlm_gg(iso1, iso2, iso)
+                        aVh1b_hh(iso1, iso2) = aVh1b_hh(iso1, iso2) + gVg_h*my_CG(is1, is2, iso)
+                        aVh1b_ss(iso1, iso2) = aVh1b_ss(iso1, iso2) + gVg_s*my_CG(is1, is2, iso)
+                        aVh1b_00(iso1, iso2) = aVh1b_00(iso1, iso2) + gVg_0*Qlm_gg(iso1, iso2, iso)
 
                      END DO !icg
                   END DO ! iso
                   !               without contributions to  V1_s*rho0
-                  DO iso = nchan_0+1, max_iso_not0
+                  DO iso = nchan_0 + 1, max_iso_not0
                      DO icg = 1, cg_n_list(iso)
                         is1 = cg_list(1, icg, iso)
                         is2 = cg_list(2, icg, iso)
 
-                        iso1 = is1+n1*(ipgf1-1)+m1
-                        iso2 = is2+n2*(ipgf2-1)+m2
+                        iso1 = is1 + n1*(ipgf1 - 1) + m1
+                        iso2 = is2 + n2*(ipgf2 - 1) + m2
                         gVg_h = 0.0_dp
                         gVg_s = 0.0_dp
 
                         DO ir = 1, nr
-                           gVg_h = gVg_h+gsph(ir, iso1)*gsph(ir, iso2)*Vh1_h(ir, iso)
-                           gVg_s = gVg_s+gsph(ir, iso1)*gsph(ir, iso2)*Vh1_s(ir, iso)
+                           gVg_h = gVg_h + gsph(ir, iso1)*gsph(ir, iso2)*Vh1_h(ir, iso)
+                           gVg_s = gVg_s + gsph(ir, iso1)*gsph(ir, iso2)*Vh1_s(ir, iso)
                         END DO ! ir
 
-                        aVh1b_hh(iso1, iso2) = aVh1b_hh(iso1, iso2)+gVg_h*my_CG(is1, is2, iso)
-                        aVh1b_ss(iso1, iso2) = aVh1b_ss(iso1, iso2)+gVg_s*my_CG(is1, is2, iso)
+                        aVh1b_hh(iso1, iso2) = aVh1b_hh(iso1, iso2) + gVg_h*my_CG(is1, is2, iso)
+                        aVh1b_ss(iso1, iso2) = aVh1b_ss(iso1, iso2) + gVg_s*my_CG(is1, is2, iso)
 
                      END DO !icg
                   END DO ! iso
                END DO ! ipgf2
             END DO ! ipgf1
-            m2 = m2+maxso
+            m2 = m2 + maxso
          END DO ! iset2
-         m1 = m1+maxso
+         m1 = m1 + maxso
       END DO !iset1
 
       DO ispin = 1, nspins

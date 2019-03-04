@@ -10,32 +10,32 @@
 !> \author Teodoro Laino - created [tlaino] - 03.2008 - Zurich University
 ! **************************************************************************************************
 MODULE cell_opt_types
-   USE cell_opt_utils,                  ONLY: get_ut_cell_matrix,&
-                                              read_external_press_tensor
-   USE cell_types,                      ONLY: cell_clone,&
-                                              cell_create,&
-                                              cell_release,&
-                                              cell_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_constants,                 ONLY: fix_none,&
-                                              fix_x,&
-                                              fix_xy,&
-                                              fix_xz,&
-                                              fix_y,&
-                                              fix_yz,&
-                                              fix_z
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE particle_list_types,             ONLY: particle_list_type
+   USE cell_opt_utils, ONLY: get_ut_cell_matrix, &
+                             read_external_press_tensor
+   USE cell_types, ONLY: cell_clone, &
+                         cell_create, &
+                         cell_release, &
+                         cell_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_constants, ONLY: fix_none, &
+                              fix_x, &
+                              fix_xy, &
+                              fix_xz, &
+                              fix_y, &
+                              fix_yz, &
+                              fix_z
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE particle_list_types, ONLY: particle_list_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -83,7 +83,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: geo_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cell_opt_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=4)                                   :: label
       INTEGER                                            :: ip, output_unit
@@ -97,7 +97,7 @@ CONTAINS
       ALLOCATE (cell_env)
       NULLIFY (cell_env%ref_cell, cell, subsys, particles)
       cell_env%ref_count = 1
-      last_cell_opt_env_id = last_cell_opt_env_id+1
+      last_cell_opt_env_id = last_cell_opt_env_id + 1
       cell_env%id_nr = last_cell_opt_env_id
       CALL force_env_get(force_env, cell=cell, subsys=subsys)
       CALL cell_create(cell_env%ref_cell)
@@ -179,11 +179,11 @@ CONTAINS
       TYPE(cell_opt_env_type), POINTER                   :: cell_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cell_opt_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(cell_env)) THEN
          CPASSERT(cell_env%ref_count > 0)
-         cell_env%ref_count = cell_env%ref_count-1
+         cell_env%ref_count = cell_env%ref_count - 1
          IF (cell_env%ref_count == 0) THEN
             CALL cell_release(cell_env%ref_cell)
             DEALLOCATE (cell_env)

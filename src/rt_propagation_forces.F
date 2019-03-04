@@ -9,40 +9,40 @@
 ! **************************************************************************************************
 
 MODULE rt_propagation_forces
-   USE admm_types,                      ONLY: admm_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              rtp_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_fm_to_dbcsr,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_create_dist_r_unrot
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, dbcsr_distribution_release, &
-        dbcsr_distribution_type, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_no_symmetry
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: one,&
-                                              zero
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: add_qs_force,&
-                                              qs_force_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_overlap,                      ONLY: build_overlap_force
-   USE rt_propagation_types,            ONLY: get_rtp,&
-                                              rt_prop_type
+   USE admm_types, ONLY: admm_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE cp_control_types, ONLY: dft_control_type, &
+                               rtp_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_fm_to_dbcsr, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_create_dist_r_unrot
+   USE cp_fm_struct, ONLY: cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, dbcsr_distribution_release, &
+      dbcsr_distribution_type, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_no_symmetry
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: one, &
+                            zero
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: add_qs_force, &
+                             qs_force_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_overlap, ONLY: build_overlap_force
+   USE rt_propagation_types, ONLY: get_rtp, &
+                                   rt_prop_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -68,7 +68,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_c_mat_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (qs_env%rtp%linear_scaling) THEN
          CALL calc_c_mat_force_ls(qs_env)
@@ -87,7 +87,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_c_mat_force_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, im, ispin, nao, natom, nmo, re
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_of_kind, kind_of
@@ -127,7 +127,7 @@ CONTAINS
       CALL get_atomic_kind_set(atomic_kind_set=atomic_kind_set, atom_of_kind=atom_of_kind, kind_of=kind_of)
 
       DO ispin = 1, SIZE(SinvH)
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
          alpha = mos(ispin)%mo_set%maxocc
 
@@ -196,7 +196,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_c_mat_force_ls', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: handle, i, im, ispin, natom, re
@@ -243,7 +243,7 @@ CONTAINS
       CALL get_rtp(rtp=rtp, rho_new=rho_new, S_minus_half=S_minus_half)
 
       DO ispin = 1, SIZE(SinvH)
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
          CALL dbcsr_multiply("N", "N", one, SinvH(ispin)%matrix, rho_new(re)%matrix, zero, tmp, &
                              filter_eps=rtp%filter_eps)
@@ -308,7 +308,7 @@ CONTAINS
                kind_atom = atom_of_kind(col_atom)
                !The block_values are in a vector format,
                ! so the dot_product is the sum over all elements of the hamand product, that I need
-               force(ikind)%ehrenfest(i, kind_atom) = force(ikind)%ehrenfest(i, kind_atom)+ &
+               force(ikind)%ehrenfest(i, kind_atom) = force(ikind)%ehrenfest(i, kind_atom) + &
                                                       2.0_dp*DOT_PRODUCT(block_values, block_values2)
             ENDIF
          END DO
@@ -325,7 +325,7 @@ CONTAINS
                kind_atom = atom_of_kind(col_atom)
                !The block_values are in a vector format, so the dot_product is
                ! the sum over all elements of the hamand product, that I need
-               force(ikind)%ehrenfest(i, kind_atom) = force(ikind)%ehrenfest(i, kind_atom)+ &
+               force(ikind)%ehrenfest(i, kind_atom) = force(ikind)%ehrenfest(i, kind_atom) + &
                                                       2.0_dp*DOT_PRODUCT(block_values, block_values2)
             ENDIF
          END DO
@@ -384,7 +384,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: mos_admm, mos
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rt_admm_forces_none', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: im, ispin, nao, natom, naux, nmo, re
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: admm_force
@@ -416,7 +416,7 @@ CONTAINS
                       "W MATRIX AUX Q")
 
       DO ispin = 1, SIZE(KS_aux_re)
-         re = 2*ispin-1; im = 2*ispin
+         re = 2*ispin - 1; im = 2*ispin
          naux = admm_env%nao_aux_fit; nmo = admm_env%nmo(ispin); nao = admm_env%nao_orb
 
          ALLOCATE (tmp_aux_aux(2), tmp_aux_nao(2), tmp_aux_mo(2), tmp_aux_mo1(2))

@@ -11,59 +11,59 @@
 !> \author Teodoro Laino
 ! **************************************************************************************************
 MODULE cp_subsys_methods
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_create,&
-                                              atomic_kind_list_release,&
-                                              atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE atprop_types,                    ONLY: atprop_create
-   USE cell_types,                      ONLY: cell_retain,&
-                                              cell_type
-   USE colvar_methods,                  ONLY: colvar_read
-   USE cp_para_env,                     ONLY: cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_result_types,                 ONLY: cp_result_create
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_set,&
-                                              cp_subsys_type
-   USE exclusion_types,                 ONLY: exclusion_type
-   USE input_constants,                 ONLY: do_conn_off,&
-                                              do_stress_analytical,&
-                                              do_stress_diagonal_anal,&
-                                              do_stress_diagonal_numer,&
-                                              do_stress_none,&
-                                              do_stress_numerical
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_create,&
-                                              molecule_kind_list_release,&
-                                              molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_list_types,             ONLY: molecule_list_create,&
-                                              molecule_list_release,&
-                                              molecule_list_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_list_types,             ONLY: particle_list_create,&
-                                              particle_list_release,&
-                                              particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE qmmm_types_low,                  ONLY: qmmm_env_mm_type
-   USE string_table,                    ONLY: id2str,&
-                                              s2s,&
-                                              str2id
-   USE topology,                        ONLY: connectivity_control,&
-                                              topology_control
-   USE topology_connectivity_util,      ONLY: topology_connectivity_pack
-   USE topology_coordinate_util,        ONLY: topology_coordinate_pack
-   USE topology_types,                  ONLY: deallocate_topology,&
-                                              init_topology,&
-                                              topology_parameters_type
-   USE topology_util,                   ONLY: check_subsys_element
-   USE virial_types,                    ONLY: virial_create,&
-                                              virial_set
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_create, &
+                                     atomic_kind_list_release, &
+                                     atomic_kind_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE atprop_types, ONLY: atprop_create
+   USE cell_types, ONLY: cell_retain, &
+                         cell_type
+   USE colvar_methods, ONLY: colvar_read
+   USE cp_para_env, ONLY: cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_result_types, ONLY: cp_result_create
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_set, &
+                              cp_subsys_type
+   USE exclusion_types, ONLY: exclusion_type
+   USE input_constants, ONLY: do_conn_off, &
+                              do_stress_analytical, &
+                              do_stress_diagonal_anal, &
+                              do_stress_diagonal_numer, &
+                              do_stress_none, &
+                              do_stress_numerical
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_create, &
+                                       molecule_kind_list_release, &
+                                       molecule_kind_list_type
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_list_types, ONLY: molecule_list_create, &
+                                  molecule_list_release, &
+                                  molecule_list_type
+   USE molecule_types, ONLY: molecule_type
+   USE particle_list_types, ONLY: particle_list_create, &
+                                  particle_list_release, &
+                                  particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE qmmm_types_low, ONLY: qmmm_env_mm_type
+   USE string_table, ONLY: id2str, &
+                           s2s, &
+                           str2id
+   USE topology, ONLY: connectivity_control, &
+                       topology_control
+   USE topology_connectivity_util, ONLY: topology_connectivity_pack
+   USE topology_coordinate_util, ONLY: topology_coordinate_pack
+   USE topology_types, ONLY: deallocate_topology, &
+                             init_topology, &
+                             topology_parameters_type
+   USE topology_util, ONLY: check_subsys_element
+   USE virial_types, ONLY: virial_create, &
+                           virial_set
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -103,7 +103,7 @@ CONTAINS
          POINTER                                         :: exclusions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_subsys_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: stress_tensor
       INTEGER, DIMENSION(:), POINTER                     :: seed_vals
@@ -231,7 +231,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: colvar_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_subsys_read_colvar', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ig, ncol
 
@@ -278,7 +278,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: ignore_outside_box
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_small_subsys', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: my_element, strtmp1
       INTEGER                                            :: iat, id_, nat
@@ -339,7 +339,7 @@ CONTAINS
          !
          ! Defining element
          !
-         id_ = INDEX(id2str(topology%atom_info%id_atmname(iat)), "_")-1
+         id_ = INDEX(id2str(topology%atom_info%id_atmname(iat)), "_") - 1
          IF (id_ == -1) id_ = LEN_TRIM(id2str(topology%atom_info%id_atmname(iat)))
          strtmp1 = id2str(topology%atom_info%id_atmname(iat))
          strtmp1 = strtmp1(1:id_)

@@ -8,54 +8,54 @@
 !>      Teodoro Laino [tlaino] 2007 - Extension to Intermolecular constraints
 ! **************************************************************************************************
 MODULE constraint
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type
-   USE colvar_types,                    ONLY: colvar_counters
-   USE constraint_3x3,                  ONLY: rattle_3x3_ext,&
-                                              rattle_3x3_int,&
-                                              rattle_roll_3x3_ext,&
-                                              rattle_roll_3x3_int,&
-                                              shake_3x3_ext,&
-                                              shake_3x3_int,&
-                                              shake_roll_3x3_ext,&
-                                              shake_roll_3x3_int
-   USE constraint_4x6,                  ONLY: rattle_4x6_ext,&
-                                              rattle_4x6_int,&
-                                              rattle_roll_4x6_ext,&
-                                              rattle_roll_4x6_int,&
-                                              shake_4x6_ext,&
-                                              shake_4x6_int,&
-                                              shake_roll_4x6_ext,&
-                                              shake_roll_4x6_int
-   USE constraint_clv,                  ONLY: &
-        rattle_colv_ext, rattle_colv_int, rattle_roll_colv_ext, rattle_roll_colv_int, &
-        shake_colv_ext, shake_colv_int, shake_roll_colv_ext, shake_roll_colv_int, &
-        shake_update_colv_ext, shake_update_colv_int
-   USE constraint_util,                 ONLY: check_tol,&
-                                              get_roll_matrix,&
-                                              restore_temporary_set,&
-                                              update_temporary_set
-   USE constraint_vsite,                ONLY: shake_vsite_ext,&
-                                              shake_vsite_int
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE input_constants,                 ONLY: npt_f_ensemble,&
-                                              npt_i_ensemble
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE message_passing,                 ONLY: mp_sum
-   USE molecule_kind_types,             ONLY: get_molecule_kind,&
-                                              get_molecule_kind_set,&
-                                              molecule_kind_type
-   USE molecule_types,                  ONLY: global_constraint_type,&
-                                              molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE simpar_types,                    ONLY: simpar_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type
+   USE colvar_types, ONLY: colvar_counters
+   USE constraint_3x3, ONLY: rattle_3x3_ext, &
+                             rattle_3x3_int, &
+                             rattle_roll_3x3_ext, &
+                             rattle_roll_3x3_int, &
+                             shake_3x3_ext, &
+                             shake_3x3_int, &
+                             shake_roll_3x3_ext, &
+                             shake_roll_3x3_int
+   USE constraint_4x6, ONLY: rattle_4x6_ext, &
+                             rattle_4x6_int, &
+                             rattle_roll_4x6_ext, &
+                             rattle_roll_4x6_int, &
+                             shake_4x6_ext, &
+                             shake_4x6_int, &
+                             shake_roll_4x6_ext, &
+                             shake_roll_4x6_int
+   USE constraint_clv, ONLY: &
+      rattle_colv_ext, rattle_colv_int, rattle_roll_colv_ext, rattle_roll_colv_int, &
+      shake_colv_ext, shake_colv_int, shake_roll_colv_ext, shake_roll_colv_int, &
+      shake_update_colv_ext, shake_update_colv_int
+   USE constraint_util, ONLY: check_tol, &
+                              get_roll_matrix, &
+                              restore_temporary_set, &
+                              update_temporary_set
+   USE constraint_vsite, ONLY: shake_vsite_ext, &
+                               shake_vsite_int
+   USE cp_log_handling, ONLY: cp_to_string
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE input_constants, ONLY: npt_f_ensemble, &
+                              npt_i_ensemble
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE message_passing, ONLY: mp_sum
+   USE molecule_kind_types, ONLY: get_molecule_kind, &
+                                  get_molecule_kind_set, &
+                                  molecule_kind_type
+   USE molecule_types, ONLY: global_constraint_type, &
+                             molecule_type
+   USE particle_types, ONLY: particle_type
+   USE simpar_types, ONLY: simpar_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -135,7 +135,7 @@ CONTAINS
       max_sigma = -1.0E+10_dp
       Shake_Inter_Loop: DO WHILE ((ABS(max_sigma) >= shake_tol) .AND. (ishake_ext <= Max_Shake_Iter))
          max_sigma = 0.0_dp
-         ishake_ext = ishake_ext+1
+         ishake_ext = ishake_ext + 1
          ! Intramolecular Constraints
          MOL: DO ikind = 1, nkind
             nmol_per_kind = local_molecules%n_el(ikind)
@@ -151,7 +151,7 @@ CONTAINS
                int_max_sigma = -1.0E+10_dp
                Shake_Intra_Loop: DO WHILE ((ABS(int_max_sigma) >= shake_tol) .AND. (ishake_int <= Max_Shake_Iter))
                   int_max_sigma = 0.0_dp
-                  ishake_int = ishake_int+1
+                  ishake_int = ishake_int + 1
                   ! 3x3
                   IF (n3x3con /= 0) &
                      CALL shake_3x3_int(molecule, particle_set, pos, vel, dt, ishake_int, &
@@ -261,7 +261,7 @@ CONTAINS
       max_sigma = -1.0E+10_dp
       Rattle_Inter_Loop: DO WHILE (ABS(max_sigma) >= rattle_tol)
          max_sigma = 0.0_dp
-         irattle_ext = irattle_ext+1
+         irattle_ext = irattle_ext + 1
          ! Intramolecular Constraints
          MOL: DO ikind = 1, nkind
             nmol_per_kind = local_molecules%n_el(ikind)
@@ -276,7 +276,7 @@ CONTAINS
                int_max_sigma = -1.0E+10_dp
                Rattle_Intra_Loop: DO WHILE (ABS(int_max_sigma) >= rattle_tol)
                   int_max_sigma = 0.0_dp
-                  irattle_int = irattle_int+1
+                  irattle_int = irattle_int + 1
                   ! 3x3
                   IF (n3x3con /= 0) &
                      CALL rattle_3x3_int(molecule, particle_set, vel, dt)
@@ -359,10 +359,10 @@ CONTAINS
       TYPE(distribution_1d_type), POINTER                :: local_particles
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'shake_roll_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, ikind, imol, ishake_ext, ishake_int, k, lagrange_mult, log_unit, &
-         n3x3con, n4x6con, nconstraint, nkind, nmol_per_kind, nvsitecon
+                 n3x3con, n4x6con, nconstraint, nkind, nmol_per_kind, nvsitecon
       LOGICAL                                            :: do_ext_constraint, dump_lm
       REAL(KIND=dp)                                      :: int_max_sigma, mass, max_sigma, shake_tol
       REAL(KIND=dp), DIMENSION(3, 3)                     :: r_shake, v_shake
@@ -394,7 +394,7 @@ CONTAINS
       max_sigma = -1.0E+10_dp
       Shake_Inter_Loop: DO WHILE (ABS(max_sigma) >= shake_tol)
          max_sigma = 0.0_dp
-         ishake_ext = ishake_ext+1
+         ishake_ext = ishake_ext + 1
          ! Intramolecular Constraints
          MOL: DO ikind = 1, nkind
             nmol_per_kind = local_molecules%n_el(ikind)
@@ -410,7 +410,7 @@ CONTAINS
                int_max_sigma = -1.0E+10_dp
                Shake_Roll_Intra_Loop: DO WHILE (ABS(int_max_sigma) >= shake_tol)
                   int_max_sigma = 0.0_dp
-                  ishake_int = ishake_int+1
+                  ishake_int = ishake_int + 1
                   ! 3x3
                   IF (n3x3con /= 0) &
                      CALL shake_roll_3x3_int(molecule, particle_set, pos, vel, r_shake, &
@@ -505,10 +505,10 @@ CONTAINS
       TYPE(distribution_1d_type), POINTER                :: local_particles
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rattle_roll_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, ikind, imol, irattle_ext, irattle_int, k, lagrange_mult, log_unit, &
-         n3x3con, n4x6con, nconstraint, nkind, nmol_per_kind
+                 n3x3con, n4x6con, nconstraint, nkind, nmol_per_kind
       LOGICAL                                            :: do_ext_constraint, dump_lm
       REAL(KIND=dp)                                      :: int_max_sigma, mass, max_sigma, &
                                                             rattle_tol
@@ -542,7 +542,7 @@ CONTAINS
       max_sigma = -1.0E+10_dp
       Rattle_Inter_Loop: DO WHILE (ABS(max_sigma) >= rattle_tol)
          max_sigma = 0.0_dp
-         irattle_ext = irattle_ext+1
+         irattle_ext = irattle_ext + 1
          ! Intramolecular Constraints
          MOL: DO ikind = 1, nkind
             nmol_per_kind = local_molecules%n_el(ikind)
@@ -558,7 +558,7 @@ CONTAINS
                irattle_int = 0
                Rattle_Roll_Intramolecular: DO WHILE (ABS(int_max_sigma) >= rattle_tol)
                   int_max_sigma = 0.0_dp
-                  irattle_int = irattle_int+1
+                  irattle_int = irattle_int + 1
                   ! 3x3
                   IF (n3x3con /= 0) &
                      CALL rattle_roll_3x3_int(molecule, particle_set, vel, r_rattle, dt, &
@@ -626,7 +626,7 @@ CONTAINS
       CHARACTER(LEN=1), INTENT(IN)                       :: id_type
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dump_lagrange_mult', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: label
       INTEGER                                            :: handle, i, ikind, imol, j, my_index, &
@@ -662,21 +662,21 @@ CONTAINS
                      molecule => molecule_set(i)
                      ! Collective Variables
                      DO j = 1, ncolv%ntot
-                        lagr(my_index+1) = molecule%lci%lcolv(j)%lambda
-                        my_index = my_index+1
+                        lagr(my_index + 1) = molecule%lci%lcolv(j)%lambda
+                        my_index = my_index + 1
                      END DO
                      ! 3x3
                      DO j = 1, n3x3con
-                        lagr(my_index+1:my_index+3) = molecule%lci%lg3x3(j)%lambda(:)
-                        my_index = my_index+3
+                        lagr(my_index + 1:my_index + 3) = molecule%lci%lg3x3(j)%lambda(:)
+                        my_index = my_index + 3
                      END DO
                      ! 4x6
                      DO j = 1, n4x6con
-                        lagr(my_index+1:my_index+6) = molecule%lci%lg4x6(j)%lambda(:)
-                        my_index = my_index+6
+                        lagr(my_index + 1:my_index + 6) = molecule%lci%lg4x6(j)%lambda(:)
+                        my_index = my_index + 6
                      END DO
                   ELSE
-                     my_index = my_index+ncolv%ntot+3*n3x3con+6*n4x6con
+                     my_index = my_index + ncolv%ntot + 3*n3x3con + 6*n4x6con
                   END IF
                END DO
             END DO MOL
@@ -684,21 +684,21 @@ CONTAINS
          END IF
          ! Intermolecular constraints
          IF (do_ext_constraint) THEN
-            CALL reallocate(lagr, 1, SIZE(lagr)+gci%ntot)
+            CALL reallocate(lagr, 1, SIZE(lagr) + gci%ntot)
             ! Collective Variables
             DO j = 1, gci%ncolv%ntot
-               lagr(my_index+1) = gci%lcolv(j)%lambda
-               my_index = my_index+1
+               lagr(my_index + 1) = gci%lcolv(j)%lambda
+               my_index = my_index + 1
             END DO
             ! 3x3
             DO j = 1, gci%ng3x3
-               lagr(my_index+1:my_index+3) = gci%lg3x3(j)%lambda(:)
-               my_index = my_index+3
+               lagr(my_index + 1:my_index + 3) = gci%lg3x3(j)%lambda(:)
+               my_index = my_index + 3
             END DO
             ! 4x6
             DO j = 1, gci%ng4x6
-               lagr(my_index+1:my_index+6) = gci%lg4x6(j)%lambda(:)
-               my_index = my_index+6
+               lagr(my_index + 1:my_index + 6) = gci%lg4x6(j)%lambda(:)
+               my_index = my_index + 6
             END DO
          END IF
          IF (log_unit > 0) THEN
@@ -711,7 +711,7 @@ CONTAINS
             END IF
             WRITE (log_unit, FMT='(A,T40,4F15.9)') TRIM(label), lagr(1:MIN(4, SIZE(lagr)))
             DO j = 5, SIZE(lagr), 4
-               WRITE (log_unit, FMT='(T40,4F15.9)') lagr(j:MIN(j+3, SIZE(lagr)))
+               WRITE (log_unit, FMT='(T40,4F15.9)') lagr(j:MIN(j + 3, SIZE(lagr)))
             END DO
          END IF
          DEALLOCATE (lagr)
@@ -789,7 +789,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: max_sigma
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rattle_int_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (log_unit > 0) THEN
          ! Dump info if requested
@@ -817,7 +817,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: max_sigma
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rattle_ext_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (log_unit > 0) THEN
          ! Dump info if requested
@@ -855,7 +855,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: root_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'shake_update_targets', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ikind, imol, nkind, &
                                                             nmol_per_kind

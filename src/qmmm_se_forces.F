@@ -9,44 +9,44 @@
 !> \author Teodoro Laino - 04.2007 [tlaino]
 ! **************************************************************************************************
 MODULE qmmm_se_forces
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_get_block_p,&
-                                              dbcsr_p_type
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_mndo, do_method_mndod, do_method_pchg, do_method_pdg, &
-        do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE multipole_types,                 ONLY: do_multipole_none
-   USE particle_types,                  ONLY: particle_type
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type,&
-                                              qmmm_pot_p_type,&
-                                              qmmm_pot_type
-   USE qmmm_util,                       ONLY: spherical_cutoff_factor
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_qmmm_types,                ONLY: qs_ks_qmmm_env_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE semi_empirical_int_arrays,       ONLY: se_orbital_pointer
-   USE semi_empirical_integrals,        ONLY: dcorecore,&
-                                              drotnuc
-   USE semi_empirical_types,            ONLY: get_se_param,&
-                                              se_int_control_type,&
-                                              se_taper_type,&
-                                              semi_empirical_create,&
-                                              semi_empirical_release,&
-                                              semi_empirical_type,&
-                                              setup_se_int_control_type
-   USE semi_empirical_utils,            ONLY: get_se_type,&
-                                              se_param_set_default
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_get_block_p, &
+                        dbcsr_p_type
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_mndo, do_method_mndod, do_method_pchg, do_method_pdg, &
+      do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE multipole_types, ONLY: do_multipole_none
+   USE particle_types, ONLY: particle_type
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type, &
+                             qmmm_pot_p_type, &
+                             qmmm_pot_type
+   USE qmmm_util, ONLY: spherical_cutoff_factor
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_qmmm_types, ONLY: qs_ks_qmmm_env_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE semi_empirical_int_arrays, ONLY: se_orbital_pointer
+   USE semi_empirical_integrals, ONLY: dcorecore, &
+                                       drotnuc
+   USE semi_empirical_types, ONLY: get_se_param, &
+                                   se_int_control_type, &
+                                   se_taper_type, &
+                                   semi_empirical_create, &
+                                   semi_empirical_release, &
+                                   semi_empirical_type, &
+                                   setup_se_int_control_type
+   USE semi_empirical_utils, ONLY: get_se_type, &
+                                   se_param_set_default
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -84,7 +84,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: Forces, Forces_added_charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deriv_se_qmmm_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iatom, ikind, iqm, ispin, &
                                                             itype, natom, natorb_a, nkind, &
@@ -153,7 +153,7 @@ CONTAINS
                                  natorb=natorb_a)
                IF (.NOT. defined .OR. natorb_a < 1) CYCLE
                Atoms: DO i = 1, SIZE(list)
-                  iqm = iqm+1
+                  iqm = iqm + 1
                   iatom = list(i)
                   ! Give back block
                   NULLIFY (p_block_a)
@@ -217,9 +217,9 @@ CONTAINS
                               natorb=natorb_a)
             IF (.NOT. defined .OR. natorb_a < 1) CYCLE
             DO i = 1, SIZE(list)
-               iqm = iqm+1
+               iqm = iqm + 1
                iatom = qmmm_env%qm_atom_index(list(i))
-               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:)+Forces_QM(:, iqm)
+               particles_mm(iatom)%f(:) = particles_mm(iatom)%f(:) + Forces_QM(:, iqm)
             END DO
          END DO
          ! MM forces will be handled directly from the QMMM module in the same way
@@ -276,7 +276,7 @@ CONTAINS
       TYPE(particle_type), DIMENSION(:), POINTER         :: particles_qm
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deriv_se_qmmm_matrix_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i1, i1L, i2, Imm, Imp, IndMM, &
                                                             Ipot, j1, j1L
@@ -294,7 +294,7 @@ CONTAINS
          LoopMM: DO Imp = 1, SIZE(Pot%mm_atom_index)
             Imm = Pot%mm_atom_index(Imp)
             IndMM = mm_atom_index(Imm)
-            r_pbc = pbc(particles_mm(IndMM)%r-particles_qm(IndQM)%r, mm_cell)
+            r_pbc = pbc(particles_mm(IndMM)%r - particles_qm(IndQM)%r, mm_cell)
             rt1 = r_pbc(1)
             rt2 = r_pbc(2)
             rt3 = r_pbc(3)
@@ -319,19 +319,19 @@ CONTAINS
             i2 = 0
             DO i1L = 1, se_kind_a%natorb
                i1 = se_orbital_pointer(i1L)
-               DO j1L = 1, i1L-1
+               DO j1L = 1, i1L - 1
                   j1 = se_orbital_pointer(j1L)
-                  i2 = i2+1
-                  force_ab = force_ab-2.0_dp*de1b(:, i2)*p_block_a(i1, j1)
+                  i2 = i2 + 1
+                  force_ab = force_ab - 2.0_dp*de1b(:, i2)*p_block_a(i1, j1)
                END DO
                j1 = se_orbital_pointer(j1L)
-               i2 = i2+1
-               force_ab = force_ab-de1b(:, i2)*p_block_a(i1, j1)
+               i2 = i2 + 1
+               force_ab = force_ab - de1b(:, i2)*p_block_a(i1, j1)
             END DO
             ! The array of QM forces are really the forces
-            forces_qm(:) = forces_qm(:)-force_ab
+            forces_qm(:) = forces_qm(:) - force_ab
             ! The one of MM atoms are instead gradients
-            forces(:, Imm) = forces(:, Imm)-force_ab
+            forces(:, Imm) = forces(:, Imm) - force_ab
          END DO LoopMM
       END DO MainLoopPot
       CALL timestop(handle)

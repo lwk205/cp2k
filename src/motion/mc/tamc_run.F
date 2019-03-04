@@ -11,128 +11,128 @@
 ! **************************************************************************************************
 MODULE tamc_run
 
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE averages_types,                  ONLY: average_quantities_type
-   USE barostat_types,                  ONLY: barostat_type,&
-                                              create_barostat_type,&
-                                              release_barostat_type
-   USE bibliography,                    ONLY: VandenCic2006
-   USE cell_types,                      ONLY: cell_type
-   USE colvar_methods,                  ONLY: colvar_eval_glob_f
-   USE colvar_types,                    ONLY: HBP_colvar_id,&
-                                              WC_colvar_id,&
-                                              colvar_p_type
-   USE constraint_fxd,                  ONLY: fix_atom_control
-   USE cp_external_control,             ONLY: external_control
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_add_iter_level,&
-                                              cp_iterate,&
-                                              cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr,&
-                                              cp_rm_iter_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE force_env_methods,               ONLY: force_env_calc_energy_force
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE free_energy_types,               ONLY: fe_env_create,&
-                                              free_energy_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: langevin_ensemble,&
-                                              npe_f_ensemble,&
-                                              npe_i_ensemble,&
-                                              nph_uniaxial_damped_ensemble,&
-                                              nph_uniaxial_ensemble,&
-                                              npt_f_ensemble,&
-                                              npt_i_ensemble,&
-                                              reftraj_ensemble
-   USE input_cp2k_check,                ONLY: remove_restart_info
-   USE input_cp2k_restarts,             ONLY: write_restart
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_remove_values,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_walltime
-   USE mc_environment_types,            ONLY: get_mc_env,&
-                                              mc_env_create,&
-                                              mc_env_release,&
-                                              mc_environment_type,&
-                                              set_mc_env
-   USE mc_misc,                         ONLY: mc_averages_create,&
-                                              mc_averages_release
-   USE mc_move_control,                 ONLY: init_mc_moves,&
-                                              mc_moves_release
-   USE mc_types,                        ONLY: get_mc_par,&
-                                              mc_averages_type,&
-                                              mc_ekin_type,&
-                                              mc_moves_type,&
-                                              mc_simpar_type,&
-                                              set_mc_par
-   USE md_ener_types,                   ONLY: create_md_ener,&
-                                              md_ener_type,&
-                                              release_md_ener
-   USE md_energies,                     ONLY: initialize_md_ener,&
-                                              md_energy
-   USE md_environment_types,            ONLY: get_md_env,&
-                                              md_env_create,&
-                                              md_env_release,&
-                                              md_environment_type,&
-                                              set_md_env
-   USE md_run,                          ONLY: qs_mol_dyn
-   USE metadynamics_types,              ONLY: meta_env_type,&
-                                              metavar_type,&
-                                              set_meta_env
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_list_types,             ONLY: molecule_list_type
-   USE molecule_types,                  ONLY: global_constraint_type,&
-                                              molecule_type
-   USE parallel_rng_types,              ONLY: UNIFORM,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_random_number,&
-                                              rng_stream_type
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: boltzmann,&
-                                              femtoseconds,&
-                                              joule,&
-                                              kelvin
-   USE qmmm_util,                       ONLY: apply_qmmm_walls_reflective
-   USE qs_environment_types,            ONLY: get_qs_env
-   USE qs_scf_post_gpw,                 ONLY: scf_post_calculation_gpw
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE reference_manager,               ONLY: cite_reference
-   USE reftraj_types,                   ONLY: create_reftraj,&
-                                              reftraj_type,&
-                                              release_reftraj
-   USE reftraj_util,                    ONLY: initialize_reftraj
-   USE simpar_methods,                  ONLY: read_md_section
-   USE simpar_types,                    ONLY: create_simpar_type,&
-                                              release_simpar_type,&
-                                              simpar_type
-   USE string_utilities,                ONLY: str_comp
-   USE thermal_region_types,            ONLY: release_thermal_regions,&
-                                              thermal_regions_type
-   USE thermal_region_utils,            ONLY: create_thermal_regions
-   USE thermostat_methods,              ONLY: create_thermostats
-   USE thermostat_types,                ONLY: release_thermostats,&
-                                              thermostats_type
-   USE virial_methods,                  ONLY: virial_evaluate
-   USE virial_types,                    ONLY: virial_type
-   USE wiener_process,                  ONLY: create_wiener_process,&
-                                              create_wiener_process_cv
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE averages_types, ONLY: average_quantities_type
+   USE barostat_types, ONLY: barostat_type, &
+                             create_barostat_type, &
+                             release_barostat_type
+   USE bibliography, ONLY: VandenCic2006
+   USE cell_types, ONLY: cell_type
+   USE colvar_methods, ONLY: colvar_eval_glob_f
+   USE colvar_types, ONLY: HBP_colvar_id, &
+                           WC_colvar_id, &
+                           colvar_p_type
+   USE constraint_fxd, ONLY: fix_atom_control
+   USE cp_external_control, ONLY: external_control
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_add_iter_level, &
+                                 cp_iterate, &
+                                 cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr, &
+                                 cp_rm_iter_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE force_env_methods, ONLY: force_env_calc_energy_force
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE free_energy_types, ONLY: fe_env_create, &
+                                free_energy_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: langevin_ensemble, &
+                              npe_f_ensemble, &
+                              npe_i_ensemble, &
+                              nph_uniaxial_damped_ensemble, &
+                              nph_uniaxial_ensemble, &
+                              npt_f_ensemble, &
+                              npt_i_ensemble, &
+                              reftraj_ensemble
+   USE input_cp2k_check, ONLY: remove_restart_info
+   USE input_cp2k_restarts, ONLY: write_restart
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_remove_values, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_walltime
+   USE mc_environment_types, ONLY: get_mc_env, &
+                                   mc_env_create, &
+                                   mc_env_release, &
+                                   mc_environment_type, &
+                                   set_mc_env
+   USE mc_misc, ONLY: mc_averages_create, &
+                      mc_averages_release
+   USE mc_move_control, ONLY: init_mc_moves, &
+                              mc_moves_release
+   USE mc_types, ONLY: get_mc_par, &
+                       mc_averages_type, &
+                       mc_ekin_type, &
+                       mc_moves_type, &
+                       mc_simpar_type, &
+                       set_mc_par
+   USE md_ener_types, ONLY: create_md_ener, &
+                            md_ener_type, &
+                            release_md_ener
+   USE md_energies, ONLY: initialize_md_ener, &
+                          md_energy
+   USE md_environment_types, ONLY: get_md_env, &
+                                   md_env_create, &
+                                   md_env_release, &
+                                   md_environment_type, &
+                                   set_md_env
+   USE md_run, ONLY: qs_mol_dyn
+   USE metadynamics_types, ONLY: meta_env_type, &
+                                 metavar_type, &
+                                 set_meta_env
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_type
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_list_types, ONLY: molecule_list_type
+   USE molecule_types, ONLY: global_constraint_type, &
+                             molecule_type
+   USE parallel_rng_types, ONLY: UNIFORM, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_random_number, &
+                                 rng_stream_type
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: boltzmann, &
+                      femtoseconds, &
+                      joule, &
+                      kelvin
+   USE qmmm_util, ONLY: apply_qmmm_walls_reflective
+   USE qs_environment_types, ONLY: get_qs_env
+   USE qs_scf_post_gpw, ONLY: scf_post_calculation_gpw
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE reference_manager, ONLY: cite_reference
+   USE reftraj_types, ONLY: create_reftraj, &
+                            reftraj_type, &
+                            release_reftraj
+   USE reftraj_util, ONLY: initialize_reftraj
+   USE simpar_methods, ONLY: read_md_section
+   USE simpar_types, ONLY: create_simpar_type, &
+                           release_simpar_type, &
+                           simpar_type
+   USE string_utilities, ONLY: str_comp
+   USE thermal_region_types, ONLY: release_thermal_regions, &
+                                   thermal_regions_type
+   USE thermal_region_utils, ONLY: create_thermal_regions
+   USE thermostat_methods, ONLY: create_thermostats
+   USE thermostat_types, ONLY: release_thermostats, &
+                               thermostats_type
+   USE virial_methods, ONLY: virial_evaluate
+   USE virial_types, ONLY: virial_type
+   USE wiener_process, ONLY: create_wiener_process, &
+                             create_wiener_process_cv
 !!!!! monte carlo part
 #include "../../base/base_uses.f90"
 
@@ -193,8 +193,8 @@ CONTAINS
       TYPE(reftraj_type), POINTER                        :: reftraj
       TYPE(rng_stream_type), POINTER                     :: rng_stream, rng_stream_mc
       TYPE(section_vals_type), POINTER :: constraint_section, force_env_section, &
-         free_energy_section, fs_section, global_section, mc_section, md_section, motion_section, &
-         reftraj_section, subsys_section, work_section
+                                          free_energy_section, fs_section, global_section, mc_section, md_section, motion_section, &
+                                          reftraj_section, subsys_section, work_section
       TYPE(simpar_type), POINTER                         :: simpar
       TYPE(thermal_regions_type), POINTER                :: thermal_regions
       TYPE(thermostats_type), POINTER                    :: thermostats
@@ -437,7 +437,7 @@ CONTAINS
             IF (force_env%meta_env%langevin) THEN
                CALL create_wiener_process_cv(force_env%meta_env)
                NULLIFY (rng_stream)
-               DO j = 1, (rand2skip-1)/nmccycles
+               DO j = 1, (rand2skip - 1)/nmccycles
                   DO i = 1, force_env%meta_env%n_colvar
                      rng_stream => force_env%meta_env%rng(i)%stream
                      auxRandom = next_random_number(rng_stream)
@@ -486,7 +486,7 @@ CONTAINS
       ELSE
          CALL get_md_env(md_env, reftraj=reftraj)
          CALL initialize_reftraj(reftraj, reftraj_section, md_env)
-         itimes = reftraj%info%first_snapshot-1
+         itimes = reftraj%info%first_snapshot - 1
          md_stride = reftraj%info%stride
       END IF
 
@@ -534,7 +534,7 @@ CONTAINS
          CALL HMCsampler(globenv, force_env, MCaverages, r, mc_par, moves, gmoves, rng_stream_mc, output_unit, &
                          fz, zbuff, nskip=rand2skip)
          CALL cp_iterate(logger%iter_info, last=.FALSE., iter_nr=0)
-         CALL section_vals_val_set(mc_section, "RANDOMTOSKIP", i_val=rand2skip+nmccycles)
+         CALL section_vals_val_set(mc_section, "RANDOMTOSKIP", i_val=rand2skip + nmccycles)
          CALL write_restart(md_env=md_env, root_section=force_env%root_section)
       ENDIF
       IF (output_unit > 0) THEN
@@ -546,8 +546,8 @@ CONTAINS
 
       DO istep = 1, force_env%meta_env%TAMCSteps
          ! Increase counters
-         itimes = itimes+1
-         time = time+force_env%meta_env%dt
+         itimes = itimes + 1
+         time = time + force_env%meta_env%dt
          IF (output_unit > 0) THEN
             WRITE (output_unit, '(a)') "HMC|==================================="
             WRITE (output_unit, '(a,1x,i0)') "HMC| on z step ", istep
@@ -614,7 +614,7 @@ CONTAINS
 !        END IF
 
          time_iter_stop = m_walltime()
-         used_time = time_iter_stop-time_iter_start
+         used_time = time_iter_stop - time_iter_start
          time_iter_start = time_iter_stop
 
 !!!!! this writes the restart...
@@ -632,8 +632,8 @@ CONTAINS
       CALL cp_iterate(logger%iter_info, last=.TRUE., iter_nr=itimes)
       force_env%qs_env%sim_time = 0.0_dp
       force_env%qs_env%sim_step = 0
-      rand2skip = rand2skip+nmccycles*force_env%meta_env%TAMCSteps
-      IF (initialStep == 0) rand2skip = rand2skip+nmccycles
+      rand2skip = rand2skip + nmccycles*force_env%meta_env%TAMCSteps
+      IF (initialStep == 0) rand2skip = rand2skip + nmccycles
       CALL section_vals_val_set(mc_section, "RANDOMTOSKIP", i_val=rand2skip)
 
       CALL write_restart(md_env=md_env, root_section=force_env%root_section)
@@ -682,7 +682,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), INTENT(INOUT)         :: An
 
       CHARACTER(len=*), PARAMETER :: routineN = 'tamc_velocities_colvar', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_c
       REAL(kind=dp)                                      :: dt, fft, sigma
@@ -702,10 +702,10 @@ CONTAINS
       meta_env%epot_walls = 0.0_dp
       DO i_c = 1, meta_env%n_colvar
          cv => meta_env%metavar(i_c)
-         fft = cv%ff_s+cv%ff_hills
+         fft = cv%ff_s + cv%ff_hills
          sigma = SQRT((meta_env%temp_wanted*kelvin)*2.0_dp*(boltzmann/joule)*cv%gamma/cv%mass)
-         cv%vvp = cv%vvp+0.5_dp*dt*(fft/cv%mass-cv%gamma*cv%vvp)*(1.0_dp-0.25_dp*dt*cv%gamma)+An(i_c)
-         meta_env%epot_walls = meta_env%epot_walls+cv%epot_walls
+         cv%vvp = cv%vvp + 0.5_dp*dt*(fft/cv%mass - cv%gamma*cv%vvp)*(1.0_dp - 0.25_dp*dt*cv%gamma) + An(i_c)
+         meta_env%epot_walls = meta_env%epot_walls + cv%epot_walls
       ENDDO
       CALL timestop(handle)
    END SUBROUTINE tamc_velocities_colvar
@@ -722,7 +722,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), INTENT(INOUT)         :: xieta
 
       CHARACTER(len=*), PARAMETER :: routineN = 'tamc_position_colvar', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_c
       REAL(kind=dp)                                      :: dt, sigma
@@ -746,7 +746,7 @@ CONTAINS
          cv => meta_env%metavar(i_c)
          sigma = SQRT((meta_env%temp_wanted*kelvin)*2.0_dp*(boltzmann/joule)*cv%gamma/cv%mass)
 !        cv%ss0 =cv%ss0 +dt*cv%vvp
-         cv%ss0 = cv%ss0+dt*cv%vvp+dt*SQRT(dt/12.0_dp)*sigma*xieta(i_c+meta_env%n_colvar)
+         cv%ss0 = cv%ss0 + dt*cv%vvp + dt*SQRT(dt/12.0_dp)*sigma*xieta(i_c + meta_env%n_colvar)
          IF (cv%periodic) THEN
             ! A periodic COLVAR is always within [-pi,pi]
             cv%ss0 = SIGN(1.0_dp, ASIN(SIN(cv%ss0)))*ACOS(COS(cv%ss0))
@@ -790,7 +790,7 @@ CONTAINS
       CALL force_env_get(force_env, subsys=subsys)
 
       dt = meta_env%dt
-      IF (.NOT. meta_env%restart) meta_env%n_steps = meta_env%n_steps+1
+      IF (.NOT. meta_env%restart) meta_env%n_steps = meta_env%n_steps + 1
       ! compute ss and the derivative of ss with respect to the atomic positions
       DO i_c = 1, meta_env%n_colvar
          cv => meta_env%metavar(i_c)
@@ -839,19 +839,19 @@ CONTAINS
       meta_env%epot_walls = 0.0_dp
       DO i_c = 1, meta_env%n_colvar
          cv => meta_env%metavar(i_c)
-         diff_ss = cv%ss-cv%ss0
+         diff_ss = cv%ss - cv%ss0
          IF (cv%periodic) THEN
             ! The difference of a periodic COLVAR is always within [-pi,pi]
             diff_ss = SIGN(1.0_dp, ASIN(SIN(diff_ss)))*ACOS(COS(diff_ss))
          END IF
          cv%epot_s = 0.5_dp*cv%lambda*diff_ss*diff_ss
          cv%ff_s = cv%lambda*(diff_ss)
-         meta_env%epot_s = meta_env%epot_s+cv%epot_s
+         meta_env%epot_s = meta_env%epot_s + cv%epot_s
          icolvar = cv%icolvar
 
          DO ii = 1, colvar_p(icolvar)%colvar%n_atom_s
             i = colvar_p(icolvar)%colvar%i_atom(ii)
-            particles%els(i)%f = particles%els(i)%f-cv%ff_s*colvar_p(icolvar)%colvar%dsdr(:, ii)
+            particles%els(i)%f = particles%els(i)%f - cv%ff_s*colvar_p(icolvar)%colvar%dsdr(:, ii)
          ENDDO
 
       ENDDO
@@ -958,12 +958,12 @@ CONTAINS
       DO ivar = 1, force_env%meta_env%n_colvar
          rng_stream => force_env%meta_env%rng(ivar)%stream
          xieta(ivar) = next_random_number(rng_stream)
-         xieta(ivar+force_env%meta_env%n_colvar) = next_random_number(rng_stream)
+         xieta(ivar + force_env%meta_env%n_colvar) = next_random_number(rng_stream)
          gamma = force_env%meta_env%metavar(ivar)%gamma
          mass = force_env%meta_env%metavar(ivar)%mass
          sigma = SQRT((force_env%meta_env%temp_wanted*kelvin)*2.0_dp*(boltzmann/joule)*gamma/mass)
-         An(ivar) = 0.5_dp*SQRT(dt)*sigma*(xieta(ivar)*(1.0_dp-0.5_dp*dt*gamma)- &
-                                           dt*gamma*xieta(ivar+force_env%meta_env%n_colvar)/SQRT(12.0_dp))
+         An(ivar) = 0.5_dp*SQRT(dt)*sigma*(xieta(ivar)*(1.0_dp - 0.5_dp*dt*gamma) - &
+                                           dt*gamma*xieta(ivar + force_env%meta_env%n_colvar)/SQRT(12.0_dp))
       ENDDO
 !    *** Velocity Verlet for Langeving *** v(t)--> v(t+1/2)
       CALL tamc_velocities_colvar(force_env, An)
@@ -1047,15 +1047,15 @@ CONTAINS
       IF (output_unit > 0) THEN
          WRITE (output_unit, '(a,l4)') "HMC|restart? ", force_env%meta_env%restart
          WRITE (output_unit, '(a,3(f16.8,1x))') &
-            "HMC|Ep, Epx, Epz ", old_epx+force_env%meta_env%epot_s, old_epx, force_env%meta_env%epot_s
+            "HMC|Ep, Epx, Epz ", old_epx + force_env%meta_env%epot_s, old_epx, force_env%meta_env%epot_s
          WRITE (output_unit, '(a)') "#HMC| No | z.. | theta.. | ff_z... | ff_z/n |"
       ENDIF
       DO i = 1, nstep
          IF (MOD(i, iprint) == 0 .AND. (output_unit > 0)) THEN
-            WRITE (output_unit, '(a,1x,i0)') "HMC|========== On Monte Carlo cycle ", i+ishift
+            WRITE (output_unit, '(a,1x,i0)') "HMC|========== On Monte Carlo cycle ", i + ishift
             WRITE (output_unit, '(a)') "HMC| Attempting a minitrajectory move"
-            WRITE (output_unit, '(a,1x,i0)') "HMC| start mini-trajectory", i+ishift
-            WRITE (output_unit, '(a,1x,i0,1x)', advance="no") "#HMC|0 ", i+ishift
+            WRITE (output_unit, '(a,1x,i0)') "HMC| start mini-trajectory", i + ishift
+            WRITE (output_unit, '(a,1x,i0,1x)', advance="no") "#HMC|0 ", i + ishift
             DO j = 1, force_env%meta_env%n_colvar
                WRITE (output_unit, '(f16.8,1x,f16.8,1x,f16.8)', advance="no") force_env%meta_env%metavar(j)%ss0, &
                   force_env%meta_env%metavar(j)%ss, &
@@ -1068,27 +1068,27 @@ CONTAINS
                           r, output_unit, rng_stream_mc, zbuff)
          ! check averages...
          ! force average for z needed too...
-         averages%ave_energy = averages%ave_energy*REAL(i-1, dp)/REAL(i, dp)+ &
+         averages%ave_energy = averages%ave_energy*REAL(i - 1, dp)/REAL(i, dp) + &
                                old_epx/REAL(i, dp)
          DO j = 1, force_env%meta_env%n_colvar
-            fz(j) = fz(j)+force_env%meta_env%metavar(j)%ff_s
+            fz(j) = fz(j) + force_env%meta_env%metavar(j)%ff_s
          ENDDO
          IF (output_unit > 0) THEN
-            WRITE (output_unit, '(a,1x,i0)') "HMC|end mini-trajectory", i+ishift
+            WRITE (output_unit, '(a,1x,i0)') "HMC|end mini-trajectory", i + ishift
 !!!!!!!! this prints z and theta(x) --ss0,ss-- needed to determine an acceptable k then
             !  the instanteneous force and some instanteneous average for force
-            WRITE (output_unit, '(a,1x,i0,1x)', advance="no") "#HMC|1 ", i+ishift
+            WRITE (output_unit, '(a,1x,i0,1x)', advance="no") "#HMC|1 ", i + ishift
             DO j = 1, force_env%meta_env%n_colvar
                WRITE (output_unit, '(f16.8,1x,f16.8,1x,f16.8,1x,f16.8)', advance="no") force_env%meta_env%metavar(j)%ss0, &
                   force_env%meta_env%metavar(j)%ss, &
-                  force_env%meta_env%metavar(j)%ff_s, fz(j)/REAL(i+ishift, dp)
+                  force_env%meta_env%metavar(j)%ff_s, fz(j)/REAL(i + ishift, dp)
             ENDDO
             WRITE (output_unit, *)
          ENDIF
-         nsamples = nsamples+1
+         nsamples = nsamples + 1
          IF (MOD(i, iprint) == 0 .AND. (output_unit > 0)) THEN
             WRITE (output_unit, '(a,f16.8)') "HMC| Running average for potential energy ", averages%ave_energy
-            WRITE (output_unit, '(a,1x,i0)') "HMC|======== End Monte Carlo cycle ", i+ishift
+            WRITE (output_unit, '(a,1x,i0)') "HMC|======== End Monte Carlo cycle ", i + ishift
          ENDIF
 !         IF (lrestart) THEN
 !           k=nstep/5
@@ -1189,8 +1189,8 @@ CONTAINS
       ALLOCATE (hmc_ekin)
 
 ! record the attempt
-      moves%hmc%attempts = moves%hmc%attempts+1
-      gmoves%hmc%attempts = gmoves%hmc%attempts+1
+      moves%hmc%attempts = moves%hmc%attempts + 1
+      gmoves%hmc%attempts = gmoves%hmc%attempts + 1
 
 ! save the old coordinates just in case we need to go back
       DO iatom = 1, nAtoms
@@ -1200,7 +1200,7 @@ CONTAINS
 ! the same for collective variables data should be made,ss first half and ff_s the last half
       DO j = 1, force_env%meta_env%n_colvar
          zbuff(j) = force_env%meta_env%metavar(j)%ss
-         zbuff(j+force_env%meta_env%n_colvar) = force_env%meta_env%metavar(j)%ff_s
+         zbuff(j + force_env%meta_env%n_colvar) = force_env%meta_env%metavar(j)%ff_s
          IF ((oldsys%colvar_p(force_env%meta_env%metavar(j)%icolvar)%colvar%type_id == HBP_colvar_id) .OR. &
              (oldsys%colvar_p(force_env%meta_env%metavar(j)%icolvar)%colvar%type_id == WC_colvar_id)) THEN
             localise = .FALSE.
@@ -1225,13 +1225,13 @@ CONTAINS
 
       force_env%meta_env => meta_env_saved
       CALL tamc_force(force_env, zpot=new_epz)
-      new_energy = new_epx+new_epz
+      new_energy = new_epx + new_epz
       IF (output_unit > 0) THEN
          WRITE (output_unit, '(a,4(f16.8,1x))') &
-            "HMC|old Ep, Ekx, Epz, Epx ", old_epx+old_epz, hmc_ekin%initial_ekin, old_epz, old_epx
+            "HMC|old Ep, Ekx, Epz, Epx ", old_epx + old_epz, hmc_ekin%initial_ekin, old_epz, old_epx
          WRITE (output_unit, '(a,4(f16.8,1x))') "HMC|new Ep, Ekx, Epz, Epx ", new_energy, hmc_ekin%final_ekin, new_epz, new_epx
       ENDIF
-      energy_term = new_energy-old_epx-old_epz+hmc_ekin%final_ekin-hmc_ekin%initial_ekin
+      energy_term = new_energy - old_epx - old_epz + hmc_ekin%final_ekin - hmc_ekin%initial_ekin
 
       value = -BETA*(energy_term)
 ! to prevent overflows
@@ -1246,10 +1246,10 @@ CONTAINS
       rand = next_random_number(rng_stream)
       IF (rand < w) THEN
 ! accept the move
-         moves%hmc%successes = moves%hmc%successes+1
-         gmoves%hmc%successes = gmoves%hmc%successes+1
+         moves%hmc%successes = moves%hmc%successes + 1
+         gmoves%hmc%successes = gmoves%hmc%successes + 1
 ! update energies
-         energy_check = energy_check+(new_energy-old_epx-old_epz)
+         energy_check = energy_check + (new_energy - old_epx - old_epz)
          old_epx = new_epx
          old_epz = new_epz
       ELSE
@@ -1259,7 +1259,7 @@ CONTAINS
          ENDDO
          DO j = 1, force_env%meta_env%n_colvar
             force_env%meta_env%metavar(j)%ss = zbuff(j)
-            force_env%meta_env%metavar(j)%ff_s = zbuff(j+force_env%meta_env%n_colvar)
+            force_env%meta_env%metavar(j)%ff_s = zbuff(j + force_env%meta_env%n_colvar)
          ENDDO
 
       ENDIF
@@ -1279,7 +1279,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'metadyn_write_colvar_header', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=100)                                 :: aux, fmt
       CHARACTER(len=255)                                 :: label1, label2, label3, label4, label5, &
@@ -1307,27 +1307,27 @@ CONTAINS
          DO i = 1, meta_env%n_colvar
             WRITE (aux, '(a,i0)') "z_", i
             label1 = TRIM(label1)//TRIM(aux)
-            m = 15*i-LEN_TRIM(label1)-1
+            m = 15*i - LEN_TRIM(label1) - 1
             label1 = TRIM(label1)//REPEAT(" ", m)//"|"
             WRITE (aux, '(a,i0)') "Theta_", i
             label2 = TRIM(label2)//TRIM(aux)
-            m = 15*i-LEN_TRIM(label2)-1
+            m = 15*i - LEN_TRIM(label2) - 1
             label2 = TRIM(label2)//REPEAT(" ", m)//"|"
             WRITE (aux, '(a,i0)') "F_z", i
             label3 = TRIM(label3)//TRIM(aux)
-            m = 15*i-LEN_TRIM(label3)-1
+            m = 15*i - LEN_TRIM(label3) - 1
             label3 = TRIM(label3)//REPEAT(" ", m)//"|"
             WRITE (aux, '(a,i0)') "F_h", i
             label4 = TRIM(label4)//TRIM(aux)
-            m = 15*i-LEN_TRIM(label4)-1
+            m = 15*i - LEN_TRIM(label4) - 1
             label4 = TRIM(label4)//REPEAT(" ", m)//"|"
             WRITE (aux, '(a,i0)') "F_w", i
             label5 = TRIM(label5)//TRIM(aux)
-            m = 15*i-LEN_TRIM(label5)-1
+            m = 15*i - LEN_TRIM(label5) - 1
             label5 = TRIM(label5)//REPEAT(" ", m)//"|"
             WRITE (aux, '(a,i0)') "v_z", i
             label6 = TRIM(label6)//TRIM(aux)
-            m = 15*i-LEN_TRIM(label6)-1
+            m = 15*i - LEN_TRIM(label6) - 1
             label6 = TRIM(label6)//REPEAT(" ", m)//"|"
          ENDDO
          WRITE (fmt, '("(a17,6a",i0 ,",4a15)")') meta_env%n_colvar*15
@@ -1359,7 +1359,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'metadyn_write_colvar', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, i_c, iw
       REAL(KIND=dp)                                      :: temp
@@ -1379,7 +1379,7 @@ CONTAINS
 !        meta_env%epot_s = 0.0_dp
          DO i_c = 1, meta_env%n_colvar
             cv => meta_env%metavar(i_c)
-            meta_env%ekin_s = meta_env%ekin_s+0.5_dp*cv%mass*cv%vvp**2
+            meta_env%ekin_s = meta_env%ekin_s + 0.5_dp*cv%mass*cv%vvp**2
          ENDDO
       END IF
 
@@ -1413,8 +1413,8 @@ CONTAINS
       ! Temperature for COLVAR
       IF (meta_env%extended_lagrange) THEN
          temp = meta_env%ekin_s*2.0_dp/(REAL(meta_env%n_colvar, KIND=dp))*kelvin
-         meta_env%avg_temp = (meta_env%avg_temp*REAL(meta_env%n_steps, KIND=dp)+ &
-                              temp)/REAL(meta_env%n_steps+1, KIND=dp)
+         meta_env%avg_temp = (meta_env%avg_temp*REAL(meta_env%n_steps, KIND=dp) + &
+                              temp)/REAL(meta_env%n_steps + 1, KIND=dp)
          iw = cp_print_key_unit_nr(logger, meta_env%metadyn_section, &
                                    "PRINT%TEMPERATURE_COLVAR", extension=".metadynLog")
          IF (iw > 0) THEN
@@ -1448,7 +1448,7 @@ CONTAINS
       DO i_c = 1, meta_env%n_colvar
          cv => meta_env%metavar(i_c)
          cv%vvp = next_random_number(force_env%globenv%gaussian_rng_stream)
-         meta_env%ekin_s = meta_env%ekin_s+0.5_dp*cv%mass*cv%vvp**2
+         meta_env%ekin_s = meta_env%ekin_s + 0.5_dp*cv%mass*cv%vvp**2
       END DO
       ekin_w = 0.5_dp*meta_env%temp_wanted*REAL(meta_env%n_colvar, KIND=dp)
       fac_t = SQRT(ekin_w/MAX(meta_env%ekin_s, 1.0E-8_dp))

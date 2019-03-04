@@ -9,8 +9,8 @@
 ! **************************************************************************************************
 MODULE mc_environment_types
 
-   USE force_env_types,                 ONLY: force_env_type
-   USE mc_types,                        ONLY: mc_simpar_type
+   USE force_env_types, ONLY: force_env_type
+   USE mc_types, ONLY: mc_simpar_type
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -56,7 +56,7 @@ CONTAINS
 
       ALLOCATE (mc_env)
 
-      last_mc_env_id = last_mc_env_id+1
+      last_mc_env_id = last_mc_env_id + 1
       mc_env%id_nr = last_mc_env_id
       mc_env%ref_count = 1
       mc_env%in_use = 0
@@ -126,7 +126,7 @@ CONTAINS
 
       IF (ASSOCIATED(mc_env)) THEN
          CPASSERT(mc_env%ref_count > 0)
-         mc_env%ref_count = mc_env%ref_count-1
+         mc_env%ref_count = mc_env%ref_count - 1
          IF (mc_env%ref_count == 0) THEN
             mc_env%ref_count = 1
             NULLIFY (mc_env%mc_par)

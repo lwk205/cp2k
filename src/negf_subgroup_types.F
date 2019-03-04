@@ -9,17 +9,17 @@
 ! **************************************************************************************************
 
 MODULE negf_subgroup_types
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type,&
-                                              get_blacs_info
-   USE cp_para_env,                     ONLY: cp_para_env_create,&
-                                              cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE message_passing,                 ONLY: mp_comm_split
-   USE negf_control_types,              ONLY: negf_control_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type, &
+                           get_blacs_info
+   USE cp_para_env, ONLY: cp_para_env_create, &
+                          cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE message_passing, ONLY: mp_comm_split
+   USE negf_control_types, ONLY: negf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -77,7 +77,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: blacs_repeatable
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'negf_sub_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       LOGICAL                                            :: is_split
@@ -95,7 +95,7 @@ CONTAINS
       is_split = negf_control%nprocs > 0 .AND. negf_control%nprocs*2 <= para_env_global%num_pe
 
       IF (is_split) THEN
-         ALLOCATE (sub_env%group_distribution(0:para_env_global%num_pe-1))
+         ALLOCATE (sub_env%group_distribution(0:para_env_global%num_pe - 1))
 
          CALL mp_comm_split(comm=para_env_global%group, sub_comm=sub_env%mpi_comm, ngroups=sub_env%ngroups, &
                             group_distribution=sub_env%group_distribution, subgroup_min_size=negf_control%nprocs)
@@ -111,7 +111,7 @@ CONTAINS
          sub_env%mpi_comm = para_env_global%group
          sub_env%ngroups = 1
 
-         ALLOCATE (sub_env%group_distribution(0:para_env_global%num_pe-1))
+         ALLOCATE (sub_env%group_distribution(0:para_env_global%num_pe - 1))
          sub_env%group_distribution(:) = 0
 
          sub_env%blacs_env => blacs_env_global
@@ -134,7 +134,7 @@ CONTAINS
       TYPE(negf_subgroup_env_type), INTENT(inout)        :: sub_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'negf_sub_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 

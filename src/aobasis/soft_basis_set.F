@@ -10,19 +10,19 @@
 ! **************************************************************************************************
 MODULE soft_basis_set
 
-   USE ao_util,                         ONLY: exp_radius
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type,&
-                                              init_cphi_and_sphi
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE memory_utilities,                ONLY: reallocate
-   USE orbital_pointers,                ONLY: indco,&
-                                              nco,&
-                                              ncoset,&
-                                              nso
-   USE orbital_symbols,                 ONLY: cgf_symbol,&
-                                              sgf_symbol
+   USE ao_util, ONLY: exp_radius
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type, &
+                              init_cphi_and_sphi
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE memory_utilities, ONLY: reallocate
+   USE orbital_pointers, ONLY: indco, &
+                               nco, &
+                               ncoset, &
+                               nso
+   USE orbital_symbols, ONLY: cgf_symbol, &
+                              sgf_symbol
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -61,11 +61,11 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: paw_type_forced, gpw_type_forced
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_soft_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: bsname
       INTEGER :: ico, ipgf, ipgf_s, iset, iset_s, ishell, lshell, lshell_old, m, maxco, maxpgf, &
-         maxpgf_s, maxshell, maxshell_s, ncgf, nset, nset_s, nsgf
+                 maxpgf_s, maxshell, maxshell_s, ncgf, nset, nset_s, nsgf
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: iset_s2h
       INTEGER, DIMENSION(:), POINTER                     :: lmax, lmin, npgf, nshell
       INTEGER, DIMENSION(:, :), POINTER                  :: l, n
@@ -107,7 +107,7 @@ CONTAINS
 
          DO iset = 1, nset ! iset
             minzet = orb_basis%zet(orb_basis%npgf(iset), iset)
-            DO ipgf = orb_basis%npgf(iset)-1, 1, -1
+            DO ipgf = orb_basis%npgf(iset) - 1, 1, -1
                IF (orb_basis%zet(ipgf, iset) < minzet) THEN
                   minzet = orb_basis%zet(ipgf, iset)
                ENDIF
@@ -115,7 +115,7 @@ CONTAINS
             radius = exp_radius(orb_basis%lmax(iset), minzet, eps_fit, 1.0_dp)
 
             !      The soft basis contains this set
-            iset_s = iset_s+1
+            iset_s = iset_s + 1
             nshell(iset_s) = orb_basis%nshell(iset)
             lmax(iset_s) = orb_basis%lmax(iset)
             lmin(iset_s) = orb_basis%lmin(iset)
@@ -159,7 +159,7 @@ CONTAINS
                ENDIF
 
                ! The soft basis contains this exponent
-               ipgf_s = ipgf_s+1
+               ipgf_s = ipgf_s + 1
                zet(ipgf_s, iset_s) = orb_basis%zet(ipgf, iset)
 
                lshell_old = orb_basis%l(1, iset)
@@ -235,16 +235,16 @@ CONTAINS
                soft_basis%nsgf_set(iset) = 0
                DO ishell = 1, nshell(iset)
                   lshell = soft_basis%l(ishell, iset)
-                  soft_basis%first_cgf(ishell, iset) = ncgf+1
-                  ncgf = ncgf+nco(lshell)
+                  soft_basis%first_cgf(ishell, iset) = ncgf + 1
+                  ncgf = ncgf + nco(lshell)
                   soft_basis%last_cgf(ishell, iset) = ncgf
                   soft_basis%ncgf_set(iset) = &
-                     soft_basis%ncgf_set(iset)+nco(lshell)
-                  soft_basis%first_sgf(ishell, iset) = nsgf+1
-                  nsgf = nsgf+nso(lshell)
+                     soft_basis%ncgf_set(iset) + nco(lshell)
+                  soft_basis%first_sgf(ishell, iset) = nsgf + 1
+                  nsgf = nsgf + nso(lshell)
                   soft_basis%last_sgf(ishell, iset) = nsgf
                   soft_basis%nsgf_set(iset) = &
-                     soft_basis%nsgf_set(iset)+nso(lshell)
+                     soft_basis%nsgf_set(iset) + nso(lshell)
                END DO
                maxco = MAX(maxco, npgf(iset)*ncoset(lmax(iset)))
             END DO
@@ -268,8 +268,8 @@ CONTAINS
             DO iset = 1, nset_s
                DO ishell = 1, nshell(iset)
                   lshell = soft_basis%l(ishell, iset)
-                  DO ico = ncoset(lshell-1)+1, ncoset(lshell)
-                     ncgf = ncgf+1
+                  DO ico = ncoset(lshell - 1) + 1, ncoset(lshell)
+                     ncgf = ncgf + 1
                      soft_basis%lx(ncgf) = indco(1, ico)
                      soft_basis%ly(ncgf) = indco(2, ico)
                      soft_basis%lz(ncgf) = indco(3, ico)
@@ -279,7 +279,7 @@ CONTAINS
                                                       soft_basis%lz(ncgf)/))
                   END DO
                   DO m = -lshell, lshell
-                     nsgf = nsgf+1
+                     nsgf = nsgf + 1
                      soft_basis%m(nsgf) = m
                      soft_basis%sgf_symbol(nsgf) = &
                         sgf_symbol(n(ishell, iset), lshell, m)

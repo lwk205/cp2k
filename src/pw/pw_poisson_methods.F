@@ -10,56 +10,56 @@
 ! **************************************************************************************************
 MODULE pw_poisson_methods
 
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE dielectric_methods,              ONLY: dielectric_compute
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi
-   USE mt_util,                         ONLY: MT0D,&
-                                              MT1D,&
-                                              MT2D
-   USE ps_implicit_methods,             ONLY: implicit_poisson_solver_mixed,&
-                                              implicit_poisson_solver_mixed_periodic,&
-                                              implicit_poisson_solver_neumann,&
-                                              implicit_poisson_solver_periodic,&
-                                              ps_implicit_create
-   USE ps_implicit_types,               ONLY: MIXED_BC,&
-                                              MIXED_PERIODIC_BC,&
-                                              NEUMANN_BC,&
-                                              PERIODIC_BC
-   USE ps_wavelet_methods,              ONLY: cp2k_distribution_to_z_slices,&
-                                              ps_wavelet_create,&
-                                              ps_wavelet_solve,&
-                                              z_slices_to_cp2k_distribution
-   USE ps_wavelet_types,                ONLY: WAVELET0D,&
-                                              WAVELET1D,&
-                                              WAVELET2D,&
-                                              WAVELET3D,&
-                                              ps_wavelet_type
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_compare,&
-                                              pw_grid_release,&
-                                              pw_grid_retain
-   USE pw_methods,                      ONLY: pw_copy,&
-                                              pw_derive,&
-                                              pw_integral_ab,&
-                                              pw_transfer
-   USE pw_poisson_types,                ONLY: &
-        ANALYTIC0D, ANALYTIC1D, ANALYTIC2D, MULTIPOLE0D, PERIODIC3D, PS_IMPLICIT, do_ewald_spme, &
-        greens_fn_type, pw_green_create, pw_green_release, pw_poisson_analytic, &
-        pw_poisson_implicit, pw_poisson_mt, pw_poisson_multipole, pw_poisson_none, &
-        pw_poisson_parameter_type, pw_poisson_periodic, pw_poisson_type, pw_poisson_wavelet
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type,&
-                                              pw_pools_copy,&
-                                              pw_pools_dealloc
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE dielectric_methods, ONLY: dielectric_compute
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi
+   USE mt_util, ONLY: MT0D, &
+                      MT1D, &
+                      MT2D
+   USE ps_implicit_methods, ONLY: implicit_poisson_solver_mixed, &
+                                  implicit_poisson_solver_mixed_periodic, &
+                                  implicit_poisson_solver_neumann, &
+                                  implicit_poisson_solver_periodic, &
+                                  ps_implicit_create
+   USE ps_implicit_types, ONLY: MIXED_BC, &
+                                MIXED_PERIODIC_BC, &
+                                NEUMANN_BC, &
+                                PERIODIC_BC
+   USE ps_wavelet_methods, ONLY: cp2k_distribution_to_z_slices, &
+                                 ps_wavelet_create, &
+                                 ps_wavelet_solve, &
+                                 z_slices_to_cp2k_distribution
+   USE ps_wavelet_types, ONLY: WAVELET0D, &
+                               WAVELET1D, &
+                               WAVELET2D, &
+                               WAVELET3D, &
+                               ps_wavelet_type
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_grids, ONLY: pw_grid_compare, &
+                       pw_grid_release, &
+                       pw_grid_retain
+   USE pw_methods, ONLY: pw_copy, &
+                         pw_derive, &
+                         pw_integral_ab, &
+                         pw_transfer
+   USE pw_poisson_types, ONLY: &
+      ANALYTIC0D, ANALYTIC1D, ANALYTIC2D, MULTIPOLE0D, PERIODIC3D, PS_IMPLICIT, do_ewald_spme, &
+      greens_fn_type, pw_green_create, pw_green_release, pw_poisson_analytic, &
+      pw_poisson_implicit, pw_poisson_mt, pw_poisson_multipole, pw_poisson_none, &
+      pw_poisson_parameter_type, pw_poisson_periodic, pw_poisson_type, pw_poisson_wavelet
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type, &
+                            pw_pools_copy, &
+                            pw_pools_dealloc
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -88,7 +88,7 @@ CONTAINS
       TYPE(pw_poisson_type), POINTER                     :: poisson_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_poisson_cleanup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(pw_pool_type), POINTER                        :: pw_pool
 
@@ -113,7 +113,7 @@ CONTAINS
       TYPE(pw_poisson_type), POINTER                     :: poisson_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_poisson_check', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: rebuild
       TYPE(greens_fn_type), POINTER                      :: green
@@ -180,7 +180,7 @@ CONTAINS
       TYPE(pw_type), OPTIONAL, POINTER                   :: density
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_poisson_rebuild', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -252,7 +252,7 @@ CONTAINS
       TYPE(pw_p_type), OPTIONAL, POINTER                 :: rho_core
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_poisson_solve', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: alpha, beta, handle, i
       INTEGER, DIMENSION(3)                              :: n
@@ -414,7 +414,7 @@ CONTAINS
                h_stress(alpha, alpha) = ehartree
                DO beta = alpha, 3
                   h_stress(alpha, beta) = h_stress(alpha, beta) &
-                                          +ffa*pw_integral_ab(dvg(alpha)%pw, dvg(beta)%pw)
+                                          + ffa*pw_integral_ab(dvg(alpha)%pw, dvg(beta)%pw)
                   h_stress(beta, alpha) = h_stress(alpha, beta)
                END DO
             END DO

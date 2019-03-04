@@ -10,25 +10,25 @@
 !> \author Manuel Guidon
 ! **************************************************************************************************
 MODULE admm_types
-   USE bibliography,                    ONLY: Guidon2010,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: admm_control_type
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE input_constants,                 ONLY: do_admm_blocked_projection,&
-                                              do_admm_blocking_purify_full,&
-                                              do_admm_charge_constrained_projection
-   USE input_section_types,             ONLY: section_vals_release,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE bibliography, ONLY: Guidon2010, &
+                           cite_reference
+   USE cp_control_types, ONLY: admm_control_type
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE input_constants, ONLY: do_admm_blocked_projection, &
+                              do_admm_blocking_purify_full, &
+                              do_admm_charge_constrained_projection
+   USE input_section_types, ONLY: section_vals_release, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -155,12 +155,12 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: natoms
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'admm_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iatom, iblock, ispin, j, jatom, &
                                                             nao_aux_fit, nao_orb, nmo, nspins
       TYPE(cp_fm_struct_type), POINTER :: fm_struct_aux_aux, fm_struct_aux_nmo, fm_struct_aux_orb, &
-         fm_struct_nmo_nmo, fm_struct_orb_aux, fm_struct_orb_nmo, fm_struct_orb_orb
+                                          fm_struct_nmo_nmo, fm_struct_orb_aux, fm_struct_orb_nmo, fm_struct_orb_orb
       TYPE(cp_fm_type), POINTER                          :: mo_coeff
 
       CALL cite_reference(Guidon2010)
@@ -336,7 +336,7 @@ CONTAINS
       TYPE(admm_type), POINTER                           :: admm_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'admm_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
 

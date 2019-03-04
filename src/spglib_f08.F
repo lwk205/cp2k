@@ -11,9 +11,9 @@
 #ifdef __SPGLIB
    MODULE spglib_f08
 
-   USE iso_c_binding,                   ONLY: c_char,&
-                                              c_double,&
-                                              c_int
+      USE iso_c_binding, ONLY: c_char, &
+                               c_double, &
+                               c_int
 
       IMPLICIT NONE
 
@@ -142,13 +142,13 @@
 ! **************************************************************************************************
       FUNCTION spg_get_symmetry(rotation, translation, max_size, lattice, &
                                 position, types, num_atom, symprec)
-      INTEGER, INTENT(inout)                             :: rotation(:, :, :)
-      REAL(KIND=dp), INTENT(inout)                       :: translation(:, :)
-      INTEGER, INTENT(in)                                :: max_size
-      REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
-      INTEGER, INTENT(in)                                :: types(:), num_atom
-      REAL(KIND=dp), INTENT(in)                          :: symprec
-      INTEGER                                            :: spg_get_symmetry
+         INTEGER, INTENT(inout)                             :: rotation(:, :, :)
+         REAL(KIND=dp), INTENT(inout)                       :: translation(:, :)
+         INTEGER, INTENT(in)                                :: max_size
+         REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
+         INTEGER, INTENT(in)                                :: types(:), num_atom
+         REAL(KIND=dp), INTENT(in)                          :: symprec
+         INTEGER                                            :: spg_get_symmetry
 
          MARK_USED(rotation)
          MARK_USED(translation)
@@ -172,10 +172,10 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_multiplicity(lattice, position, types, num_atom, symprec)
-      REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
-      INTEGER, INTENT(in)                                :: types(:), num_atom
-      REAL(KIND=dp), INTENT(in)                          :: symprec
-      INTEGER                                            :: spg_get_multiplicity
+         REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
+         INTEGER, INTENT(in)                                :: types(:), num_atom
+         REAL(KIND=dp), INTENT(in)                          :: symprec
+         INTEGER                                            :: spg_get_multiplicity
 
          MARK_USED(lattice)
          MARK_USED(position)
@@ -197,11 +197,11 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_international(symbol, lattice, position, types, num_atom, symprec)
-      CHARACTER, INTENT(out)                             :: symbol(11)
-      REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
-      INTEGER, INTENT(in)                                :: types(:), num_atom
-      REAL(KIND=dp), INTENT(in)                          :: symprec
-      INTEGER                                            :: spg_get_international
+         CHARACTER, INTENT(out)                             :: symbol(11)
+         REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
+         INTEGER, INTENT(in)                                :: types(:), num_atom
+         REAL(KIND=dp), INTENT(in)                          :: symprec
+         INTEGER                                            :: spg_get_international
 
 ! the number corresponding to 'symbol'. 0 on failure
          MARK_USED(lattice)
@@ -225,11 +225,11 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_schoenflies(symbol, lattice, position, types, num_atom, symprec)
-      CHARACTER, INTENT(out)                             :: symbol(7)
-      REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
-      INTEGER, INTENT(in)                                :: types(:), num_atom
-      REAL(KIND=dp), INTENT(in)                          :: symprec
-      INTEGER                                            :: spg_get_schoenflies
+         CHARACTER, INTENT(out)                             :: symbol(7)
+         REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
+         INTEGER, INTENT(in)                                :: types(:), num_atom
+         REAL(KIND=dp), INTENT(in)                          :: symprec
+         INTEGER                                            :: spg_get_schoenflies
 
 ! the number corresponding to 'symbol'. 0 on failure
          MARK_USED(lattice)
@@ -251,10 +251,10 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_pointgroup(symbol, trans_mat, rotations, num_rotations)
-      CHARACTER                                          :: symbol(6)
-      INTEGER, INTENT(inout)                             :: trans_mat(:, :)
-      INTEGER, INTENT(in)                                :: rotations(:, :, :), num_rotations
-      INTEGER                                            :: spg_get_pointgroup
+         CHARACTER                                          :: symbol(6)
+         INTEGER, INTENT(inout)                             :: trans_mat(:, :)
+         INTEGER, INTENT(in)                                :: rotations(:, :, :), num_rotations
+         INTEGER                                            :: spg_get_pointgroup
 
          MARK_USED(trans_mat)
          MARK_USED(rotations)
@@ -280,12 +280,12 @@
 ! **************************************************************************************************
       FUNCTION spg_get_ir_reciprocal_mesh(grid_point, map, mesh, &
                                           is_shift, is_time_reversal, lattice, position, types, num_atom, symprec)
-      INTEGER, INTENT(out)                               :: grid_point(:, :), map(:)
-      INTEGER, INTENT(in)                                :: mesh(:), is_shift(:), is_time_reversal
-      REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
-      INTEGER, INTENT(in)                                :: types(:), num_atom
-      REAL(KIND=dp), INTENT(in)                          :: symprec
-      INTEGER                                            :: spg_get_ir_reciprocal_mesh
+         INTEGER, INTENT(out)                               :: grid_point(:, :), map(:)
+         INTEGER, INTENT(in)                                :: mesh(:), is_shift(:), is_time_reversal
+         REAL(KIND=dp), INTENT(in)                          :: lattice(:, :), position(:, :)
+         INTEGER, INTENT(in)                                :: types(:), num_atom
+         REAL(KIND=dp), INTENT(in)                          :: symprec
+         INTEGER                                            :: spg_get_ir_reciprocal_mesh
 
 ! size is product(mesh)
 
@@ -309,7 +309,7 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_major_version()
-      INTEGER                                            :: spg_get_major_version
+         INTEGER                                            :: spg_get_major_version
 
          spg_get_major_version = 0
       END FUNCTION spg_get_major_version
@@ -319,7 +319,7 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_minor_version()
-      INTEGER                                            :: spg_get_minor_version
+         INTEGER                                            :: spg_get_minor_version
 
          spg_get_minor_version = 0
       END FUNCTION spg_get_minor_version
@@ -329,7 +329,7 @@
 !> \return ...
 ! **************************************************************************************************
       FUNCTION spg_get_micro_version()
-      INTEGER                                            :: spg_get_micro_version
+         INTEGER                                            :: spg_get_micro_version
 
          spg_get_micro_version = 0
       END FUNCTION spg_get_micro_version

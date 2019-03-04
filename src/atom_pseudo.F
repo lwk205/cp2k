@@ -5,42 +5,42 @@
 
 ! **************************************************************************************************
 MODULE atom_pseudo
-   USE atom_electronic_structure,       ONLY: calculate_atom
-   USE atom_fit,                        ONLY: atom_fit_pseudo
-   USE atom_operators,                  ONLY: atom_int_release,&
-                                              atom_int_setup,&
-                                              atom_ppint_release,&
-                                              atom_ppint_setup,&
-                                              atom_relint_release,&
-                                              atom_relint_setup
-   USE atom_output,                     ONLY: atom_print_basis,&
-                                              atom_print_info,&
-                                              atom_print_method,&
-                                              atom_print_potential
-   USE atom_types,                      ONLY: &
-        atom_basis_type, atom_integrals, atom_optimization_type, atom_orbitals, atom_p_type, &
-        atom_potential_type, atom_state, create_atom_orbs, create_atom_type, init_atom_basis, &
-        init_atom_potential, lmat, read_atom_opt_section, release_atom_basis, &
-        release_atom_potential, release_atom_type, set_atom
-   USE atom_utils,                      ONLY: atom_consistent_method,&
-                                              atom_set_occupation,&
-                                              get_maxl_occ,&
-                                              get_maxn_occ
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_constants,                 ONLY: do_analytic,&
-                                              poly_conf
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE periodic_table,                  ONLY: nelem,&
-                                              ptable
-   USE physcon,                         ONLY: bohr
+   USE atom_electronic_structure, ONLY: calculate_atom
+   USE atom_fit, ONLY: atom_fit_pseudo
+   USE atom_operators, ONLY: atom_int_release, &
+                             atom_int_setup, &
+                             atom_ppint_release, &
+                             atom_ppint_setup, &
+                             atom_relint_release, &
+                             atom_relint_setup
+   USE atom_output, ONLY: atom_print_basis, &
+                          atom_print_info, &
+                          atom_print_method, &
+                          atom_print_potential
+   USE atom_types, ONLY: &
+      atom_basis_type, atom_integrals, atom_optimization_type, atom_orbitals, atom_p_type, &
+      atom_potential_type, atom_state, create_atom_orbs, create_atom_type, init_atom_basis, &
+      init_atom_potential, lmat, read_atom_opt_section, release_atom_basis, &
+      release_atom_potential, release_atom_type, set_atom
+   USE atom_utils, ONLY: atom_consistent_method, &
+                         atom_set_occupation, &
+                         get_maxl_occ, &
+                         get_maxn_occ
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_constants, ONLY: do_analytic, &
+                              poly_conf
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE periodic_table, ONLY: nelem, &
+                             ptable
+   USE physcon, ONLY: bohr
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -63,7 +63,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: atom_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_pseudo_opt', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: elem
       CHARACTER(LEN=default_string_length), &
@@ -158,7 +158,7 @@ CONTAINS
       maxn = 0
       CALL section_vals_val_get(atom_section, "CALCULATE_STATES", i_vals=cn)
       DO in = 1, MIN(SIZE(cn), 4)
-         maxn(in-1) = cn(in)
+         maxn(in - 1) = cn(in)
       END DO
       DO in = 0, lmat
          maxn(in) = MIN(maxn(in), ae_basis%nbas(in))
@@ -223,7 +223,7 @@ CONTAINS
             DO k = 0, state%maxl_calc
                ads = 2
                IF (state%maxn_occ(k) == 0) ads = 1
-               state%maxn_calc(k) = MAX(maxn(k), state%maxn_occ(k)+ads)
+               state%maxn_calc(k) = MAX(maxn(k), state%maxn_occ(k) + ads)
                state%maxn_calc(k) = MIN(state%maxn_calc(k), ae_basis%nbas(k))
             END DO
             state%core = 0._dp
@@ -234,7 +234,7 @@ CONTAINS
                state%occa = 0._dp
                state%occb = 0._dp
                DO l = 0, lmat
-                  nm = REAL((2*l+1), KIND=dp)
+                  nm = REAL((2*l + 1), KIND=dp)
                   DO k = 1, 10
                      ne = state%occupation(l, k)
                      IF (ne == 0._dp) THEN !empty shell
@@ -244,10 +244,10 @@ CONTAINS
                         state%occb(l, k) = nm
                      ELSEIF (state%multiplicity == -2) THEN !High spin case
                         state%occa(l, k) = MIN(ne, nm)
-                        state%occb(l, k) = MAX(0._dp, ne-nm)
+                        state%occb(l, k) = MAX(0._dp, ne - nm)
                      ELSE
-                        state%occa(l, k) = 0.5_dp*(ne+state%multiplicity-1._dp)
-                        state%occb(l, k) = ne-state%occa(l, k)
+                        state%occa(l, k) = 0.5_dp*(ne + state%multiplicity - 1._dp)
+                        state%occb(l, k) = ne - state%occa(l, k)
                      END IF
                   END DO
                END DO
@@ -256,20 +256,20 @@ CONTAINS
             ! set occupations for pseudopotential calculation
             CALL section_vals_val_get(atom_section, "CORE", c_vals=tmpstringlist)
             CALL atom_set_occupation(tmpstringlist, statepp%core, pocc)
-            zcore = zval-NINT(SUM(statepp%core))
+            zcore = zval - NINT(SUM(statepp%core))
             CALL set_atom(atom_info(in, im)%atom, zcore=zcore, pp_calc=.TRUE.)
 
-            statepp%occ = state%occ-statepp%core
+            statepp%occ = state%occ - statepp%core
             statepp%occupation = 0._dp
             DO l = 0, lmat
                k = 0
                DO i = 1, 10
                   IF (statepp%occ(l, i) /= 0._dp) THEN
-                     k = k+1
+                     k = k + 1
                      statepp%occupation(l, k) = state%occ(l, i)
                      IF (state%multiplicity /= -1) THEN
-                        statepp%occa(l, k) = state%occa(l, i)-statepp%core(l, i)/2
-                        statepp%occb(l, k) = state%occb(l, i)-statepp%core(l, i)/2
+                        statepp%occa(l, k) = state%occa(l, i) - statepp%core(l, i)/2
+                        statepp%occb(l, k) = state%occb(l, i) - statepp%core(l, i)/2
                      END IF
                   END IF
                END DO
@@ -281,7 +281,7 @@ CONTAINS
             statepp%maxn_calc = 0
             maxn = get_maxn_occ(statepp%core)
             DO k = 0, statepp%maxl_calc
-               statepp%maxn_calc(k) = state%maxn_calc(k)-maxn(k)
+               statepp%maxn_calc(k) = state%maxn_calc(k) - maxn(k)
                statepp%maxn_calc(k) = MIN(statepp%maxn_calc(k), pp_basis%nbas(k))
             END DO
             statepp%multiplicity = state%multiplicity

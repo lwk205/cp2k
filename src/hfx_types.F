@@ -10,60 +10,60 @@
 !> \author Manuel Guidon
 ! **************************************************************************************************
 MODULE hfx_types
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE bibliography,                    ONLY: cite_reference,&
-                                              guidon2008,&
-                                              guidon2009
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell,&
-                                              plane_distance,&
-                                              scaled_to_real
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              file_exists,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE hfx_helpers,                     ONLY: count_cells_perd,&
-                                              next_image_cell_perd
-   USE hfx_libint_wrapper,              ONLY: initialize_libderiv,&
-                                              initialize_libint,&
-                                              terminate_libderiv,&
-                                              terminate_libint
-   USE hfx_libint_wrapper_types,        ONLY: lib_deriv,&
-                                              lib_int,&
-                                              prim_data_f_size
-   USE input_constants,                 ONLY: &
-        do_hfx_auto_shells, do_hfx_potential_coulomb, do_hfx_potential_gaussian, &
-        do_hfx_potential_id, do_hfx_potential_long, do_hfx_potential_mix_cl, &
-        do_hfx_potential_mix_cl_trunc, do_hfx_potential_mix_lg, do_hfx_potential_short, &
-        do_hfx_potential_truncated, hfx_do_eval_energy, hfx_do_eval_forces
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp,&
-                                              int_8
-   USE machine,                         ONLY: m_chdir,&
-                                              m_getcwd
-   USE mathconstants,                   ONLY: pi
-   USE orbital_pointers,                ONLY: nco,&
-                                              ncoset,&
-                                              nso
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE string_utilities,                ONLY: compress
-   USE t_c_g0,                          ONLY: free_C0
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE bibliography, ONLY: cite_reference, &
+                           guidon2008, &
+                           guidon2009
+   USE cell_types, ONLY: cell_type, &
+                         get_cell, &
+                         plane_distance, &
+                         scaled_to_real
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       file_exists, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE hfx_helpers, ONLY: count_cells_perd, &
+                          next_image_cell_perd
+   USE hfx_libint_wrapper, ONLY: initialize_libderiv, &
+                                 initialize_libint, &
+                                 terminate_libderiv, &
+                                 terminate_libint
+   USE hfx_libint_wrapper_types, ONLY: lib_deriv, &
+                                       lib_int, &
+                                       prim_data_f_size
+   USE input_constants, ONLY: &
+      do_hfx_auto_shells, do_hfx_potential_coulomb, do_hfx_potential_gaussian, &
+      do_hfx_potential_id, do_hfx_potential_long, do_hfx_potential_mix_cl, &
+      do_hfx_potential_mix_cl_trunc, do_hfx_potential_mix_lg, do_hfx_potential_short, &
+      do_hfx_potential_truncated, hfx_do_eval_energy, hfx_do_eval_forces
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp, &
+                    int_8
+   USE machine, ONLY: m_chdir, &
+                      m_getcwd
+   USE mathconstants, ONLY: pi
+   USE orbital_pointers, ONLY: nco, &
+                               ncoset, &
+                               nso
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE string_utilities, ONLY: compress
+   USE t_c_g0, ONLY: free_C0
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num, omp_get_num_threads
 
@@ -479,7 +479,7 @@ CONTAINS
       CHARACTER(LEN=512)                                 :: error_msg
       CHARACTER(LEN=default_path_length)                 :: char_val
       INTEGER :: handle, i, i_thread, iatom, ikind, int_val, irep, jkind, max_set, n_rep_hf, &
-         n_threads, natom_a, natom_b, nkind, nseta, nsetb, pbc_shells, storage_id
+                 n_threads, natom_a, natom_b, nkind, nseta, nsetb, pbc_shells, storage_id
       INTEGER, DIMENSION(:), POINTER                     :: atom2kind, kind_of
       LOGICAL                                            :: logic_val, my_do_exx
       REAL(dp)                                           :: real_val
@@ -727,7 +727,7 @@ CONTAINS
                ALLOCATE (actual_x_data%is_assoc_atomic_block(natom, natom))
                ALLOCATE (actual_x_data%atomic_block_offset(natom, natom))
                ALLOCATE (actual_x_data%set_offset(max_set, max_set, nkind, nkind))
-               ALLOCATE (actual_x_data%block_offset(para_env%num_pe+1))
+               ALLOCATE (actual_x_data%block_offset(para_env%num_pe + 1))
             END IF
 
             ALLOCATE (actual_x_data%distribution_forces(1))
@@ -744,7 +744,7 @@ CONTAINS
                !! ** This guy is allocated on the master thread only
                IF (i_thread == 1) THEN
                   ALLOCATE (actual_x_data%pmax_atom(natom, natom))
-                  ALLOCATE (actual_x_data%initial_p(nkind*(nkind+1)/2))
+                  ALLOCATE (actual_x_data%initial_p(nkind*(nkind + 1)/2))
                   i = 1
                   DO ikind = 1, nkind
                      CALL get_atomic_kind(atomic_kind_set(ikind), natom=natom_a)
@@ -754,14 +754,14 @@ CONTAINS
                         nsetb = actual_x_data%basis_parameter(jkind)%nset
                         ALLOCATE (actual_x_data%initial_p(i)%p_kind(nseta, nsetb, natom_a, natom_b))
                         actual_x_data%memory_parameter%size_p_screen = &
-                           actual_x_data%memory_parameter%size_p_screen+nseta*nsetb*natom_a*natom_b
-                        i = i+1
+                           actual_x_data%memory_parameter%size_p_screen + nseta*nsetb*natom_a*natom_b
+                        i = i + 1
                      END DO
                   END DO
                   IF (actual_x_data%memory_parameter%treat_forces_in_core) THEN
                      ALLOCATE (actual_x_data%pmax_atom_forces(natom, natom))
 
-                     ALLOCATE (actual_x_data%initial_p_forces(nkind*(nkind+1)/2))
+                     ALLOCATE (actual_x_data%initial_p_forces(nkind*(nkind + 1)/2))
                      i = 1
                      DO ikind = 1, nkind
                         CALL get_atomic_kind(atomic_kind_set(ikind), natom=natom_a)
@@ -771,8 +771,8 @@ CONTAINS
                            nsetb = actual_x_data%basis_parameter(jkind)%nset
                            ALLOCATE (actual_x_data%initial_p_forces(i)%p_kind(nseta, nsetb, natom_a, natom_b))
                            actual_x_data%memory_parameter%size_p_screen = &
-                              actual_x_data%memory_parameter%size_p_screen+nseta*nsetb*natom_a*natom_b
-                           i = i+1
+                              actual_x_data%memory_parameter%size_p_screen + nseta*nsetb*natom_a*natom_b
+                           i = i + 1
                         END DO
                      END DO
                   END IF
@@ -785,7 +785,7 @@ CONTAINS
                atom2kind = 0
                DO iatom = 1, natom
                   ikind = kind_of(iatom)
-                  atom2kind(ikind) = atom2kind(ikind)+1
+                  atom2kind(ikind) = atom2kind(ikind) + 1
                   actual_x_data%map_atom_to_kind_atom(iatom) = atom2kind(ikind)
                END DO
                DEALLOCATE (kind_of, atom2kind)
@@ -875,7 +875,7 @@ CONTAINS
 
       DO iter = 1, iterMAX
          delta_r = f0/fprime0
-         r0 = r0-delta_r
+         r0 = r0 - delta_r
          CALL eval_transc_func(r0, eps, omg, f0, fprime0)
          IF (ABS(delta_r) .LT. abstol .OR. ABS(f0) .LT. soltol) EXIT
       END DO
@@ -893,11 +893,11 @@ CONTAINS
 !> \param df ...
 ! **************************************************************************************************
       SUBROUTINE eval_transc_func(r, eps, omega, fn, df)
-      REAL(dp), INTENT(in)                               :: r, eps, omega
-      REAL(dp), INTENT(out)                              :: fn, df
+         REAL(dp), INTENT(in)                               :: r, eps, omega
+         REAL(dp), INTENT(out)                              :: fn, df
 
-         fn = erfc(omega*r)-r*eps
-         df = -omega*2*EXP(-omega**2*r**2)/SQRT(pi)-eps
+         fn = erfc(omega*r) - r*eps
+         df = -omega*2*EXP(-omega**2*r**2)/SQRT(pi) - eps
       END SUBROUTINE eval_transc_func
    END SUBROUTINE erfc_cutoff
 ! **************************************************************************************************
@@ -976,7 +976,7 @@ CONTAINS
             DO i = 0, basis_info%max_am
                nl_count = 0
                DO j = 1, nshell(iset)
-                  IF (basis_parameter(ikind)%nl(j, iset) == i) nl_count = nl_count+1
+                  IF (basis_parameter(ikind)%nl(j, iset) == i) nl_count = nl_count + 1
                END DO
                basis_parameter(ikind)%nsgfl(i, iset) = nl_count
             END DO
@@ -1018,20 +1018,20 @@ CONTAINS
          DO iset = 1, nseta
             sgfa = first_sgfa(1, iset)
             DO ipgf = 1, npgfa(iset)
-               offset_a1 = (ipgf-1)*ncoset(la_max(iset))
+               offset_a1 = (ipgf - 1)*ncoset(la_max(iset))
                s_offset_nl_a = 0
                DO la = la_min(iset), la_max(iset)
-                  offset_a = offset_a1+ncoset(la-1)
+                  offset_a = offset_a1 + ncoset(la - 1)
                   co_counter = 0
-                  co_counter = co_counter+1
+                  co_counter = co_counter + 1
                   so_counter = 0
-                  DO k = sgfa+s_offset_nl_a, sgfa+s_offset_nl_a+nso(la)*nl_a(la, iset)-1
-                     DO i = offset_a+1, offset_a+nco(la)
-                        so_counter = so_counter+1
+                  DO k = sgfa + s_offset_nl_a, sgfa + s_offset_nl_a + nso(la)*nl_a(la, iset) - 1
+                     DO i = offset_a + 1, offset_a + nco(la)
+                        so_counter = so_counter + 1
                         basis_parameter(ikind)%sphi_ext(so_counter, la, ipgf, iset) = sphi_a(i, k)
                      END DO
                   END DO
-                  s_offset_nl_a = s_offset_nl_a+nso(la)*(nl_a(la, iset))
+                  s_offset_nl_a = s_offset_nl_a + nso(la)*(nl_a(la, iset))
                END DO
             END DO
          END DO
@@ -1049,7 +1049,7 @@ CONTAINS
       TYPE(hfx_basis_type), DIMENSION(:), POINTER        :: basis_parameter
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'hfx_release_basis_types', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -1088,7 +1088,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: skip_disk, skip_in_core_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parse_memory_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=512)                                 :: error_msg
       CHARACTER(LEN=default_path_length)                 :: char_val, filename, orig_wd
@@ -1162,7 +1162,7 @@ CONTAINS
          memory_parameter%do_disk_storage = .FALSE.
       END IF
       IF (PRESENT(storage_id)) THEN
-         storage_id = (irep-1)*para_env%num_pe*n_threads+para_env%mepos*n_threads+i_thread-1
+         storage_id = (irep - 1)*para_env%num_pe*n_threads + para_env%mepos*n_threads + i_thread - 1
       END IF
    END SUBROUTINE parse_memory_section
 
@@ -1309,16 +1309,16 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: i_thread
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'hfx_create_neighbor_cells', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=512)                                 :: error_msg
       CHARACTER(LEN=64)                                  :: char_nshells
       INTEGER :: i, idx, ikind, ipgf, iset, ishell, j, jkind, jpgf, jset, jshell, k, kshell, l, &
-         m(3), max_shell, nseta, nsetb, total_number_of_cells, ub, ub_max
+                 m(3), max_shell, nseta, nsetb, total_number_of_cells, ub, ub_max
       INTEGER, DIMENSION(:), POINTER                     :: la_max, lb_max, npgfa, npgfb
       LOGICAL                                            :: image_cell_found, nothing_more_to_add
       REAL(dp) :: cross_product(3), dist_min, distance(14), l_min, normal(3, 6), P(3, 14), &
-         plane_vector(3, 2), point_in_plane(3), r(3), R1, R_max, R_max_stress, s(3), x, y, z, Zeta1
+                  plane_vector(3, 2), point_in_plane(3), r(3), R1, R_max, R_max_stress, s(3), x, y, z, Zeta1
       REAL(dp), DIMENSION(:, :), POINTER                 :: zeta, zetb
       TYPE(hfx_cell_type), ALLOCATABLE, DIMENSION(:)     :: tmp_neighbor_cells
 
@@ -1366,8 +1366,8 @@ CONTAINS
                   DO jset = 1, nsetb
                      DO ipgf = 1, npgfa(iset)
                         DO jpgf = 1, npgfb(jset)
-                           Zeta1 = zeta(ipgf, iset)+zetb(jpgf, jset)
-                           R1 = 1.0_dp/SQRT(Zeta1)*mul_fact(la_max(iset)+lb_max(jset))* &
+                           Zeta1 = zeta(ipgf, iset) + zetb(jpgf, jset)
+                           R1 = 1.0_dp/SQRT(Zeta1)*mul_fact(la_max(iset) + lb_max(jset))* &
                                 SQRT(-LOG(x_data%screening_parameter%eps_schwarz))
                            R_max = MAX(R1, R_max)
                         END DO
@@ -1377,7 +1377,7 @@ CONTAINS
             END DO
          END DO
 
-         R_max = 2.0_dp*R_max+x_data%potential_parameter%cutoff_radius
+         R_max = 2.0_dp*R_max + x_data%potential_parameter%cutoff_radius
          nothing_more_to_add = .FALSE.
          max_shell = 0
          total_number_of_cells = 0
@@ -1426,13 +1426,13 @@ CONTAINS
             ! Calculate distances to the eight points P1 to P8
             image_cell_found = .FALSE.
             ALLOCATE (tmp_neighbor_cells(1:ub))
-            DO i = 1, ub-1
+            DO i = 1, ub - 1
                tmp_neighbor_cells(i) = x_data%neighbor_cells(i)
             END DO
-            ub_max = (2*max_shell+1)**3
+            ub_max = (2*max_shell + 1)**3
             DEALLOCATE (x_data%neighbor_cells)
             ALLOCATE (x_data%neighbor_cells(1:ub_max))
-            DO i = 1, ub-1
+            DO i = 1, ub - 1
                x_data%neighbor_cells(i) = tmp_neighbor_cells(i)
             END DO
             DO i = ub, ub_max
@@ -1448,15 +1448,15 @@ CONTAINS
                IF (MAX(ABS(ishell), ABS(jshell), ABS(kshell)) /= max_shell) CYCLE
                idx = 0
                DO j = 0, 1
-                  x = -1.0_dp/2.0_dp+j*1.0_dp
+                  x = -1.0_dp/2.0_dp + j*1.0_dp
                   DO k = 0, 1
-                     y = -1.0_dp/2.0_dp+k*1.0_dp
+                     y = -1.0_dp/2.0_dp + k*1.0_dp
                      DO l = 0, 1
-                        z = -1.0_dp/2.0_dp+l*1.0_dp
-                        idx = idx+1
-                        P(1, idx) = x+ishell
-                        P(2, idx) = y+jshell
-                        P(3, idx) = z+kshell
+                        z = -1.0_dp/2.0_dp + l*1.0_dp
+                        idx = idx + 1
+                        P(1, idx) = x + ishell
+                        P(2, idx) = y + jshell
+                        P(3, idx) = z + kshell
                         CALL scaled_to_real(r, P(:, idx), cell)
                         distance(idx) = SQRT(SUM(r**2))
                         P(1:3, idx) = r
@@ -1466,97 +1466,97 @@ CONTAINS
                ! Now check distance to Faces and only take them into account if the base point lies within quadrilateral
 
                ! Face A (1342) 1 is the reference
-               idx = idx+1
-               plane_vector(:, 1) = P(:, 3)-P(:, 1)
-               plane_vector(:, 2) = P(:, 2)-P(:, 1)
-               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2)-plane_vector(3, 1)*plane_vector(2, 2)
-               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2)-plane_vector(1, 1)*plane_vector(3, 2)
-               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2)-plane_vector(2, 1)*plane_vector(1, 2)
+               idx = idx + 1
+               plane_vector(:, 1) = P(:, 3) - P(:, 1)
+               plane_vector(:, 2) = P(:, 2) - P(:, 1)
+               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2) - plane_vector(3, 1)*plane_vector(2, 2)
+               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2) - plane_vector(1, 1)*plane_vector(3, 2)
+               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2) - plane_vector(2, 1)*plane_vector(1, 2)
                normal(:, 1) = cross_product/SQRT(SUM(cross_product**2))
-               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 1)+normal(2, 1)*P(2, 1)+normal(3, 1)*P(3, 1))
+               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 1) + normal(2, 1)*P(2, 1) + normal(3, 1)*P(3, 1))
 
                IF (point_is_in_quadrilateral(P(:, 1), P(:, 3), P(:, 4), P(:, 2), point_in_plane)) THEN
-                  distance(idx) = ABS(normal(1, 1)*P(1, 1)+normal(2, 1)*P(2, 1)+normal(3, 1)*P(3, 1))
+                  distance(idx) = ABS(normal(1, 1)*P(1, 1) + normal(2, 1)*P(2, 1) + normal(3, 1)*P(3, 1))
                ELSE
                   distance(idx) = HUGE(distance(idx))
                END IF
 
                ! Face B (1562) 1 is the reference
-               idx = idx+1
-               plane_vector(:, 1) = P(:, 2)-P(:, 1)
-               plane_vector(:, 2) = P(:, 5)-P(:, 1)
-               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2)-plane_vector(3, 1)*plane_vector(2, 2)
-               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2)-plane_vector(1, 1)*plane_vector(3, 2)
-               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2)-plane_vector(2, 1)*plane_vector(1, 2)
+               idx = idx + 1
+               plane_vector(:, 1) = P(:, 2) - P(:, 1)
+               plane_vector(:, 2) = P(:, 5) - P(:, 1)
+               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2) - plane_vector(3, 1)*plane_vector(2, 2)
+               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2) - plane_vector(1, 1)*plane_vector(3, 2)
+               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2) - plane_vector(2, 1)*plane_vector(1, 2)
                normal(:, 1) = cross_product/SQRT(SUM(cross_product**2))
-               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 1)+normal(2, 1)*P(2, 1)+normal(3, 1)*P(3, 1))
+               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 1) + normal(2, 1)*P(2, 1) + normal(3, 1)*P(3, 1))
 
                IF (point_is_in_quadrilateral(P(:, 1), P(:, 5), P(:, 6), P(:, 2), point_in_plane)) THEN
-                  distance(idx) = ABS(normal(1, 1)*P(1, 1)+normal(2, 1)*P(2, 1)+normal(3, 1)*P(3, 1))
+                  distance(idx) = ABS(normal(1, 1)*P(1, 1) + normal(2, 1)*P(2, 1) + normal(3, 1)*P(3, 1))
                ELSE
                   distance(idx) = HUGE(distance(idx))
                END IF
 
                ! Face C (5786) 5 is the reference
-               idx = idx+1
-               plane_vector(:, 1) = P(:, 7)-P(:, 5)
-               plane_vector(:, 2) = P(:, 6)-P(:, 5)
-               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2)-plane_vector(3, 1)*plane_vector(2, 2)
-               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2)-plane_vector(1, 1)*plane_vector(3, 2)
-               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2)-plane_vector(2, 1)*plane_vector(1, 2)
+               idx = idx + 1
+               plane_vector(:, 1) = P(:, 7) - P(:, 5)
+               plane_vector(:, 2) = P(:, 6) - P(:, 5)
+               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2) - plane_vector(3, 1)*plane_vector(2, 2)
+               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2) - plane_vector(1, 1)*plane_vector(3, 2)
+               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2) - plane_vector(2, 1)*plane_vector(1, 2)
                normal(:, 1) = cross_product/SQRT(SUM(cross_product**2))
-               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 5)+normal(2, 1)*P(2, 5)+normal(3, 1)*P(3, 5))
+               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 5) + normal(2, 1)*P(2, 5) + normal(3, 1)*P(3, 5))
 
                IF (point_is_in_quadrilateral(P(:, 5), P(:, 7), P(:, 8), P(:, 6), point_in_plane)) THEN
-                  distance(idx) = ABS(normal(1, 1)*P(1, 5)+normal(2, 1)*P(2, 5)+normal(3, 1)*P(3, 5))
+                  distance(idx) = ABS(normal(1, 1)*P(1, 5) + normal(2, 1)*P(2, 5) + normal(3, 1)*P(3, 5))
                ELSE
                   distance(idx) = HUGE(distance(idx))
                END IF
 
                ! Face D (3784) 3 is the reference
-               idx = idx+1
-               plane_vector(:, 1) = P(:, 7)-P(:, 3)
-               plane_vector(:, 2) = P(:, 4)-P(:, 3)
-               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2)-plane_vector(3, 1)*plane_vector(2, 2)
-               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2)-plane_vector(1, 1)*plane_vector(3, 2)
-               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2)-plane_vector(2, 1)*plane_vector(1, 2)
+               idx = idx + 1
+               plane_vector(:, 1) = P(:, 7) - P(:, 3)
+               plane_vector(:, 2) = P(:, 4) - P(:, 3)
+               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2) - plane_vector(3, 1)*plane_vector(2, 2)
+               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2) - plane_vector(1, 1)*plane_vector(3, 2)
+               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2) - plane_vector(2, 1)*plane_vector(1, 2)
                normal(:, 1) = cross_product/SQRT(SUM(cross_product**2))
-               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 3)+normal(2, 1)*P(2, 3)+normal(3, 1)*P(3, 3))
+               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 3) + normal(2, 1)*P(2, 3) + normal(3, 1)*P(3, 3))
 
                IF (point_is_in_quadrilateral(P(:, 3), P(:, 7), P(:, 8), P(:, 4), point_in_plane)) THEN
-                  distance(idx) = ABS(normal(1, 1)*P(1, 3)+normal(2, 1)*P(2, 3)+normal(3, 1)*P(3, 3))
+                  distance(idx) = ABS(normal(1, 1)*P(1, 3) + normal(2, 1)*P(2, 3) + normal(3, 1)*P(3, 3))
                ELSE
                   distance(idx) = HUGE(distance(idx))
                END IF
 
                ! Face E (2684) 2 is the reference
-               idx = idx+1
-               plane_vector(:, 1) = P(:, 6)-P(:, 2)
-               plane_vector(:, 2) = P(:, 4)-P(:, 2)
-               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2)-plane_vector(3, 1)*plane_vector(2, 2)
-               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2)-plane_vector(1, 1)*plane_vector(3, 2)
-               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2)-plane_vector(2, 1)*plane_vector(1, 2)
+               idx = idx + 1
+               plane_vector(:, 1) = P(:, 6) - P(:, 2)
+               plane_vector(:, 2) = P(:, 4) - P(:, 2)
+               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2) - plane_vector(3, 1)*plane_vector(2, 2)
+               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2) - plane_vector(1, 1)*plane_vector(3, 2)
+               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2) - plane_vector(2, 1)*plane_vector(1, 2)
                normal(:, 1) = cross_product/SQRT(SUM(cross_product**2))
-               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 2)+normal(2, 1)*P(2, 2)+normal(3, 1)*P(3, 2))
+               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 2) + normal(2, 1)*P(2, 2) + normal(3, 1)*P(3, 2))
 
                IF (point_is_in_quadrilateral(P(:, 2), P(:, 6), P(:, 8), P(:, 4), point_in_plane)) THEN
-                  distance(idx) = ABS(normal(1, 1)*P(1, 2)+normal(2, 1)*P(2, 2)+normal(3, 1)*P(3, 2))
+                  distance(idx) = ABS(normal(1, 1)*P(1, 2) + normal(2, 1)*P(2, 2) + normal(3, 1)*P(3, 2))
                ELSE
                   distance(idx) = HUGE(distance(idx))
                END IF
 
                ! Face F (1573) 1 is the reference
-               idx = idx+1
-               plane_vector(:, 1) = P(:, 5)-P(:, 1)
-               plane_vector(:, 2) = P(:, 3)-P(:, 1)
-               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2)-plane_vector(3, 1)*plane_vector(2, 2)
-               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2)-plane_vector(1, 1)*plane_vector(3, 2)
-               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2)-plane_vector(2, 1)*plane_vector(1, 2)
+               idx = idx + 1
+               plane_vector(:, 1) = P(:, 5) - P(:, 1)
+               plane_vector(:, 2) = P(:, 3) - P(:, 1)
+               cross_product(1) = plane_vector(2, 1)*plane_vector(3, 2) - plane_vector(3, 1)*plane_vector(2, 2)
+               cross_product(2) = plane_vector(3, 1)*plane_vector(1, 2) - plane_vector(1, 1)*plane_vector(3, 2)
+               cross_product(3) = plane_vector(1, 1)*plane_vector(2, 2) - plane_vector(2, 1)*plane_vector(1, 2)
                normal(:, 1) = cross_product/SQRT(SUM(cross_product**2))
-               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 1)+normal(2, 1)*P(2, 1)+normal(3, 1)*P(3, 1))
+               point_in_plane = -normal(:, 1)*(normal(1, 1)*P(1, 1) + normal(2, 1)*P(2, 1) + normal(3, 1)*P(3, 1))
 
                IF (point_is_in_quadrilateral(P(:, 1), P(:, 5), P(:, 7), P(:, 3), point_in_plane)) THEN
-                  distance(idx) = ABS(normal(1, 1)*P(1, 1)+normal(2, 1)*P(2, 1)+normal(3, 1)*P(3, 1))
+                  distance(idx) = ABS(normal(1, 1)*P(1, 1) + normal(2, 1)*P(2, 1) + normal(3, 1)*P(3, 1))
                ELSE
                   distance(idx) = HUGE(distance(idx))
                END IF
@@ -1566,9 +1566,9 @@ CONTAINS
                   image_cell_found = .TRUE.
                END IF
                IF (dist_min < R_max) THEN
-                  total_number_of_cells = total_number_of_cells+1
+                  total_number_of_cells = total_number_of_cells + 1
                   x_data%neighbor_cells(ub)%cell = REAL((/ishell, jshell, kshell/), dp)
-                  ub = ub+1
+                  ub = ub + 1
                   image_cell_found = .TRUE.
                END IF
 
@@ -1576,14 +1576,14 @@ CONTAINS
             END DO
             END DO
             IF (image_cell_found) THEN
-               max_shell = max_shell+1
+               max_shell = max_shell + 1
             ELSE
                nothing_more_to_add = .TRUE.
             END IF
          END DO
          ! now remove what is not needed
          ALLOCATE (tmp_neighbor_cells(total_number_of_cells))
-         DO i = 1, ub-1
+         DO i = 1, ub - 1
             tmp_neighbor_cells(i) = x_data%neighbor_cells(i)
          END DO
          DEALLOCATE (x_data%neighbor_cells)
@@ -1608,7 +1608,7 @@ CONTAINS
          ELSE
             total_number_of_cells = 0
             DO i = 0, x_data%periodic_parameter%number_of_shells
-               total_number_of_cells = total_number_of_cells+count_cells_perd(i, x_data%periodic_parameter%perd)
+               total_number_of_cells = total_number_of_cells + count_cells_perd(i, x_data%periodic_parameter%perd)
             END DO
             IF (total_number_of_cells < SIZE(x_data%neighbor_cells)) THEN
                IF (i_thread == 1) THEN
@@ -1623,7 +1623,7 @@ CONTAINS
             END IF
             total_number_of_cells = 0
             DO i = 0, x_data%periodic_parameter%number_of_shells
-               total_number_of_cells = total_number_of_cells+count_cells_perd(i, x_data%periodic_parameter%perd)
+               total_number_of_cells = total_number_of_cells + count_cells_perd(i, x_data%periodic_parameter%perd)
             END DO
             DEALLOCATE (x_data%neighbor_cells)
 
@@ -1633,14 +1633,14 @@ CONTAINS
             DO WHILE (SUM(m**2) <= x_data%periodic_parameter%number_of_shells)
                x_data%neighbor_cells(i)%cell = REAL(m, dp)
                CALL next_image_cell_perd(m, x_data%periodic_parameter%perd)
-               i = i+1
+               i = i + 1
             ENDDO
          END IF
       CASE DEFAULT
          total_number_of_cells = 0
          IF (pbc_shells == -1) pbc_shells = 0
          DO i = 0, pbc_shells
-            total_number_of_cells = total_number_of_cells+count_cells_perd(i, x_data%periodic_parameter%perd)
+            total_number_of_cells = total_number_of_cells + count_cells_perd(i, x_data%periodic_parameter%perd)
          END DO
          DEALLOCATE (x_data%neighbor_cells)
 
@@ -1651,7 +1651,7 @@ CONTAINS
          DO WHILE (SUM(m**2) <= pbc_shells)
             x_data%neighbor_cells(i)%cell = REAL(m, dp)
             CALL next_image_cell_perd(m, x_data%periodic_parameter%perd)
-            i = i+1
+            i = i + 1
          ENDDO
       END SELECT
 
@@ -1668,7 +1668,7 @@ CONTAINS
       DO i = 1, SIZE(x_data%neighbor_cells)
          R_max_stress = MAX(R_max_stress, MAXVAL(ABS(x_data%neighbor_cells(i)%cell_r(:))))
       END DO
-      R_max_stress = R_max_stress+ABS(MAXVAL(cell%hmat(:, :)))
+      R_max_stress = R_max_stress + ABS(MAXVAL(cell%hmat(:, :)))
       x_data%periodic_parameter%R_max_stress = R_max_stress
 
    END SUBROUTINE hfx_create_neighbor_cells
@@ -1706,9 +1706,9 @@ CONTAINS
 
       ! ** ABC
 
-      v0 = D-A
-      v1 = C-A
-      v2 = P-A
+      v0 = D - A
+      v1 = C - A
+      v2 = P - A
 
       ! ** Compute dot products
       dot00 = DOT_PRODUCT(v0, v0)
@@ -1718,17 +1718,17 @@ CONTAINS
       dot12 = DOT_PRODUCT(v1, v2)
 
       ! ** Compute barycentric coordinates
-      invDenom = 1/(dot00*dot11-dot01*dot01)
-      u = (dot11*dot02-dot01*dot12)*invDenom
-      v = (dot00*dot12-dot01*dot02)*invDenom
+      invDenom = 1/(dot00*dot11 - dot01*dot01)
+      u = (dot11*dot02 - dot01*dot12)*invDenom
+      v = (dot00*dot12 - dot01*dot02)*invDenom
       ! ** Check if point is in triangle
-      IF ((u >= 0-fuzzy) .AND. (v >= 0-fuzzy) .AND. (u+v <= 1+fuzzy)) THEN
+      IF ((u >= 0 - fuzzy) .AND. (v >= 0 - fuzzy) .AND. (u + v <= 1 + fuzzy)) THEN
          point_is_in_quadrilateral = .TRUE.
          RETURN
       END IF
-      v0 = C-A
-      v1 = B-A
-      v2 = P-A
+      v0 = C - A
+      v1 = B - A
+      v2 = P - A
 
       ! ** Compute dot products
       dot00 = DOT_PRODUCT(v0, v0)
@@ -1738,12 +1738,12 @@ CONTAINS
       dot12 = DOT_PRODUCT(v1, v2)
 
       ! ** Compute barycentric coordinates
-      invDenom = 1/(dot00*dot11-dot01*dot01)
-      u = (dot11*dot02-dot01*dot12)*invDenom
-      v = (dot00*dot12-dot01*dot02)*invDenom
+      invDenom = 1/(dot00*dot11 - dot01*dot01)
+      u = (dot11*dot02 - dot01*dot12)*invDenom
+      v = (dot00*dot12 - dot01*dot02)*invDenom
 
       ! ** Check if point is in triangle
-      IF ((u >= 0-fuzzy) .AND. (v >= 0-fuzzy) .AND. (u+v <= 1+fuzzy)) THEN
+      IF ((u >= 0 - fuzzy) .AND. (v >= 0 - fuzzy) .AND. (u + v <= 1 + fuzzy)) THEN
          point_is_in_quadrilateral = .TRUE.
          RETURN
       END IF
@@ -1766,7 +1766,7 @@ CONTAINS
       LOGICAL                                            :: do_disk_storage
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'hfx_init_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(hfx_container_node), POINTER                  :: current, next
 
@@ -1813,7 +1813,7 @@ CONTAINS
       TYPE(hfx_type), POINTER                            :: x_data
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'hfx_set_distr_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (x_data%distribution_energy)
 
@@ -1836,7 +1836,7 @@ CONTAINS
       TYPE(hfx_type), POINTER                            :: x_data
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'hfx_set_distr_forces', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (x_data%distribution_forces)
 
@@ -1863,7 +1863,7 @@ CONTAINS
       INTEGER(int_8)                                     :: max_memory
 
       max_memory = memory_parameter%max_memory
-      max_memory = max_memory-subtr_size_mb
+      max_memory = max_memory - subtr_size_mb
       IF (max_memory <= 0) THEN
          memory_parameter%do_all_on_the_fly = .TRUE.
          memory_parameter%max_compression_counter = 0
@@ -2000,7 +2000,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: eval_type
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dealloc_containers', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: bin, i
 
@@ -2059,7 +2059,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: bin_size, eval_type
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'alloc_containers', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: bin, i
 

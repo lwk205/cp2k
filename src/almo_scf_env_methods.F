@@ -11,23 +11,23 @@
 ! **************************************************************************************************
 MODULE almo_scf_env_methods
 
-   USE almo_scf_types,                  ONLY: almo_max_cutoff_multiplier,&
-                                              almo_scf_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE input_constants,                 ONLY: &
-        almo_constraint_distance, almo_deloc_none, almo_deloc_scf, almo_deloc_x, &
-        almo_deloc_x_then_scf, almo_deloc_xalmo_1diag, almo_domain_layout_atomic, &
-        almo_domain_layout_molecular, almo_frz_crystal, almo_mat_distr_molecular, &
-        almo_occ_vol_penalty_none, almo_scf_diag, almo_scf_pcg, almo_scf_skip, cg_hager_zhang, &
-        do_bondparm_vdw, molecular_guess, tensor_orthogonal, virt_full, virt_minimal, virt_number, &
-        xalmo_trial_r0_out
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
+   USE almo_scf_types, ONLY: almo_max_cutoff_multiplier, &
+                             almo_scf_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE input_constants, ONLY: &
+      almo_constraint_distance, almo_deloc_none, almo_deloc_scf, almo_deloc_x, &
+      almo_deloc_x_then_scf, almo_deloc_xalmo_1diag, almo_domain_layout_atomic, &
+      almo_domain_layout_molecular, almo_frz_crystal, almo_mat_distr_molecular, &
+      almo_occ_vol_penalty_none, almo_scf_diag, almo_scf_pcg, almo_scf_skip, cg_hager_zhang, &
+      do_bondparm_vdw, molecular_guess, tensor_orthogonal, virt_full, virt_minimal, virt_number, &
+      xalmo_trial_r0_out
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -51,7 +51,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nallocate
       TYPE(almo_scf_env_type), POINTER                   :: almo_scf_env
@@ -103,12 +103,12 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_init_read_write_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(section_vals_type), POINTER :: almo_analysis_section, almo_opt_diis_section, &
-         almo_opt_pcg_section, almo_scf_section, matrix_iterate_section, penalty_section, &
-         xalmo_opt_newton_pcg_section, xalmo_opt_pcg_section
+                                          almo_opt_pcg_section, almo_scf_section, matrix_iterate_section, penalty_section, &
+                                          xalmo_opt_newton_pcg_section, xalmo_opt_pcg_section
 
       CALL timeset(routineN, handle)
 

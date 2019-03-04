@@ -10,21 +10,21 @@
 !> \author Nico Holmberg [03.2017]
 ! **************************************************************************************************
 MODULE qs_cdft_types
-   USE cp_array_utils,                  ONLY: cp_1d_r_p_type
-   USE cp_fm_types,                     ONLY: cp_fm_p_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE hirshfeld_types,                 ONLY: hirshfeld_type,&
-                                              release_hirshfeld_type
-   USE input_constants,                 ONLY: becke_cutoff_global,&
-                                              outer_scf_none,&
-                                              radius_single,&
-                                              shape_function_gaussian
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE outer_scf_control_types,         ONLY: outer_scf_control_type,&
-                                              qs_outer_scf_type
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_cdft_opt_types,               ONLY: cdft_opt_type_release
+   USE cp_array_utils, ONLY: cp_1d_r_p_type
+   USE cp_fm_types, ONLY: cp_fm_p_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE hirshfeld_types, ONLY: hirshfeld_type, &
+                              release_hirshfeld_type
+   USE input_constants, ONLY: becke_cutoff_global, &
+                              outer_scf_none, &
+                              radius_single, &
+                              shape_function_gaussian
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE outer_scf_control_types, ONLY: outer_scf_control_type, &
+                                      qs_outer_scf_type
+   USE pw_types, ONLY: pw_p_type
+   USE qs_cdft_opt_types, ONLY: cdft_opt_type_release
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -263,7 +263,7 @@ CONTAINS
       TYPE(becke_constraint_type), POINTER               :: becke_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'becke_control_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(becke_control))
       ALLOCATE (becke_control)
@@ -301,7 +301,7 @@ CONTAINS
       TYPE(becke_constraint_type), POINTER               :: becke_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'becke_control_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(becke_control))
       IF (becke_control%vector_buffer%store_vectors) THEN
@@ -344,7 +344,7 @@ CONTAINS
       TYPE(cdft_control_type), POINTER                   :: cdft_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cdft_control_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(cdft_control))
       ALLOCATE (cdft_control)
@@ -427,13 +427,13 @@ CONTAINS
       TYPE(cdft_control_type), POINTER                   :: cdft_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cdft_control_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
       CPASSERT(ASSOCIATED(cdft_control))
       CPASSERT(cdft_control%ref_count > 0)
-      cdft_control%ref_count = cdft_control%ref_count-1
+      cdft_control%ref_count = cdft_control%ref_count - 1
       IF (cdft_control%ref_count == 0) THEN
          ! Constraint settings
          IF (ASSOCIATED(cdft_control%atoms)) &
@@ -512,10 +512,10 @@ CONTAINS
       TYPE(cdft_control_type), POINTER                   :: cdft_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cdft_control_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(cdft_control))
-      cdft_control%ref_count = cdft_control%ref_count+1
+      cdft_control%ref_count = cdft_control%ref_count + 1
    END SUBROUTINE cdft_control_retain
 
 ! **************************************************************************************************
@@ -528,7 +528,7 @@ CONTAINS
       TYPE(hirshfeld_constraint_type), POINTER           :: hirshfeld_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'hirshfeld_control_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(hirshfeld_control))
       ALLOCATE (hirshfeld_control)
@@ -552,7 +552,7 @@ CONTAINS
       TYPE(hirshfeld_constraint_type), POINTER           :: hirshfeld_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'hirshfeld_control_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(hirshfeld_control))
 

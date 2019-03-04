@@ -8,23 +8,23 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_potentials
-   USE ai_overlap,                      ONLY: overlap_aab
-   USE ao_util,                         ONLY: exp_radius
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: gamma1
-   USE mathlib,                         ONLY: multinomial
-   USE orbital_pointers,                ONLY: indco,&
-                                              ncoset,&
-                                              orbital_pointers_maxl => current_maxl
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
+   USE ai_overlap, ONLY: overlap_aab
+   USE ao_util, ONLY: exp_radius
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: gamma1
+   USE mathlib, ONLY: multinomial
+   USE orbital_pointers, ONLY: indco, &
+                               ncoset, &
+                               orbital_pointers_maxl => current_maxl
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -109,8 +109,8 @@ CONTAINS
       CHARACTER(len=*), PARAMETER                        :: routineN = 'pao_calc_gaussian'
 
       INTEGER :: handle, i, ic, iset, ishell, ishell_abs, jset, jshell, jshell_abs, la1_max, &
-         la1_min, la2_max, la2_min, lb_max, lb_min, N, na1, na2, nb, ncfga1, ncfga2, ncfgb, &
-         npgfa1, npgfa2, npgfb
+                 la1_min, la2_max, la2_min, lb_max, lb_min, N, na1, na2, nb, ncfga1, ncfga2, ncfgb, &
+                 npgfa1, npgfa2, npgfb
       REAL(dp)                                           :: coeff, norm2
       REAL(dp), DIMENSION(:), POINTER                    :: rpgfa1, rpgfa2, rpgfb, zeta1, zeta2, zetb
       REAL(dp), DIMENSION(:, :), POINTER                 :: new_block_V, sab
@@ -142,7 +142,7 @@ CONTAINS
       ! setup description of potential
       lb_min = lpot
       lb_max = lpot
-      ncfgb = ncoset(lb_max)-ncoset(lb_min-1)
+      ncfgb = ncoset(lb_max) - ncoset(lb_min - 1)
       npgfb = 1 ! number of exponents
       nb = npgfb*ncfgb
 
@@ -157,8 +157,8 @@ CONTAINS
       DO ishell = 1, basis_set%nshell(iset)
       DO jshell = 1, basis_set%nshell(jset)
          IF (PRESENT(min_shell) .AND. PRESENT(max_shell)) THEN
-            ishell_abs = SUM(basis_set%nshell(1:iset-1))+ishell
-            jshell_abs = SUM(basis_set%nshell(1:jset-1))+jshell
+            ishell_abs = SUM(basis_set%nshell(1:iset - 1)) + ishell
+            jshell_abs = SUM(basis_set%nshell(1:jset - 1)) + jshell
             IF (MIN(ishell_abs, jshell_abs) /= min_shell) CYCLE
             IF (MAX(ishell_abs, jshell_abs) /= max_shell) CYCLE
          ENDIF
@@ -171,7 +171,7 @@ CONTAINS
          la1_max = basis_set%l(ishell, iset)
          la1_min = basis_set%l(ishell, iset)
          npgfa1 = basis_set%npgf(iset)
-         ncfga1 = ncoset(la1_max)-ncoset(la1_min-1)
+         ncfga1 = ncoset(la1_max) - ncoset(la1_min - 1)
          na1 = npgfa1*ncfga1
          zeta1 => basis_set%zet(:, iset)
          rpgfa1 => basis_set%pgf_radius(:, iset)
@@ -180,7 +180,7 @@ CONTAINS
          la2_max = basis_set%l(jshell, jset)
          la2_min = basis_set%l(jshell, jset)
          npgfa2 = basis_set%npgf(jset)
-         ncfga2 = ncoset(la2_max)-ncoset(la2_min-1)
+         ncfga2 = ncoset(la2_max) - ncoset(la2_min - 1)
          na2 = npgfa2*ncfga2
          zeta2 => basis_set%zet(:, jset)
          rpgfa2 => basis_set%pgf_radius(:, jset)
@@ -209,8 +209,8 @@ CONTAINS
             ALLOCATE (sab(na1, na2))
             sab = 0.0_dp
             DO ic = 1, ncfgb
-               coeff = multinomial(lpot/2, indco(:, ncoset(lpot-1)+ic)/2)
-               sab = sab+coeff*saab(:, :, ic)
+               coeff = multinomial(lpot/2, indco(:, ncoset(lpot - 1) + ic)/2)
+               sab = sab + coeff*saab(:, :, ic)
             ENDDO
             CALL my_contract(sab=sab, block=new_block_V, basis_set=basis_set, &
                              iset=iset, ishell=ishell, jset=jset, jshell=jshell)
@@ -221,8 +221,8 @@ CONTAINS
             ALLOCATE (dab(na1, na2, 3))
             dab = 0.0_dp
             DO ic = 1, ncfgb
-               coeff = multinomial(lpot/2, indco(:, ncoset(lpot-1)+ic)/2)
-               dab = dab+coeff*daab(:, :, ic, :)
+               coeff = multinomial(lpot/2, indco(:, ncoset(lpot - 1) + ic)/2)
+               dab = dab + coeff*daab(:, :, ic, :)
             ENDDO
             DO i = 1, 3
                CALL my_contract(sab=dab(:, :, i), block=new_block_D(:, :, i), basis_set=basis_set, &
@@ -238,18 +238,18 @@ CONTAINS
       DEALLOCATE (rpgfb, zetb)
 
       ! post-processing
-      norm2 = (2.0_dp*beta)**(-0.5_dp-lpot)*gamma1(lpot)
+      norm2 = (2.0_dp*beta)**(-0.5_dp - lpot)*gamma1(lpot)
       IF (PRESENT(block_V)) THEN
-         block_V = block_V+weight*new_block_V/SQRT(norm2)
+         block_V = block_V + weight*new_block_V/SQRT(norm2)
          DEALLOCATE (new_block_V)
-         block_V = 0.5_dp*(block_V+TRANSPOSE(block_V)) ! symmetrize
+         block_V = 0.5_dp*(block_V + TRANSPOSE(block_V)) ! symmetrize
       ENDIF
 
       IF (PRESENT(block_D)) THEN
-         block_D = block_D+weight*new_block_D/SQRT(norm2)
+         block_D = block_D + weight*new_block_D/SQRT(norm2)
          DEALLOCATE (new_block_D)
          DO i = 1, 3
-            block_D(:, :, i) = 0.5_dp*(block_D(:, :, i)+TRANSPOSE(block_D(:, :, i))) ! symmetrize
+            block_D(:, :, i) = 0.5_dp*(block_D(:, :, i) + TRANSPOSE(block_D(:, :, i))) ! symmetrize
          ENDDO
       ENDIF
 
@@ -301,26 +301,26 @@ CONTAINS
       ! and then for each gaussian over all configrations of *the given shell*.
       l1 = basis_set%l(ishell, iset)
       l2 = basis_set%l(jshell, jset)
-      n1 = ncoset(l1)-ncoset(l1-1)
-      n2 = ncoset(l2)-ncoset(l2-1)
+      n1 = ncoset(l1) - ncoset(l1 - 1)
+      n2 = ncoset(l2) - ncoset(l2 - 1)
 
       DO ipgf = 1, basis_set%npgf(iset)
       DO jpgf = 1, basis_set%npgf(jset)
          ! prepare first trafo-matrix
-         a = (ipgf-1)*nn1+ncoset(l1-1)+1
-         T1 => basis_set%sphi(a:a+n1-1, sgfa1:sgla1)
+         a = (ipgf - 1)*nn1 + ncoset(l1 - 1) + 1
+         T1 => basis_set%sphi(a:a + n1 - 1, sgfa1:sgla1)
 
          ! prepare second trafo-matrix
-         b = (jpgf-1)*nn2+ncoset(l2-1)+1
-         T2 => basis_set%sphi(b:b+n2-1, sgfa2:sgla2)
+         b = (jpgf - 1)*nn2 + ncoset(l2 - 1) + 1
+         T2 => basis_set%sphi(b:b + n2 - 1, sgfa2:sgla2)
 
          ! prepare SAB matrix
-         c = (ipgf-1)*n1+1
-         d = (jpgf-1)*n2+1
-         S => sab(c:c+n1-1, d:d+n2-1)
+         c = (ipgf - 1)*n1 + 1
+         d = (jpgf - 1)*n2 + 1
+         S => sab(c:c + n1 - 1, d:d + n2 - 1)
 
          ! do the transformation
-         V = V+MATMUL(TRANSPOSE(T1), MATMUL(S, T2))
+         V = V + MATMUL(TRANSPOSE(T1), MATMUL(S, T2))
       ENDDO
       ENDDO
 

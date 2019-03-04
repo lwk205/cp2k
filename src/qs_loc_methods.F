@@ -17,87 +17,87 @@
 !> \author MI (04.2005)
 ! **************************************************************************************************
 MODULE qs_loc_methods
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              deallocate_atomic_kind_set,&
-                                              set_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type,&
-                                              fm_pool_create_fm
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_p_type, &
-        cp_fm_release, cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_iter_string,&
-                                              cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_constants,                 ONLY: &
-        do_loc_crazy, do_loc_direct, do_loc_jacobi, do_loc_l1_norm_sd, do_loc_none, dump_dcd, &
-        dump_dcd_aligned_cell, dump_xmol, op_loc_berry, op_loc_boys, op_loc_pipek, state_loc_list
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_get_ivals,&
-                                              section_get_lval,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp,&
-                                              sp
-   USE machine,                         ONLY: m_flush
-   USE mathconstants,                   ONLY: twopi
-   USE memory_utilities,                ONLY: reallocate
-   USE motion_utils,                    ONLY: get_output_format
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: get_particle_set,&
-                                              write_particle_coordinates
-   USE particle_types,                  ONLY: allocate_particle_set,&
-                                              deallocate_particle_set,&
-                                              particle_type
-   USE physcon,                         ONLY: angstrom
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_wavefunction
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_loc_types,                    ONLY: get_qs_loc_env,&
-                                              localized_wfn_control_type,&
-                                              qs_loc_env_new_type
-   USE qs_loc_utils,                    ONLY: jacobi_rotation_pipek
-   USE qs_localization_methods,         ONLY: approx_l1_norm_sd,&
-                                              crazy_rotations,&
-                                              direct_mini,&
-                                              jacobi_rotations
-   USE qs_matrix_pools,                 ONLY: mpools_get
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE string_utilities,                ONLY: xstring
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                deallocate_atomic_kind_set, &
+                                set_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type, &
+                               fm_pool_create_fm
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_p_type, &
+      cp_fm_release, cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_iter_string, &
+                                 cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_constants, ONLY: &
+      do_loc_crazy, do_loc_direct, do_loc_jacobi, do_loc_l1_norm_sd, do_loc_none, dump_dcd, &
+      dump_dcd_aligned_cell, dump_xmol, op_loc_berry, op_loc_boys, op_loc_pipek, state_loc_list
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_get_ivals, &
+                                  section_get_lval, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp, &
+                    sp
+   USE machine, ONLY: m_flush
+   USE mathconstants, ONLY: twopi
+   USE memory_utilities, ONLY: reallocate
+   USE motion_utils, ONLY: get_output_format
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: get_particle_set, &
+                               write_particle_coordinates
+   USE particle_types, ONLY: allocate_particle_set, &
+                             deallocate_particle_set, &
+                             particle_type
+   USE physcon, ONLY: angstrom
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: calculate_wavefunction
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_loc_types, ONLY: get_qs_loc_env, &
+                           localized_wfn_control_type, &
+                           qs_loc_env_new_type
+   USE qs_loc_utils, ONLY: jacobi_rotation_pipek
+   USE qs_localization_methods, ONLY: approx_l1_norm_sd, &
+                                      crazy_rotations, &
+                                      direct_mini, &
+                                      jacobi_rotations
+   USE qs_matrix_pools, ONLY: mpools_get
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE string_utilities, ONLY: xstring
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -154,7 +154,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: print_loc_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'optimize_loc_berry', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, max_iter, nao, nmoloc, &
                                                             out_each, output_unit, sweeps
@@ -283,7 +283,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: print_loc_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'optimize_loc_pipek', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iatom, isgf, ldz, nao, natom, &
                                                             ncol, nmoloc, output_unit, sweeps
@@ -401,7 +401,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: only_initial_out
 
       CHARACTER(len=*), PARAMETER :: routineN = 'centers_spreads_berry', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: file_tmp, iter
       COMPLEX(KIND=dp)                                   :: z
@@ -446,13 +446,13 @@ CONTAINS
             CALL cp_fm_get_element(zij(1, jdir)%matrix, istate, istate, realpart)
             CALL cp_fm_get_element(zij(2, jdir)%matrix, istate, istate, imagpart)
             z = CMPLX(realpart, imagpart, dp)
-            spread_i = spread_i-weights(jdir)* &
-                       LOG(realpart*realpart+imagpart*imagpart)/twopi/twopi
-            spread_ii = spread_ii+weights(jdir)* &
-                        (1.0_dp-(realpart*realpart+imagpart*imagpart))/twopi/twopi
+            spread_i = spread_i - weights(jdir)* &
+                       LOG(realpart*realpart + imagpart*imagpart)/twopi/twopi
+            spread_ii = spread_ii + weights(jdir)* &
+                        (1.0_dp - (realpart*realpart + imagpart*imagpart))/twopi/twopi
             IF (jdir < 4) THEN
                DO idir = 1, 3
-                  c(idir) = c(idir)+ &
+                  c(idir) = c(idir) + &
                             (cell%hmat(idir, jdir)/twopi)*AIMAG(LOG(z))
                ENDDO
             END IF
@@ -461,8 +461,8 @@ CONTAINS
          centers(1:3, istate) = cpbc(1:3)
          centers(4, istate) = spread_i
          centers(5, istate) = spread_ii
-         sum_spread_i = sum_spread_i+centers(4, istate)
-         sum_spread_ii = sum_spread_ii+centers(5, istate)
+         sum_spread_i = sum_spread_i + centers(4, istate)
+         sum_spread_ii = sum_spread_ii + centers(5, istate)
          IF (unit_out_s > 0 .AND. .NOT. my_only_init) WRITE (unit_out_s, '(I6,2F16.8)') istate, centers(4:5, istate)
       ENDDO
 
@@ -508,7 +508,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: print_loc_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'centers_spreads_pipek', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: file_tmp, iter
       INTEGER                                            :: iatom, istate, natom, nstate, unit_out_s
@@ -554,7 +554,7 @@ CONTAINS
 
       DO iatom = 1, natom
          DO istate = 1, nstate
-            Qii(istate) = Qii(istate)+diag(istate, iatom)*diag(istate, iatom)
+            Qii(istate) = Qii(istate) + diag(istate, iatom)*diag(istate, iatom)
             IF (ABS(diag(istate, iatom)) > ziimax(istate)) THEN
                ziimax(istate) = ABS(diag(istate, iatom))
                atom_of_state(istate) = iatom
@@ -711,7 +711,7 @@ CONTAINS
             imoloc = 0
             DO i = lb, ub
                ! Get the index in the subset
-               imoloc = imoloc+1
+               imoloc = imoloc + 1
                ! Get the index in the full set
                imo = localized_wfn_control%loc_states(i, ispin)
 
@@ -744,12 +744,12 @@ CONTAINS
             ! Provides boundaries of MOs
             CALL section_vals_val_get(print_loc_section, "WANNIER_CUBES%CUBES_LU_BOUNDS", &
                                       i_vals=bounds)
-            ncubes = bounds(2)-bounds(1)+1
+            ncubes = bounds(2) - bounds(1) + 1
             IF (ncubes > 0) THEN
                list_cubes_setup = .TRUE.
                ALLOCATE (list_cubes(ncubes))
                DO ir = 1, ncubes
-                  list_cubes(ir) = bounds(1)+(ir-1)
+                  list_cubes(ir) = bounds(1) + (ir - 1)
                END DO
             END IF
 
@@ -762,11 +762,11 @@ CONTAINS
                   CALL section_vals_val_get(print_loc_section, "WANNIER_CUBES%CUBES_LIST", &
                                             i_rep_val=ir, i_vals=list)
                   IF (ASSOCIATED(list)) THEN
-                     CALL reallocate(list_cubes, 1, ncubes+SIZE(list))
+                     CALL reallocate(list_cubes, 1, ncubes + SIZE(list))
                      DO i = 1, SIZE(list)
-                        list_cubes(i+ncubes) = list(i)
+                        list_cubes(i + ncubes) = list(i)
                      END DO
-                     ncubes = ncubes+SIZE(list)
+                     ncubes = ncubes + SIZE(list)
                   END IF
                END DO
                IF (ncubes > 0) list_cubes_setup = .TRUE.
@@ -909,7 +909,7 @@ CONTAINS
       END IF
 
       DO istate = 1, nstates
-         ivector = state_list(istate)-my_state0
+         ivector = state_list(istate) - my_state0
          CALL get_qs_env(qs_env=qs_env, atomic_kind_set=atomic_kind_set, qs_kind_set=qs_kind_set, cell=cell, &
                          dft_control=dft_control, particle_set=particle_set, pw_env=pw_env)
 
@@ -969,7 +969,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ispin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_wannier_centers', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(default_string_length)                   :: iter, unit_str
       CHARACTER(LEN=default_string_length)               :: my_ext, my_form
@@ -1031,7 +1031,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: unit_conv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_wannier_traj', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: iter, remark1, remark2, title
       INTEGER                                            :: i, iskip, natom, ntot, outformat
@@ -1043,7 +1043,7 @@ CONTAINS
       NULLIFY (particle_set, atomic_kind_set, atomic_kind, logger)
       logger => cp_get_default_logger()
       natom = SIZE(qs_loc_env%particle_set)
-      ntot = natom+SIZE(center, 2)
+      ntot = natom + SIZE(center, 2)
       CALL allocate_particle_set(particle_set, ntot)
       ALLOCATE (atomic_kind_set(1))
       atomic_kind => atomic_kind_set(1)
@@ -1055,9 +1055,9 @@ CONTAINS
          particle_set(i)%r = pbc(qs_loc_env%particle_set(i)%r, qs_loc_env%cell)
       END DO
       ! Wannier Centers
-      DO i = natom+1, ntot
+      DO i = natom + 1, ntot
          particle_set(i)%atomic_kind => atomic_kind
-         particle_set(i)%r = pbc(center(1:3, i-natom), qs_loc_env%cell)
+         particle_set(i)%r = pbc(center(1:3, i - natom), qs_loc_env%cell)
       END DO
       ! Dump the structure
       CALL section_vals_val_get(print_key, "FORMAT", i_val=outformat)

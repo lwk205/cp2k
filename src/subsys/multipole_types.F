@@ -8,15 +8,15 @@
 !> \author Teodoro Laino [tlaino] - University of Zurich - 12.2007
 ! **************************************************************************************************
 MODULE multipole_types
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE external_potential_types,        ONLY: fist_potential_type,&
-                                              get_potential
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE particle_types,                  ONLY: particle_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE external_potential_types, ONLY: fist_potential_type, &
+                                       get_potential
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE particle_types, ONLY: particle_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -71,7 +71,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: max_multipole
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_multipole_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ind2, iparticle, j, n_rep, nparticles
       LOGICAL                                            :: explicit
@@ -81,7 +81,7 @@ CONTAINS
 
       ALLOCATE (multipoles)
 
-      last_multipole_id_nr = last_multipole_id_nr+1
+      last_multipole_id_nr = last_multipole_id_nr + 1
       multipoles%id_nr = last_multipole_id_nr
       multipoles%ref_count = 1
       multipoles%task = .FALSE.
@@ -142,7 +142,7 @@ CONTAINS
                CALL section_vals_val_get(work_section, "_DEFAULT_KEYWORD_", i_rep_val=iparticle, r_vals=work)
                DO i = 1, 3
                   DO j = 1, 3
-                     ind2 = 3*(MIN(i, j)-1)-(MIN(i, j)*(MIN(i, j)-1))/2+MAX(i, j)
+                     ind2 = 3*(MIN(i, j) - 1) - (MIN(i, j)*(MIN(i, j) - 1))/2 + MAX(i, j)
                      multipoles%quadrupoles(i, j, iparticle) = work(ind2)
                   END DO
                END DO
@@ -164,11 +164,11 @@ CONTAINS
       TYPE(multipole_type), POINTER                      :: multipoles
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_multipole_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(multipoles)) THEN
          CPASSERT(multipoles%ref_count > 0)
-         multipoles%ref_count = multipoles%ref_count-1
+         multipoles%ref_count = multipoles%ref_count - 1
          IF (multipoles%ref_count == 0) THEN
             IF (ASSOCIATED(multipoles%charges)) THEN
                DEALLOCATE (multipoles%charges)
@@ -198,11 +198,11 @@ CONTAINS
       TYPE(multipole_type), POINTER                      :: multipoles
 
       CHARACTER(len=*), PARAMETER :: routineN = 'retain_multipole_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(multipoles)) THEN
          CPASSERT(multipoles%ref_count > 0)
-         multipoles%ref_count = multipoles%ref_count+1
+         multipoles%ref_count = multipoles%ref_count + 1
       END IF
    END SUBROUTINE retain_multipole_type
 

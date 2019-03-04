@@ -40,7 +40,7 @@ CONTAINS
       TYPE(exclusion_type), DIMENSION(:), POINTER        :: exclusions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'exclusion_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom
 

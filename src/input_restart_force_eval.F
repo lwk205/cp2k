@@ -4,58 +4,58 @@
 !--------------------------------------------------------------------------------------------------!
 
 MODULE input_restart_force_eval
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              real_to_scaled
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_linked_list_input,            ONLY: cp_sll_val_create,&
-                                              cp_sll_val_get_length,&
-                                              cp_sll_val_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE eip_environment_types,           ONLY: eip_env_get
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type,&
-                                              multiple_fe_list,&
-                                              use_eip_force,&
-                                              use_qmmm,&
-                                              use_qs_force
-   USE input_constants,                 ONLY: do_coord_cp2k,&
-                                              ehrenfest,&
-                                              mol_dyn_run,&
-                                              mon_car_run,&
-                                              pint_run,&
-                                              use_rt_restart
-   USE input_cp2k_restarts_util,        ONLY: section_velocity_val_set
-   USE input_restart_rng,               ONLY: section_rng_val_set
-   USE input_section_types,             ONLY: &
-        section_get_keyword_index, section_type, section_vals_add_values, section_vals_get, &
-        section_vals_get_subs_vals, section_vals_get_subs_vals3, section_vals_remove_values, &
-        section_vals_type, section_vals_val_get, section_vals_val_set, section_vals_val_unset
-   USE input_val_types,                 ONLY: val_create,&
-                                              val_release,&
-                                              val_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_sum
-   USE molecule_kind_types,             ONLY: get_molecule_kind
-   USE molecule_list_types,             ONLY: molecule_list_type
-   USE molecule_types,                  ONLY: get_molecule,&
-                                              molecule_type
-   USE multipole_types,                 ONLY: multipole_type
-   USE parallel_rng_types,              ONLY: dump_rng_stream,&
-                                              rng_record_length
-   USE particle_list_types,             ONLY: particle_list_type
-   USE qmmm_ff_fist,                    ONLY: qmmm_ff_precond_only_qm
-   USE qs_environment_types,            ONLY: get_qs_env
-   USE string_utilities,                ONLY: string_to_ascii
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         real_to_scaled
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_linked_list_input, ONLY: cp_sll_val_create, &
+                                   cp_sll_val_get_length, &
+                                   cp_sll_val_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE eip_environment_types, ONLY: eip_env_get
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type, &
+                              multiple_fe_list, &
+                              use_eip_force, &
+                              use_qmmm, &
+                              use_qs_force
+   USE input_constants, ONLY: do_coord_cp2k, &
+                              ehrenfest, &
+                              mol_dyn_run, &
+                              mon_car_run, &
+                              pint_run, &
+                              use_rt_restart
+   USE input_cp2k_restarts_util, ONLY: section_velocity_val_set
+   USE input_restart_rng, ONLY: section_rng_val_set
+   USE input_section_types, ONLY: &
+      section_get_keyword_index, section_type, section_vals_add_values, section_vals_get, &
+      section_vals_get_subs_vals, section_vals_get_subs_vals3, section_vals_remove_values, &
+      section_vals_type, section_vals_val_get, section_vals_val_set, section_vals_val_unset
+   USE input_val_types, ONLY: val_create, &
+                              val_release, &
+                              val_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_sum
+   USE molecule_kind_types, ONLY: get_molecule_kind
+   USE molecule_list_types, ONLY: molecule_list_type
+   USE molecule_types, ONLY: get_molecule, &
+                             molecule_type
+   USE multipole_types, ONLY: multipole_type
+   USE parallel_rng_types, ONLY: dump_rng_stream, &
+                                 rng_record_length
+   USE particle_list_types, ONLY: particle_list_type
+   USE qmmm_ff_fist, ONLY: qmmm_ff_precond_only_qm
+   USE qs_environment_types, ONLY: get_qs_env
+   USE string_utilities, ONLY: string_to_ascii
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -86,7 +86,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: respa
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'update_force_eval', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i_subsys, iforce_eval, myid, nforce_eval
       INTEGER, DIMENSION(:), POINTER                     :: i_force_eval
@@ -176,7 +176,7 @@ CONTAINS
                   dft_section => section_vals_get_subs_vals3(force_env_sections, "DFT", &
                                                              i_rep_section=i_force_eval(iforce_eval))
                   ALLOCATE (work(SIZE(force_env%mixed_env%strength, 2)))
-                  work = force_env%mixed_env%strength(iforce_eval-1, :)
+                  work = force_env%mixed_env%strength(iforce_eval - 1, :)
                   CALL section_vals_val_set(dft_section, "QS%CDFT%STRENGTH", &
                                             r_vals_ptr=work)
                   CALL section_vals_val_set(dft_section, "QS%CDFT%COUNTER", &
@@ -236,7 +236,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'update_rng_particle', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=rng_record_length)                   :: rng_record
       INTEGER                                            :: iparticle, iparticle_kind, &
@@ -448,7 +448,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: cell_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'update_cell_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       INTEGER, DIMENSION(:), POINTER                     :: iwork
@@ -508,7 +508,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: shell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'section_coord_val_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2*default_string_length)             :: line
       CHARACTER(LEN=default_string_length)               :: my_tag, name
@@ -581,7 +581,7 @@ CONTAINS
             NULLIFY (my_val)
          ELSE
             IF (last_atom < irk) THEN
-               imol = imol+1
+               imol = imol + 1
                molecule_now => molecules%els(imol)
                CALL get_molecule(molecule_now, last_atom=last_atom)
                CALL get_molecule_kind(molecule_now%molecule_kind, molname_generated=molname_generated, &
@@ -648,7 +648,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dipoles_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'update_dipoles_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ik, irk, Nlist, nloop
       REAL(KIND=dp), DIMENSION(:), POINTER               :: work
@@ -725,7 +725,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: quadrupoles_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'update_quadrupoles_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ik, ind, irk, j, Nlist, nloop
       REAL(KIND=dp), DIMENSION(:), POINTER               :: work
@@ -761,7 +761,7 @@ CONTAINS
          ind = 0
          DO i = 1, 3
             DO j = i, 3
-               ind = ind+1
+               ind = ind + 1
                work(ind) = quadrupoles(j, i, irk)
             END DO
          END DO
@@ -821,7 +821,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: core_or_shell, scaled_coordinates
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dump_coordinates_cp2k', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: kind_name, tag
       INTEGER                                            :: handle, imolecule, iparticle, last_atom
@@ -847,7 +847,7 @@ CONTAINS
          CALL get_atomic_kind(particles%els(iparticle)%atomic_kind, name=kind_name)
          IF (.NOT. core_or_shell) THEN
             IF (iparticle > last_atom) THEN
-               imolecule = imolecule+1
+               imolecule = imolecule + 1
                molecule => molecules%els(imolecule)
                CALL get_molecule(molecule, last_atom=last_atom)
                CALL get_molecule_kind(molecule%molecule_kind, &

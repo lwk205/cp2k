@@ -10,58 +10,58 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE hirshfeld_methods
-   USE atom_kind_orbitals,              ONLY: calculate_atomic_density
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE cube_utils,                      ONLY: cube_info_type
-   USE hirshfeld_types,                 ONLY: get_hirshfeld_info,&
-                                              hirshfeld_type,&
-                                              set_hirshfeld_info
-   USE input_constants,                 ONLY: radius_covalent,&
-                                              radius_default,&
-                                              radius_single,&
-                                              radius_user,&
-                                              radius_vdw,&
-                                              shape_function_density,&
-                                              shape_function_gaussian
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: pi
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE periodic_table,                  ONLY: get_ptable_info
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_integrate_function
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_p_type,&
-                                              pw_release
-   USE qs_collocate_density,            ONLY: collocate_pgf_product_rspace
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integrate_potential_low,      ONLY: integrate_pgf_product_rspace
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_modify_pab_block,             ONLY: FUNC_AB
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE realspace_grid_types,            ONLY: pw2rs,&
-                                              realspace_grid_desc_type,&
-                                              realspace_grid_type,&
-                                              rs2pw,&
-                                              rs_grid_release,&
-                                              rs_grid_retain,&
-                                              rs_grid_zero,&
-                                              rs_pw_transfer
+   USE atom_kind_orbitals, ONLY: calculate_atomic_density
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE cube_utils, ONLY: cube_info_type
+   USE hirshfeld_types, ONLY: get_hirshfeld_info, &
+                              hirshfeld_type, &
+                              set_hirshfeld_info
+   USE input_constants, ONLY: radius_covalent, &
+                              radius_default, &
+                              radius_single, &
+                              radius_user, &
+                              radius_vdw, &
+                              shape_function_density, &
+                              shape_function_gaussian
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE mathconstants, ONLY: pi
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE periodic_table, ONLY: get_ptable_info
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_integrate_function
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_p_type, &
+                       pw_release
+   USE qs_collocate_density, ONLY: collocate_pgf_product_rspace
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integrate_potential_low, ONLY: integrate_pgf_product_rspace
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_modify_pab_block, ONLY: FUNC_AB
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE realspace_grid_types, ONLY: pw2rs, &
+                                   realspace_grid_desc_type, &
+                                   realspace_grid_type, &
+                                   rs2pw, &
+                                   rs_grid_release, &
+                                   rs_grid_retain, &
+                                   rs_grid_zero, &
+                                   rs_pw_transfer
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -93,7 +93,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_hirshfeld_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=2)                                   :: element_symbol
       INTEGER                                            :: iatom, ikind, natom, nspin
@@ -118,13 +118,13 @@ CONTAINS
          CALL get_qs_kind(qs_kind_set(ikind), zeff=zeff)
          IF (nspin == 1) THEN
             WRITE (UNIT=unit_nr, FMT="(i7,T15,A2,T20,i3,T27,F8.3,T42,F8.3,T72,F8.3)") &
-               iatom, element_symbol, ikind, refc, charges(iatom, 1), zeff-charges(iatom, 1)
+               iatom, element_symbol, ikind, refc, charges(iatom, 1), zeff - charges(iatom, 1)
          ELSE
             WRITE (UNIT=unit_nr, FMT="(i7,T15,A2,T20,i3,T27,F8.3,T36,2F8.3,T61,F8.3,T72,F8.3)") &
                iatom, element_symbol, ikind, refc, charges(iatom, 1), charges(iatom, 2), &
-               charges(iatom, 1)-charges(iatom, 2), zeff-SUM(charges(iatom, :))
+               charges(iatom, 1) - charges(iatom, 2), zeff - SUM(charges(iatom, :))
          END IF
-         tc1 = tc1+(zeff-SUM(charges(iatom, :)))
+         tc1 = tc1 + (zeff - SUM(charges(iatom, :)))
       END DO
       WRITE (UNIT=unit_nr, FMT="(/,T3,A,T72,F8.3)") "Total Charge ", tc1
       WRITE (unit_nr, '(T2,A)') '!-----------------------------------------------------------------------------!'
@@ -147,7 +147,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), OPTIONAL, POINTER     :: radii_list
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_shape_function', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: ngto = 8
 
       CHARACTER(len=2)                                   :: esym
@@ -238,7 +238,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), INTENT(inout)      :: charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'comp_hirshfeld_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: is
       LOGICAL                                            :: rho_r_valid
@@ -254,7 +254,7 @@ CONTAINS
       CALL calculate_hirshfeld_normalization(qs_env, hirshfeld_env)
       ! check normalization
       tnfun = pw_integrate_function(hirshfeld_env%fnorm%pw)
-      tnfun = ABS(tnfun-SUM(hirshfeld_env%charges))
+      tnfun = ABS(tnfun - SUM(hirshfeld_env%charges))
       !
       ALLOCATE (rhonorm)
       !
@@ -331,7 +331,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ounit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'comp_hirshfeld_i_charges', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: maxloop = 100
       REAL(KIND=dp), PARAMETER                           :: maxres = 1.0e-2_dp
 
@@ -364,7 +364,7 @@ CONTAINS
          CALL calculate_hirshfeld_normalization(qs_env, hirshfeld_env)
          ! check normalization
          tnfun = pw_integrate_function(hirshfeld_env%fnorm%pw)
-         tnfun = ABS(tnfun-SUM(hirshfeld_env%charges))
+         tnfun = ABS(tnfun - SUM(hirshfeld_env%charges))
          ! loop over spins
          DO is = 1, SIZE(rho_r)
             IF (rho_r_valid) THEN
@@ -379,7 +379,7 @@ CONTAINS
          ! residual
          res = 0.0_dp
          DO iat = 1, natom
-            res = res+(SUM(charges(iat, :))-hirshfeld_env%charges(iat))**2
+            res = res + (SUM(charges(iat, :)) - hirshfeld_env%charges(iat))**2
          END DO
          res = SQRT(res/REAL(natom, KIND=dp))
          IF (ounit > 0) THEN
@@ -412,7 +412,7 @@ CONTAINS
       TYPE(hirshfeld_type), POINTER                      :: hirshfeld_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_hirshfeld_normalization', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, handle, iatom, iex, ikind, &
                                                             ithread, j, natom, npme, nthread, &
@@ -466,11 +466,11 @@ CONTAINS
                IF (rs_rho%desc%parallel .AND. .NOT. rs_rho%desc%distributed) THEN
                   ! replicated realspace grid, split the atoms up between procs
                   IF (MODULO(iatom, rs_rho%desc%group_size) == rs_rho%desc%my_pos) THEN
-                     npme = npme+1
+                     npme = npme + 1
                      cores(npme) = iatom
                   ENDIF
                ELSE
-                  npme = npme+1
+                  npme = npme + 1
                   cores(npme) = iatom
                ENDIF
             END DO
@@ -529,7 +529,7 @@ CONTAINS
          OPTIONAL                                        :: fderiv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'hirshfeld_integration', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, handle, iatom, iex, ikind, &
                                                             ithread, j, natom, npme, nthread, &
@@ -587,11 +587,11 @@ CONTAINS
                IF (rs_v%desc%parallel .AND. .NOT. rs_v%desc%distributed) THEN
                   ! replicated realspace grid, split the atoms up between procs
                   IF (MODULO(iatom, rs_v%desc%group_size) == rs_v%desc%my_pos) THEN
-                     npme = npme+1
+                     npme = npme + 1
                      cores(npme) = iatom
                   ENDIF
                ELSE
-                  npme = npme+1
+                  npme = npme + 1
                   cores(npme) = iatom
                ENDIF
             END DO
@@ -611,9 +611,9 @@ CONTAINS
                                                  eps_gvg_rspace=eps_rho_rspace, calculate_forces=do_force, &
                                                  force_a=force_a, force_b=force_b, use_virial=.FALSE., &
                                                  use_subpatch=.TRUE., subpatch_pattern=0_int_8)
-               fval(atom_a) = fval(atom_a)+hab(1, 1)*dvol*coef
+               fval(atom_a) = fval(atom_a) + hab(1, 1)*dvol*coef
                IF (do_force) THEN
-                  fderiv(:, atom_a) = fderiv(:, atom_a)+force_a(:)*dvol
+                  fderiv(:, atom_a) = fderiv(:, atom_a) + force_a(:)*dvol
                END IF
             END DO
 

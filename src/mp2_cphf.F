@@ -10,86 +10,86 @@
 !>      11.2013 created [Mauro Del Ben]
 ! **************************************************************************************************
 MODULE mp2_cphf
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              dbcsr_allocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_upper_to_full
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm_submat,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_add,&
-                                              dbcsr_copy,&
-                                              dbcsr_create,&
-                                              dbcsr_p_type,&
-                                              dbcsr_release,&
-                                              dbcsr_scale,&
-                                              dbcsr_set,&
-                                              dbcsr_type_symmetric
-   USE hfx_energy_potential,            ONLY: integrate_four_center
-   USE hfx_types,                       ONLY: alloc_containers,&
-                                              hfx_container_type,&
-                                              hfx_init_container,&
-                                              hfx_type
-   USE input_constants,                 ONLY: hfx_do_eval_energy
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: dp
-   USE linear_systems,                  ONLY: solve_system
-   USE machine,                         ONLY: m_walltime
-   USE mathconstants,                   ONLY: fourpi
-   USE message_passing,                 ONLY: mp_sum
-   USE mp2_types,                       ONLY: mp2_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_derive,&
-                                              pw_integral_ab,&
-                                              pw_scale,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_integrate_potential,          ONLY: integrate_v_core_rspace,&
-                                              integrate_v_rspace
-   USE qs_ks_types,                     ONLY: qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho_methods,                  ONLY: qs_rho_rebuild
-   USE qs_rho_types,                    ONLY: qs_rho_create,&
-                                              qs_rho_get,&
-                                              qs_rho_release,&
-                                              qs_rho_type
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  dbcsr_allocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_upper_to_full
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm_submat, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_add, &
+                        dbcsr_copy, &
+                        dbcsr_create, &
+                        dbcsr_p_type, &
+                        dbcsr_release, &
+                        dbcsr_scale, &
+                        dbcsr_set, &
+                        dbcsr_type_symmetric
+   USE hfx_energy_potential, ONLY: integrate_four_center
+   USE hfx_types, ONLY: alloc_containers, &
+                        hfx_container_type, &
+                        hfx_init_container, &
+                        hfx_type
+   USE input_constants, ONLY: hfx_do_eval_energy
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: dp
+   USE linear_systems, ONLY: solve_system
+   USE machine, ONLY: m_walltime
+   USE mathconstants, ONLY: fourpi
+   USE message_passing, ONLY: mp_sum
+   USE mp2_types, ONLY: mp2_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_derive, &
+                         pw_integral_ab, &
+                         pw_scale, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_integrate_potential, ONLY: integrate_v_core_rspace, &
+                                     integrate_v_rspace
+   USE qs_ks_types, ONLY: qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho_methods, ONLY: qs_rho_rebuild
+   USE qs_rho_types, ONLY: qs_rho_create, &
+                           qs_rho_get, &
+                           qs_rho_release, &
+                           qs_rho_type
+   USE virial_types, ONLY: virial_type
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num, omp_get_num_threads
 
@@ -142,11 +142,11 @@ CONTAINS
       TYPE(cp_fm_type), OPTIONAL, POINTER                :: mo_coeff_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'solve_z_vector_eq', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: alpha, beta, bin, dimen, handle, handle2, i, i_global, i_thread, iiB, ikind, &
-         irep, ispin, j_global, jjB, my_bin_size, n_rep_hf, n_threads, ncol_local, nrow_local, &
-         transf_type_in, transf_type_out, virtual, virtual_beta
+                 irep, ispin, j_global, jjB, my_bin_size, n_rep_hf, n_threads, ncol_local, nrow_local, &
+                 transf_type_in, transf_type_out, virtual, virtual_beta
       INTEGER, DIMENSION(3)                              :: comp
       INTEGER, DIMENSION(:), POINTER                     :: col_indices, row_indices
       LOGICAL                                            :: alpha_beta, do_dynamic_load_balancing, &
@@ -159,8 +159,8 @@ CONTAINS
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env
       TYPE(cp_fm_struct_type), POINTER                   :: fm_struct_tmp
       TYPE(cp_fm_type), POINTER :: fm_back, fm_G_mu_nu, L_jb, L_jb_beta, mo_coeff_o, &
-         mo_coeff_o_beta, mo_coeff_v, mo_coeff_v_beta, P_ia, P_ia_beta, P_mo, P_mo_beta, W_mo, &
-         W_mo_beta
+                                   mo_coeff_o_beta, mo_coeff_v, mo_coeff_v_beta, P_ia, P_ia_beta, P_mo, P_mo_beta, W_mo, &
+                                   W_mo_beta
       TYPE(dbcsr_p_type)                                 :: P_mu_nu
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: mat_mu_nu, matrix_ks, matrix_p_mp2, &
                                                             matrix_s, matrix_w_mp2, rho_ao
@@ -192,8 +192,8 @@ CONTAINS
 
       ! start collecting stuff
       dimen = nmo
-      virtual = dimen-homo
-      IF (alpha_beta) virtual_beta = dimen-homo_beta
+      virtual = dimen - homo
+      IF (alpha_beta) virtual_beta = dimen - homo_beta
       NULLIFY (input, pw_env, matrix_s, blacs_env, rho, energy, force, virial, matrix_w_mp2, &
                matrix_p_mp2, matrix_ks, rho_core, sab_orb)
       CALL get_qs_env(qs_env, &
@@ -300,7 +300,7 @@ CONTAINS
       CALL cp_fm_set_all(mo_coeff_v, 0.0_dp)
       CALL cp_fm_to_fm_submat(msource=mo_coeff, mtarget=mo_coeff_v, &
                               nrow=dimen, ncol=virtual, &
-                              s_firstrow=1, s_firstcol=homo+1, &
+                              s_firstrow=1, s_firstcol=homo + 1, &
                               t_firstrow=1, t_firstcol=1)
 
       IF (alpha_beta) THEN
@@ -323,7 +323,7 @@ CONTAINS
          CALL cp_fm_set_all(mo_coeff_v_beta, 0.0_dp)
          CALL cp_fm_to_fm_submat(msource=mo_coeff_beta, mtarget=mo_coeff_v_beta, &
                                  nrow=dimen, ncol=virtual_beta, &
-                                 s_firstrow=1, s_firstcol=homo_beta+1, &
+                                 s_firstrow=1, s_firstcol=homo_beta + 1, &
                                  t_firstrow=1, t_firstcol=1)
       ENDIF
 
@@ -339,8 +339,8 @@ CONTAINS
 !$       n_threads = omp_get_max_threads()
 
          DO irep = 1, n_rep_hf
-            DO i_thread = 0, n_threads-1
-               actual_x_data => qs_env%x_data(irep, i_thread+1)
+            DO i_thread = 0, n_threads - 1
+               actual_x_data => qs_env%x_data(irep, i_thread + 1)
 
                do_dynamic_load_balancing = .TRUE.
                IF (n_threads == 1 .OR. actual_x_data%memory_parameter%do_disk_storage) do_dynamic_load_balancing = .FALSE.
@@ -518,7 +518,7 @@ CONTAINS
       CALL cp_fm_to_fm_submat(msource=P_ia, mtarget=P_mo, &
                               nrow=homo, ncol=virtual, &
                               s_firstrow=1, s_firstcol=1, &
-                              t_firstrow=1, t_firstcol=homo+1)
+                              t_firstrow=1, t_firstcol=homo + 1)
       CALL cp_fm_release(P_ia)
       ! transpose P_MO matrix (easy way to symmetrize)
       CALL cp_fm_set_all(fm_back, 0.0_dp)
@@ -529,7 +529,7 @@ CONTAINS
          CALL cp_fm_to_fm_submat(msource=P_ia_beta, mtarget=P_mo_beta, &
                                  nrow=homo_beta, ncol=virtual_beta, &
                                  s_firstrow=1, s_firstcol=1, &
-                                 t_firstrow=1, t_firstcol=homo_beta+1)
+                                 t_firstrow=1, t_firstcol=homo_beta + 1)
          CALL cp_fm_release(P_ia_beta)
          ! transpose P_MO matrix (easy way to symmetrize)
          CALL cp_fm_set_all(fm_back, 0.0_dp)
@@ -548,17 +548,17 @@ CONTAINS
          IF (j_global <= homo) THEN
             DO iiB = 1, nrow_local
                i_global = row_indices(iiB)
-               W_mo%local_data(iiB, jjB) = W_mo%local_data(iiB, jjB)-P_mo%local_data(iiB, jjB)*Eigenval(j_global)
+               W_mo%local_data(iiB, jjB) = W_mo%local_data(iiB, jjB) - P_mo%local_data(iiB, jjB)*Eigenval(j_global)
             END DO
          ELSE
             DO iiB = 1, nrow_local
                i_global = row_indices(iiB)
                IF (i_global <= homo) THEN
                   ! virt-occ
-                  W_mo%local_data(iiB, jjB) = W_mo%local_data(iiB, jjB)-P_mo%local_data(iiB, jjB)*Eigenval(i_global)
+                  W_mo%local_data(iiB, jjB) = W_mo%local_data(iiB, jjB) - P_mo%local_data(iiB, jjB)*Eigenval(i_global)
                ELSE
                   ! virt-virt
-                  W_mo%local_data(iiB, jjB) = W_mo%local_data(iiB, jjB)-P_mo%local_data(iiB, jjB)*Eigenval(j_global)
+                  W_mo%local_data(iiB, jjB) = W_mo%local_data(iiB, jjB) - P_mo%local_data(iiB, jjB)*Eigenval(j_global)
                END IF
             END DO
          END IF
@@ -575,7 +575,7 @@ CONTAINS
                DO iiB = 1, nrow_local
                   i_global = row_indices(iiB)
                   W_mo_beta%local_data(iiB, jjB) = &
-                     W_mo_beta%local_data(iiB, jjB)-P_mo_beta%local_data(iiB, jjB)*Eigenval_beta(j_global)
+                     W_mo_beta%local_data(iiB, jjB) - P_mo_beta%local_data(iiB, jjB)*Eigenval_beta(j_global)
                END DO
             ELSE
                DO iiB = 1, nrow_local
@@ -583,11 +583,11 @@ CONTAINS
                   IF (i_global <= homo_beta) THEN
                      ! virt-occ
                      W_mo_beta%local_data(iiB, jjB) = &
-                        W_mo_beta%local_data(iiB, jjB)-P_mo_beta%local_data(iiB, jjB)*Eigenval_beta(i_global)
+                        W_mo_beta%local_data(iiB, jjB) - P_mo_beta%local_data(iiB, jjB)*Eigenval_beta(i_global)
                   ELSE
                      ! virt-virt
                      W_mo_beta%local_data(iiB, jjB) = &
-                        W_mo_beta%local_data(iiB, jjB)-P_mo_beta%local_data(iiB, jjB)*Eigenval_beta(j_global)
+                        W_mo_beta%local_data(iiB, jjB) - P_mo_beta%local_data(iiB, jjB)*Eigenval_beta(j_global)
                   END IF
                END DO
             END IF
@@ -918,11 +918,11 @@ CONTAINS
             h_stress(alpha, alpha) = -e_hartree
             DO beta = alpha, 3
                h_stress(alpha, beta) = h_stress(alpha, beta) &
-                                       -2.0_dp*pw_integral_ab(rho_g%pw, dvg(beta)%pw)/fourpi
+                                       - 2.0_dp*pw_integral_ab(rho_g%pw, dvg(beta)%pw)/fourpi
                h_stress(beta, alpha) = h_stress(alpha, beta)
             END DO
          END DO
-         virial%pv_virial = virial%pv_virial+h_stress/REAL(para_env%num_pe, dp)
+         virial%pv_virial = virial%pv_virial + h_stress/REAL(para_env%num_pe, dp)
 
          ! free stuff
          CALL pw_pool_give_back_pw(auxbas_pw_pool, temp_pw_g%pw)
@@ -1031,7 +1031,7 @@ CONTAINS
       REAL(KIND=dp), OPTIONAL                            :: factor
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'cphf_like_update', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_global, iiB, irep, j_global, &
                                                             jjB, ncol_local, nrow_local, ns
@@ -1105,8 +1105,8 @@ CONTAINS
                          mo_coeff_v, fm_mo, 0.0_dp, fm_back, &
                          a_first_col=1, &
                          a_first_row=1, &
-                         b_first_col=homo+1, &
-                         b_first_row=homo+1, &
+                         b_first_col=homo + 1, &
+                         b_first_row=homo + 1, &
                          c_first_col=1, &
                          c_first_row=1)
             CALL cp_fm_set_all(fm_ao, 0.0_dp)
@@ -1124,8 +1124,8 @@ CONTAINS
                          mo_coeff_v_beta, fm_mo, 0.0_dp, fm_back, &
                          a_first_col=1, &
                          a_first_row=1, &
-                         b_first_col=homo_beta+1, &
-                         b_first_row=homo_beta+1, &
+                         b_first_col=homo_beta + 1, &
+                         b_first_row=homo_beta + 1, &
                          c_first_col=1, &
                          c_first_row=1)
             CALL cp_fm_set_all(fm_ao, 0.0_dp)
@@ -1189,7 +1189,7 @@ CONTAINS
                DO iiB = 1, nrow_local
                   i_global = row_indices(iiB)
                   fm_mo_out%local_data(iiB, jjB) = fm_mo_out%local_data(iiB, jjB)* &
-                                                   (Eigenval(j_global+homo)-Eigenval(i_global))
+                                                   (Eigenval(j_global + homo) - Eigenval(i_global))
                END DO
             END DO
          ELSE
@@ -1443,15 +1443,15 @@ CONTAINS
                                                             L_jb_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'solve_z_vector_eq_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: cycle_counter, handle, i_global, iiB, iiter, j_global, jjB, max_num_iter, &
-         ncol_local, ncol_local_b, nrow_local, nrow_local_b, transf_type_in, transf_type_out, &
-         virtual_beta
+                 ncol_local, ncol_local_b, nrow_local, nrow_local_b, transf_type_in, transf_type_out, &
+                 virtual_beta
       INTEGER, DIMENSION(:), POINTER                     :: col_indices, row_indices
       LOGICAL                                            :: alpha_beta, converged
       REAL(KIND=dp) :: alpha, beta, conv, conv_b, eps_conv, factor, norm_b, norm_b_beta, norms(3), &
-         norms_beta(3), out_alpha, rkrk, rkrk_beta, t1, t2
+                       norms_beta(3), out_alpha, rkrk, rkrk_beta, t1, t2
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: proj_bi_xj, temp_vals, x_norm, x_norm_b, &
                                                             xi_b
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: A_small, b_small, xi_Axi
@@ -1467,7 +1467,7 @@ CONTAINS
       factor = 4.0_dp
       IF (PRESENT(homo_beta) .AND. PRESENT(Eigenval_beta)) alpha_beta = .TRUE.
       IF (alpha_beta) THEN
-         virtual_beta = dimen-homo_beta
+         virtual_beta = dimen - homo_beta
          factor = 2.0_dp
       ENDIF
 
@@ -1536,14 +1536,14 @@ CONTAINS
             norm_b_beta = 0.0_dp
             norm_b_beta = SUM(L_jb_beta%local_data(:, :)*L_jb_beta%local_data(:, :))
             CALL mp_sum(norm_b_beta, para_env%group)
-            norm_b = norm_b+norm_b_beta
+            norm_b = norm_b + norm_b_beta
          ENDIF
          ! Set the norm
          norm_b = SQRT(norm_b)
 
          cycle_counter = 0
          DO iiter = 1, max_num_iter
-            cycle_counter = cycle_counter+1
+            cycle_counter = cycle_counter + 1
             t1 = m_walltime()
 
             ! calculate matrix-vector product
@@ -1600,15 +1600,15 @@ CONTAINS
                norms_beta(2) = SUM(rk_b%local_data(:, :)*pk_b%local_data(:, :))
                norms_beta(3) = SUM(pk_b%local_data(:, :)*Ap_b%local_data(:, :))
                CALL mp_sum(norms_beta, para_env%group)
-               norms = norms+norms_beta
+               norms = norms + norms_beta
             ENDIF
             alpha = norms(1)/norms(3)
 
-            xk%local_data(:, :) = xk%local_data(:, :)+alpha*pk%local_data(:, :)
-            rk%local_data(:, :) = rk%local_data(:, :)-alpha*Ap%local_data(:, :)
+            xk%local_data(:, :) = xk%local_data(:, :) + alpha*pk%local_data(:, :)
+            rk%local_data(:, :) = rk%local_data(:, :) - alpha*Ap%local_data(:, :)
             IF (alpha_beta) THEN
-               xk_b%local_data(:, :) = xk_b%local_data(:, :)+alpha*pk_b%local_data(:, :)
-               rk_b%local_data(:, :) = rk_b%local_data(:, :)-alpha*Ap_b%local_data(:, :)
+               xk_b%local_data(:, :) = xk_b%local_data(:, :) + alpha*pk_b%local_data(:, :)
+               rk_b%local_data(:, :) = rk_b%local_data(:, :) - alpha*Ap_b%local_data(:, :)
             ENDIF
 
             rkrk = 0.0_dp
@@ -1619,13 +1619,13 @@ CONTAINS
                rkrk_beta = 0.0_dp
                rkrk_beta = SUM(rk_b%local_data(:, :)*rk_b%local_data(:, :))
                CALL mp_sum(rkrk_beta, para_env%group)
-               rkrk = rkrk+rkrk_beta
+               rkrk = rkrk + rkrk_beta
             ENDIF
             beta = rkrk/norms(2)
 
-            pk%local_data(:, :) = rk%local_data(:, :)+beta*pk%local_data(:, :)
+            pk%local_data(:, :) = rk%local_data(:, :) + beta*pk%local_data(:, :)
             IF (alpha_beta) THEN
-               pk_b%local_data(:, :) = rk_b%local_data(:, :)+beta*pk_b%local_data(:, :)
+               pk_b%local_data(:, :) = rk_b%local_data(:, :) + beta*pk_b%local_data(:, :)
             ENDIF
 
             conv = SQRT(rkrk)/norm_b
@@ -1633,7 +1633,7 @@ CONTAINS
             t2 = m_walltime()
 
             IF (unit_nr > 0) THEN
-               WRITE (unit_nr, '(T3,I5,T13,F6.1,11X,F14.8)') iiter, t2-t1, conv
+               WRITE (unit_nr, '(T3,I5,T13,F6.1,11X,F14.8)') iiter, t2 - t1, conv
             END IF
 
             IF (conv <= eps_conv) THEN
@@ -1687,7 +1687,7 @@ CONTAINS
             DO iiB = 1, nrow_local
                i_global = row_indices(iiB)
                precond%local_data(iiB, jjB) = precond%local_data(iiB, jjB)/ &
-                                              (Eigenval(j_global+homo)-Eigenval(i_global))
+                                              (Eigenval(j_global + homo) - Eigenval(i_global))
             END DO
          END DO
 
@@ -1740,7 +1740,7 @@ CONTAINS
                DO iiB = 1, nrow_local_b
                   i_global = row_indices(iiB)
                   precond_b%local_data(iiB, jjB) = precond_b%local_data(iiB, jjB)/ &
-                                                   (Eigenval_beta(j_global+homo_beta)-Eigenval_beta(i_global))
+                                                   (Eigenval_beta(j_global + homo_beta) - Eigenval_beta(i_global))
                END DO
             END DO
 
@@ -1764,7 +1764,7 @@ CONTAINS
 
          cycle_counter = 0
          DO iiter = 1, max_num_iter
-            cycle_counter = cycle_counter+1
+            cycle_counter = cycle_counter + 1
 
             t1 = m_walltime()
 
@@ -1776,8 +1776,8 @@ CONTAINS
             IF (.NOT. alpha_beta) THEN
                ! first compute the projection of the actual b_i into all previous x_i
                ! already scaled with the norm of each x_i
-               ALLOCATE (proj_bi_xj(iiter-1))
-               DO iiB = 1, iiter-1
+               ALLOCATE (proj_bi_xj(iiter - 1))
+               DO iiB = 1, iiter - 1
                   proj_bi_xj(iiB) = 0.0_dp
                   proj_bi_xj(iiB) = accurate_sum(b_i%local_data(1:nrow_local, 1:ncol_local)* &
                                                  xn(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local))
@@ -1787,8 +1787,8 @@ CONTAINS
 
                ! update actual x_i
                xn(iiter)%matrix%local_data(:, :) = b_i%local_data(:, :)
-               DO iiB = 1, iiter-1
-                  xn(iiter)%matrix%local_data(:, :) = xn(iiter)%matrix%local_data(:, :)- &
+               DO iiB = 1, iiter - 1
+                  xn(iiter)%matrix%local_data(:, :) = xn(iiter)%matrix%local_data(:, :) - &
                                                       xn(iiB)%matrix%local_data(:, :)*proj_bi_xj(iiB)
                END DO
                DEALLOCATE (proj_bi_xj)
@@ -1801,25 +1801,25 @@ CONTAINS
 
                ! first compute the projection of the actual b_i into all previous x_i
                ! already scaled with the norm of each x_i
-               ALLOCATE (proj_bi_xj(iiter-1))
-               DO iiB = 1, iiter-1
+               ALLOCATE (proj_bi_xj(iiter - 1))
+               DO iiB = 1, iiter - 1
                   proj_bi_xj(iiB) = 0.0_dp
                   proj_bi_xj(iiB) = &
                      accurate_sum(b_i%local_data(1:nrow_local, 1:ncol_local)* &
-                                  xn(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local))+ &
+                                  xn(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local)) + &
                      accurate_sum(b_i_b%local_data(1:nrow_local_b, 1:ncol_local_b)* &
                                   xn_b(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b))
-                  proj_bi_xj(iiB) = proj_bi_xj(iiB)/(x_norm(iib)+x_norm_b(iib))
+                  proj_bi_xj(iiB) = proj_bi_xj(iiB)/(x_norm(iib) + x_norm_b(iib))
                END DO
                CALL mp_sum(proj_bi_xj, para_env%group)
 
                ! update actual x_i
                xn(iiter)%matrix%local_data(:, :) = b_i%local_data(:, :)
                xn_b(iiter)%matrix%local_data(:, :) = b_i_b%local_data(:, :)
-               DO iiB = 1, iiter-1
-                  xn(iiter)%matrix%local_data(:, :) = xn(iiter)%matrix%local_data(:, :)- &
+               DO iiB = 1, iiter - 1
+                  xn(iiter)%matrix%local_data(:, :) = xn(iiter)%matrix%local_data(:, :) - &
                                                       xn(iiB)%matrix%local_data(:, :)*proj_bi_xj(iiB)
-                  xn_b(iiter)%matrix%local_data(:, :) = xn_b(iiter)%matrix%local_data(:, :)- &
+                  xn_b(iiter)%matrix%local_data(:, :) = xn_b(iiter)%matrix%local_data(:, :) - &
                                                         xn_b(iiB)%matrix%local_data(:, :)*proj_bi_xj(iiB)
                END DO
                DEALLOCATE (proj_bi_xj)
@@ -1886,44 +1886,44 @@ CONTAINS
             ! iiter+1 -> <x_i|b>
             ! iiter+2 -> <x_i|x_i>
 
-            ALLOCATE (temp_vals(iiter+2))
+            ALLOCATE (temp_vals(iiter + 2))
             temp_vals = 0.0_dp
             ! <Ax_i|x_j>
             DO iiB = 1, iiter
                temp_vals(iiB) = accurate_sum(Ax(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)* &
                                              xn(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local))
                IF (alpha_beta) THEN
-                  temp_vals(iiB) = temp_vals(iib)+ &
+                  temp_vals(iiB) = temp_vals(iib) + &
                                    accurate_sum(Ax_ab(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)* &
-                                                xn(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local))+ &
+                                                xn(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local)) + &
                                    accurate_sum(Ax_bb(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)* &
-                                                xn_b(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b))+ &
+                                                xn_b(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)) + &
                                    accurate_sum(Ax_ba(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)* &
                                                 xn_b(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b))
                ENDIF
             END DO
             ! <x_i|b>
-            temp_vals(iiter+1) = accurate_sum(xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)* &
-                                              L_jb%local_data(1:nrow_local, 1:ncol_local))
+            temp_vals(iiter + 1) = accurate_sum(xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)* &
+                                                L_jb%local_data(1:nrow_local, 1:ncol_local))
             ! norm
-            temp_vals(iiter+2) = accurate_sum(xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)* &
-                                              xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local))
+            temp_vals(iiter + 2) = accurate_sum(xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)* &
+                                                xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local))
             IF (alpha_beta) THEN
                ! <x_i_b|b_b>
-               temp_vals(iiter+1) = temp_vals(iiter+1)+ &
-                                    accurate_sum(xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)* &
-                                                 L_jb_beta%local_data(1:nrow_local_b, 1:ncol_local_b))
+               temp_vals(iiter + 1) = temp_vals(iiter + 1) + &
+                                      accurate_sum(xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)* &
+                                                   L_jb_beta%local_data(1:nrow_local_b, 1:ncol_local_b))
                ! norm
-               temp_vals(iiter+2) = temp_vals(iiter+2)+ &
-                                    accurate_sum(xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)* &
-                                                 xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b))
+               temp_vals(iiter + 2) = temp_vals(iiter + 2) + &
+                                      accurate_sum(xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)* &
+                                                   xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b))
             ENDIF
             CALL mp_sum(temp_vals, para_env%group)
             ! update <Ax_i|x_j>,  <x_i|b> and norm <x_i|x_i>
             xi_Axi(iiter, 1:iiter) = temp_vals(1:iiter)
             xi_Axi(1:iiter, iiter) = temp_vals(1:iiter)
-            xi_b(iiter) = temp_vals(iiter+1)
-            x_norm(iiter) = temp_vals(iiter+2)
+            xi_b(iiter) = temp_vals(iiter + 1)
+            x_norm(iiter) = temp_vals(iiter + 2)
             DEALLOCATE (temp_vals)
 
             ! solve reduced system
@@ -1941,10 +1941,10 @@ CONTAINS
             IF (.NOT. alpha_beta) THEN
                DO iiB = 1, iiter
                   residual%local_data(1:nrow_local, 1:ncol_local) = &
-                     residual%local_data(1:nrow_local, 1:ncol_local)+ &
+                     residual%local_data(1:nrow_local, 1:ncol_local) + &
                      b_small(iiB, 1)*Ax(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local)
                END DO
-               residual%local_data(1:nrow_local, 1:ncol_local) = residual%local_data(1:nrow_local, 1:ncol_local)- &
+               residual%local_data(1:nrow_local, 1:ncol_local) = residual%local_data(1:nrow_local, 1:ncol_local) - &
                                                                  L_jb%local_data(1:nrow_local, 1:ncol_local)
                conv = 0.0_dp
                conv = accurate_sum(residual%local_data(1:nrow_local, 1:ncol_local)* &
@@ -1956,34 +1956,34 @@ CONTAINS
                CALL cp_fm_set_all(residual_b, 0.0_dp)
                DO iiB = 1, iiter
                   residual%local_data(1:nrow_local, 1:ncol_local) = &
-                     residual%local_data(1:nrow_local, 1:ncol_local)+ &
-                     b_small(iiB, 1)*Ax(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local)+ &
+                     residual%local_data(1:nrow_local, 1:ncol_local) + &
+                     b_small(iiB, 1)*Ax(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local) + &
                      b_small(iiB, 1)*Ax_ab(iiB)%matrix%local_data(1:nrow_local, 1:ncol_local)
                   residual_b%local_data(1:nrow_local_b, 1:ncol_local_b) = &
-                     residual_b%local_data(1:nrow_local_b, 1:ncol_local_b)+ &
-                     b_small(iiB, 1)*Ax_bb(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)+ &
+                     residual_b%local_data(1:nrow_local_b, 1:ncol_local_b) + &
+                     b_small(iiB, 1)*Ax_bb(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b) + &
                      b_small(iiB, 1)*Ax_ba(iiB)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)
                END DO
-               residual%local_data(1:nrow_local, 1:ncol_local) = residual%local_data(1:nrow_local, 1:ncol_local)- &
+               residual%local_data(1:nrow_local, 1:ncol_local) = residual%local_data(1:nrow_local, 1:ncol_local) - &
                                                                  L_jb%local_data(1:nrow_local, 1:ncol_local)
                conv = 0.0_dp
                conv = accurate_sum(residual%local_data(1:nrow_local, 1:ncol_local)* &
                                    residual%local_data(1:nrow_local, 1:ncol_local))
                CALL mp_sum(conv, para_env%group)
                conv = SQRT(conv)
-               residual_b%local_data(1:nrow_local_b, 1:ncol_local_b) = residual_b%local_data(1:nrow_local_b, 1:ncol_local_b)- &
+               residual_b%local_data(1:nrow_local_b, 1:ncol_local_b) = residual_b%local_data(1:nrow_local_b, 1:ncol_local_b) - &
                                                                        L_jb_beta%local_data(1:nrow_local_b, 1:ncol_local_b)
                conv_b = 0.0_dp
                conv_b = accurate_sum(residual_b%local_data(1:nrow_local_b, 1:ncol_local_b)* &
                                      residual_b%local_data(1:nrow_local_b, 1:ncol_local_b))
                CALL mp_sum(conv_b, para_env%group)
-               conv = conv+SQRT(conv_b)
+               conv = conv + SQRT(conv_b)
             ENDIF
 
             t2 = m_walltime()
 
             IF (unit_nr > 0) THEN
-               WRITE (unit_nr, '(T3,I5,T13,F6.1,11X,F14.8)') iiter, t2-t1, conv
+               WRITE (unit_nr, '(T3,I5,T13,F6.1,11X,F14.8)') iiter, t2 - t1, conv
             END IF
 
             IF (conv <= eps_conv) THEN
@@ -1997,9 +1997,9 @@ CONTAINS
             ELSE
                b_i%local_data(:, :) = precond%local_data(:, :)* &
                                       (Ax(iiter)%matrix%local_data(:, :) &
-                                       +Ax_ab(iiter)%matrix%local_data(:, :))
+                                       + Ax_ab(iiter)%matrix%local_data(:, :))
                b_i_b%local_data(:, :) = precond_b%local_data(:, :)* &
-                                        (Ax_bb(iiter)%matrix%local_data(:, :)+ &
+                                        (Ax_bb(iiter)%matrix%local_data(:, :) + &
                                          Ax_ba(iiter)%matrix%local_data(:, :))
             ENDIF
 
@@ -2007,12 +2007,12 @@ CONTAINS
 
          ! store solution into P_ia
          DO iiter = 1, cycle_counter
-            P_ia%local_data(1:nrow_local, 1:ncol_local) = P_ia%local_data(1:nrow_local, 1:ncol_local)+ &
+            P_ia%local_data(1:nrow_local, 1:ncol_local) = P_ia%local_data(1:nrow_local, 1:ncol_local) + &
                                                           b_small(iiter, 1)*xn(iiter)%matrix%local_data(1:nrow_local, 1:ncol_local)
             ! The same for beta
             IF (alpha_beta) THEN
                P_ia_beta%local_data(1:nrow_local_b, 1:ncol_local_b) = &
-                  P_ia_beta%local_data(1:nrow_local_b, 1:ncol_local_b)+ &
+                  P_ia_beta%local_data(1:nrow_local_b, 1:ncol_local_b) + &
                   b_small(iiter, 1)*xn_b(iiter)%matrix%local_data(1:nrow_local_b, 1:ncol_local_b)
             ENDIF
          END DO
@@ -2087,9 +2087,9 @@ CONTAINS
          WRITE (*, *) iii
          DO jjj = 1, SIZE(mat, 2), 20
             IF (PRESENT(unitout)) THEN
-               WRITE (1000+unitout, '(1000F10.5)') mat(iii, jjj:MIN(SIZE(mat, 2), jjj+19))
+               WRITE (1000 + unitout, '(1000F10.5)') mat(iii, jjj:MIN(SIZE(mat, 2), jjj + 19))
             ELSE
-               WRITE (*, '(1000F10.5)') mat(iii, jjj:MIN(SIZE(mat, 2), jjj+19))
+               WRITE (*, '(1000F10.5)') mat(iii, jjj:MIN(SIZE(mat, 2), jjj + 19))
             END IF
          END DO
          WRITE (*, *)

@@ -9,51 +9,51 @@
 ! *****************************************************************************
 MODULE qs_basis_gradient
 
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE cp_fm_types,                     ONLY: cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE particle_types,                  ONLY: particle_type
-   USE qs_core_hamiltonian,             ONLY: build_core_hamiltonian_matrix
-   USE qs_energy_matrix_w,              ONLY: qs_energies_compute_w
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: allocate_qs_force,&
-                                              deallocate_qs_force,&
-                                              qs_force_type,&
-                                              replicate_qs_force,&
-                                              zero_qs_force
-   USE qs_gspace_mixing,                ONLY: mixing_allocate
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_methods,                   ONLY: qs_ks_allocate_basics,&
-                                              qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix,&
-                                              make_basis_sm
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_lists,               ONLY: build_qs_neighbor_lists
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_set,&
-                                              qs_rho_type
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE qs_subsys_types,                 ONLY: qs_subsys_set,&
-                                              qs_subsys_type
-   USE qs_update_s_mstruct,             ONLY: qs_env_update_s_mstruct
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE cp_fm_types, ONLY: cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE particle_types, ONLY: particle_type
+   USE qs_core_hamiltonian, ONLY: build_core_hamiltonian_matrix
+   USE qs_energy_matrix_w, ONLY: qs_energies_compute_w
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: allocate_qs_force, &
+                             deallocate_qs_force, &
+                             qs_force_type, &
+                             replicate_qs_force, &
+                             zero_qs_force
+   USE qs_gspace_mixing, ONLY: mixing_allocate
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_methods, ONLY: qs_ks_allocate_basics, &
+                            qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: qs_ks_env_type, &
+                          set_ks_env
+   USE qs_mo_methods, ONLY: calculate_density_matrix, &
+                            make_basis_sm
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_lists, ONLY: build_qs_neighbor_lists
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_set, &
+                           qs_rho_type
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE qs_subsys_types, ONLY: qs_subsys_set, &
+                              qs_subsys_type
+   USE qs_update_s_mstruct, ONLY: qs_env_update_s_mstruct
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -82,7 +82,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_basis_center_gradient', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, iatom, ikind, img, ispin, &
                                                             natom, nimg, nkind, nspin
@@ -213,8 +213,8 @@ CONTAINS
          CALL get_atomic_kind(particle_set(iatom)%atomic_kind, kind_number=ikind)
          CALL get_qs_kind(qs_kind_set(ikind), floating=floating)
          IF (floating) THEN
-            nfloat = nfloat+1
-            norm = norm+SUM(ABS(gradient(1:3, iatom)))
+            nfloat = nfloat + 1
+            norm = norm + SUM(ABS(gradient(1:3, iatom)))
          END IF
       END DO
       IF (nfloat > 0) THEN
@@ -232,7 +232,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_update_basis_center_pos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iatom, ikind, natom
       LOGICAL                                            :: floating
@@ -256,7 +256,7 @@ CONTAINS
          CALL get_atomic_kind(particle_set(iatom)%atomic_kind, kind_number=ikind)
          CALL get_qs_kind(qs_kind_set(ikind), floating=floating)
          IF (floating) THEN
-            particle_set(iatom)%r(1:3) = particle_set(iatom)%r(1:3)+alpha*gradient(1:3, iatom)
+            particle_set(iatom)%r(1:3) = particle_set(iatom)%r(1:3) + alpha*gradient(1:3, iatom)
          END IF
       END DO
 
@@ -277,7 +277,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_basis_reinit_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nmo
       TYPE(cp_fm_type), POINTER                          :: mo_coeff

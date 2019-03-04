@@ -11,57 +11,57 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE mao_wfn_analysis
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type
-   USE bibliography,                    ONLY: Ehrhardt1985,&
-                                              Heinzmann1976,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cholesky,               ONLY: cp_dbcsr_cholesky_decompose,&
-                                              cp_dbcsr_cholesky_restore
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_type, &
-        dbcsr_get_block_diag, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_replicate_all, &
-        dbcsr_reserve_diag_blocks, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, &
-        dbcsr_type_symmetric
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE iterate_matrix,                  ONLY: invert_Hotelling
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE mao_methods,                     ONLY: mao_basis_analysis,&
-                                              mao_build_q,&
-                                              mao_reference_basis
-   USE mao_optimizer,                   ONLY: mao_optimize
-   USE mathlib,                         ONLY: invmat_symm
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_neighbor_list_types,          ONLY: deallocate_neighbor_list_set,&
-                                              get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_neighbor_lists,               ONLY: setup_neighbor_list
-   USE qs_overlap,                      ONLY: build_overlap_matrix_simple
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_p_type
+   USE bibliography, ONLY: Ehrhardt1985, &
+                           Heinzmann1976, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cholesky, ONLY: cp_dbcsr_cholesky_decompose, &
+                                cp_dbcsr_cholesky_restore
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_type, &
+      dbcsr_get_block_diag, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release, dbcsr_replicate_all, &
+      dbcsr_reserve_diag_blocks, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, &
+      dbcsr_type_symmetric
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE iterate_matrix, ONLY: invert_Hotelling
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: kpoint_type
+   USE mao_methods, ONLY: mao_basis_analysis, &
+                          mao_build_q, &
+                          mao_reference_basis
+   USE mao_optimizer, ONLY: mao_optimize
+   USE mathlib, ONLY: invmat_symm
+   USE message_passing, ONLY: mp_sum
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_neighbor_list_types, ONLY: deallocate_neighbor_list_set, &
+                                     get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_neighbor_lists, ONLY: setup_neighbor_list
+   USE qs_overlap, ONLY: build_overlap_matrix_simple
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -94,13 +94,13 @@ CONTAINS
 
       CHARACTER(len=2)                                   :: element_symbol, esa, esb, esc
       INTEGER :: fall, handle, ia, iab, iabc, iatom, ib, ic, icol, ikind, irow, ispin, jatom, &
-         mao_basis, max_iter, me, na, nab, nabc, natom, nb, nc, nimages, nspin, ssize
+                 mao_basis, max_iter, me, na, nab, nabc, natom, nb, nc, nimages, nspin, ssize
       INTEGER, DIMENSION(:), POINTER                     :: col_blk_sizes, mao_blk, mao_blk_sizes, &
                                                             orb_blk, row_blk_sizes
       LOGICAL                                            :: analyze_ua, explicit, fo, for, fos, &
                                                             found, neglect_abc, print_basis
       REAL(KIND=dp) :: deltaq, electra(2), eps_ab, eps_abc, eps_filter, eps_fun, eps_grad, epsx, &
-         senabc, senmax, threshold, total_charge, total_spin, ua_charge(2), zeff
+                       senabc, senmax, threshold, total_charge, total_spin, ua_charge(2), zeff
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: occnumA, occnumABC, qab, qmatab, qmatac, &
                                                             qmatbc, raq, sab, selnABC, sinv, &
                                                             smatab, smatac, smatbc, uaq
@@ -214,7 +214,7 @@ CONTAINS
          END IF
          CALL dbcsr_get_block_p(matrix=matrix_p(1, 1)%matrix, &
                                 row=irow, col=icol, block=block, found=found)
-         IF (.NOT. found) fall = fall+1
+         IF (.NOT. found) fall = fall + 1
       END DO
       CALL neighbor_list_iterator_release(nl_iterator)
 
@@ -312,7 +312,7 @@ CONTAINS
       ! calculate unassigned charge : n - Tr PS
       DO ispin = 1, nspin
          CALL dbcsr_trace(mao_dmat(ispin)%matrix, mao_smat(ispin)%matrix, ua_charge(ispin))
-         ua_charge(ispin) = electra(ispin)-ua_charge(ispin)
+         ua_charge(ispin) = electra(ispin) - ua_charge(ispin)
       END DO
       IF (unit_nr > 0) THEN
          WRITE (unit_nr, *)
@@ -334,7 +334,7 @@ CONTAINS
                                    row=iatom, col=iatom, block=block, found=found)
             IF (found) THEN
                DO iab = 1, SIZE(block, 1)
-                  occnumA(iatom, ispin) = occnumA(iatom, ispin)+block(iab, iab)
+                  occnumA(iatom, ispin) = occnumA(iatom, ispin) + block(iab, iab)
                END DO
             END IF
          END DO
@@ -353,7 +353,7 @@ CONTAINS
          CALL dbcsr_get_block_diag(mao_smat(ispin)%matrix, smat_diag)
          CALL dbcsr_replicate_all(smat_diag)
          DO ia = 1, natom
-            DO ib = ia+1, natom
+            DO ib = ia + 1, natom
                iab = 0
                CALL dbcsr_get_block_p(matrix=mao_qmat(ispin)%matrix, &
                                       row=ia, col=ib, block=block, found=found)
@@ -363,35 +363,35 @@ CONTAINS
                IF (iab == 0 .AND. para_env%ionode) THEN
                   ! AB block is not available N_AB = N_A + N_B
                   ! Do this only on the "source" processor
-                  occnumAB(ia, ib, ispin) = occnumA(ia, ispin)+occnumA(ib, ispin)
-                  occnumAB(ib, ia, ispin) = occnumA(ia, ispin)+occnumA(ib, ispin)
+                  occnumAB(ia, ib, ispin) = occnumA(ia, ispin) + occnumA(ib, ispin)
+                  occnumAB(ib, ia, ispin) = occnumA(ia, ispin) + occnumA(ib, ispin)
                ELSE IF (found) THEN
                   ! owner of AB block performs calculation
                   na = SIZE(block, 1)
                   nb = SIZE(block, 2)
-                  nab = na+nb
+                  nab = na + nb
                   ALLOCATE (sab(nab, nab), qab(nab, nab), sinv(nab, nab))
                   ! qmat
-                  qab(1:na, na+1:nab) = block(1:na, 1:nb)
-                  qab(na+1:nab, 1:na) = TRANSPOSE(block(1:na, 1:nb))
+                  qab(1:na, na + 1:nab) = block(1:na, 1:nb)
+                  qab(na + 1:nab, 1:na) = TRANSPOSE(block(1:na, 1:nb))
                   CALL dbcsr_get_block_p(matrix=qmat_diag, row=ia, col=ia, block=diag, found=fo)
                   CPASSERT(fo)
                   qab(1:na, 1:na) = diag(1:na, 1:na)
                   CALL dbcsr_get_block_p(matrix=qmat_diag, row=ib, col=ib, block=diag, found=fo)
                   CPASSERT(fo)
-                  qab(na+1:nab, na+1:nab) = diag(1:nb, 1:nb)
+                  qab(na + 1:nab, na + 1:nab) = diag(1:nb, 1:nb)
                   ! smat
                   CALL dbcsr_get_block_p(matrix=mao_smat(ispin)%matrix, &
                                          row=ia, col=ib, block=block, found=fo)
                   CPASSERT(fo)
-                  sab(1:na, na+1:nab) = block(1:na, 1:nb)
-                  sab(na+1:nab, 1:na) = TRANSPOSE(block(1:na, 1:nb))
+                  sab(1:na, na + 1:nab) = block(1:na, 1:nb)
+                  sab(na + 1:nab, 1:na) = TRANSPOSE(block(1:na, 1:nb))
                   CALL dbcsr_get_block_p(matrix=smat_diag, row=ia, col=ia, block=diag, found=fo)
                   CPASSERT(fo)
                   sab(1:na, 1:na) = diag(1:na, 1:na)
                   CALL dbcsr_get_block_p(matrix=smat_diag, row=ib, col=ib, block=diag, found=fo)
                   CPASSERT(fo)
-                  sab(na+1:nab, na+1:nab) = diag(1:nb, 1:nb)
+                  sab(na + 1:nab, na + 1:nab) = diag(1:nb, 1:nb)
                   ! inv smat
                   sinv(1:nab, 1:nab) = sab(1:nab, 1:nab)
                   CALL invmat_symm(sinv)
@@ -413,8 +413,8 @@ CONTAINS
       selnAB = 0.0_dp
       DO ispin = 1, nspin
          DO ia = 1, natom
-            DO ib = ia+1, natom
-               selnAB(ia, ib, ispin) = occnumA(ia, ispin)+occnumA(ib, ispin)-occnumAB(ia, ib, ispin)
+            DO ib = ia + 1, natom
+               selnAB(ia, ib, ispin) = occnumA(ia, ispin) + occnumA(ib, ispin) - occnumAB(ia, ib, ispin)
                selnAB(ib, ia, ispin) = selnAB(ia, ib, ispin)
             END DO
          END DO
@@ -422,7 +422,7 @@ CONTAINS
 
       IF (.NOT. neglect_abc) THEN
          ! calculate N_ABC
-         nabc = (natom*(natom-1)*(natom-2))/6
+         nabc = (natom*(natom - 1)*(natom - 2))/6
          ALLOCATE (occnumABC(nabc, nspin))
          occnumABC = -1.0_dp
          DO ispin = 1, nspin
@@ -440,10 +440,10 @@ CONTAINS
                CALL dbcsr_get_block_p(matrix=smat_diag, row=ia, col=ia, block=sblka, found=fo)
                CPASSERT(fo)
                na = SIZE(qblka, 1)
-               DO ib = ia+1, natom
+               DO ib = ia + 1, natom
                   ! screen with SEN(AB)
                   IF (selnAB(ia, ib, ispin) < eps_abc) THEN
-                     iabc = iabc+(natom-ib)
+                     iabc = iabc + (natom - ib)
                      CYCLE
                   END IF
                   CALL dbcsr_get_block_p(matrix=qmat_diag, row=ib, col=ib, block=qblkb, found=fo)
@@ -451,7 +451,7 @@ CONTAINS
                   CALL dbcsr_get_block_p(matrix=smat_diag, row=ib, col=ib, block=sblkb, found=fo)
                   CPASSERT(fo)
                   nb = SIZE(qblkb, 1)
-                  nab = na+nb
+                  nab = na + nb
                   ALLOCATE (qmatab(na, nb), smatab(na, nb))
                   CALL dbcsr_get_block_p(matrix=mao_qmat(ispin)%matrix, row=ia, col=ib, &
                                          block=block, found=found)
@@ -463,10 +463,10 @@ CONTAINS
                   smatab = 0.0_dp
                   IF (found) smatab(1:na, 1:nb) = block(1:na, 1:nb)
                   CALL mp_sum(smatab, para_env%group)
-                  DO ic = ib+1, natom
+                  DO ic = ib + 1, natom
                      ! screen with SEN(AB)
                      IF ((selnAB(ia, ic, ispin) < eps_abc) .OR. (selnAB(ib, ic, ispin) < eps_abc)) THEN
-                        iabc = iabc+1
+                        iabc = iabc + 1
                         CYCLE
                      END IF
                      CALL dbcsr_get_block_p(matrix=qmat_diag, row=ic, col=ic, block=qblkc, found=fo)
@@ -497,33 +497,33 @@ CONTAINS
                      IF (found) smatbc(1:nb, 1:nc) = block(1:nb, 1:nc)
                      CALL mp_sum(smatbc, para_env%group)
                      !
-                     nabc = na+nb+nc
+                     nabc = na + nb + nc
                      ALLOCATE (sab(nabc, nabc), sinv(nabc, nabc), qab(nabc, nabc))
                      !
                      qab(1:na, 1:na) = qblka(1:na, 1:na)
-                     qab(na+1:nab, na+1:nab) = qblkb(1:nb, 1:nb)
-                     qab(nab+1:nabc, nab+1:nabc) = qblkc(1:nc, 1:nc)
-                     qab(1:na, na+1:nab) = qmatab(1:na, 1:nb)
-                     qab(na+1:nab, 1:na) = TRANSPOSE(qmatab(1:na, 1:nb))
-                     qab(1:na, nab+1:nabc) = qmatac(1:na, 1:nc)
-                     qab(nab+1:nabc, 1:na) = TRANSPOSE(qmatac(1:na, 1:nc))
-                     qab(na+1:nab, nab+1:nabc) = qmatbc(1:nb, 1:nc)
-                     qab(nab+1:nabc, na+1:nab) = TRANSPOSE(qmatbc(1:nb, 1:nc))
+                     qab(na + 1:nab, na + 1:nab) = qblkb(1:nb, 1:nb)
+                     qab(nab + 1:nabc, nab + 1:nabc) = qblkc(1:nc, 1:nc)
+                     qab(1:na, na + 1:nab) = qmatab(1:na, 1:nb)
+                     qab(na + 1:nab, 1:na) = TRANSPOSE(qmatab(1:na, 1:nb))
+                     qab(1:na, nab + 1:nabc) = qmatac(1:na, 1:nc)
+                     qab(nab + 1:nabc, 1:na) = TRANSPOSE(qmatac(1:na, 1:nc))
+                     qab(na + 1:nab, nab + 1:nabc) = qmatbc(1:nb, 1:nc)
+                     qab(nab + 1:nabc, na + 1:nab) = TRANSPOSE(qmatbc(1:nb, 1:nc))
                      !
                      sab(1:na, 1:na) = sblka(1:na, 1:na)
-                     sab(na+1:nab, na+1:nab) = sblkb(1:nb, 1:nb)
-                     sab(nab+1:nabc, nab+1:nabc) = sblkc(1:nc, 1:nc)
-                     sab(1:na, na+1:nab) = smatab(1:na, 1:nb)
-                     sab(na+1:nab, 1:na) = TRANSPOSE(smatab(1:na, 1:nb))
-                     sab(1:na, nab+1:nabc) = smatac(1:na, 1:nc)
-                     sab(nab+1:nabc, 1:na) = TRANSPOSE(smatac(1:na, 1:nc))
-                     sab(na+1:nab, nab+1:nabc) = smatbc(1:nb, 1:nc)
-                     sab(nab+1:nabc, na+1:nab) = TRANSPOSE(smatbc(1:nb, 1:nc))
+                     sab(na + 1:nab, na + 1:nab) = sblkb(1:nb, 1:nb)
+                     sab(nab + 1:nabc, nab + 1:nabc) = sblkc(1:nc, 1:nc)
+                     sab(1:na, na + 1:nab) = smatab(1:na, 1:nb)
+                     sab(na + 1:nab, 1:na) = TRANSPOSE(smatab(1:na, 1:nb))
+                     sab(1:na, nab + 1:nabc) = smatac(1:na, 1:nc)
+                     sab(nab + 1:nabc, 1:na) = TRANSPOSE(smatac(1:na, 1:nc))
+                     sab(na + 1:nab, nab + 1:nabc) = smatbc(1:nb, 1:nc)
+                     sab(nab + 1:nabc, na + 1:nab) = TRANSPOSE(smatbc(1:nb, 1:nc))
                      ! inv smat
                      sinv(1:nabc, 1:nabc) = sab(1:nabc, 1:nabc)
                      CALL invmat_symm(sinv)
                      ! Tr(Q*Sinv)
-                     iabc = iabc+1
+                     iabc = iabc + 1
                      me = MOD(iabc, para_env%num_pe)
                      IF (me == para_env%mepos) THEN
                         occnumABC(iabc, ispin) = SUM(qab*sinv)
@@ -546,18 +546,18 @@ CONTAINS
 
       IF (.NOT. neglect_abc) THEN
          ! calculate shared electron numbers (ABC)
-         nabc = (natom*(natom-1)*(natom-2))/6
+         nabc = (natom*(natom - 1)*(natom - 2))/6
          ALLOCATE (selnABC(nabc, nspin))
          selnABC = 0.0_dp
          DO ispin = 1, nspin
             iabc = 0
             DO ia = 1, natom
-               DO ib = ia+1, natom
-                  DO ic = ib+1, natom
-                     iabc = iabc+1
+               DO ib = ia + 1, natom
+                  DO ic = ib + 1, natom
+                     iabc = iabc + 1
                      IF (occnumABC(iabc, ispin) >= 0.0_dp) THEN
-                        selnABC(iabc, ispin) = occnumA(ia, ispin)+occnumA(ib, ispin)+occnumA(ic, ispin)- &
-                                               occnumAB(ia, ib, ispin)-occnumAB(ia, ic, ispin)-occnumAB(ib, ic, ispin)+ &
+                        selnABC(iabc, ispin) = occnumA(ia, ispin) + occnumA(ib, ispin) + occnumA(ic, ispin) - &
+                                               occnumAB(ia, ib, ispin) - occnumAB(ia, ic, ispin) - occnumAB(ib, ic, ispin) + &
                                                occnumABC(iabc, ispin)
                      END IF
                   END DO
@@ -573,18 +573,18 @@ CONTAINS
          DO ia = 1, natom
             raq(ia, ispin) = occnumA(ia, ispin)
             DO ib = 1, natom
-               raq(ia, ispin) = raq(ia, ispin)-0.5_dp*selnAB(ia, ib, ispin)
+               raq(ia, ispin) = raq(ia, ispin) - 0.5_dp*selnAB(ia, ib, ispin)
             END DO
          END DO
          IF (.NOT. neglect_abc) THEN
             iabc = 0
             DO ia = 1, natom
-               DO ib = ia+1, natom
-                  DO ic = ib+1, natom
-                     iabc = iabc+1
-                     raq(ia, ispin) = raq(ia, ispin)+selnABC(iabc, ispin)/3._dp
-                     raq(ib, ispin) = raq(ib, ispin)+selnABC(iabc, ispin)/3._dp
-                     raq(ic, ispin) = raq(ic, ispin)+selnABC(iabc, ispin)/3._dp
+               DO ib = ia + 1, natom
+                  DO ic = ib + 1, natom
+                     iabc = iabc + 1
+                     raq(ia, ispin) = raq(ia, ispin) + selnABC(iabc, ispin)/3._dp
+                     raq(ib, ispin) = raq(ib, ispin) + selnABC(iabc, ispin)/3._dp
+                     raq(ic, ispin) = raq(ic, ispin) + selnABC(iabc, ispin)/3._dp
                   END DO
                END DO
             END DO
@@ -593,7 +593,7 @@ CONTAINS
 
       ! calculate unassigned charge (from sum over atomic charges)
       DO ispin = 1, nspin
-         deltaq = (electra(ispin)-SUM(raq(1:natom, ispin)))-ua_charge(ispin)
+         deltaq = (electra(ispin) - SUM(raq(1:natom, ispin))) - ua_charge(ispin)
          IF (unit_nr > 0) THEN
             WRITE (UNIT=unit_nr, FMT="(T2,A,T32,A,i2,T55,A,F12.8)") &
                "Cutoff error on charge", "Spin ", ispin, "error charge =", deltaq
@@ -690,7 +690,7 @@ CONTAINS
                                    filter_eps=eps_filter)
                ! Tr(P*A)
                CALL dbcsr_trace(matrix_p(ispin, 1)%matrix, amat, uaq(ia, ispin))
-               uaq(ia, ispin) = uaq(ia, ispin)-electra(ispin)
+               uaq(ia, ispin) = uaq(ia, ispin) - electra(ispin)
             END DO
             !
             CALL dbcsr_release(sumat)
@@ -709,13 +709,13 @@ CONTAINS
          DEALLOCATE (orb_blk, mao_blk)
       END IF
       !
-      raq(1:natom, 1:nspin) = raq(1:natom, 1:nspin)-uaq(1:natom, 1:nspin)
+      raq(1:natom, 1:nspin) = raq(1:natom, 1:nspin) - uaq(1:natom, 1:nspin)
       DO ispin = 1, nspin
-         deltaq = electra(ispin)-SUM(raq(1:natom, ispin))
+         deltaq = electra(ispin) - SUM(raq(1:natom, ispin))
          IF (unit_nr > 0) THEN
             WRITE (UNIT=unit_nr, FMT="(T2,A,T32,A,i2,T55,A,F12.8)") &
                "Charge/Atom redistributed", "Spin ", ispin, "delta charge =", &
-               (deltaq+ua_charge(ispin))/REAL(natom, KIND=dp)
+               (deltaq + ua_charge(ispin))/REAL(natom, KIND=dp)
          END IF
       END DO
 
@@ -727,8 +727,8 @@ CONTAINS
             WRITE (unit_nr, "(/,T2,A,T40,A,T55,A,T70,A)") "MAO atomic charges ", "Atom", "Charge", "Spin Charge"
          END IF
          DO ispin = 1, nspin
-            deltaq = electra(ispin)-SUM(raq(1:natom, ispin))
-            raq(:, ispin) = raq(:, ispin)+deltaq/REAL(natom, KIND=dp)
+            deltaq = electra(ispin) - SUM(raq(1:natom, ispin))
+            raq(:, ispin) = raq(:, ispin) + deltaq/REAL(natom, KIND=dp)
          END DO
          total_charge = 0.0_dp
          total_spin = 0.0_dp
@@ -737,13 +737,13 @@ CONTAINS
                                  element_symbol=element_symbol, kind_number=ikind)
             CALL get_qs_kind(qs_kind_set(ikind), zeff=zeff)
             IF (nspin == 1) THEN
-               WRITE (unit_nr, "(T30,I6,T42,A2,T69,F12.6)") iatom, element_symbol, zeff-raq(iatom, 1)
-               total_charge = total_charge+(zeff-raq(iatom, 1))
+               WRITE (unit_nr, "(T30,I6,T42,A2,T69,F12.6)") iatom, element_symbol, zeff - raq(iatom, 1)
+               total_charge = total_charge + (zeff - raq(iatom, 1))
             ELSE
                WRITE (unit_nr, "(T30,I6,T42,A2,T48,F12.6,T69,F12.6)") iatom, element_symbol, &
-                  zeff-raq(iatom, 1)-raq(iatom, 2), raq(iatom, 1)-raq(iatom, 2)
-               total_charge = total_charge+(zeff-raq(iatom, 1)-raq(iatom, 2))
-               total_spin = total_spin+(raq(iatom, 1)-raq(iatom, 2))
+                  zeff - raq(iatom, 1) - raq(iatom, 2), raq(iatom, 1) - raq(iatom, 2)
+               total_charge = total_charge + (zeff - raq(iatom, 1) - raq(iatom, 2))
+               total_spin = total_spin + (raq(iatom, 1) - raq(iatom, 2))
             END IF
          END DO
          IF (nspin == 1) THEN
@@ -769,12 +769,12 @@ CONTAINS
                                     element_symbol=element_symbol)
                IF (nspin == 1) THEN
                   WRITE (unit_nr, "(T30,I6,T42,A2,T69,F12.6)") iatom, element_symbol, uaq(iatom, 1)
-                  total_charge = total_charge+uaq(iatom, 1)
+                  total_charge = total_charge + uaq(iatom, 1)
                ELSE
                   WRITE (unit_nr, "(T30,I6,T42,A2,T48,F12.6,T69,F12.6)") iatom, element_symbol, &
-                     uaq(iatom, 1)+uaq(iatom, 2), uaq(iatom, 1)-uaq(iatom, 2)
-                  total_charge = total_charge+uaq(iatom, 1)+uaq(iatom, 2)
-                  total_spin = total_spin+uaq(iatom, 1)-uaq(iatom, 2)
+                     uaq(iatom, 1) + uaq(iatom, 2), uaq(iatom, 1) - uaq(iatom, 2)
+                  total_charge = total_charge + uaq(iatom, 1) + uaq(iatom, 2)
+                  total_spin = total_spin + uaq(iatom, 1) - uaq(iatom, 2)
                END IF
             END DO
             IF (nspin == 1) THEN
@@ -794,7 +794,7 @@ CONTAINS
                "SEN(1)", "SEN(2)", "SEN(total)"
          END IF
          DO ia = 1, natom
-            DO ib = ia+1, natom
+            DO ib = ia + 1, natom
                CALL get_atomic_kind(atomic_kind=particle_set(ia)%atomic_kind, element_symbol=esa)
                CALL get_atomic_kind(atomic_kind=particle_set(ib)%atomic_kind, element_symbol=esb)
                IF (nspin == 1) THEN
@@ -802,9 +802,9 @@ CONTAINS
                      WRITE (unit_nr, "(T26,I6,' ',A2,T35,I6,' ',A2,T69,F12.6)") ia, esa, ib, esb, selnAB(ia, ib, 1)
                   END IF
                ELSE
-                  IF ((selnAB(ia, ib, 1)+selnAB(ia, ib, 2)) > eps_ab) THEN
+                  IF ((selnAB(ia, ib, 1) + selnAB(ia, ib, 2)) > eps_ab) THEN
                      WRITE (unit_nr, "(T26,I6,' ',A2,T35,I6,' ',A2,T45,3F12.6)") ia, esa, ib, esb, &
-                        selnAB(ia, ib, 1), selnAB(ia, ib, 2), (selnAB(ia, ib, 1)+selnAB(ia, ib, 2))
+                        selnAB(ia, ib, 1), selnAB(ia, ib, 2), (selnAB(ia, ib, 1) + selnAB(ia, ib, 2))
                   END IF
                END IF
             END DO
@@ -819,9 +819,9 @@ CONTAINS
             senmax = 0.0_dp
             iabc = 0
             DO ia = 1, natom
-               DO ib = ia+1, natom
-                  DO ic = ib+1, natom
-                     iabc = iabc+1
+               DO ib = ia + 1, natom
+                  DO ic = ib + 1, natom
+                     iabc = iabc + 1
                      senabc = SUM(selnABC(iabc, :))
                      senmax = MAX(senmax, senabc)
                      IF (senabc > eps_abc) THEN

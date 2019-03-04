@@ -8,38 +8,38 @@
 !> \author JGH (14.08.2004)
 ! **************************************************************************************************
 MODULE semi_empirical_types
-   USE basis_set_types,                 ONLY: deallocate_sto_basis_set,&
-                                              sto_basis_set_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE dg_types,                        ONLY: dg_type
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_mndo, do_method_mndod, do_method_pdg, do_method_pm3, &
-        do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1, do_se_IS_kdso_d, &
-        do_se_IS_slater
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE multipole_types,                 ONLY: do_multipole_charge,&
-                                              do_multipole_dipole,&
-                                              do_multipole_none,&
-                                              do_multipole_quadrupole
-   USE physcon,                         ONLY: angstrom,&
-                                              evolt,&
-                                              kcalmol
-   USE pw_pool_types,                   ONLY: pw_pool_type
-   USE semi_empirical_expns3_types,     ONLY: semi_empirical_expns3_p_type,&
-                                              semi_empirical_expns3_release
-   USE semi_empirical_mpole_types,      ONLY: semi_empirical_mpole_p_release,&
-                                              semi_empirical_mpole_p_type
-   USE taper_types,                     ONLY: taper_create,&
-                                              taper_release,&
-                                              taper_type
+   USE basis_set_types, ONLY: deallocate_sto_basis_set, &
+                              sto_basis_set_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE dg_types, ONLY: dg_type
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_mndo, do_method_mndod, do_method_pdg, do_method_pm3, &
+      do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_rm1, do_se_IS_kdso_d, &
+      do_se_IS_slater
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE multipole_types, ONLY: do_multipole_charge, &
+                              do_multipole_dipole, &
+                              do_multipole_none, &
+                              do_multipole_quadrupole
+   USE physcon, ONLY: angstrom, &
+                      evolt, &
+                      kcalmol
+   USE pw_pool_types, ONLY: pw_pool_type
+   USE semi_empirical_expns3_types, ONLY: semi_empirical_expns3_p_type, &
+                                          semi_empirical_expns3_release
+   USE semi_empirical_mpole_types, ONLY: semi_empirical_mpole_p_release, &
+                                         semi_empirical_mpole_p_type
+   USE taper_types, ONLY: taper_create, &
+                          taper_release, &
+                          taper_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -187,7 +187,7 @@ CONTAINS
       TYPE(semi_empirical_type), POINTER                 :: sep
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(sep))
       ALLOCATE (sep)
@@ -211,7 +211,7 @@ CONTAINS
       TYPE(semi_empirical_type), POINTER                 :: sep
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -618,7 +618,7 @@ CONTAINS
                                                             taper_lrc, range_lrc
 
       CHARACTER(len=*), PARAMETER :: routineN = 'se_taper_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(se_taper))
       ALLOCATE (se_taper)
@@ -647,7 +647,7 @@ CONTAINS
       TYPE(se_taper_type), POINTER                       :: se_taper
 
       CHARACTER(len=*), PARAMETER :: routineN = 'se_taper_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(se_taper)) THEN
          CALL taper_release(se_taper%taper_cou)

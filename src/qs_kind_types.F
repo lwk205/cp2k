@@ -18,83 +18,83 @@
 !> - 07.2015 new container for basis sets [jgh]
 ! **************************************************************************************************
 MODULE qs_kind_types
-   USE atom_sgp,                        ONLY: atom_sgp_potential_type,&
-                                              atom_sgp_release,&
-                                              sgp_construction
-   USE atom_types,                      ONLY: atom_ecppot_type,&
-                                              lmat,&
-                                              read_ecp_potential
-   USE atom_upf,                        ONLY: atom_read_upf,&
-                                              atom_release_upf,&
-                                              atom_upfpot_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_container_types,       ONLY: add_basis_set_to_container,&
-                                              basis_set_container_type,&
-                                              get_basis_from_container,&
-                                              remove_basis_from_container,&
-                                              remove_basis_set_container
-   USE basis_set_types,                 ONLY: &
-        allocate_gto_basis_set, allocate_sto_basis_set, combine_basis_sets, &
-        create_gto_from_sto_basis, deallocate_gto_basis_set, deallocate_sto_basis_set, &
-        get_gto_basis_set, gto_basis_set_type, init_aux_basis_set, init_orb_basis_set, &
-        read_gto_basis_set, read_sto_basis_set, sto_basis_set_type, write_gto_basis_set, &
-        write_orb_basis_set
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              qs_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE external_potential_types,        ONLY: &
-        all_potential_type, allocate_potential, deallocate_potential, get_potential, &
-        gth_potential_type, init_potential, local_potential_type, read_potential, &
-        set_default_all_potential, set_potential, sgp_potential_type, write_potential
-   USE input_constants,                 ONLY: &
-        do_method_am1, do_method_dftb, do_method_mndo, do_method_mndod, do_method_pdg, &
-        do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_pw, &
-        do_method_rm1, do_qs, do_sirius
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: pi
-   USE orbital_pointers,                ONLY: init_orbital_pointers,&
-                                              nco,&
-                                              ncoset
-   USE paw_proj_set_types,              ONLY: allocate_paw_proj_set,&
-                                              deallocate_paw_proj_set,&
-                                              get_paw_proj_set,&
-                                              paw_proj_set_type,&
-                                              projectors
-   USE periodic_table,                  ONLY: get_ptable_info,&
-                                              ptable
-   USE physcon,                         ONLY: bohr,&
-                                              evolt
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type
-   USE qs_dftb_utils,                   ONLY: deallocate_dftb_atom_param,&
-                                              get_dftb_atom_param,&
-                                              write_dftb_atom_param
-   USE qs_dispersion_types,             ONLY: qs_atom_dispersion_type
-   USE qs_grid_atom,                    ONLY: allocate_grid_atom,&
-                                              deallocate_grid_atom,&
-                                              grid_atom_type
-   USE qs_harmonics_atom,               ONLY: allocate_harmonics_atom,&
-                                              deallocate_harmonics_atom,&
-                                              harmonics_atom_type
-   USE semi_empirical_types,            ONLY: get_se_param,&
-                                              semi_empirical_create,&
-                                              semi_empirical_release,&
-                                              semi_empirical_type,&
-                                              write_se_param
-   USE semi_empirical_utils,            ONLY: init_se_param,&
-                                              se_param_set_default
-   USE soft_basis_set,                  ONLY: create_soft_basis
-   USE string_utilities,                ONLY: uppercase
+   USE atom_sgp, ONLY: atom_sgp_potential_type, &
+                       atom_sgp_release, &
+                       sgp_construction
+   USE atom_types, ONLY: atom_ecppot_type, &
+                         lmat, &
+                         read_ecp_potential
+   USE atom_upf, ONLY: atom_read_upf, &
+                       atom_release_upf, &
+                       atom_upfpot_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_container_types, ONLY: add_basis_set_to_container, &
+                                        basis_set_container_type, &
+                                        get_basis_from_container, &
+                                        remove_basis_from_container, &
+                                        remove_basis_set_container
+   USE basis_set_types, ONLY: &
+      allocate_gto_basis_set, allocate_sto_basis_set, combine_basis_sets, &
+      create_gto_from_sto_basis, deallocate_gto_basis_set, deallocate_sto_basis_set, &
+      get_gto_basis_set, gto_basis_set_type, init_aux_basis_set, init_orb_basis_set, &
+      read_gto_basis_set, read_sto_basis_set, sto_basis_set_type, write_gto_basis_set, &
+      write_orb_basis_set
+   USE cp_control_types, ONLY: dft_control_type, &
+                               qs_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE external_potential_types, ONLY: &
+      all_potential_type, allocate_potential, deallocate_potential, get_potential, &
+      gth_potential_type, init_potential, local_potential_type, read_potential, &
+      set_default_all_potential, set_potential, sgp_potential_type, write_potential
+   USE input_constants, ONLY: &
+      do_method_am1, do_method_dftb, do_method_mndo, do_method_mndod, do_method_pdg, &
+      do_method_pm3, do_method_pm6, do_method_pm6fm, do_method_pnnl, do_method_pw, &
+      do_method_rm1, do_qs, do_sirius
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE mathconstants, ONLY: pi
+   USE orbital_pointers, ONLY: init_orbital_pointers, &
+                               nco, &
+                               ncoset
+   USE paw_proj_set_types, ONLY: allocate_paw_proj_set, &
+                                 deallocate_paw_proj_set, &
+                                 get_paw_proj_set, &
+                                 paw_proj_set_type, &
+                                 projectors
+   USE periodic_table, ONLY: get_ptable_info, &
+                             ptable
+   USE physcon, ONLY: bohr, &
+                      evolt
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type
+   USE qs_dftb_utils, ONLY: deallocate_dftb_atom_param, &
+                            get_dftb_atom_param, &
+                            write_dftb_atom_param
+   USE qs_dispersion_types, ONLY: qs_atom_dispersion_type
+   USE qs_grid_atom, ONLY: allocate_grid_atom, &
+                           deallocate_grid_atom, &
+                           grid_atom_type
+   USE qs_harmonics_atom, ONLY: allocate_harmonics_atom, &
+                                deallocate_harmonics_atom, &
+                                harmonics_atom_type
+   USE semi_empirical_types, ONLY: get_se_param, &
+                                   semi_empirical_create, &
+                                   semi_empirical_release, &
+                                   semi_empirical_type, &
+                                   write_se_param
+   USE semi_empirical_utils, ONLY: init_se_param, &
+                                   se_param_set_default
+   USE soft_basis_set, ONLY: create_soft_basis
+   USE string_utilities, ONLY: uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -238,7 +238,7 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_qs_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nkind
 
@@ -507,7 +507,7 @@ CONTAINS
             CALL get_gto_basis_set(gto_basis_set=tmp_basis_set, ncgf=ncgf)
          ELSE IF (ASSOCIATED(qs_kind%dftb_parameter)) THEN
             l = qs_kind%dftb_parameter%lmax
-            ncgf = ((l+1)*(l+2)*(l+3))/6
+            ncgf = ((l + 1)*(l + 2)*(l + 3))/6
          ELSE
             ncgf = 0
          END IF
@@ -792,10 +792,10 @@ CONTAINS
 
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
       LOGICAL, INTENT(OUT), OPTIONAL :: all_potential_present, tnadd_potential_present, &
-         gth_potential_present, sgp_potential_present, paw_atom_present, dft_plus_u_atom_present
+                                        gth_potential_present, sgp_potential_present, paw_atom_present, dft_plus_u_atom_present
       INTEGER, INTENT(OUT), OPTIONAL :: maxcgf, maxsgf, maxco, maxco_proj, maxgtops, maxlgto, &
-         maxlprj, maxnset, maxsgf_set, ncgf, npgf, nset, nsgf, nshell, maxpol, maxlppl, maxlppnl, &
-         maxppnl, nelectron
+                                        maxlprj, maxnset, maxsgf_set, ncgf, npgf, nset, nsgf, nshell, maxpol, maxlppl, maxlppnl, &
+                                        maxppnl, nelectron
       INTEGER, INTENT(IN), OPTIONAL                      :: maxder
       INTEGER, INTENT(OUT), OPTIONAL                     :: max_ngrid_rad, max_sph_harm, &
                                                             maxg_iso_not0, lmax_rho0
@@ -803,7 +803,7 @@ CONTAINS
       CHARACTER(len=*), OPTIONAL                         :: basis_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_qs_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: my_basis_type
       INTEGER                                            :: ikind, imax, lmax_rho0_kind, &
@@ -877,11 +877,11 @@ CONTAINS
 
             IF (PRESENT(maxlppl) .AND. ASSOCIATED(gth_potential)) THEN
                CALL get_potential(potential=gth_potential, nexp_ppl=n)
-               maxlppl = MAX(maxlppl, 2*(n-1))
+               maxlppl = MAX(maxlppl, 2*(n - 1))
             ELSEIF (PRESENT(maxlppl) .AND. ASSOCIATED(sgp_potential)) THEN
                CALL get_potential(potential=sgp_potential, nrloc=nrloc)
-               n = MAXVAL(nrloc)-2
-               maxlppl = MAX(maxlppl, 2*(n-1))
+               n = MAXVAL(nrloc) - 2
+               maxlppl = MAX(maxlppl, 2*(n - 1))
             END IF
 
             IF (PRESENT(maxlppnl) .AND. ASSOCIATED(gth_potential)) THEN
@@ -894,7 +894,7 @@ CONTAINS
 
             IF (PRESENT(maxpol) .AND. ASSOCIATED(tnadd_potential)) THEN
                CALL get_potential(potential=tnadd_potential, npol=n)
-               maxpol = MAX(maxpol, 2*(n-1))
+               maxpol = MAX(maxpol, 2*(n - 1))
             END IF
 
             IF (PRESENT(maxco_proj) .AND. ASSOCIATED(paw_proj_set)) THEN
@@ -924,7 +924,7 @@ CONTAINS
                   maxcgf = MAX(maxcgf, imax)
                ELSE IF (ASSOCIATED(qs_kind%dftb_parameter)) THEN
                   CALL get_dftb_atom_param(dftb_parameter=dftb_parameter, lmax=imax)
-                  imax = ((imax+1)*(imax+2)*(imax+3))/6
+                  imax = ((imax + 1)*(imax + 2)*(imax + 3))/6
                   maxcgf = MAX(maxcgf, imax)
                END IF
             END IF
@@ -990,45 +990,45 @@ CONTAINS
             IF (PRESENT(ncgf)) THEN
                IF (ASSOCIATED(tmp_basis_set)) THEN
                   CALL get_gto_basis_set(gto_basis_set=tmp_basis_set, ncgf=n)
-                  ncgf = ncgf+n*qs_kind_set(ikind)%natom
+                  ncgf = ncgf + n*qs_kind_set(ikind)%natom
                ELSE IF (ASSOCIATED(qs_kind%dftb_parameter)) THEN
                   CALL get_dftb_atom_param(dftb_parameter=dftb_parameter, lmax=imax)
-                  n = ((imax+1)*(imax+2)*(imax+3))/6
-                  ncgf = ncgf+n*qs_kind_set(ikind)%natom
+                  n = ((imax + 1)*(imax + 2)*(imax + 3))/6
+                  ncgf = ncgf + n*qs_kind_set(ikind)%natom
                END IF
             END IF
 
             IF (PRESENT(npgf)) THEN
                IF (ASSOCIATED(tmp_basis_set)) THEN
                   CALL get_gto_basis_set(gto_basis_set=tmp_basis_set, npgf_sum=n)
-                  npgf = npgf+n*qs_kind_set(ikind)%natom
+                  npgf = npgf + n*qs_kind_set(ikind)%natom
                END IF
             END IF
 
             IF (PRESENT(nset)) THEN
                IF (ASSOCIATED(tmp_basis_set)) THEN
                   CALL get_gto_basis_set(gto_basis_set=tmp_basis_set, nset=n)
-                  nset = nset+n*qs_kind_set(ikind)%natom
+                  nset = nset + n*qs_kind_set(ikind)%natom
                END IF
             END IF
 
             IF (PRESENT(nsgf)) THEN
                IF (ASSOCIATED(tmp_basis_set)) THEN
                   CALL get_gto_basis_set(gto_basis_set=tmp_basis_set, nsgf=n)
-                  nsgf = nsgf+n*qs_kind_set(ikind)%natom
+                  nsgf = nsgf + n*qs_kind_set(ikind)%natom
                ELSE IF (ASSOCIATED(qs_kind%dftb_parameter)) THEN
                   CALL get_dftb_atom_param(dftb_parameter=dftb_parameter, natorb=n)
-                  nsgf = nsgf+n*qs_kind_set(ikind)%natom
+                  nsgf = nsgf + n*qs_kind_set(ikind)%natom
                END IF
             END IF
 
             IF (PRESENT(nshell)) THEN
                IF (ASSOCIATED(tmp_basis_set)) THEN
                   CALL get_gto_basis_set(gto_basis_set=tmp_basis_set, nshell_sum=n)
-                  nshell = nshell+n*qs_kind_set(ikind)%natom
+                  nshell = nshell + n*qs_kind_set(ikind)%natom
                ELSE IF (ASSOCIATED(qs_kind%dftb_parameter)) THEN
                   CALL get_dftb_atom_param(dftb_parameter=dftb_parameter, lmax=n)
-                  nshell = nshell+(n+1)*qs_kind_set(ikind)%natom
+                  nshell = nshell + (n + 1)*qs_kind_set(ikind)%natom
                END IF
             END IF
 
@@ -1046,7 +1046,7 @@ CONTAINS
                   zeff = 0.0_dp
                   zeff_correction = 0.0_dp
                END IF
-               nelectron = nelectron+qs_kind_set(ikind)%natom*NINT(zeff-zeff_correction)
+               nelectron = nelectron + qs_kind_set(ikind)%natom*NINT(zeff - zeff_correction)
             END IF
 
             IF (PRESENT(basis_rcut)) THEN
@@ -1172,7 +1172,7 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_qs_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind
       TYPE(qs_kind_type), POINTER                        :: qs_kind
@@ -1205,7 +1205,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: force_env_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_gapw_basis_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nkind
       LOGICAL                                            :: gpw, paw_atom
@@ -1313,10 +1313,10 @@ CONTAINS
                            DO ic = 1, nc
                               cval = cval_nlcc(ic, i)
                               coa = cval/alpha
-                              den(:, 1) = den(:, 1)+fe(:)*rc**(2*ic-2)*cval
-                              den(:, 2) = den(:, 2)-fe(:)*rc**(2*ic-1)*coa
+                              den(:, 1) = den(:, 1) + fe(:)*rc**(2*ic - 2)*cval
+                              den(:, 2) = den(:, 2) - fe(:)*rc**(2*ic - 1)*coa
                               IF (ic > 1) THEN
-                                 den(:, 2) = den(:, 2)+REAL(2*ic-2, dp)*fe(:)*rc**(2*ic-3)*coa
+                                 den(:, 2) = den(:, 2) + REAL(2*ic - 2, dp)*fe(:)*rc**(2*ic - 3)*coa
                               END IF
                            END DO
                         END DO
@@ -1335,8 +1335,8 @@ CONTAINS
                            alpha = a_nlcc(i)
                            fe(:) = EXP(-alpha*rr(:)*rr(:))
                            cval = c_nlcc(i)
-                           den(:, 1) = den(:, 1)+cval*fe(:)
-                           den(:, 2) = den(:, 2)-2.0_dp*alpha*cval*rr(:)*fe(:)
+                           den(:, 1) = den(:, 1) + cval*fe(:)
+                           den(:, 2) = den(:, 2) - 2.0_dp*alpha*cval*rr(:)*fe(:)
                         END DO
                         DEALLOCATE (rc, fe)
                      END IF
@@ -1382,8 +1382,8 @@ CONTAINS
       CHARACTER(len=default_path_length)                 :: kg_potential_fn_kind, &
                                                             potential_file_name, potential_fn_kind
       CHARACTER(LEN=default_string_length) :: akind_name, aux_basis_set_name, &
-         aux_fit_basis_set_name, basis_type, keyword, kgpot_name, kgpot_type, lri_basis_set_name, &
-         orb_basis_set_name, potential_name, potential_type, ri_aux_basis_set_name, tmp
+                                          aux_fit_basis_set_name, basis_type, keyword, kgpot_name, kgpot_type, lri_basis_set_name, &
+                                              orb_basis_set_name, potential_name, potential_type, ri_aux_basis_set_name, tmp
       CHARACTER(LEN=default_string_length), DIMENSION(4) :: description
       CHARACTER(LEN=default_string_length), &
          DIMENSION(:), POINTER                           :: tmpstringlist
@@ -1391,10 +1391,10 @@ CONTAINS
          DIMENSION(maxbas)                               :: basis_set_form, basis_set_name, &
                                                             basis_set_type
       INTEGER :: handle, i, i_rep, ipaodesc, ipaopot, ipos, j, jj, k_rep, l, m, n_rep, nb_rep, &
-         nexp, ngauss, nlcc, nloc, nnl, norbitals, npaodesc, npaopot, nppnl, nspin, z
+                 nexp, ngauss, nlcc, nloc, nnl, norbitals, npaodesc, npaopot, nppnl, nspin, z
       INTEGER, DIMENSION(:), POINTER                     :: add_el, elec_conf, orbitals
       LOGICAL :: check, explicit, explicit_basis, explicit_kgpot, explicit_potential, nobasis, &
-         section_enabled, subsection_enabled, update_input
+                 section_enabled, subsection_enabled, update_input
       REAL(KIND=dp)                                      :: alpha, ccore, rc, zeff_correction
       REAL(KIND=dp), DIMENSION(3)                        :: error
       REAL(KIND=dp), DIMENSION(:), POINTER               :: a_nl, aloc, anlcc, cloc, cnlcc, nelec
@@ -1405,8 +1405,8 @@ CONTAINS
       TYPE(atom_upfpot_type)                             :: upfpot
       TYPE(gto_basis_set_type), POINTER                  :: sup_basis_set, tmp_basis_set
       TYPE(section_vals_type), POINTER :: basis_section, bs_section, dft_plus_u_section, &
-         dft_section, enforce_occupation_section, kgpot_section, pao_desc_section, &
-         pao_pot_section, potential_section, spin_section
+                                          dft_section, enforce_occupation_section, kgpot_section, pao_desc_section, &
+                                          pao_pot_section, potential_section, spin_section
       TYPE(sto_basis_set_type), POINTER                  :: sto_basis_set
 
       CALL timeset(routineN, handle)
@@ -1447,7 +1447,7 @@ CONTAINS
          IF (((ipos == 2) .OR. (ipos == 3)) .AND. (INDEX(qs_kind%name, "_ghost") == 0)) THEN
             ! If the atm_name could not match any KIND section it maybe be a QM/MM link atom.
             ! ghost atoms will be treated differently.
-            akind_name = qs_kind%name(1:ipos-1)
+            akind_name = qs_kind%name(1:ipos - 1)
             CALL uppercase(akind_name)
             DO i_rep = 1, n_rep
                CALL section_vals_val_get(kind_section, "_SECTION_PARAMETERS_", &
@@ -1567,7 +1567,7 @@ CONTAINS
          CALL section_vals_val_get(kind_section, i_rep_section=k_rep, &
                                    keyword_name="RI_AUX_BASIS_SET", c_val=ri_aux_basis_set_name)
          IF (ri_aux_basis_set_name /= "") THEN
-            nb_rep = nb_rep+1
+            nb_rep = nb_rep + 1
             CPASSERT(nb_rep <= maxbas)
             basis_set_type(nb_rep) = "RI_AUX"
             basis_set_form(nb_rep) = "GTO"
@@ -1632,7 +1632,7 @@ CONTAINS
                IF (potential_type == "") THEN
                   ipos = INDEX(potential_name, "-")
                   IF (ipos > 1) THEN
-                     potential_type = potential_name(:ipos-1)
+                     potential_type = potential_name(:ipos - 1)
                   ELSE
                      potential_type = potential_name
                   END IF
@@ -1846,7 +1846,7 @@ CONTAINS
                                          keyword_name="ORBITALS", &
                                          i_vals=orbitals)
                norbitals = SIZE(orbitals)
-               IF (norbitals <= 0 .OR. norbitals > 2*l+1) &
+               IF (norbitals <= 0 .OR. norbitals > 2*l + 1) &
                   CALL cp_abort(__LOCATION__, "DFT+U| Invalid number of ORBITALS specified: "// &
                                 "1 to 2*L+1 integer numbers are expected")
                ALLOCATE (qs_kind%dft_plus_u%orbitals(norbitals))
@@ -1954,7 +1954,7 @@ CONTAINS
             CALL add_basis_set_to_container(qs_kind%basis_sets, tmp_basis_set, "ORB")
             CALL init_potential(qs_kind%all_potential, itype="BARE", &
                                 zeff=qs_kind%se_parameter%zeff, zeff_correction=zeff_correction)
-            qs_kind%se_parameter%zeff = qs_kind%se_parameter%zeff-zeff_correction
+            qs_kind%se_parameter%zeff = qs_kind%se_parameter%zeff - zeff_correction
          CASE (do_method_dftb)
             ! Do nothing at this stage.. The initialization of the parameters will be done
             ! later
@@ -1978,7 +1978,7 @@ CONTAINS
          ! PW DFT
          ! Allocate and initialise the potential data set structure
          IF (potential_name /= '') THEN
-            SELECT CASE (TRIM (potential_type))
+            SELECT CASE (TRIM(potential_type))
             CASE ("ALL", "ECP")
                CALL cp_abort(__LOCATION__, &
                              "PW DFT calculations only with potential type UPF or GTH possible."// &
@@ -2027,7 +2027,7 @@ CONTAINS
          ! Allocate and initialise the basis set data set structure
          ! first external basis sets
          DO i = 1, nb_rep
-            SELECT CASE (basis_set_form (i))
+            SELECT CASE (basis_set_form(i))
             CASE ("GTO")
                NULLIFY (tmp_basis_set)
                CALL allocate_gto_basis_set(tmp_basis_set)
@@ -2070,8 +2070,8 @@ CONTAINS
                                           inumbas=i, basis_type=basis_type)
             IF (basis_type == "") CYCLE
             jj = i
-            DO j = i+1, SIZE(qs_kind%basis_sets)
-               jj = jj+1
+            DO j = i + 1, SIZE(qs_kind%basis_sets)
+               jj = jj + 1
                NULLIFY (sup_basis_set)
                CALL get_basis_from_container(qs_kind%basis_sets, basis_set=sup_basis_set, &
                                              inumbas=jj, basis_type=tmp)
@@ -2079,7 +2079,7 @@ CONTAINS
                   ! we found a match, combine the basis sets and delete the second
                   CALL combine_basis_sets(tmp_basis_set, sup_basis_set)
                   CALL remove_basis_from_container(qs_kind%basis_sets, jj)
-                  jj = jj-1
+                  jj = jj - 1
                END IF
             END DO
             NULLIFY (sup_basis_set)
@@ -2113,7 +2113,7 @@ CONTAINS
                   potential_file_name = potential_fn_kind
                END IF
                !
-               SELECT CASE (TRIM (potential_type))
+               SELECT CASE (TRIM(potential_type))
                CASE ("ALL")
                   CALL allocate_potential(qs_kind%all_potential)
                   CALL read_potential(qs_kind%element_symbol, potential_name, &
@@ -2154,7 +2154,7 @@ CONTAINS
                      nnl = sgppot%n_nonlocal
                      nppnl = 0
                      DO l = 0, sgppot%lmax
-                        nppnl = nppnl+nnl*nco(l)
+                        nppnl = nppnl + nnl*nco(l)
                      END DO
                      l = sgppot%lmax
                      ALLOCATE (a_nl(nnl), h_nl(nnl, 0:l), c_nl(nnl, nnl, 0:l))
@@ -2199,7 +2199,7 @@ CONTAINS
                      nnl = sgppot%n_nonlocal
                      nppnl = 0
                      DO l = 0, sgppot%lmax
-                        nppnl = nppnl+nnl*nco(l)
+                        nppnl = nppnl + nnl*nco(l)
                      END DO
                      l = sgppot%lmax
                      ALLOCATE (a_nl(nnl), h_nl(nnl, 0:l), c_nl(nnl, nnl, 0:l))
@@ -2259,13 +2259,13 @@ CONTAINS
             IF ((kgpot_name /= '') .OR. explicit_kgpot) THEN
                ipos = INDEX(kgpot_name, "-")
                IF (ipos > 1) THEN
-                  kgpot_type = kgpot_name(:ipos-1)
+                  kgpot_type = kgpot_name(:ipos - 1)
                ELSE
                   kgpot_type = kgpot_name
                END IF
                CALL uppercase(kgpot_type)
 
-               SELECT CASE (TRIM (kgpot_type))
+               SELECT CASE (TRIM(kgpot_type))
                CASE ("TNADD")
                   ! determine the pseudopotential file to search
                   IF (kg_potential_fn_kind == "-") THEN
@@ -2333,10 +2333,10 @@ CONTAINS
 
       INTEGER                                            :: i, istat, j
 
-      DO i = 1, LEN_TRIM(string)-2
-         IF (string(i:i+1) .NE. "-Q") CYCLE
-         j = SCAN(string(i+2:), "- ")
-         READ (string(i+2:i+j), '(I3)', iostat=istat) n
+      DO i = 1, LEN_TRIM(string) - 2
+         IF (string(i:i + 1) .NE. "-Q") CYCLE
+         j = SCAN(string(i + 2:), "- ")
+         READ (string(i + 2:i + j), '(I3)', iostat=istat) n
          IF (istat == 0) RETURN
       ENDDO
       n = -1 ! valence electron number not found
@@ -2359,7 +2359,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: force_env_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qs_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, method, nkind, qs_method
       LOGICAL                                            :: no_fail
@@ -2450,7 +2450,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'check_qs_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, nkind
       TYPE(qs_kind_type), POINTER                        :: qs_kind
@@ -2515,7 +2515,7 @@ CONTAINS
          IF (ASSOCIATED(qs_kind%elec_conf)) THEN
             DEALLOCATE (qs_kind%elec_conf)
          ENDIF
-         ALLOCATE (qs_kind%elec_conf(0:SIZE(elec_conf)-1))
+         ALLOCATE (qs_kind%elec_conf(0:SIZE(elec_conf) - 1))
          qs_kind%elec_conf(:) = elec_conf(:)
       ENDIF
       IF (PRESENT(paw_atom)) qs_kind%paw_atom = paw_atom
@@ -2696,7 +2696,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_qs_kind_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, nkind, output_unit
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -2743,7 +2743,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_gto_basis_sets', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: basis_type, bstring
       INTEGER                                            :: handle, ibas, ikind, nkind, output_unit
@@ -2826,7 +2826,7 @@ CONTAINS
          INTENT(OUT)                                     :: edelta
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_atom_electronic_state', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ii, is, l, ll, ne, nn, z
       INTEGER, DIMENSION(:), POINTER                     :: econf
@@ -2858,21 +2858,21 @@ CONTAINS
          CALL set_pseudo_state(econf, z, ncalc, ncore, nelem)
       ELSE
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             nn = ptable(z)%e_conv(l)
             ii = 0
             DO
-               ii = ii+1
+               ii = ii + 1
                IF (nn <= ll) THEN
                   nelem(l, ii) = nn
                   EXIT
                ELSE
                   nelem(l, ii) = ll
-                  nn = nn-ll
+                  nn = nn - ll
                END IF
             END DO
          END DO
-         ncalc = nelem-ncore
+         ncalc = nelem - ncore
       END IF
 
       ! readjust the occupation number of the orbitals as requested by user
@@ -2883,28 +2883,28 @@ CONTAINS
             DO i = 1, SIZE(addel, 1)
                ne = addel(i, is)
                l = laddel(i, is)
-               nn = naddel(i, is)-l
+               nn = naddel(i, is) - l
                IF (ne /= 0) THEN
                   IF (nn == 0) THEN
                      DO ii = SIZE(nelem, 2), 1, -1
                         IF (ncalc(l, ii) > 0) THEN
-                           IF ((ncalc(l, ii)+ne) < 2*(2*l+1)+1) THEN
-                              edelta(l, ii, is) = edelta(l, ii, is)+ne
+                           IF ((ncalc(l, ii) + ne) < 2*(2*l + 1) + 1) THEN
+                              edelta(l, ii, is) = edelta(l, ii, is) + ne
                               nn = ii
                            ELSE
-                              edelta(l, ii+1, is) = edelta(l, ii+1, is)+ne
-                              nn = ii+1
+                              edelta(l, ii + 1, is) = edelta(l, ii + 1, is) + ne
+                              nn = ii + 1
                            END IF
                            EXIT
                         ELSE IF (ii == 1) THEN
-                           edelta(l, ii, is) = edelta(l, ii, is)+ne
+                           edelta(l, ii, is) = edelta(l, ii, is) + ne
                            nn = ii
                         END IF
                      END DO
                   ELSE
-                     edelta(l, nn, is) = edelta(l, nn, is)+ne
+                     edelta(l, nn, is) = edelta(l, nn, is) + ne
                   END IF
-                  IF (ncalc(l, nn)+edelta(l, nn, is) < 0) THEN
+                  IF (ncalc(l, nn) + edelta(l, nn, is) < 0) THEN
                      edelta(l, nn, is) = -ncalc(l, nn)
                   END IF
                END IF
@@ -2914,12 +2914,12 @@ CONTAINS
       ELSE IF (magnetization /= 0.0_dp) THEN
          dmag = 0.5_dp*ABS(magnetization)
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             ii = 0
             DO i = 1, SIZE(ncalc, 2)
                IF (ncalc(l, i) == 0) CYCLE
                IF (ncalc(l, i) == ll) CYCLE
-               IF (ncalc(l, i) > dmag .AND. (ll-ncalc(l, i)) > dmag) THEN
+               IF (ncalc(l, i) > dmag .AND. (ll - ncalc(l, i)) > dmag) THEN
                   ii = i
                   EXIT
                END IF
@@ -2959,73 +2959,73 @@ CONTAINS
       INTEGER, DIMENSION(0:lmat, 10), INTENT(OUT)        :: ncalc, ncore, nelem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_pseudo_state', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ii, l, ll, lx, nn
       INTEGER, DIMENSION(0:lmat)                         :: econfx
 
       econfx = 0
-      econfx(0:SIZE(econf)-1) = econf
+      econfx(0:SIZE(econf) - 1) = econf
       IF (SUM(econf) >= 0) THEN
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
-            nn = ptable(z)%e_conv(l)-econfx(l)
+            ll = 2*(2*l + 1)
+            nn = ptable(z)%e_conv(l) - econfx(l)
             IF (MOD(nn, ll) == 0) CYCLE
             IF (econfx(l) == 0) CYCLE
             IF (MOD(nn, 2) == 0) CYCLE
-            DO lx = 3, l+1, -1
+            DO lx = 3, l + 1, -1
                IF (econfx(lx) == 0) CYCLE
-               econfx(l) = econfx(l)+1
-               econfx(lx) = econfx(lx)-1
+               econfx(l) = econfx(l) + 1
+               econfx(lx) = econfx(lx) - 1
                EXIT
             END DO
          END DO
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
-            nn = ptable(z)%e_conv(l)-econfx(l)
+            ll = 2*(2*l + 1)
+            nn = ptable(z)%e_conv(l) - econfx(l)
             ii = 0
             DO
-               ii = ii+1
+               ii = ii + 1
                IF (nn <= ll) THEN
                   ncore(l, ii) = nn
                   EXIT
                ELSE
                   ncore(l, ii) = ll
-                  nn = nn-ll
+                  nn = nn - ll
                END IF
             END DO
          END DO
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             nn = ptable(z)%e_conv(l)
             ii = 0
             DO
-               ii = ii+1
+               ii = ii + 1
                IF (nn <= ll) THEN
                   nelem(l, ii) = nn
                   EXIT
                ELSE
                   nelem(l, ii) = ll
-                  nn = nn-ll
+                  nn = nn - ll
                END IF
             END DO
          END DO
-         ncalc = nelem-ncore
+         ncalc = nelem - ncore
       ELSE
          ncore = 0
          ncalc = 0
          DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             nn = ABS(econfx(l))
             ii = 0
             DO
-               ii = ii+1
+               ii = ii + 1
                IF (nn <= ll) THEN
                   ncalc(l, ii) = -nn
                   EXIT
                ELSE
                   ncalc(l, ii) = -ll
-                  nn = nn-ll
+                  nn = nn - ll
                END IF
             END DO
          END DO

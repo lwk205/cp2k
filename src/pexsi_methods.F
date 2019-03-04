@@ -13,46 +13,46 @@
 ! **************************************************************************************************
 
 MODULE pexsi_methods
-   USE arnoldi_api,                     ONLY: arnoldi_data_type,&
-                                              arnoldi_ev,&
-                                              deallocate_arnoldi_data,&
-                                              get_selected_ritz_val,&
-                                              get_selected_ritz_vector,&
-                                              set_arnoldi_initial_vector,&
-                                              setup_arnoldi_data
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_to_csr_screening
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE dbcsr_api,                       ONLY: &
-        convert_csr_to_dbcsr, convert_dbcsr_to_csr, csr_create, csr_create_from_dbcsr, &
-        csr_destroy, csr_eqrow_floor_dist, csr_print_sparsity, dbcsr_copy, &
-        dbcsr_copy_into_existing, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_get, &
-        dbcsr_distribution_type, dbcsr_get_info, dbcsr_has_symmetry, dbcsr_p_type, dbcsr_release, &
-        dbcsr_scale, dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_real_8
-   USE dm_ls_scf_qs,                    ONLY: matrix_ls_to_qs
-   USE dm_ls_scf_types,                 ONLY: ls_scf_env_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp,&
-                                              int_4,&
-                                              int_8
-   USE message_passing,                 ONLY: mp_bcast
-   USE pexsi_interface,                 ONLY: cp_pexsi_dft_driver,&
-                                              cp_pexsi_get_options,&
-                                              cp_pexsi_load_real_hs_matrix,&
-                                              cp_pexsi_retrieve_real_dft_matrix,&
-                                              cp_pexsi_set_default_options,&
-                                              cp_pexsi_set_options
-   USE pexsi_types,                     ONLY: convert_nspin_cp2k_pexsi,&
-                                              cp2k_to_pexsi,&
-                                              lib_pexsi_env,&
-                                              pexsi_to_cp2k
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
+   USE arnoldi_api, ONLY: arnoldi_data_type, &
+                          arnoldi_ev, &
+                          deallocate_arnoldi_data, &
+                          get_selected_ritz_val, &
+                          get_selected_ritz_vector, &
+                          set_arnoldi_initial_vector, &
+                          setup_arnoldi_data
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_to_csr_screening
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE dbcsr_api, ONLY: &
+      convert_csr_to_dbcsr, convert_dbcsr_to_csr, csr_create, csr_create_from_dbcsr, &
+      csr_destroy, csr_eqrow_floor_dist, csr_print_sparsity, dbcsr_copy, &
+      dbcsr_copy_into_existing, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_get, &
+      dbcsr_distribution_type, dbcsr_get_info, dbcsr_has_symmetry, dbcsr_p_type, dbcsr_release, &
+      dbcsr_scale, dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_real_8
+   USE dm_ls_scf_qs, ONLY: matrix_ls_to_qs
+   USE dm_ls_scf_types, ONLY: ls_scf_env_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp, &
+                    int_4, &
+                    int_8
+   USE message_passing, ONLY: mp_bcast
+   USE pexsi_interface, ONLY: cp_pexsi_dft_driver, &
+                              cp_pexsi_get_options, &
+                              cp_pexsi_load_real_hs_matrix, &
+                              cp_pexsi_retrieve_real_dft_matrix, &
+                              cp_pexsi_set_default_options, &
+                              cp_pexsi_set_options
+   USE pexsi_types, ONLY: convert_nspin_cp2k_pexsi, &
+                          cp2k_to_pexsi, &
+                          lib_pexsi_env, &
+                          pexsi_to_cp2k
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -80,7 +80,7 @@ CONTAINS
       TYPE(lib_pexsi_env), INTENT(INOUT)                 :: pexsi_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'pexsi_init_read_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: isInertiaCount_int, maxPEXSIIter, &
                                                             min_ranks_per_pole, npSymbFact, &
@@ -88,7 +88,7 @@ CONTAINS
                                                             verbosity
       LOGICAL                                            :: csr_screening, isInertiaCount
       REAL(KIND=dp) :: gap, muInertiaExpansion, muInertiaTolerance, muMax0, muMin0, &
-         muPEXSISafeGuard, numElectronInitialTolerance, numElectronTargetTolerance, temperature
+                       muPEXSISafeGuard, numElectronInitialTolerance, numElectronTargetTolerance, temperature
 
 ! Note: omitting the following PEXSI options: deltaE (estimated by Arnoldi
 ! before invoking PEXSI), mu0 (taken from previous SCF step), matrixType
@@ -241,7 +241,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(2), INTENT(IN)            :: mu_spin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pexsi_finalize_scf', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, unit_nr
       REAL(KIND=dp)                                      :: kTS_total, mu_total
@@ -312,14 +312,14 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iscf, ispin
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'density_matrix_pexsi', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: S_not_identity = 0
 
       INTEGER :: handle, is_symbolic_factorize, isInertiaCount, isInertiaCount_out, mynode, &
-         n_total_inertia_iter, n_total_pexsi_iter, unit_nr
+                 n_total_inertia_iter, n_total_pexsi_iter, unit_nr
       LOGICAL                                            :: first_call, pexsi_convergence
       REAL(KIND=dp) :: delta_E, energy_H, energy_S, free_energy, mu_max_in, mu_max_out, mu_min_in, &
-         mu_min_out, nel_tol, nelectron_diff, nelectron_exact_pexsi, nelectron_out
+                       mu_min_out, nel_tol, nelectron_diff, nelectron_exact_pexsi, nelectron_out
       TYPE(arnoldi_data_type)                            :: my_arnoldi
       TYPE(cp_logger_type), POINTER                      :: logger
       TYPE(dbcsr_distribution_type)                      :: dist
@@ -384,7 +384,7 @@ CONTAINS
       CALL arnoldi_ev(arnoldi_matrices, my_arnoldi)
       delta_E = REAL(get_selected_ritz_val(my_arnoldi, 1), dp)
       ! increase delta_E a bit to make sure that it really is an upper bound
-      delta_E = delta_E+1.0E-2_dp*ABS(delta_E)
+      delta_E = delta_E + 1.0E-2_dp*ABS(delta_E)
       CALL get_selected_ritz_vector(my_arnoldi, 1, arnoldi_matrices(1)%matrix, &
                                     pexsi_env%max_ev_vector(ispin))
       CALL deallocate_arnoldi_data(my_arnoldi)
@@ -449,7 +449,7 @@ CONTAINS
                                n_total_inertia_iter, n_total_pexsi_iter)
 
       ! Check convergence
-      nelectron_diff = nelectron_out-nelectron_exact_pexsi
+      nelectron_diff = nelectron_out - nelectron_exact_pexsi
       pexsi_convergence = ABS(nelectron_diff) .LT. nel_tol
 
       IF (unit_nr > 0) THEN
@@ -481,7 +481,7 @@ CONTAINS
             pexsi_env%csr_mat_F%nzval_local%r_dp, &
             energy_H, energy_S, free_energy)
          ! calculate entropic energy contribution -TS = A - U
-         kTS = (free_energy-energy_H)
+         kTS = (free_energy - energy_H)
       ENDIF
 
       ! send kTS to all nodes:
@@ -543,7 +543,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: check_convergence
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pexsi_set_convergence_tolerance', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: tol_nel
@@ -554,13 +554,13 @@ CONTAINS
 
       IF (initialize) THEN
          pexsi_env%adaptive_nel_alpha = &
-            (pexsi_env%tol_nel_initial-pexsi_env%tol_nel_target)/(ABS(delta_scf)-eps_scf)
+            (pexsi_env%tol_nel_initial - pexsi_env%tol_nel_target)/(ABS(delta_scf) - eps_scf)
          pexsi_env%adaptive_nel_beta = &
-            pexsi_env%tol_nel_initial-pexsi_env%adaptive_nel_alpha*ABS(delta_scf)
+            pexsi_env%tol_nel_initial - pexsi_env%adaptive_nel_alpha*ABS(delta_scf)
          pexsi_env%do_adaptive_tol_nel = .TRUE.
       ENDIF
       IF (pexsi_env%do_adaptive_tol_nel) THEN
-         tol_nel = pexsi_env%adaptive_nel_alpha*ABS(delta_scf)+pexsi_env%adaptive_nel_beta
+         tol_nel = pexsi_env%adaptive_nel_alpha*ABS(delta_scf) + pexsi_env%adaptive_nel_beta
          tol_nel = MAX(tol_nel, pexsi_env%tol_nel_target)
          tol_nel = MIN(tol_nel, pexsi_env%tol_nel_initial)
       ENDIF

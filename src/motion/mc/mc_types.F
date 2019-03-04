@@ -11,47 +11,47 @@
 !> \author MJM
 ! **************************************************************************************************
 MODULE mc_types
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE fist_environment_types,          ONLY: fist_env_get,&
-                                              fist_environment_type
-   USE fist_nonbond_env_types,          ONLY: fist_nonbond_env_get,&
-                                              fist_nonbond_env_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_p_type,&
-                                              force_env_type,&
-                                              use_fist_force,&
-                                              use_qs_force
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: do_fist,&
-                                              do_qs
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: pi
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_p_type
-   USE molecule_kind_types,             ONLY: atom_type,&
-                                              get_molecule_kind,&
-                                              molecule_kind_type
-   USE pair_potential_types,            ONLY: pair_potential_pp_type
-   USE particle_list_types,             ONLY: particle_list_p_type
-   USE physcon,                         ONLY: boltzmann,&
-                                              joule
-   USE string_utilities,                ONLY: uppercase,&
-                                              xstring
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         get_cell
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE fist_environment_types, ONLY: fist_env_get, &
+                                     fist_environment_type
+   USE fist_nonbond_env_types, ONLY: fist_nonbond_env_get, &
+                                     fist_nonbond_env_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_p_type, &
+                              force_env_type, &
+                              use_fist_force, &
+                              use_qs_force
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: do_fist, &
+                              do_qs
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE mathconstants, ONLY: pi
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_p_type
+   USE molecule_kind_types, ONLY: atom_type, &
+                                  get_molecule_kind, &
+                                  molecule_kind_type
+   USE pair_potential_types, ONLY: pair_potential_pp_type
+   USE particle_list_types, ONLY: particle_list_p_type
+   USE physcon, ONLY: boltzmann, &
+                      joule
+   USE string_utilities, ONLY: uppercase, &
+                               xstring
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -407,8 +407,8 @@ CONTAINS
                                                             pmswap, pmvolume, pmtraion, pmtrans, &
                                                             pmcltrans
       CHARACTER(LEN=*), INTENT(OUT), OPTIONAL :: ensemble, PROGRAM, restart_file_name, &
-         molecules_file, moves_file, coords_file, energy_file, displacement_file, cell_file, &
-         dat_file, data_file, box2_file, fft_lib
+                                               molecules_file, moves_file, coords_file, energy_file, displacement_file, cell_file, &
+                                                 dat_file, data_file, box2_file, fft_lib
       INTEGER, INTENT(OUT), OPTIONAL                     :: iprint
       REAL(KIND=dp), INTENT(OUT), OPTIONAL               :: rcut
       LOGICAL, INTENT(OUT), OPTIONAL                     :: ldiscrete
@@ -558,7 +558,7 @@ CONTAINS
       REAL(dp), DIMENSION(:, :), OPTIONAL, POINTER       :: mass
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_mc_molecule_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(nboxes)) nboxes = mc_molecule_info%nboxes
       IF (PRESENT(nchain_total)) nchain_total = mc_molecule_info%nchain_total
@@ -847,7 +847,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nmol_types
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_sim_par_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       NULLIFY (mc_par)
 
@@ -886,7 +886,7 @@ CONTAINS
       TYPE(mc_simpar_type), POINTER                      :: mc_par
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_sim_par_destroy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (mc_par%mc_input_file)
       DEALLOCATE (mc_par%mc_bias_file)
@@ -937,13 +937,13 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: lhmc
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_input_file_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(default_string_length)                   :: cdum, line, method_name
       CHARACTER(default_string_length), &
          DIMENSION(:, :), POINTER                        :: atom_names
       INTEGER :: abc_column, abc_row, cell_column, cell_row, idum, iline, io_stat, irep, iunit, &
-         iw, line_number, nlines, nmol_types, nstart, row_number, unit
+                 iw, line_number, nlines, nmol_types, nstart, row_number, unit
       INTEGER, DIMENSION(:), POINTER                     :: nunits
 
 ! some stuff in case we need to write error messages to the screen
@@ -973,7 +973,7 @@ CONTAINS
       DO
          READ (unit, '(A)', IOSTAT=io_stat) line
          IF (io_stat .NE. 0) EXIT
-         nlines = nlines+1
+         nlines = nlines + 1
       ENDDO
 
       ALLOCATE (mc_input_file%text(1:nlines))
@@ -1031,7 +1031,7 @@ CONTAINS
 ! now the RUN_TYPE
       CALL mc_parse_text(mc_input_file%text, 1, nlines, "RUN_TYPE", .FALSE., &
                          mc_input_file%run_type_row, mc_input_file%run_type_column)
-      mc_input_file%run_type_column = mc_input_file%run_type_column+9
+      mc_input_file%run_type_column = mc_input_file%run_type_column + 9
       IF (mc_input_file%run_type_row == 0) THEN
          IF (iw > 0) THEN
             WRITE (iw, *)
@@ -1046,17 +1046,17 @@ CONTAINS
       CALL mc_parse_text(mc_input_file%text, 1, nlines, "&CELL", .FALSE., &
                          mc_input_file%cell_row, mc_input_file%cell_column)
 ! now find the ABC input line after CELL
-      CALL mc_parse_text(mc_input_file%text, mc_input_file%cell_row+1, nlines, &
+      CALL mc_parse_text(mc_input_file%text, mc_input_file%cell_row + 1, nlines, &
                          "ABC", .FALSE., abc_row, abc_column)
 ! is there a &CELL inbetween?  If so, that ABC will be for the ref_cell
 ! and we need to find the next one
-      CALL mc_parse_text(mc_input_file%text, mc_input_file%cell_row+1, abc_row, &
+      CALL mc_parse_text(mc_input_file%text, mc_input_file%cell_row + 1, abc_row, &
                          "&CELL", .FALSE., cell_row, cell_column)
       IF (cell_row == 0) THEN ! nothing in between...we found the correct ABC
          mc_input_file%cell_row = abc_row
-         mc_input_file%cell_column = abc_column+4
+         mc_input_file%cell_column = abc_column + 4
       ELSE
-         CALL mc_parse_text(mc_input_file%text, abc_row+1, nlines, &
+         CALL mc_parse_text(mc_input_file%text, abc_row + 1, nlines, &
                             "ABC", .FALSE., mc_input_file%cell_row, mc_input_file%cell_column)
       ENDIF
       IF (mc_input_file%cell_row == 0) THEN
@@ -1076,12 +1076,12 @@ CONTAINS
             CALL mc_parse_text(mc_input_file%text, nstart, nlines, "&MOLECULE", &
                                .FALSE., row_number, idum)
             IF (row_number == 0) EXIT
-            nstart = row_number+1
-            irep = irep+1
+            nstart = row_number + 1
+            irep = irep + 1
             CALL mc_parse_text(mc_input_file%text, nstart, nlines, "NMOL", &
                                .FALSE., mc_input_file%mol_set_nmol_row(irep), &
                                mc_input_file%mol_set_nmol_column(irep))
-            mc_input_file%mol_set_nmol_column(irep) = mc_input_file%mol_set_nmol_column(irep)+5
+            mc_input_file%mol_set_nmol_column(irep) = mc_input_file%mol_set_nmol_column(irep) + 5
 
          ENDDO
          IF (irep .NE. nmol_types) THEN
@@ -1103,7 +1103,7 @@ CONTAINS
                          "METHOD", .FALSE., line_number, idum)
       READ (mc_input_file%text(line_number), *) cdum, method_name
       CALL uppercase(method_name)
-      SELECT CASE (TRIM (ADJUSTL (method_name)))
+      SELECT CASE (TRIM(ADJUSTL(method_name)))
       CASE ("FIST")
          mc_input_file%in_use = use_fist_force
       CASE ("QS", "QUICKSTEP")
@@ -1124,7 +1124,7 @@ CONTAINS
       TYPE(mc_input_file_type), POINTER                  :: mc_input_file
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_input_file_destroy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (mc_input_file%mol_set_nmol_row)
       DEALLOCATE (mc_input_file%mol_set_nmol_column)
@@ -1181,7 +1181,7 @@ CONTAINS
             ELSE
                IF (PRESENT(start_row_number)) start_row_number = iline
                column_number = index_string
-               DO jline = iline+1, nend
+               DO jline = iline + 1, nend
 ! now we find the &END that matches up with this one...
 ! I need proper indentation because I'm not very smart
                   text_temp = text(jline)
@@ -1216,7 +1216,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input_file, force_env_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_mc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=5)                                   :: box_string, molecule_string, &
                                                             tab_box_string, tab_string, &
@@ -1275,7 +1275,7 @@ CONTAINS
       mc_par%displacement_file = mc_par%program(ia:ie) &
                                  //'.max_displacements'
       mc_par%data_file = mc_par%program(ia:ie)//'.data'
-      stop_num = ie-3
+      stop_num = ie - 3
       mc_par%dat_file = mc_par%program(ia:stop_num)//'dat'
 
 ! set them into the input parameter structure as the new defaults
@@ -1326,7 +1326,7 @@ CONTAINS
 ! now an integer array
       CALL section_vals_val_get(mc_section, "AVBMC%AVBMC_ATOM", i_vals=temp_i_array)
 
-      IF (mc_par%pmhmc-mc_par%pmswap >= 1.0_dp .AND. mc_par%pmhmc == 1.0_dp) THEN
+      IF (mc_par%pmhmc - mc_par%pmswap >= 1.0_dp .AND. mc_par%pmhmc == 1.0_dp) THEN
          mc_par%lhmc = .TRUE.
       ELSE
          mc_par%lhmc = .FALSE.
@@ -1534,9 +1534,9 @@ CONTAINS
       IF (iw > 0) THEN
          WRITE (box_string, '(I2)') mc_par%mc_molecule_info%nboxes
          WRITE (molecule_string, '(I2)') mc_par%mc_molecule_info%nmol_types
-         WRITE (tab_string, '(I4)') 81-10*mc_par%mc_molecule_info%nmol_types
-         WRITE (tab_box_string, '(I4)') 81-10*mc_par%mc_molecule_info%nboxes
-         WRITE (tab_string_int, '(I4)') 81-5*mc_par%mc_molecule_info%nmol_types
+         WRITE (tab_string, '(I4)') 81 - 10*mc_par%mc_molecule_info%nmol_types
+         WRITE (tab_box_string, '(I4)') 81 - 10*mc_par%mc_molecule_info%nboxes
+         WRITE (tab_string_int, '(I4)') 81 - 5*mc_par%mc_molecule_info%nmol_types
          format_string = "(A,T"//TRIM(ADJUSTL(tab_string))//","//TRIM(ADJUSTL(molecule_string))//"(2X,F8.4))"
          format_box_string = "(A,T"//TRIM(ADJUSTL(tab_box_string))//","//TRIM(ADJUSTL(box_string))//"(2X,F8.4))"
          format_string_int = "(A,T"//TRIM(ADJUSTL(tab_string))//","//TRIM(ADJUSTL(molecule_string))//"(I3,2X))"
@@ -1796,14 +1796,14 @@ CONTAINS
       REAL(dp), DIMENSION(:, :), OPTIONAL, POINTER       :: coordinates_empty
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mc_determine_molecule_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: name
       CHARACTER(LEN=default_string_length), &
          ALLOCATABLE, DIMENSION(:)                       :: names_init
       INTEGER :: first_mol, iatom, ibox, imol, imolecule, itype, iunique, iunit, jtype, last_mol, &
-         natom, natoms_large, nbend, nbond, nboxes, nmol_types, nmolecule, ntorsion, ntypes, &
-         skip_box, this_molecule, total
+                 natom, natoms_large, nbend, nbond, nboxes, nmol_types, nmolecule, ntorsion, ntypes, &
+                 skip_box, this_molecule, total
       INTEGER, DIMENSION(:), POINTER                     :: molecule_list
       LOGICAL                                            :: lnew_type
       TYPE(atom_type), DIMENSION(:), POINTER             :: atom_list
@@ -1849,7 +1849,7 @@ CONTAINS
          CALL cp_subsys_get(subsys, &
                             molecule_kinds=molecule_kinds(ibox)%list, &
                             particles=particles(ibox)%list)
-         ntypes = ntypes+SIZE(molecule_kinds(ibox)%list%els(:))
+         ntypes = ntypes + SIZE(molecule_kinds(ibox)%list%els(:))
       ENDDO
 
       ALLOCATE (names_init(1:ntypes))
@@ -1865,19 +1865,19 @@ CONTAINS
             CALL get_molecule_kind(molecule_kind, name=names_init(itype), &
                                    natom=natom)
             IF (natom .GT. natoms_large) natoms_large = natom
-            itype = itype+1
+            itype = itype + 1
          ENDDO
       ENDDO
 
       nmol_types = 0
       DO itype = 1, ntypes
          lnew_type = .TRUE.
-         DO jtype = 1, itype-1
+         DO jtype = 1, itype - 1
             IF (TRIM(names_init(itype)) .EQ. TRIM(names_init(jtype))) &
                lnew_type = .FALSE.
          ENDDO
          IF (lnew_type) THEN
-            nmol_types = nmol_types+1
+            nmol_types = nmol_types + 1
          ELSE
             names_init(itype) = ''
          ENDIF
@@ -1900,9 +1900,9 @@ CONTAINS
       DO ibox = 1, nboxes
          IF (ibox == skip_box) CYCLE
          DO imolecule = 1, SIZE(molecule_kinds(ibox)%list%els(:))
-            itype = itype+1
+            itype = itype + 1
             IF (names_init(itype) .EQ. '') CYCLE
-            iunique = iunique+1
+            iunique = iunique + 1
             mc_molecule_info%names(iunique) = names_init(itype)
             molecule_kind => molecule_kinds(ibox)%list%els(imolecule)
             CALL get_molecule_kind(molecule_kind, natom=mc_molecule_info%nunits(iunique), &
@@ -1916,7 +1916,7 @@ CONTAINS
             ENDDO
 
 ! compute the probabilities of doing any particular kind of conformation change
-            total = nbond+nbend+ntorsion
+            total = nbond + nbend + ntorsion
 
             IF (total == 0) THEN
                mc_molecule_info%conf_prob(:, iunique) = 0.0e0_dp
@@ -1948,7 +1948,7 @@ CONTAINS
                CALL get_molecule_kind(molecule_kind, nmolecule=nmolecule, &
                                       name=name)
                IF (TRIM(name) .NE. mc_molecule_info%names(iunique)) CYCLE
-               mc_molecule_info%nchains(iunique, ibox) = mc_molecule_info%nchains(iunique, ibox)+nmolecule
+               mc_molecule_info%nchains(iunique, ibox) = mc_molecule_info%nchains(iunique, ibox) + nmolecule
             ENDDO
          ENDDO
       ENDDO
@@ -1957,10 +1957,10 @@ CONTAINS
          mc_molecule_info%nunits_tot(ibox) = 0
          IF (ibox == skip_box) CYCLE
          DO iunique = 1, nmol_types
-            mc_molecule_info%nunits_tot(ibox) = mc_molecule_info%nunits_tot(ibox)+ &
+            mc_molecule_info%nunits_tot(ibox) = mc_molecule_info%nunits_tot(ibox) + &
                                                 mc_molecule_info%nunits(iunique)*mc_molecule_info%nchains(iunique, ibox)
          ENDDO
-         mc_molecule_info%nchain_total = mc_molecule_info%nchain_total+SUM(mc_molecule_info%nchains(:, ibox))
+         mc_molecule_info%nchain_total = mc_molecule_info%nchain_total + SUM(mc_molecule_info%nchains(:, ibox))
       ENDDO
 
 ! now we need to figure out which type every molecule is,
@@ -1971,8 +1971,8 @@ CONTAINS
       last_mol = 0
       DO ibox = 1, nboxes
          IF (ibox == skip_box) CYCLE
-         first_mol = last_mol+1
-         last_mol = first_mol+SUM(mc_molecule_info%nchains(:, ibox))-1
+         first_mol = last_mol + 1
+         last_mol = first_mol + SUM(mc_molecule_info%nchains(:, ibox)) - 1
          mc_molecule_info%in_box(first_mol:last_mol) = ibox
          DO imolecule = 1, SIZE(molecule_kinds(ibox)%list%els(:))
             molecule_kind => molecule_kinds(ibox)%list%els(imolecule)
@@ -1986,7 +1986,7 @@ CONTAINS
                ENDIF
             ENDDO
             DO imol = 1, SIZE(molecule_list(:))
-               mc_molecule_info%mol_type(first_mol+molecule_list(imol)-1) = this_molecule
+               mc_molecule_info%mol_type(first_mol + molecule_list(imol) - 1) = this_molecule
             ENDDO
          ENDDO
       ENDDO
@@ -2010,7 +2010,7 @@ CONTAINS
       TYPE(mc_molecule_info_type), POINTER               :: mc_molecule_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mc_molecule_info_destroy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (mc_molecule_info%nchains)
       DEALLOCATE (mc_molecule_info%nunits)
@@ -2043,7 +2043,7 @@ CONTAINS
       TYPE(mc_simpar_type), POINTER                      :: mc_par
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mc_input_parameters_check', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: imol_type, nboxes, nchain_total, &
                                                             nmol_types

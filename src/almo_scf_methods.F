@@ -11,48 +11,48 @@
 !> \author Rustam Z Khaliullin
 ! **************************************************************************************************
 MODULE almo_scf_methods
-   USE almo_scf_types,                  ONLY: almo_scf_env_type,&
-                                              almo_scf_history_type
-   USE bibliography,                    ONLY: Kolafa2004,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_dbcsr_cholesky,               ONLY: cp_dbcsr_cholesky_decompose,&
-                                              cp_dbcsr_cholesky_invert
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_distribution_get, &
-        dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, dbcsr_frobenius_norm, &
-        dbcsr_get_block_p, dbcsr_get_diag, dbcsr_get_info, dbcsr_get_stored_coordinates, &
-        dbcsr_init_random, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
-        dbcsr_nblkcols_total, dbcsr_nblkrows_total, dbcsr_print, dbcsr_release, &
-        dbcsr_reserve_block2d, dbcsr_scale_by_vector, dbcsr_set, dbcsr_set_diag, dbcsr_transposed, &
-        dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric, dbcsr_work_create
-   USE domain_submatrix_methods,        ONLY: &
-        add_submatrices, construct_dbcsr_from_submatrices, construct_submatrices, &
-        copy_submatrices, copy_submatrix_data, init_submatrices, multiply_submatrices, &
-        print_submatrices, release_submatrices
-   USE domain_submatrix_types,          ONLY: domain_map_type,&
-                                              domain_submatrix_type,&
-                                              select_row,&
-                                              select_row_col
-   USE fermi_utils,                     ONLY: FermiFixed
+   USE almo_scf_types, ONLY: almo_scf_env_type, &
+                             almo_scf_history_type
+   USE bibliography, ONLY: Kolafa2004, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_dbcsr_cholesky, ONLY: cp_dbcsr_cholesky_decompose, &
+                                cp_dbcsr_cholesky_invert
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_distribution_get, &
+      dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, dbcsr_frobenius_norm, &
+      dbcsr_get_block_p, dbcsr_get_diag, dbcsr_get_info, dbcsr_get_stored_coordinates, &
+      dbcsr_init_random, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
+      dbcsr_nblkcols_total, dbcsr_nblkrows_total, dbcsr_print, dbcsr_release, &
+      dbcsr_reserve_block2d, dbcsr_scale_by_vector, dbcsr_set, dbcsr_set_diag, dbcsr_transposed, &
+      dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric, dbcsr_work_create
+   USE domain_submatrix_methods, ONLY: &
+      add_submatrices, construct_dbcsr_from_submatrices, construct_submatrices, &
+      copy_submatrices, copy_submatrix_data, init_submatrices, multiply_submatrices, &
+      print_submatrices, release_submatrices
+   USE domain_submatrix_types, ONLY: domain_map_type, &
+                                     domain_submatrix_type, &
+                                     select_row, &
+                                     select_row_col
+   USE fermi_utils, ONLY: FermiFixed
 !! for smearing
-   USE input_constants,                 ONLY: almo_domain_layout_molecular,&
-                                              almo_mat_distr_atomic,&
-                                              almo_scf_diag,&
-                                              spd_inversion_dense_cholesky,&
-                                              spd_inversion_ls_hotelling,&
-                                              spd_inversion_ls_taylor
-   USE iterate_matrix,                  ONLY: invert_Hotelling,&
-                                              invert_Taylor,&
-                                              matrix_sqrt_Newton_Schulz
-   USE kinds,                           ONLY: dp
-   USE mathlib,                         ONLY: binomial
-   USE util,                            ONLY: sort
+   USE input_constants, ONLY: almo_domain_layout_molecular, &
+                              almo_mat_distr_atomic, &
+                              almo_scf_diag, &
+                              spd_inversion_dense_cholesky, &
+                              spd_inversion_ls_hotelling, &
+                              spd_inversion_ls_taylor
+   USE iterate_matrix, ONLY: invert_Hotelling, &
+                             invert_Taylor, &
+                             matrix_sqrt_Newton_Schulz
+   USE kinds, ONLY: dp
+   USE mathlib, ONLY: binomial
+   USE util, ONLY: sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -92,12 +92,12 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_ks_to_ks_xx', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ndomains
       REAL(KIND=dp)                                      :: eps_multiply
       TYPE(dbcsr_type) :: matrix_tmp1, matrix_tmp2, matrix_tmp3, matrix_tmp4, matrix_tmp5, &
-         matrix_tmp6, matrix_tmp7, matrix_tmp8, matrix_tmp9
+                          matrix_tmp6, matrix_tmp7, matrix_tmp8, matrix_tmp9
       TYPE(domain_submatrix_type), ALLOCATABLE, &
          DIMENSION(:)                                    :: subm_tmp1, subm_tmp2, subm_tmp3
 
@@ -438,12 +438,12 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_ks_to_ks_blk', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       REAL(KIND=dp)                                      :: eps_multiply
       TYPE(dbcsr_type) :: matrix_tmp1, matrix_tmp2, matrix_tmp3, matrix_tmp4, matrix_tmp5, &
-         matrix_tmp6, matrix_tmp7, matrix_tmp8, matrix_tmp9, matrix_tmp_err
+                          matrix_tmp6, matrix_tmp7, matrix_tmp8, matrix_tmp9, matrix_tmp_err
 
       CALL timeset(routineN, handle)
 
@@ -724,7 +724,7 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_ks_xx_to_tv_xx', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iblock_size, idomain, info, &
                                                             ispin, lwork, ndomains
@@ -815,7 +815,7 @@ CONTAINS
                                         subm_t(idomain))
                !! Copy occupied eigenvalues if smearing requested
                IF (almo_scf_env%smear) THEN
-                  almo_scf_env%mo_energies(1+SUM(almo_scf_env%nocc_of_domain(:idomain-1, ispin)) &
+                  almo_scf_env%mo_energies(1 + SUM(almo_scf_env%nocc_of_domain(:idomain - 1, ispin)) &
                                            :SUM(almo_scf_env%nocc_of_domain(:idomain, ispin)), ispin) &
                      = eigenvalues(1:almo_scf_env%nocc_of_domain(idomain, ispin))
                END IF
@@ -872,7 +872,7 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_ks_blk_to_tv_blk', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iblock_col, iblock_row, &
                                                             iblock_size, info, ispin, lwork, &
@@ -986,7 +986,7 @@ CONTAINS
                   !!             (which is still a reasonable smearing in most cases...)
                   IF (almo_scf_env%smear) THEN
                      DO orbital = 1, nocc_of_block
-                        almo_scf_env%mo_energies(SUM(almo_scf_env%nocc_of_domain(:iblock_row-1, ispin))+orbital, &
+                        almo_scf_env%mo_energies(SUM(almo_scf_env%nocc_of_domain(:iblock_row - 1, ispin)) + orbital, &
                                                  ispin) = eigenvalues(orbital)
                      END DO
                   END IF
@@ -998,14 +998,14 @@ CONTAINS
                   NULLIFY (p_new_block)
                   CALL dbcsr_reserve_block2d(matrix_v_blk_orthog, iblock_row, iblock_col, p_new_block)
                   CPASSERT(ASSOCIATED(p_new_block))
-                  p_new_block(:, :) = data_copy(:, (nocc_of_block+1):(nocc_of_block+nvirt_of_block))
+                  p_new_block(:, :) = data_copy(:, (nocc_of_block + 1):(nocc_of_block + nvirt_of_block))
                   ! virtual energies
                   NULLIFY (p_new_block)
                   CALL dbcsr_reserve_block2d(almo_scf_env%matrix_evv_full(ispin), iblock_row, iblock_col, p_new_block)
                   CPASSERT(ASSOCIATED(p_new_block))
                   p_new_block(:, :) = 0.0_dp
                   DO orbital = 1, nvirt_of_block
-                     p_new_block(orbital, orbital) = eigenvalues(nocc_of_block+orbital)
+                     p_new_block(orbital, orbital) = eigenvalues(nocc_of_block + orbital)
                   ENDDO
                ENDIF
 
@@ -1068,7 +1068,7 @@ CONTAINS
       INTEGER, DIMENSION(:)                              :: nocc
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'pseudo_invert_diagonal_blk', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iblock_col, iblock_row, &
                                                             iblock_size, methodID
@@ -1136,7 +1136,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: ionic
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_p_blk_to_t_blk', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iblock_col, iblock_row, &
                                                             iblock_size, info, ispin, lwork, &
@@ -1218,7 +1218,7 @@ CONTAINS
                nocc_of_block = SIZE(p_new_block, 2)
                CPASSERT(ASSOCIATED(p_new_block))
                CPASSERT(nocc_of_block .GT. 0)
-               p_new_block(:, :) = data_copy(:, iblock_size-nocc_of_block+1:)
+               p_new_block(:, :) = data_copy(:, iblock_size - nocc_of_block + 1:)
 
                DEALLOCATE (WORK)
                DEALLOCATE (data_copy)
@@ -1295,7 +1295,7 @@ CONTAINS
       INTEGER, DIMENSION(:), INTENT(IN)                  :: nocc_of_domain
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_t_rescaling', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, idomain, neigenval_used, nmo
       REAL(KIND=dp)                                      :: kTS
@@ -1322,15 +1322,15 @@ CONTAINS
 
       !! Apply Fermi-Dirac smearing for each domain and store associated occupations for the whole system
       DO idomain = 1, ndomains
-         CALL FermiFixed(occupation_numbers(1+neigenval_used:nocc_of_domain(idomain)+neigenval_used), &
+         CALL FermiFixed(occupation_numbers(1 + neigenval_used:nocc_of_domain(idomain) + neigenval_used), &
                          mu_of_domain(idomain), &
                          kTS, &
-                         mo_energies(1+neigenval_used:nocc_of_domain(idomain)+neigenval_used), &
+                         mo_energies(1 + neigenval_used:nocc_of_domain(idomain) + neigenval_used), &
                          real_ne_of_domain(idomain), &
                          smear_e_temp, &
                          1.0_dp) !! Warning, maxocc is set to 1 since we don't want to interfere with the spin_factor rescaling
-         spin_kTS = spin_kTS+kTS !! Add up electronic entropy contributions
-         neigenval_used = neigenval_used+nocc_of_domain(idomain) !! Update eigenvalues index offset
+         spin_kTS = spin_kTS + kTS !! Add up electronic entropy contributions
+         neigenval_used = neigenval_used + nocc_of_domain(idomain) !! Update eigenvalues index offset
       END DO
       rescaling_factors(:) = SQRT(occupation_numbers) !! scale = sqrt(occupation_number)
 
@@ -1478,7 +1478,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: smear
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'orthogonalize_mos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dim0, handle
       LOGICAL                                            :: smearing
@@ -1605,7 +1605,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: inv_eps_factor
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'almo_scf_t_to_proj', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dim0, handle, my_accelerator, &
                                                             my_algorithm
@@ -1826,7 +1826,7 @@ CONTAINS
       TYPE(dbcsr_type), INTENT(IN), OPTIONAL             :: sig_inv_projector, sig_inv_template
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'apply_projector', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(dbcsr_type)                                   :: tmp_no, tmp_ov, tmp_ov2, tmp_sig, &
@@ -1979,7 +1979,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: eps_filter
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'generator_to_unitary', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, unit_nr
       LOGICAL                                            :: safe_mode
@@ -2087,7 +2087,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: use_trimmer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'apply_domain_operators', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ndomains
       LOGICAL                                            :: matrix_trimmer_required, my_use_trimmer, &
@@ -2210,7 +2210,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: my_action
 
       CHARACTER(len=*), PARAMETER :: routineN = 'construct_domain_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, idomain, index1_end, &
                                                             index1_start, n_domain_mos, naos, &
@@ -2302,14 +2302,14 @@ CONTAINS
             IF (idomain .EQ. 1) THEN
                index1_start = 1
             ELSE
-               index1_start = map%index1(idomain-1)
+               index1_start = map%index1(idomain - 1)
             ENDIF
-            index1_end = map%index1(idomain)-1
+            index1_end = map%index1(idomain) - 1
 
             n_domain_mos = 0
             DO row = index1_start, index1_end
                neighbor = map%pairs(row, 1)
-               n_domain_mos = n_domain_mos+nmos(neighbor)
+               n_domain_mos = n_domain_mos + nmos(neighbor)
             ENDDO
 
             naos = subm_main(idomain)%nrows
@@ -2438,7 +2438,7 @@ CONTAINS
       INTEGER, DIMENSION(:), INTENT(IN)                  :: node_of_domain
 
       CHARACTER(len=*), PARAMETER :: routineN = 'construct_domain_s_sqrt', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, idomain, naos, ndomains
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: Ssqrt, Ssqrtinv
@@ -2511,7 +2511,7 @@ CONTAINS
       INTEGER, DIMENSION(:), INTENT(IN)                  :: node_of_domain
 
       CHARACTER(len=*), PARAMETER :: routineN = 'construct_domain_s_inv', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, idomain, naos, ndomains
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: Sinv
@@ -2584,7 +2584,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: filter_eps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'construct_domain_r_down', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ndomains
       TYPE(dbcsr_type)                                   :: m_tmp_no_1, m_tmp_no_2, matrix_r
@@ -2766,7 +2766,7 @@ CONTAINS
          OPTIONAL                                        :: s_inv_half, s_half
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pseudo_invert_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ii, INFO, jj, LWORK, range1_eiv, &
                                                             range2_eiv, range3_eiv, unit_nr
@@ -2824,7 +2824,7 @@ CONTAINS
          END IF
          ! complete the matrix
          DO ii = 1, N
-            DO jj = ii+1, N
+            DO jj = ii + 1, N
                Ainv(ii, jj) = Ainv(jj, ii)
             ENDDO
             !WRITE(*,'(100F13.9)') Ainv(ii,:)
@@ -2879,13 +2879,13 @@ CONTAINS
                   IF (PRESENT(bad_modes_projector_down)) THEN
                      IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*1.0_dp
                   ENDIF
-                  range1_eiv = range1_eiv+1
+                  range1_eiv = range1_eiv + 1
                ELSE
-                  temp1(jj, :) = temp2(:, jj)/(eigenvalues(jj)+my_shift)
+                  temp1(jj, :) = temp2(:, jj)/(eigenvalues(jj) + my_shift)
                   IF (PRESENT(bad_modes_projector_down)) THEN
                      IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*0.0_dp
                   ENDIF
-                  range2_eiv = range2_eiv+1
+                  range2_eiv = range2_eiv + 1
                ENDIF
             ENDDO
          ELSE
@@ -2896,19 +2896,19 @@ CONTAINS
                      IF (PRESENT(bad_modes_projector_down)) THEN
                         IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*1.0_dp
                      ENDIF
-                     range1_eiv = range1_eiv+1
+                     range1_eiv = range1_eiv + 1
                   ELSE IF (jj .LE. range2) THEN
                      temp1(jj, :) = temp2(:, jj)*1.0_dp
                      IF (PRESENT(bad_modes_projector_down)) THEN
                         IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*1.0_dp
                      ENDIF
-                     range2_eiv = range2_eiv+1
+                     range2_eiv = range2_eiv + 1
                   ELSE
-                     temp1(jj, :) = temp2(:, jj)/(eigenvalues(jj)+my_shift)
+                     temp1(jj, :) = temp2(:, jj)/(eigenvalues(jj) + my_shift)
                      IF (PRESENT(bad_modes_projector_down)) THEN
                         IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*0.0_dp
                      ENDIF
-                     range3_eiv = range3_eiv+1
+                     range3_eiv = range3_eiv + 1
                   ENDIF
                ENDDO
             ELSE
@@ -2918,14 +2918,14 @@ CONTAINS
                      IF (PRESENT(bad_modes_projector_down)) THEN
                         IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*1.0_dp
                      ENDIF
-                     range1_eiv = range1_eiv+1
+                     range1_eiv = range1_eiv + 1
                   ELSE
-                     temp1(jj, :) = temp2(:, jj)/(eigenvalues(jj)+my_shift)
+                     temp1(jj, :) = temp2(:, jj)/(eigenvalues(jj) + my_shift)
                      IF (PRESENT(bad_modes_projector_down)) THEN
                         IF (ALLOCATED(bad_modes_projector_down)) temp3(jj, :) = Ainv(:, jj)*0.0_dp
                      ENDIF
 
-                     range2_eiv = range2_eiv+1
+                     range2_eiv = range2_eiv + 1
                   ENDIF
                ENDDO
             ENDIF
@@ -3005,7 +3005,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: range1_thr, shift
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pseudo_matrix_power', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, INFO, jj, LWORK, range1_eiv, &
                                                             range2_eiv, unit_nr
@@ -3087,9 +3087,9 @@ CONTAINS
          DO jj = 1, N
             IF ((jj .LE. range1) .AND. (eigenvalues(jj) .LT. range1_thr)) THEN
                temp1(jj, :) = temp2(:, jj)*0.0_dp
-               range1_eiv = range1_eiv+1
+               range1_eiv = range1_eiv + 1
             ELSE
-               temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj)+my_shift)**power)
+               temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj) + my_shift)**power)
             ENDIF
          ENDDO
       ELSE
@@ -3097,9 +3097,9 @@ CONTAINS
             DO jj = 1, N
                IF (jj .LE. range1) THEN
                   temp1(jj, :) = temp2(:, jj)*0.0_dp
-                  range1_eiv = range1_eiv+1
+                  range1_eiv = range1_eiv + 1
                ELSE
-                  temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj)+my_shift)**power)
+                  temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj) + my_shift)**power)
                ENDIF
             ENDDO
          ELSE
@@ -3108,14 +3108,14 @@ CONTAINS
                   IF (eigenvalues(jj) .LT. range1_thr) THEN
                      temp1(jj, :) = temp2(:, jj)*0.0_dp
 
-                     range1_eiv = range1_eiv+1
+                     range1_eiv = range1_eiv + 1
                   ELSE
-                     temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj)+my_shift)**power)
+                     temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj) + my_shift)**power)
                   ENDIF
                ENDDO
             ELSE
                DO jj = 1, N
-                  temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj)+my_shift)**power)
+                  temp1(jj, :) = temp2(:, jj)*((eigenvalues(jj) + my_shift)**power)
                ENDDO
             ENDIF
          ENDIF
@@ -3141,7 +3141,7 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'distribute_domains', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, idomain, least_loaded, nao, &
                                                             ncpus, ndomains
@@ -3170,8 +3170,8 @@ CONTAINS
 
       DO idomain = 1, ndomains
          least_loaded = MINLOC(cpu_load, 1)
-         cpu_load(least_loaded) = cpu_load(least_loaded)+domain_load(idomain)
-         almo_scf_env%cpu_of_domain(index0(idomain)) = least_loaded-1
+         cpu_load(least_loaded) = cpu_load(least_loaded) + domain_load(idomain)
+         almo_scf_env%cpu_of_domain(index0(idomain)) = least_loaded - 1
       ENDDO
 
       DEALLOCATE (cpu_load)
@@ -3278,7 +3278,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), INTENT(IN)               :: nocc_of_domain
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xalmo_initial_guess', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iaspc, ispin, istore, naspc, &
                                                             unit_nr
@@ -3351,9 +3351,9 @@ CONTAINS
             ! extrapolation
             DO iaspc = 1, naspc
 
-               istore = MOD(xalmo_history%istore-iaspc, xalmo_history%nstore)+1
-               alpha = (-1.0_dp)**(iaspc+1)*REAL(iaspc, KIND=dp)* &
-                       binomial(2*naspc, naspc-iaspc)/binomial(2*naspc-2, naspc-1)
+               istore = MOD(xalmo_history%istore - iaspc, xalmo_history%nstore) + 1
+               alpha = (-1.0_dp)**(iaspc + 1)*REAL(iaspc, KIND=dp)* &
+                       binomial(2*naspc, naspc - iaspc)/binomial(2*naspc - 2, naspc - 1)
                IF (unit_nr > 0) THEN
                   WRITE (unit_nr, FMT="(T3,A2,I0,A4,F10.6)") &
                      "B(", iaspc, ") = ", alpha

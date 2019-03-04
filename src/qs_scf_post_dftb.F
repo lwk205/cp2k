@@ -10,58 +10,58 @@
 !> \author JHU (03.2013)
 ! **************************************************************************************************
 MODULE qs_scf_post_dftb
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_reduce,&
-                                              cp_fm_cholesky_restore
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm_submat,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_get_ival,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE mathconstants,                   ONLY: twopi
-   USE moments_utils,                   ONLY: get_reference_point
-   USE mulliken,                        ONLY: mulliken_charges
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: debye
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE qs_scf_wfn_mix,                  ONLY: wfn_mix
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_reduce, &
+                             cp_fm_cholesky_restore
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_to_fm_submat, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_get_ival, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE mathconstants, ONLY: twopi
+   USE moments_utils, ONLY: get_reference_point
+   USE mulliken, ONLY: mulliken_charges
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: debye
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE qs_scf_wfn_mix, ONLY: wfn_mix
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -90,7 +90,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_post_calculation_dftb', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: ana
       CHARACTER(LEN=default_string_length)               :: aname
@@ -134,7 +134,7 @@ CONTAINS
          CALL get_dftb_atom_param(dftb_kind, zeff=zeff)
          DO iatom = 1, nat
             iat = atomic_kind_set(ikind)%atom_list(iatom)
-            mcharge(iat) = zeff-SUM(charges(iat, 1:nspins))
+            mcharge(iat) = zeff - SUM(charges(iat, 1:nspins))
          END DO
       END DO
 
@@ -176,7 +176,7 @@ CONTAINS
                      iat = atomic_kind_set(ikind)%atom_list(iatom)
                      WRITE (UNIT=unit_nr, &
                             FMT="(T2,I6,5X,A2,2X,I6,T29,4(1X,F12.6))") &
-                        iat, ana, ikind, charges(iat, 1:2), mcharge(iat), charges(iat, 1)-charges(iat, 2)
+                        iat, ana, ikind, charges(iat, 1:2), mcharge(iat), charges(iat, 1) - charges(iat, 2)
                   END DO
                END DO
                WRITE (UNIT=unit_nr, &
@@ -339,7 +339,7 @@ CONTAINS
       INTEGER                                            :: i, iat, ikind, j, nat, reference
       LOGICAL                                            :: do_berry
       REAL(KIND=dp) :: charge_tot, ci(3), dci(3), dipole(3), dipole_deriv(3), drcc(3), dria(3), &
-         dtheta, gvec(3), q, rcc(3), ria(3), theta, tmp(3), via(3)
+                       dtheta, gvec(3), q, rcc(3), ria(3), theta, tmp(3), via(3)
       REAL(KIND=dp), DIMENSION(:), POINTER               :: ref_point
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
       TYPE(cell_type), POINTER                           :: cell
@@ -370,7 +370,7 @@ CONTAINS
          zphase = CMPLX(COS(ria), SIN(ria), dp)**charge_tot
 
          dria = twopi*MATMUL(cell%h_inv, drcc)
-         dzphase = charge_tot*CMPLX(-SIN(ria), COS(ria), dp)**(charge_tot-1.0_dp)*dria
+         dzphase = charge_tot*CMPLX(-SIN(ria), COS(ria), dp)**(charge_tot - 1.0_dp)*dria
 
          ggamma = CMPLX(1.0_dp, 0.0_dp, KIND=dp)
          dggamma = CMPLX(0.0_dp, 0.0_dp, KIND=dp)
@@ -387,19 +387,19 @@ CONTAINS
                   theta = SUM(ria(:)*gvec(:))
                   dtheta = SUM(via(:)*gvec(:))
                   zeta = CMPLX(COS(theta), SIN(theta), KIND=dp)**(-q)
-                  dzeta = -q*CMPLX(-SIN(theta), COS(theta), KIND=dp)**(-q-1.0_dp)*dtheta
-                  dggamma(j) = dggamma(j)*zeta+ggamma(j)*dzeta
+                  dzeta = -q*CMPLX(-SIN(theta), COS(theta), KIND=dp)**(-q - 1.0_dp)*dtheta
+                  dggamma(j) = dggamma(j)*zeta + ggamma(j)*dzeta
                   ggamma(j) = ggamma(j)*zeta
                END DO
             ENDDO
          END DO
-         dggamma = dggamma*zphase+ggamma*dzphase
+         dggamma = dggamma*zphase + ggamma*dzphase
          ggamma = ggamma*zphase
          IF (ALL(REAL(ggamma, KIND=dp) /= 0.0_dp)) THEN
             tmp = AIMAG(ggamma)/REAL(ggamma, KIND=dp)
             ci = ATAN(tmp)
-            dci = (1.0_dp/(1.0_dp+tmp**2))* &
-                  (AIMAG(dggamma)*REAL(ggamma, KIND=dp)-AIMAG(ggamma)*REAL(dggamma, KIND=dp))/(REAL(ggamma, KIND=dp))**2
+            dci = (1.0_dp/(1.0_dp + tmp**2))* &
+                  (AIMAG(dggamma)*REAL(ggamma, KIND=dp) - AIMAG(ggamma)*REAL(dggamma, KIND=dp))/(REAL(ggamma, KIND=dp))**2
             dipole = MATMUL(cell%hmat, ci)/twopi
             dipole_deriv = MATMUL(cell%hmat, dci)/twopi
          END IF
@@ -409,8 +409,8 @@ CONTAINS
             ! no pbc(particle_set(i)%r(:),cell) so that the total dipole is the sum of the molecular dipoles
             ria = particle_set(i)%r(:)
             q = charges(i)
-            dipole = dipole-q*(ria-rcc)
-            dipole_deriv(:) = dipole_deriv(:)-q*(particle_set(i)%v(:)-drcc)
+            dipole = dipole - q*(ria - rcc)
+            dipole_deriv(:) = dipole_deriv(:) - q*(particle_set(i)%v(:) - drcc)
          END DO
       END IF
       IF (unit_nr > 0) THEN
@@ -473,7 +473,7 @@ CONTAINS
 
       DO ispin = 1, SIZE(mos)
          CALL get_mo_set(mos(ispin)%mo_set, mo_coeff=mo_coeff, eigenvalues=mo_eigenvalues, nmo=nmo)
-         CALL cp_fm_struct_create(fmstruct=ao_lumo_struct, nrow_global=nao, ncol_global=nao-nmo, &
+         CALL cp_fm_struct_create(fmstruct=ao_lumo_struct, nrow_global=nao, ncol_global=nao - nmo, &
                                   template_fmstruct=mo_coeff%matrix_struct)
 
          CALL cp_fm_create(lumos(ispin)%matrix, matrix_struct=ao_lumo_struct)
@@ -482,7 +482,7 @@ CONTAINS
          CALL choose_eigv_solver(KS_tmp, work, mo_eigenvalues)
          CALL cp_fm_cholesky_restore(work, nao, S_tmp, MO_tmp, "SOLVE")
          CALL cp_fm_to_fm_submat(MO_tmp, mo_coeff, nao, nmo, 1, 1, 1, 1)
-         CALL cp_fm_to_fm_submat(MO_tmp, lumos(ispin)%matrix, nao, nao-nmo, 1, nmo+1, 1, 1)
+         CALL cp_fm_to_fm_submat(MO_tmp, lumos(ispin)%matrix, nao, nao - nmo, 1, nmo + 1, 1, 1)
 
          CALL cp_fm_struct_release(ao_lumo_struct)
       END DO

@@ -10,7 +10,7 @@
 ! **************************************************************************************************
 MODULE sto_ng
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -68,7 +68,7 @@ CONTAINS
       CPASSERT(nq >= 1)
       CPASSERT(lq >= 0)
 
-      m = (nq*(nq-1))/2+lq+1
+      m = (nq*(nq - 1))/2 + lq + 1
       SELECT CASE (m)
       CASE (1) ! 1s
          SELECT CASE (n)

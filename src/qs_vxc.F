@@ -13,46 +13,46 @@
 ! **************************************************************************************************
 MODULE qs_vxc
 
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE input_constants,                 ONLY: sic_ad,&
-                                              sic_eo,&
-                                              sic_mauri_spz,&
-                                              sic_mauri_us,&
-                                              sic_none,&
-                                              xc_none,&
-                                              xc_vdw_fun_nonloc
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_grids,                        ONLY: pw_grid_compare
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_release,&
-                                              pw_type
-   USE qs_dispersion_nonloc,            ONLY: calculate_dispersion_nonloc
-   USE qs_dispersion_types,             ONLY: qs_dispersion_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE virial_types,                    ONLY: virial_type
-   USE xc,                              ONLY: xc_exc_calc,&
-                                              xc_vxc_pw_create1
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE input_constants, ONLY: sic_ad, &
+                              sic_eo, &
+                              sic_mauri_spz, &
+                              sic_mauri_us, &
+                              sic_none, &
+                              xc_none, &
+                              xc_vdw_fun_nonloc
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_grids, ONLY: pw_grid_compare
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_release, &
+                       pw_type
+   USE qs_dispersion_nonloc, ONLY: calculate_dispersion_nonloc
+   USE qs_dispersion_types, ONLY: qs_dispersion_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE virial_types, ONLY: virial_type
+   USE xc, ONLY: xc_exc_calc, &
+                 xc_vxc_pw_create1
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -114,7 +114,7 @@ CONTAINS
 
       INTEGER                                            :: handle, ispin, myfun, nelec_spin(2), vdw
       LOGICAL :: compute_virial, do_adiabatic_rescaling, my_just_energy, rho_g_valid, &
-         sic_scaling_b_zero, tau_r_valid, uf_grid, vdW_nl
+                 sic_scaling_b_zero, tau_r_valid, uf_grid, vdW_nl
       REAL(KIND=dp)                                      :: exc_m, factor, &
                                                             my_adiabatic_rescale_factor, &
                                                             my_scaling, nelec_s_inv
@@ -201,7 +201,7 @@ CONTAINS
             ! no idea yet what to do here in that case
             CPASSERT(.NOT. tau_r_valid)
          CASE (sic_mauri_us)
-            my_scaling = 1.0_dp-dft_control%sic_scaling_b
+            my_scaling = 1.0_dp - dft_control%sic_scaling_b
             ! no idea yet what to do here in that case
             CPASSERT(.NOT. tau_r_valid)
          CASE (sic_eo)
@@ -418,7 +418,7 @@ CONTAINS
                                       virial_xc=virial_xc_tmp)
             END IF
 
-            exc = exc-dft_control%sic_scaling_b*exc_m
+            exc = exc - dft_control%sic_scaling_b*exc_m
 
             ! and take care of the potential only vxc_rho is taken into account
             IF (.NOT. my_just_energy) THEN
@@ -490,7 +490,7 @@ CONTAINS
                                          virial_xc=virial_xc_tmp)
                END IF
 
-               exc = exc-dft_control%sic_scaling_b*nelec_spin(ispin)*exc_m
+               exc = exc - dft_control%sic_scaling_b*nelec_spin(ispin)*exc_m
 
                ! and take care of the potential only vxc_rho is taken into account
                IF (.NOT. my_just_energy) THEN
@@ -535,7 +535,7 @@ CONTAINS
                                       virial_xc=virial_xc_tmp)
             END IF
 
-            exc = exc+dft_control%sic_scaling_b*exc_m
+            exc = exc + dft_control%sic_scaling_b*exc_m
 
             ! and take care of the potential
             IF (.NOT. my_just_energy) THEN

@@ -12,11 +12,11 @@
 ! **************************************************************************************************
 MODULE hirshfeld_types
 
-   USE input_constants,                 ONLY: radius_default,&
-                                              shape_function_gaussian
-   USE kinds,                           ONLY: dp
-   USE pw_types,                        ONLY: pw_p_type,&
-                                              pw_release
+   USE input_constants, ONLY: radius_default, &
+                              shape_function_gaussian
+   USE kinds, ONLY: dp
+   USE pw_types, ONLY: pw_p_type, &
+                       pw_release
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,7 +65,7 @@ CONTAINS
       TYPE(hirshfeld_type), POINTER                      :: hirshfeld_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_hirshfeld_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(hirshfeld_env)) THEN
          CALL release_hirshfeld_type(hirshfeld_env)
@@ -91,7 +91,7 @@ CONTAINS
       TYPE(hirshfeld_type), POINTER                      :: hirshfeld_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_hirshfeld_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind
       TYPE(shape_fn), DIMENSION(:), POINTER              :: kind_shape
@@ -148,7 +148,7 @@ CONTAINS
       LOGICAL, INTENT(OUT), OPTIONAL                     :: use_bohr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_hirshfeld_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(hirshfeld_env))
 
@@ -195,7 +195,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: use_bohr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_hirshfeld_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(hirshfeld_env))
 

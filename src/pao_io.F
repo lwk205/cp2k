@@ -8,44 +8,44 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_io
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        convert_dbcsr_to_csr, csr_create_from_dbcsr, csr_dbcsr_blkrow_dist, csr_destroy, csr_type, &
-        csr_write, dbcsr_copy, dbcsr_desymmetrize, dbcsr_get_block_p, dbcsr_get_info, &
-        dbcsr_has_symmetry, dbcsr_release, dbcsr_type
-   USE dm_ls_scf_types,                 ONLY: ls_scf_env_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_max,&
-                                              mp_sum
-   USE pao_input,                       ONLY: id2str
-   USE pao_param,                       ONLY: pao_param_count
-   USE pao_types,                       ONLY: pao_env_type
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: angstrom
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              pao_potential_type,&
-                                              qs_kind_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE cell_types, ONLY: cell_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      convert_dbcsr_to_csr, csr_create_from_dbcsr, csr_dbcsr_blkrow_dist, csr_destroy, csr_type, &
+      csr_write, dbcsr_copy, dbcsr_desymmetrize, dbcsr_get_block_p, dbcsr_get_info, &
+      dbcsr_has_symmetry, dbcsr_release, dbcsr_type
+   USE dm_ls_scf_types, ONLY: ls_scf_env_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_max, &
+                              mp_sum
+   USE pao_input, ONLY: id2str
+   USE pao_param, ONLY: pao_param_count
+   USE pao_types, ONLY: pao_env_type
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: angstrom
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            pao_potential_type, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -88,7 +88,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_read_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: param
       INTEGER                                            :: iatom, ikind, natoms
@@ -118,7 +118,7 @@ CONTAINS
          CALL pao_read_raw(pao%restart_file, param, hmat, kinds, atom2kind, positions, xblocks)
 
          ! check cell
-         IF (MAXVAL(ABS(hmat-cell%hmat)) > 1e-10) &
+         IF (MAXVAL(ABS(hmat - cell%hmat)) > 1e-10) &
             CPWARN("Restarting from differnt cell")
 
          ! check parametrization
@@ -143,7 +143,7 @@ CONTAINS
          ! check positions, warning only
          diff = 0.0_dp
          DO iatom = 1, natoms
-            diff = MAX(diff, MAXVAL(ABS(positions(iatom, :)-particle_set(iatom)%r)))
+            diff = MAX(diff, MAXVAL(ABS(positions(iatom, :) - particle_set(iatom)%r)))
          ENDDO
          IF (diff > 1e-10) &
             CPWARN("Restarting from different atom positions")
@@ -304,7 +304,7 @@ CONTAINS
             ALLOCATE (xblocks(iatom)%p(nparams, 1))
             BACKSPACE (unit_nr)
             READ (unit_nr, fmt=*) label, iatom, xblocks(iatom)%p
-            xblocks_read = xblocks_read+1
+            xblocks_read = xblocks_read + 1
             CPASSERT(iatom == xblocks_read) ! ensure blocks are read in order
 
          ELSE IF (TRIM(label) == "THE_END") THEN
@@ -394,7 +394,7 @@ CONTAINS
       REAL(dp)                                           :: energy
 
       CHARACTER(len=*), PARAMETER :: printkey_section = 'DFT%LS_SCF%PAO%PRINT%RESTART', &
-         routineN = 'pao_write_restart', routineP = moduleN//':'//routineN
+                                     routineN = 'pao_write_restart', routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, unit_max, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -496,7 +496,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_restart_header', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: kindname
       INTEGER                                            :: iatom, ikind, ipot, nparams, &
@@ -567,7 +567,7 @@ CONTAINS
       TYPE(ls_scf_env_type), TARGET                      :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_write_ks_matrix_csr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, fileformat
       INTEGER                                            :: handle, ispin, output_unit, unit_nr
@@ -643,7 +643,7 @@ CONTAINS
       TYPE(ls_scf_env_type), TARGET                      :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_write_s_matrix_csr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, fileformat
       INTEGER                                            :: handle, output_unit, unit_nr

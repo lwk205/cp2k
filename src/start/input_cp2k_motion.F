@@ -9,58 +9,58 @@
 !> \author teo & fawzi
 ! **************************************************************************************************
 MODULE input_cp2k_motion
-   USE bibliography,                    ONLY: Brieuc2016,&
-                                              Byrd1995,&
-                                              Ceriotti2010,&
-                                              Ceriotti2012,&
-                                              Ceriotti2014,&
-                                              Henkelman1999,&
-                                              Henkelman2014,&
-                                              Kapil2016
-   USE cp_output_handling,              ONLY: add_last_numeric,&
-                                              cp_print_key_section_create,&
-                                              debug_print_level,&
-                                              high_print_level,&
-                                              low_print_level,&
-                                              medium_print_level
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE input_constants,                 ONLY: &
-        default_bfgs_method_id, default_cell_direct_id, default_cell_geo_opt_id, &
-        default_cell_md_id, default_cg_method_id, default_dimer_method_id, &
-        default_lbfgs_method_id, default_minimization_method_id, default_ts_method_id, &
-        do_mc_gemc_npt, do_mc_gemc_nvt, do_mc_traditional, do_mc_virial, fix_none, fix_x, fix_xy, &
-        fix_xz, fix_y, fix_yz, fix_z, fmt_id_pdb, fmt_id_xyz, gaussian, helium_cell_shape_cube, &
-        helium_cell_shape_octahedron, helium_forces_average, helium_forces_last, &
-        helium_mdist_exponential, helium_mdist_gaussian, helium_mdist_linear, &
-        helium_mdist_quadratic, helium_mdist_singlev, helium_mdist_uniform, &
-        helium_sampling_ceperley, helium_sampling_worm, helium_solute_intpot_mwater, &
-        helium_solute_intpot_none, integrate_exact, integrate_numeric, ls_2pnt, ls_3pnt, ls_fit, &
-        ls_gold, ls_none, matrix_init_cholesky, matrix_init_diagonal, numerical, perm_cycle, &
-        perm_plain, propagator_pimd, propagator_rpmd, transformation_normal, transformation_stage
-   USE input_cp2k_constraints,          ONLY: create_constraint_section
-   USE input_cp2k_free_energy,          ONLY: create_fe_section
-   USE input_cp2k_md,                   ONLY: create_md_section
-   USE input_cp2k_motion_print,         ONLY: add_format_keyword,&
-                                              create_motion_print_section
-   USE input_cp2k_neb,                  ONLY: create_band_section
-   USE input_cp2k_subsys,               ONLY: create_rng_section
-   USE input_cp2k_thermostats,          ONLY: create_coord_section,&
-                                              create_gle_section,&
-                                              create_velocity_section
-   USE input_cp2k_tmc,                  ONLY: create_TMC_section
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: integer_t,&
-                                              logical_t,&
-                                              real_t
-   USE kinds,                           ONLY: dp
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: Brieuc2016, &
+                           Byrd1995, &
+                           Ceriotti2010, &
+                           Ceriotti2012, &
+                           Ceriotti2014, &
+                           Henkelman1999, &
+                           Henkelman2014, &
+                           Kapil2016
+   USE cp_output_handling, ONLY: add_last_numeric, &
+                                 cp_print_key_section_create, &
+                                 debug_print_level, &
+                                 high_print_level, &
+                                 low_print_level, &
+                                 medium_print_level
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE input_constants, ONLY: &
+      default_bfgs_method_id, default_cell_direct_id, default_cell_geo_opt_id, &
+      default_cell_md_id, default_cg_method_id, default_dimer_method_id, &
+      default_lbfgs_method_id, default_minimization_method_id, default_ts_method_id, &
+      do_mc_gemc_npt, do_mc_gemc_nvt, do_mc_traditional, do_mc_virial, fix_none, fix_x, fix_xy, &
+      fix_xz, fix_y, fix_yz, fix_z, fmt_id_pdb, fmt_id_xyz, gaussian, helium_cell_shape_cube, &
+      helium_cell_shape_octahedron, helium_forces_average, helium_forces_last, &
+      helium_mdist_exponential, helium_mdist_gaussian, helium_mdist_linear, &
+      helium_mdist_quadratic, helium_mdist_singlev, helium_mdist_uniform, &
+      helium_sampling_ceperley, helium_sampling_worm, helium_solute_intpot_mwater, &
+      helium_solute_intpot_none, integrate_exact, integrate_numeric, ls_2pnt, ls_3pnt, ls_fit, &
+      ls_gold, ls_none, matrix_init_cholesky, matrix_init_diagonal, numerical, perm_cycle, &
+      perm_plain, propagator_pimd, propagator_rpmd, transformation_normal, transformation_stage
+   USE input_cp2k_constraints, ONLY: create_constraint_section
+   USE input_cp2k_free_energy, ONLY: create_fe_section
+   USE input_cp2k_md, ONLY: create_md_section
+   USE input_cp2k_motion_print, ONLY: add_format_keyword, &
+                                      create_motion_print_section
+   USE input_cp2k_neb, ONLY: create_band_section
+   USE input_cp2k_subsys, ONLY: create_rng_section
+   USE input_cp2k_thermostats, ONLY: create_coord_section, &
+                                     create_gle_section, &
+                                     create_velocity_section
+   USE input_cp2k_tmc, ONLY: create_TMC_section
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: integer_t, &
+                              logical_t, &
+                              real_t
+   USE kinds, ONLY: dp
+   USE string_utilities, ONLY: s2a
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -82,7 +82,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_motion_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: subsection
 
@@ -159,7 +159,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -384,7 +384,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_avbmc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -439,7 +439,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_move_prob_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -521,7 +521,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mol_prob_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -581,7 +581,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_box_prob_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -627,7 +627,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_update_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -672,7 +672,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_max_disp_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: subsection
 
@@ -704,7 +704,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_mol_disp_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -764,7 +764,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_box_disp_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -808,7 +808,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: just_optimizers, use_model_hessian
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_geoopt_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection
@@ -936,7 +936,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_shellcore_opt_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: print_key, subsection
 
@@ -976,7 +976,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_cell_opt_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection
@@ -1090,7 +1090,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_ts_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection, subsection2, &
@@ -1221,7 +1221,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: use_model_hessian
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_bfgs_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key
@@ -1289,7 +1289,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_cg_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection, subsubsection
@@ -1422,7 +1422,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_lbfgs_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1489,7 +1489,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_fp_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key
@@ -1586,7 +1586,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_driver_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -1636,7 +1636,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_pint_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection, subsubsection
@@ -2070,7 +2070,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_helium_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key, subsection, subsubsection

@@ -10,21 +10,21 @@
 !> \author Joost VandeVondele (09.2002)
 ! **************************************************************************************************
 MODULE preconditioner_types
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_fm_types,                     ONLY: cp_fm_release,&
-                                              cp_fm_type
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type,&
-                                              dbcsr_release_p,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: cholesky_reduce,&
-                                              ot_precond_solver_default
-   USE kinds,                           ONLY: dp
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_fm_types, ONLY: cp_fm_release, &
+                          cp_fm_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_deallocate_matrix, &
+                        dbcsr_p_type, &
+                        dbcsr_release_p, &
+                        dbcsr_type
+   USE input_constants, ONLY: cholesky_reduce, &
+                              ot_precond_solver_default
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -118,7 +118,7 @@ CONTAINS
       TYPE(preconditioner_type)                          :: preconditioner_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'destroy_preconditioner', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 

@@ -73,62 +73,62 @@
 !> \author Matthias Krack (14.09.2000,21.03.02)
 ! **************************************************************************************************
 MODULE qs_core_hamiltonian
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE core_ae,                         ONLY: build_core_ae
-   USE core_ppl,                        ONLY: build_core_ppl
-   USE core_ppnl,                       ONLY: build_core_ppnl
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_dbcsr_output,                 ONLY: cp_dbcsr_write_matrix_dist,&
-                                              cp_dbcsr_write_sparse_matrix
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_distribution_type, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_p_type, dbcsr_type
-   USE input_constants,                 ONLY: do_admm_purify_none,&
-                                              do_ppl_analytic,&
-                                              kg_tnadd_atomic,&
-                                              rel_none,&
-                                              rel_trans_atom
-   USE input_section_types,             ONLY: section_vals_val_get
-   USE kg_environment_types,            ONLY: kg_environment_type
-   USE kg_tnadd_mat,                    ONLY: build_tnadd_mat
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE lri_environment_types,           ONLY: lri_environment_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_condnum,                      ONLY: overlap_condnum
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_kinetic,                      ONLY: build_kinetic_matrix
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_oce_methods,                  ONLY: build_oce_matrices
-   USE qs_oce_types,                    ONLY: allocate_oce_set,&
-                                              create_oce_set,&
-                                              oce_matrix_type
-   USE qs_overlap,                      ONLY: build_overlap_matrix
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE core_ae, ONLY: build_core_ae
+   USE core_ppl, ONLY: build_core_ppl
+   USE core_ppnl, ONLY: build_core_ppnl
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_dbcsr_output, ONLY: cp_dbcsr_write_matrix_dist, &
+                              cp_dbcsr_write_sparse_matrix
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_distribution_type, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_p_type, dbcsr_type
+   USE input_constants, ONLY: do_admm_purify_none, &
+                              do_ppl_analytic, &
+                              kg_tnadd_atomic, &
+                              rel_none, &
+                              rel_trans_atom
+   USE input_section_types, ONLY: section_vals_val_get
+   USE kg_environment_types, ONLY: kg_environment_type
+   USE kg_tnadd_mat, ONLY: build_tnadd_mat
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE lri_environment_types, ONLY: lri_environment_type
+   USE particle_types, ONLY: particle_type
+   USE qs_condnum, ONLY: overlap_condnum
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_kinetic, ONLY: build_kinetic_matrix
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_oce_methods, ONLY: build_oce_matrices
+   USE qs_oce_types, ONLY: allocate_oce_set, &
+                           create_oce_set, &
+                           oce_matrix_type
+   USE qs_overlap, ONLY: build_overlap_matrix
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -156,7 +156,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_core_hamiltonian_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, img, iw, nder, nders, &
                                                             nimages, nkind
@@ -553,7 +553,7 @@ CONTAINS
       TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_atomic_relmat', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, iatom, ikind, jatom, natom
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: kind_of
@@ -571,7 +571,7 @@ CONTAINS
          IF (iatom == jatom) THEN
             ikind = kind_of(iatom)
             CALL get_qs_kind(qs_kind_set(ikind), reltmat=reltmat)
-            hblock = hblock+reltmat
+            hblock = hblock + reltmat
          END IF
       END DO
       CALL dbcsr_iterator_stop(iter)
@@ -591,7 +591,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dump_info_core_hamiltonian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: after, handle, i, ic, iw, output_unit
       LOGICAL                                            :: omit_headers

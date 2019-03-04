@@ -11,25 +11,25 @@
 !> \author Martin Haeufel
 ! **************************************************************************************************
 MODULE kg_environment_types
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE integration_grid_types,          ONLY: deallocate_intgrid,&
-                                              integration_grid_type
-   USE kinds,                           ONLY: dp
-   USE lri_environment_types,           ONLY: lri_density_release,&
-                                              lri_density_type,&
-                                              lri_env_release,&
-                                              lri_environment_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE qs_dispersion_types,             ONLY: qs_dispersion_release,&
-                                              qs_dispersion_type
-   USE qs_grid_atom,                    ONLY: atom_integration_grid_type,&
-                                              deallocate_atom_int_grid
-   USE qs_neighbor_list_types,          ONLY: deallocate_neighbor_list_set,&
-                                              neighbor_list_set_p_type
-   USE task_list_types,                 ONLY: deallocate_task_list,&
-                                              task_list_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_section_types, ONLY: section_vals_type
+   USE integration_grid_types, ONLY: deallocate_intgrid, &
+                                     integration_grid_type
+   USE kinds, ONLY: dp
+   USE lri_environment_types, ONLY: lri_density_release, &
+                                    lri_density_type, &
+                                    lri_env_release, &
+                                    lri_environment_type
+   USE molecule_types, ONLY: molecule_type
+   USE qs_dispersion_types, ONLY: qs_dispersion_release, &
+                                  qs_dispersion_type
+   USE qs_grid_atom, ONLY: atom_integration_grid_type, &
+                           deallocate_atom_int_grid
+   USE qs_neighbor_list_types, ONLY: deallocate_neighbor_list_set, &
+                                     neighbor_list_set_p_type
+   USE task_list_types, ONLY: deallocate_task_list, &
+                              task_list_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE

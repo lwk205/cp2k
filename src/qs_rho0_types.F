@@ -5,18 +5,18 @@
 ! **************************************************************************************************
 MODULE qs_rho0_types
 
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: fourpi,&
-                                              pi,&
-                                              rootpi
-   USE memory_utilities,                ONLY: reallocate
-   USE pw_types,                        ONLY: pw_p_type,&
-                                              pw_release
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_rho_atom_types,               ONLY: rho_atom_coeff
-   USE whittaker,                       ONLY: whittaker_c0a,&
-                                              whittaker_ci
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: fourpi, &
+                            pi, &
+                            rootpi
+   USE memory_utilities, ONLY: reallocate
+   USE pw_types, ONLY: pw_p_type, &
+                       pw_release
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_rho_atom_types, ONLY: rho_atom_coeff
+   USE whittaker, ONLY: whittaker_c0a, &
+                        whittaker_ci
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -97,7 +97,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nkind
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_multipoles', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iat, ikind
 
@@ -141,7 +141,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: natom
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_rho0_atom', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iat
 
@@ -170,7 +170,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nr, nchannels
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_rho0_atom_rad', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (rho0_atom%rho0_rad_h)
 
@@ -195,7 +195,7 @@ CONTAINS
       TYPE(rho0_mpole_type), POINTER                     :: rho0
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_rho0_mpole', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(rho0)) THEN
          CALL deallocate_rho0_mpole(rho0)
@@ -270,10 +270,10 @@ CONTAINS
          rho0_mpole%mp_gau(ik)%g0_h(1:nr, l) = gh_tmp(1:nr)* &
                                                rho0_mpole%norm_g0l_h(l)
 
-         prefactor = fourpi/(2.0_dp*l+1.0_dp)*rho0_mpole%norm_g0l_h(l)
+         prefactor = fourpi/(2.0_dp*l + 1.0_dp)*rho0_mpole%norm_g0l_h(l)
          CALL whittaker_c0a(int1, grid_atom%rad, gexp, erf_z_h, z_h, l, l, nr)
          DO ir = 1, nr
-            rho0_mpole%mp_gau(ik)%vg0_h(ir, l) = prefactor*(int1(ir)+ &
+            rho0_mpole%mp_gau(ik)%vg0_h(ir, l) = prefactor*(int1(ir) + &
                                                             int2(ir)*grid_atom%rad2l(ir, l))
          END DO
 
@@ -291,7 +291,7 @@ CONTAINS
       TYPE(mpole_gau_overlap), DIMENSION(:), POINTER     :: mp_gau
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_mpole_gau', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nkind
 
@@ -321,7 +321,7 @@ CONTAINS
       TYPE(mpole_rho_atom), DIMENSION(:), POINTER        :: mp_rho
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_mpole_rho', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iat, natom
 
@@ -347,7 +347,7 @@ CONTAINS
       TYPE(rho0_atom_type), DIMENSION(:), POINTER        :: rho0_atom_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_rho0_atom', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iat, natom
 
@@ -383,7 +383,7 @@ CONTAINS
       TYPE(rho0_mpole_type), POINTER                     :: rho0
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_rho0_mpole', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(rho0)) THEN
 
@@ -511,7 +511,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: tddft
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_mpole_rho', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: my_tddft
 
@@ -549,7 +549,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_rho0_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, l, nkind
       REAL(dp)                                           :: conv

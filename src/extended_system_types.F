@@ -13,13 +13,13 @@
 !> \author CJM
 ! **************************************************************************************************
 MODULE extended_system_types
-   USE bibliography,                    ONLY: Nose1984a,&
-                                              Nose1984b,&
-                                              cite_reference
-   USE input_constants,                 ONLY: do_thermo_no_communication
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
+   USE bibliography, ONLY: Nose1984a, &
+                           Nose1984b, &
+                           cite_reference
+   USE input_constants, ONLY: do_thermo_no_communication
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -118,7 +118,7 @@ CONTAINS
       TYPE(map_info_type), POINTER                       :: map_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_map_info_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (map_info)
       NULLIFY (map_info%index, map_info%map_index)
@@ -138,7 +138,7 @@ CONTAINS
       TYPE(map_info_type), POINTER                       :: map_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'release_map_info_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(map_info)) THEN
          IF (ASSOCIATED(map_info%p_kin)) THEN

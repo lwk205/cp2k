@@ -11,7 +11,7 @@
 ! **************************************************************************************************
 MODULE qs_energy_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -93,7 +93,7 @@ CONTAINS
       TYPE(qs_energy_type), POINTER                      :: qs_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_qs_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -119,7 +119,7 @@ CONTAINS
       TYPE(qs_energy_type), POINTER                      :: qs_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_qs_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qs_energy)) THEN
          IF (ASSOCIATED(qs_energy%ddapc_restraint)) THEN

@@ -8,26 +8,26 @@
 !> \author Teodoro Laino
 ! **************************************************************************************************
 MODULE qmmm_pw_grid
-   USE input_constants,                 ONLY: do_par_atom,&
-                                              do_qmmm_gauss,&
-                                              do_qmmm_swave
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE message_passing,                 ONLY: mp_comm_dup,&
-                                              mp_environ
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_grid_types,                   ONLY: FULLSPACE,&
-                                              PW_MODE_DISTRIBUTED,&
-                                              PW_MODE_LOCAL,&
-                                              pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_create,&
-                                              pw_grid_release
-   USE pw_pool_types,                   ONLY: pw_pool_create,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type,&
-                                              pw_pools_dealloc
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_type
+   USE input_constants, ONLY: do_par_atom, &
+                              do_qmmm_gauss, &
+                              do_qmmm_swave
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE message_passing, ONLY: mp_comm_dup, &
+                              mp_environ
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_grid_types, ONLY: FULLSPACE, &
+                            PW_MODE_DISTRIBUTED, &
+                            PW_MODE_LOCAL, &
+                            pw_grid_type
+   USE pw_grids, ONLY: pw_grid_create, &
+                       pw_grid_release
+   USE pw_pool_types, ONLY: pw_pool_create, &
+                            pw_pool_p_type, &
+                            pw_pool_type, &
+                            pw_pools_dealloc
+   USE qmmm_types_low, ONLY: qmmm_env_qm_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -54,7 +54,7 @@ CONTAINS
       TYPE(pw_env_type), POINTER                         :: pw_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_pw_grid_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: auxbas_grid, Ilevel, pw_mode
       REAL(KIND=dp), DIMENSION(3)                        :: Maxdr, Mindr
@@ -121,7 +121,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: pw_mode
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pw_grid_create_copy_no_pbc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: pw_mode_loc
       INTEGER, DIMENSION(:), POINTER                     :: pos_of_x
@@ -131,27 +131,27 @@ CONTAINS
       pw_mode_loc = pw_grid_in%para%mode
       IF (PRESENT(pw_mode)) pw_mode_loc = pw_mode
       CALL pw_grid_create(pw_grid_out, pw_grid_in%para%group)
-      qmmm_grid_tag = qmmm_grid_tag+1
+      qmmm_grid_tag = qmmm_grid_tag + 1
       pw_grid_out%id_nr = qmmm_grid_tag
       pw_grid_out%ref_count = 1
       pw_grid_out%reference = 0
       pw_grid_out%bounds = pw_grid_in%bounds
-      pw_grid_out%bounds(2, :) = pw_grid_out%bounds(2, :)+1
+      pw_grid_out%bounds(2, :) = pw_grid_out%bounds(2, :) + 1
       IF (pw_mode_loc == PW_MODE_DISTRIBUTED) THEN
          pw_grid_out%bounds_local = pw_grid_in%bounds_local
          IF (pw_grid_in%bounds_local(2, 1) == pw_grid_in%bounds(2, 1) .AND. &
              pw_grid_in%bounds_local(1, 1) <= pw_grid_in%bounds(2, 1)) THEN
-            pw_grid_out%bounds_local(2, 1) = pw_grid_out%bounds_local(2, 1)+1
+            pw_grid_out%bounds_local(2, 1) = pw_grid_out%bounds_local(2, 1) + 1
          END IF
-         pw_grid_out%bounds_local(2, 2) = pw_grid_out%bounds_local(2, 2)+1
-         pw_grid_out%bounds_local(2, 3) = pw_grid_out%bounds_local(2, 3)+1
+         pw_grid_out%bounds_local(2, 2) = pw_grid_out%bounds_local(2, 2) + 1
+         pw_grid_out%bounds_local(2, 3) = pw_grid_out%bounds_local(2, 3) + 1
       ELSE
          pw_grid_out%bounds_local = pw_grid_out%bounds
       END IF
-      pw_grid_out%npts = pw_grid_in%npts+1
+      pw_grid_out%npts = pw_grid_in%npts + 1
       pw_grid_out%ngpts = PRODUCT(INT(pw_grid_out%npts, KIND=int_8))
       pw_grid_out%ngpts_cut = 0
-      pw_grid_out%npts_local = pw_grid_out%bounds_local(2, :)-pw_grid_out%bounds_local(1, :)+1
+      pw_grid_out%npts_local = pw_grid_out%bounds_local(2, :) - pw_grid_out%bounds_local(1, :) + 1
       pw_grid_out%ngpts_local = PRODUCT(pw_grid_out%npts_local)
       pw_grid_out%ngpts_cut_local = 0
       pw_grid_out%dr = pw_grid_in%dr
@@ -179,8 +179,8 @@ CONTAINS
                pw_grid_out%para%nyzray, &
                pw_grid_out%para%bo)
       ALLOCATE (pos_of_x(pw_grid_out%bounds(1, 1):pw_grid_out%bounds(2, 1)))
-      pos_of_x(:pw_grid_out%bounds(2, 1)-1) = pw_grid_in%para%pos_of_x
-      pos_of_x(pw_grid_out%bounds(2, 1)) = pos_of_x(pw_grid_out%bounds(2, 1)-1)
+      pos_of_x(:pw_grid_out%bounds(2, 1) - 1) = pw_grid_in%para%pos_of_x
+      pos_of_x(pw_grid_out%bounds(2, 1)) = pos_of_x(pw_grid_out%bounds(2, 1) - 1)
       pw_grid_out%para%pos_of_x => pos_of_x
       pw_grid_out%para%rs_dims = pw_grid_in%para%rs_dims
       IF (PRODUCT(pw_grid_in%para%rs_dims) /= 0) THEN

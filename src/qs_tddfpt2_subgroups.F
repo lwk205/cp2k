@@ -4,73 +4,73 @@
 !--------------------------------------------------------------------------------------------------!
 
 MODULE qs_tddfpt2_subgroups
-   USE admm_types,                      ONLY: admm_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              qs_control_type,&
-                                              tddfpt2_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_dist2d_to_dist
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_copy_general,&
-                                              cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_retain,&
-                                              cp_fm_type
-   USE cp_para_env,                     ONLY: cp_para_env_create,&
-                                              cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_distribution_release,&
-                                              dbcsr_distribution_type,&
-                                              dbcsr_get_info,&
-                                              dbcsr_release,&
-                                              dbcsr_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE distribution_2d_types,           ONLY: distribution_2d_release,&
-                                              distribution_2d_type
-   USE distribution_methods,            ONLY: distribute_molecules_2d
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_comm_split
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_methods,                  ONLY: pw_env_create,&
-                                              pw_env_rebuild
-   USE pw_env_types,                    ONLY: pw_env_release,&
-                                              pw_env_retain,&
-                                              pw_env_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_neighbor_list_types,          ONLY: deallocate_neighbor_list_set,&
-                                              neighbor_list_set_p_type
-   USE qs_neighbor_lists,               ONLY: atom2d_build,&
-                                              atom2d_cleanup,&
-                                              build_neighbor_lists,&
-                                              local_atoms_type,&
-                                              pair_radius_setup
-   USE task_list_methods,               ONLY: generate_qs_task_list
-   USE task_list_types,                 ONLY: allocate_task_list,&
-                                              deallocate_task_list,&
-                                              task_list_type
+   USE admm_types, ONLY: admm_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type, &
+                               qs_control_type, &
+                               tddfpt2_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_dist2d_to_dist
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_copy_general, &
+                          cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_retain, &
+                          cp_fm_type
+   USE cp_para_env, ONLY: cp_para_env_create, &
+                          cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_distribution_release, &
+                        dbcsr_distribution_type, &
+                        dbcsr_get_info, &
+                        dbcsr_release, &
+                        dbcsr_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE distribution_2d_types, ONLY: distribution_2d_release, &
+                                    distribution_2d_type
+   USE distribution_methods, ONLY: distribute_molecules_2d
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_comm_split
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: molecule_type
+   USE particle_types, ONLY: particle_type
+   USE pw_env_methods, ONLY: pw_env_create, &
+                             pw_env_rebuild
+   USE pw_env_types, ONLY: pw_env_release, &
+                           pw_env_retain, &
+                           pw_env_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_neighbor_list_types, ONLY: deallocate_neighbor_list_set, &
+                                     neighbor_list_set_p_type
+   USE qs_neighbor_lists, ONLY: atom2d_build, &
+                                atom2d_cleanup, &
+                                build_neighbor_lists, &
+                                local_atoms_type, &
+                                pair_radius_setup
+   USE task_list_methods, ONLY: generate_qs_task_list
+   USE task_list_types, ONLY: allocate_task_list, &
+                              deallocate_task_list, &
+                              task_list_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -167,7 +167,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), INTENT(in)       :: mos_occ
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_sub_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nao, nao_aux, nmo_occ, &
                                                             nspins
@@ -200,7 +200,7 @@ CONTAINS
       NULLIFY (sub_env%admm_A)
 
       IF (sub_env%is_split) THEN
-         ALLOCATE (sub_env%group_distribution(0:para_env_global%num_pe-1))
+         ALLOCATE (sub_env%group_distribution(0:para_env_global%num_pe - 1))
 
          CALL mp_comm_split(comm=para_env_global%group, sub_comm=sub_env%mpi_comm, ngroups=sub_env%ngroups, &
                             group_distribution=sub_env%group_distribution, subgroup_min_size=tddfpt_control%nprocs)
@@ -307,7 +307,7 @@ CONTAINS
       TYPE(tddfpt_subgroup_env_type), INTENT(inout)      :: sub_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_sub_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -391,7 +391,7 @@ CONTAINS
       TYPE(mgrid_saved_parameters), INTENT(out)          :: mgrid_saved
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'init_tddfpt_mgrid', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, igrid, ngrids
 
@@ -436,7 +436,7 @@ CONTAINS
       ELSE
          qs_control%e_cutoff(1) = qs_control%cutoff
          DO igrid = 2, ngrids
-            qs_control%e_cutoff(igrid) = qs_control%e_cutoff(igrid-1)/qs_control%progression_factor
+            qs_control%e_cutoff(igrid) = qs_control%e_cutoff(igrid - 1)/qs_control%progression_factor
          END DO
       END IF
 
@@ -455,7 +455,7 @@ CONTAINS
       TYPE(mgrid_saved_parameters), INTENT(in)           :: mgrid_saved
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'restore_qs_mgrid', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -493,7 +493,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_build_distribution_2d', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
@@ -554,7 +554,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: skip_load_balance, reorder_grid_ranks
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_build_tasklist', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, nkinds
       LOGICAL, ALLOCATABLE, DIMENSION(:)                 :: orb_present
@@ -636,7 +636,7 @@ CONTAINS
          POINTER                                         :: sab
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_dbcsr_create_by_dist', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER                                          :: matrix_type
       CHARACTER(len=default_string_length)               :: matrix_name
@@ -687,10 +687,10 @@ CONTAINS
       TYPE(tddfpt_subgroup_env_type), INTENT(in)         :: sub_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tddfpt_fm_replicate_across_subgroups', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, igroup, igroup_local, ncols_global_dest, ncols_global_src, ngroups, &
-         nrows_global_dest, nrows_global_src
+                 nrows_global_dest, nrows_global_src
       TYPE(cp_blacs_env_type), POINTER                   :: blacs_env_global
       TYPE(cp_fm_type), POINTER                          :: fm_null
       TYPE(cp_para_env_type), POINTER                    :: para_env_global
@@ -711,7 +711,7 @@ CONTAINS
          igroup_local = sub_env%group_distribution(para_env_global%mepos)
          ngroups = sub_env%ngroups
 
-         DO igroup = 0, ngroups-1
+         DO igroup = 0, ngroups - 1
             IF (igroup == igroup_local) THEN
                CALL cp_fm_copy_general(fm_src, fm_dest_sub, para_env_global)
             ELSE

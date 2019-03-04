@@ -11,12 +11,12 @@
 ! **************************************************************************************************
 MODULE dielectric_types
 
-   USE kinds,                           ONLY: dp
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: pw_p_type,&
-                                              pw_release,&
-                                              pw_type
+   USE kinds, ONLY: dp
+   USE pw_pool_types, ONLY: pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: pw_p_type, &
+                       pw_release, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -84,7 +84,7 @@ CONTAINS
       TYPE(pw_pool_type), INTENT(IN), OPTIONAL, POINTER  :: pw_pool
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dielectric_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
       LOGICAL                                            :: can_give_back
@@ -129,7 +129,7 @@ CONTAINS
       TYPE(dielectric_parameters), INTENT(INOUT)         :: dielec_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dielectric_parameters_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(dielec_params%aa_cuboidal_xxtnt)) DEALLOCATE (dielec_params%aa_cuboidal_xxtnt)
       IF (ASSOCIATED(dielec_params%aa_cuboidal_yxtnt)) DEALLOCATE (dielec_params%aa_cuboidal_yxtnt)

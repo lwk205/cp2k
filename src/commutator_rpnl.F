@@ -10,35 +10,35 @@
 !>      - full rewrite [jhu, 2009-01-23]
 ! **************************************************************************************************
 MODULE commutator_rpnl
-   USE ai_moments,                      ONLY: moment
-   USE ai_overlap,                      ONLY: overlap
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE dbcsr_api,                       ONLY: dbcsr_get_block_p,&
-                                              dbcsr_p_type
-   USE external_potential_types,        ONLY: gth_potential_p_type,&
-                                              gth_potential_type,&
-                                              sgp_potential_p_type,&
-                                              sgp_potential_type
-   USE kinds,                           ONLY: dp
-   USE orbital_pointers,                ONLY: init_orbital_pointers,&
-                                              nco,&
-                                              ncoset
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE sap_kind_types,                  ONLY: alist_type,&
-                                              clist_type,&
-                                              get_alist,&
-                                              release_sap_int,&
-                                              sap_int_type,&
-                                              sap_sort
+   USE ai_moments, ONLY: moment
+   USE ai_overlap, ONLY: overlap
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE dbcsr_api, ONLY: dbcsr_get_block_p, &
+                        dbcsr_p_type
+   USE external_potential_types, ONLY: gth_potential_p_type, &
+                                       gth_potential_type, &
+                                       sgp_potential_p_type, &
+                                       sgp_potential_type
+   USE kinds, ONLY: dp
+   USE orbital_pointers, ONLY: init_orbital_pointers, &
+                               nco, &
+                               ncoset
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE sap_kind_types, ONLY: alist_type, &
+                             clist_type, &
+                             get_alist, &
+                             release_sap_int, &
+                             sap_int_type, &
+                             sap_sort
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num, omp_get_num_threads
 
@@ -73,9 +73,9 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_com_rpnl', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, iab, iac, iatom, ibc, icol, ikind, ilist, inode, irow, iset, jatom, &
-         jkind, jneighbor, kac, katom, kbc, kkind, l, lc_max, lc_min, ldai, ldsab, lppnl, maxco, &
-         maxder, maxl, maxlgto, maxlppnl, maxppnl, maxsgf, mepos, na, nb, ncoa, ncoc, nkind, &
-         nlist, nneighbor, nnode, np, nppnl, nprjc, nseta, nsgfa, nthread, prjc, sgfa
+                 jkind, jneighbor, kac, katom, kbc, kkind, l, lc_max, lc_min, ldai, ldsab, lppnl, maxco, &
+                 maxder, maxl, maxlgto, maxlppnl, maxppnl, maxsgf, mepos, na, nb, ncoa, ncoc, nkind, &
+                 nlist, nneighbor, nnode, np, nppnl, nprjc, nseta, nsgfa, nthread, prjc, sgfa
       INTEGER, DIMENSION(3)                              :: cell_b, cell_c
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, npgfa, nprj_ppnl, &
                                                             nsgf_seta
@@ -117,10 +117,10 @@ CONTAINS
                               maxppnl=maxppnl)
 
          maxl = MAX(maxlgto, maxlppnl)
-         CALL init_orbital_pointers(maxl+1)
+         CALL init_orbital_pointers(maxl + 1)
 
          ldsab = MAX(maxco, ncoset(maxlppnl), maxsgf, maxppnl)
-         ldai = ncoset(maxl+1)
+         ldai = ncoset(maxl + 1)
 
          !sap_int needs to be shared as multiple threads need to access this
          ALLOCATE (sap_int(nkind*nkind))
@@ -179,7 +179,7 @@ CONTAINS
          DO WHILE (neighbor_list_iterate(nl_iterator, mepos=mepos) == 0)
             CALL get_iterator_info(nl_iterator, mepos=mepos, ikind=ikind, jkind=kkind, iatom=iatom, &
                                    jatom=katom, nlist=nlist, ilist=ilist, nnode=nneighbor, inode=jneighbor, cell=cell_c, r=rac)
-            iac = ikind+nkind*(kkind-1)
+            iac = ikind + nkind*(kkind - 1)
             IF (.NOT. ASSOCIATED(basis_set(ikind)%gto_basis_set)) CYCLE
             gpot = ASSOCIATED(gpotential(kkind)%gth_potential)
             spot = ASSOCIATED(spotential(kkind)%sgp_potential)
@@ -251,8 +251,8 @@ CONTAINS
                   nprjc = nprj_ppnl(l)*nco(l)
                   IF (nprjc == 0) CYCLE
                   rprjc(1) = ppnl_radius
-                  IF (set_radius_a(iset)+rprjc(1) < dac) CYCLE
-                  lc_max = l+2*(nprj_ppnl(l)-1)
+                  IF (set_radius_a(iset) + rprjc(1) < dac) CYCLE
+                  lc_max = l + 2*(nprj_ppnl(l) - 1)
                   lc_min = l
                   zetc(1) = alpha_ppnl(l)
                   ncoc = ncoset(lc_max)
@@ -266,7 +266,7 @@ CONTAINS
                      CALL dgemm("N", "N", ncoa, nprjc, ncoc, 1.0_dp, sab(1, 1, i), ldsab, &
                                 cprj(1, prjc), SIZE(cprj, 1), 0.0_dp, work(1, 1, i), ldsab)
                   END DO
-                  prjc = prjc+nprjc
+                  prjc = prjc + nprjc
                END DO
                DO i = 1, maxder
                   ! Contraction step (basis functions)
@@ -308,7 +308,7 @@ CONTAINS
                                    jatom=jatom, nlist=nlist, ilist=ilist, nnode=nnode, inode=inode, cell=cell_b, r=rab)
             IF (.NOT. ASSOCIATED(basis_set(ikind)%gto_basis_set)) CYCLE
             IF (.NOT. ASSOCIATED(basis_set(jkind)%gto_basis_set)) CYCLE
-            iab = ikind+nkind*(jkind-1)
+            iab = ikind + nkind*(jkind - 1)
 
             ! *** Create matrix blocks for a new matrix block column ***
             IF (iatom <= jatom) THEN
@@ -325,8 +325,8 @@ CONTAINS
             ! loop over all kinds for projector atom
             IF (ASSOCIATED(x_block) .AND. ASSOCIATED(y_block) .AND. ASSOCIATED(z_block)) THEN
                DO kkind = 1, nkind
-                  iac = ikind+nkind*(kkind-1)
-                  ibc = jkind+nkind*(kkind-1)
+                  iac = ikind + nkind*(kkind - 1)
+                  ibc = jkind + nkind*(kkind - 1)
                   IF (.NOT. ASSOCIATED(sap_int(iac)%alist)) CYCLE
                   IF (.NOT. ASSOCIATED(sap_int(ibc)%alist)) CYCLE
                   CALL get_alist(sap_int(iac), alist_ac, iatom)
@@ -336,7 +336,7 @@ CONTAINS
                   DO kac = 1, alist_ac%nclist
                      DO kbc = 1, alist_bc%nclist
                         IF (alist_ac%clist(kac)%catom /= alist_bc%clist(kbc)%catom) CYCLE
-                        IF (ALL(cell_b+alist_bc%clist(kbc)%cell-alist_ac%clist(kac)%cell == 0)) THEN
+                        IF (ALL(cell_b + alist_bc%clist(kbc)%cell - alist_ac%clist(kac)%cell == 0)) THEN
                            IF (alist_ac%clist(kac)%maxac*alist_bc%clist(kbc)%maxach < eps_ppnl) CYCLE
                            acint => alist_ac%clist(kac)%acint
                            bcint => alist_bc%clist(kbc)%acint

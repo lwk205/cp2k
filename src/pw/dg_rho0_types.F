@@ -9,17 +9,17 @@
 ! **************************************************************************************************
 MODULE dg_rho0_types
 
-   USE kinds,                           ONLY: dp
-   USE pw_grid_types,                   ONLY: pw_grid_type
-   USE pw_methods,                      ONLY: pw_zero
-   USE pw_poisson_types,                ONLY: do_ewald_ewald,&
-                                              do_ewald_none,&
-                                              do_ewald_pme,&
-                                              do_ewald_spme
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              pw_create,&
-                                              pw_p_type,&
-                                              pw_release
+   USE kinds, ONLY: dp
+   USE pw_grid_types, ONLY: pw_grid_type
+   USE pw_methods, ONLY: pw_zero
+   USE pw_poisson_types, ONLY: do_ewald_ewald, &
+                               do_ewald_none, &
+                               do_ewald_pme, &
+                               do_ewald_spme
+   USE pw_types, ONLY: REALDATA3D, &
+                       pw_create, &
+                       pw_p_type, &
+                       pw_release
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -132,7 +132,7 @@ CONTAINS
       dg_rho0%grid = 0
       dg_rho0%kind = 0
       dg_rho0%type = do_ewald_none
-      last_dg_rho0_id_nr = last_dg_rho0_id_nr+1
+      last_dg_rho0_id_nr = last_dg_rho0_id_nr + 1
       dg_rho0%id_nr = last_dg_rho0_id_nr
       dg_rho0%ref_count = 1
       NULLIFY (dg_rho0%density%pw)
@@ -155,7 +155,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(dg_rho0))
       CPASSERT(dg_rho0%ref_count > 0)
-      dg_rho0%ref_count = dg_rho0%ref_count+1
+      dg_rho0%ref_count = dg_rho0%ref_count + 1
    END SUBROUTINE dg_rho0_retain
 
 ! **************************************************************************************************
@@ -171,11 +171,11 @@ CONTAINS
       TYPE(dg_rho0_type), POINTER                        :: dg_rho0
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dg_rho0_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(dg_rho0)) THEN
          CPASSERT(dg_rho0%ref_count > 0)
-         dg_rho0%ref_count = dg_rho0%ref_count-1
+         dg_rho0%ref_count = dg_rho0%ref_count - 1
          IF (dg_rho0%ref_count == 0) THEN
             IF (ASSOCIATED(dg_rho0%gcc)) THEN
                DEALLOCATE (dg_rho0%gcc)
@@ -228,7 +228,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: alpha
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dg_rho0_pme_gauss', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       INTEGER, PARAMETER                                 :: IMPOSSIBLE = 10000
 
       INTEGER                                            :: gpt, l0, ln, lp, m0, mn, mp, n0, nn, np
@@ -278,12 +278,12 @@ CONTAINS
          e_gsq = EXP(-const*pw_grid%gsq(gpt))/pw_grid%vol
 
          !*apsi
-         lp = lp+bds(1, 1)
-         mp = mp+bds(1, 2)
-         np = np+bds(1, 3)
-         ln = ln+bds(1, 1)
-         mn = mn+bds(1, 2)
-         nn = nn+bds(1, 3)
+         lp = lp + bds(1, 1)
+         mp = mp + bds(1, 2)
+         np = np + bds(1, 3)
+         ln = ln + bds(1, 1)
+         mn = mn + bds(1, 2)
+         nn = nn + bds(1, 3)
 
          rho0(lp, mp, np) = e_gsq
          rho0(ln, mn, nn) = e_gsq

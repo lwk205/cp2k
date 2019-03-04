@@ -15,72 +15,72 @@
 !>      completely contained in the simulation box
 ! **************************************************************************************************
 MODULE qs_linres_issc_utils
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_frobenius_norm,&
-                                              cp_fm_trace
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: convert_offsets_to_sizes,&
-                                              dbcsr_copy,&
-                                              dbcsr_create,&
-                                              dbcsr_distribution_type,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type_antisymmetric,&
-                                              dbcsr_type_symmetric
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathlib,                         ONLY: diamat_all
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: a_fine,&
-                                              e_mass,&
-                                              hertz,&
-                                              p_mass
-   USE qs_elec_field,                   ONLY: build_efg_matrix
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_fermi_contact,                ONLY: build_fermi_contact_matrix
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_linres_methods,               ONLY: linres_solver
-   USE qs_linres_types,                 ONLY: get_issc_env,&
-                                              issc_env_create,&
-                                              issc_env_type,&
-                                              linres_control_type
-   USE qs_matrix_pools,                 ONLY: qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_p_env_types,                  ONLY: qs_p_env_type
-   USE qs_spin_orbit,                   ONLY: build_pso_matrix
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_frobenius_norm, &
+                                 cp_fm_trace
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: convert_offsets_to_sizes, &
+                        dbcsr_copy, &
+                        dbcsr_create, &
+                        dbcsr_distribution_type, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type_antisymmetric, &
+                        dbcsr_type_symmetric
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathlib, ONLY: diamat_all
+   USE memory_utilities, ONLY: reallocate
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: a_fine, &
+                      e_mass, &
+                      hertz, &
+                      p_mass
+   USE qs_elec_field, ONLY: build_efg_matrix
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_fermi_contact, ONLY: build_fermi_contact_matrix
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_linres_methods, ONLY: linres_solver
+   USE qs_linres_types, ONLY: get_issc_env, &
+                              issc_env_create, &
+                              issc_env_type, &
+                              linres_control_type
+   USE qs_matrix_pools, ONLY: qs_matrix_pools_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_p_env_types, ONLY: qs_p_env_type
+   USE qs_spin_orbit, ONLY: build_pso_matrix
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -189,12 +189,12 @@ CONTAINS
          ijdir = 0
          DO idir = 1, 3
          DO jdir = idir, 3
-            ijdir = ijdir+1
+            ijdir = ijdir + 1
             DO ispin = 1, nspins
                CALL cp_fm_set_all(psi1_efg(ispin, ijdir)%matrix, 0.0_dp)
             ENDDO
             IF (output_unit > 0) THEN
-               WRITE (output_unit, "(T10,A)") "Response to the perturbation operator efg_"//ACHAR(idir+119)//ACHAR(jdir+119)
+               WRITE (output_unit, "(T10,A)") "Response to the perturbation operator efg_"//ACHAR(idir + 119)//ACHAR(jdir + 119)
             ENDIF
             !
             !Initial guess for psi1
@@ -220,7 +220,7 @@ CONTAINS
             DO ispin = 1, nspins
                CALL cp_fm_to_fm(psi1(ispin)%matrix, psi1_efg(ispin, ijdir)%matrix)
                CALL cp_fm_frobenius_norm(psi1(ispin)%matrix, fro)
-               chk = chk+fro
+               chk = chk + fro
             ENDDO
             !
             ! print response functions
@@ -252,7 +252,7 @@ CONTAINS
                CALL cp_fm_set_all(psi1_pso(ispin, idir)%matrix, 0.0_dp)
             ENDDO
             IF (output_unit > 0) THEN
-               WRITE (output_unit, "(T10,A)") "Response to the perturbation operator pso_"//ACHAR(idir+119)
+               WRITE (output_unit, "(T10,A)") "Response to the perturbation operator pso_"//ACHAR(idir + 119)
             ENDIF
             !
             !Initial guess for psi1
@@ -278,7 +278,7 @@ CONTAINS
             DO ispin = 1, nspins
                CALL cp_fm_to_fm(psi1(ispin)%matrix, psi1_pso(ispin, idir)%matrix)
                CALL cp_fm_frobenius_norm(psi1(ispin)%matrix, fro)
-               chk = chk+fro
+               chk = chk + fro
             ENDDO
             !
             ! print response functions
@@ -334,7 +334,7 @@ CONTAINS
          DO ispin = 1, nspins
             CALL cp_fm_to_fm(psi1(ispin)%matrix, psi1_fc(ispin)%matrix)
             CALL cp_fm_frobenius_norm(psi1(ispin)%matrix, fro)
-            chk = chk+fro
+            chk = chk + fro
          ENDDO
          !
          ! print response functions
@@ -366,7 +366,7 @@ CONTAINS
                CALL cp_fm_set_all(psi1_dso(ispin, idir)%matrix, 0.0_dp)
             ENDDO
             IF (output_unit > 0) THEN
-               WRITE (output_unit, "(T10,A)") "Response to the perturbation operator r_"//ACHAR(idir+119)
+               WRITE (output_unit, "(T10,A)") "Response to the perturbation operator r_"//ACHAR(idir + 119)
             ENDIF
             !
             !Initial guess for psi1
@@ -392,7 +392,7 @@ CONTAINS
             DO ispin = 1, nspins
                CALL cp_fm_to_fm(psi1(ispin)%matrix, psi1_dso(ispin, idir)%matrix)
                CALL cp_fm_frobenius_norm(psi1(ispin)%matrix, fro)
-               chk = chk+fro
+               chk = chk + fro
             ENDDO
             !
             ! print response functions
@@ -522,7 +522,7 @@ CONTAINS
          DO jatom = 1, natom
             r_i = particle_set(iatom)%r
             r_j = particle_set(jatom)%r
-            r_j = pbc(r_i, r_j, cell)+r_i
+            r_j = pbc(r_i, r_j, cell) + r_i
             !
             !
             !
@@ -545,9 +545,9 @@ CONTAINS
 
                CALL cp_fm_trace(fc_psi0(ispin)%matrix, psi1_fc(ispin)%matrix, buf)
                issc_fc = 2.0_dp*2.0_dp*maxocc*facfc*buf
-               issc(1, 1, iatom, jatom, 1) = issc(1, 1, iatom, jatom, 1)+issc_fc
-               issc(2, 2, iatom, jatom, 1) = issc(2, 2, iatom, jatom, 1)+issc_fc
-               issc(3, 3, iatom, jatom, 1) = issc(3, 3, iatom, jatom, 1)+issc_fc
+               issc(1, 1, iatom, jatom, 1) = issc(1, 1, iatom, jatom, 1) + issc_fc
+               issc(2, 2, iatom, jatom, 1) = issc(2, 2, iatom, jatom, 1) + issc_fc
+               issc(3, 3, iatom, jatom, 1) = issc(3, 3, iatom, jatom, 1) + issc_fc
             ENDIF
             !
             ! SD term
@@ -593,7 +593,7 @@ CONTAINS
                   DO jxyz = 1, 3
                      CALL cp_fm_trace(fc_psi0(ispin)%matrix, psi1_pso(ispin, jxyz)%matrix, buf)
                      issc_pso = -2.0_dp*maxocc*facpso*buf
-                     issc(ixyz, jxyz, iatom, jatom, 3) = issc(ixyz, jxyz, iatom, jatom, 3)+issc_pso
+                     issc(ixyz, jxyz, iatom, jatom, 3) = issc(ixyz, jxyz, iatom, jatom, 3) + issc_pso
                   ENDDO
                ENDDO
             ENDIF
@@ -632,7 +632,7 @@ CONTAINS
                      ! we save the polarizability for a checksum later on !
                      issc_dso = 2.0_dp*maxocc*buf
                      !WRITE(*,*) ixyz,jxyz,'tr(P_r*r)=',2.0_dp * maxocc * buf
-                     issc(ixyz, jxyz, iatom, jatom, 4) = issc(ixyz, jxyz, iatom, jatom, 4)+issc_dso
+                     issc(ixyz, jxyz, iatom, jatom, 4) = issc(ixyz, jxyz, iatom, jatom, 4) + issc_dso
                   ENDDO
                ENDDO
 
@@ -725,30 +725,30 @@ CONTAINS
                   !
                   ! FC
                   issc_tmp(:, :) = issc(:, :, iatom, jatom, 1)
-                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :)+TRANSPOSE(issc_tmp(:, :)))
+                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :) + TRANSPOSE(issc_tmp(:, :)))
                   CALL diamat_all(issc_tmp, eig)
-                  issc_iso_fc = (eig(1)+eig(2)+eig(3))/3.0_dp
+                  issc_iso_fc = (eig(1) + eig(2) + eig(3))/3.0_dp
                   !
                   ! SD
                   issc_tmp(:, :) = issc(:, :, iatom, jatom, 2)
-                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :)+TRANSPOSE(issc_tmp(:, :)))
+                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :) + TRANSPOSE(issc_tmp(:, :)))
                   CALL diamat_all(issc_tmp, eig)
-                  issc_iso_sd = (eig(1)+eig(2)+eig(3))/3.0_dp
+                  issc_iso_sd = (eig(1) + eig(2) + eig(3))/3.0_dp
                   !
                   ! PSO
                   issc_tmp(:, :) = issc(:, :, iatom, jatom, 3)
-                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :)+TRANSPOSE(issc_tmp(:, :)))
+                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :) + TRANSPOSE(issc_tmp(:, :)))
                   CALL diamat_all(issc_tmp, eig)
-                  issc_iso_pso = (eig(1)+eig(2)+eig(3))/3.0_dp
+                  issc_iso_pso = (eig(1) + eig(2) + eig(3))/3.0_dp
                   !
                   ! DSO
                   issc_tmp(:, :) = issc(:, :, iatom, jatom, 4)
-                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :)+TRANSPOSE(issc_tmp(:, :)))
+                  issc_tmp(:, :) = 0.5_dp*(issc_tmp(:, :) + TRANSPOSE(issc_tmp(:, :)))
                   CALL diamat_all(issc_tmp, eig)
-                  issc_iso_dso = (eig(1)+eig(2)+eig(3))/3.0_dp
+                  issc_iso_dso = (eig(1) + eig(2) + eig(3))/3.0_dp
                   !
                   ! TOT
-                  issc_iso_tot = issc_iso_fc+issc_iso_sd+issc_iso_dso+issc_iso_pso
+                  issc_iso_tot = issc_iso_fc + issc_iso_sd + issc_iso_dso + issc_iso_pso
                   !
                   !
                   WRITE (unit_atoms, *)
@@ -876,11 +876,11 @@ CONTAINS
          NULLIFY (list)
          CALL section_vals_val_get(issc_section, "ISSC_ON_ATOM_LIST", i_rep_val=ir, i_vals=list)
          IF (ASSOCIATED(list)) THEN
-            CALL reallocate(issc_env%issc_on_atom_list, 1, n+SIZE(list))
+            CALL reallocate(issc_env%issc_on_atom_list, 1, n + SIZE(list))
             DO ini = 1, SIZE(list)
-               issc_env%issc_on_atom_list(ini+n) = list(ini)
+               issc_env%issc_on_atom_list(ini + n) = list(ini)
             ENDDO
-            n = n+SIZE(list)
+            n = n + SIZE(list)
          ENDIF
       ENDDO
       !
@@ -1043,11 +1043,11 @@ CONTAINS
       TYPE(issc_env_type)                                :: issc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'issc_env_cleanup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: idir, ispin
 
-      issc_env%ref_count = issc_env%ref_count-1
+      issc_env%ref_count = issc_env%ref_count - 1
       IF (issc_env%ref_count == 0) THEN
          IF (ASSOCIATED(issc_env%issc_on_atom_list)) THEN
             DEALLOCATE (issc_env%issc_on_atom_list)

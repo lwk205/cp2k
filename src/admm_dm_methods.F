@@ -10,27 +10,27 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE admm_dm_methods
-   USE admm_dm_types,                   ONLY: admm_dm_type,&
-                                              mcweeny_history_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_unit_nr
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_frobenius_norm, dbcsr_get_block_p, &
-        dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
-        dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_p_type, dbcsr_release, &
-        dbcsr_scale, dbcsr_set, dbcsr_type
-   USE input_constants,                 ONLY: do_admm_basis_projection,&
-                                              do_admm_blocked_projection
-   USE iterate_matrix,                  ONLY: invert_Hotelling
-   USE kinds,                           ONLY: dp
-   USE pw_types,                        ONLY: pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_set,&
-                                              qs_rho_type
+   USE admm_dm_types, ONLY: admm_dm_type, &
+                            mcweeny_history_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE cp_log_handling, ONLY: cp_logger_get_default_unit_nr
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_frobenius_norm, dbcsr_get_block_p, &
+      dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
+      dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_p_type, dbcsr_release, &
+      dbcsr_scale, dbcsr_set, dbcsr_type
+   USE input_constants, ONLY: do_admm_basis_projection, &
+                              do_admm_blocked_projection
+   USE iterate_matrix, ONLY: invert_Hotelling
+   USE kinds, ONLY: dp
+   USE pw_types, ONLY: pw_p_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_set, &
+                           qs_rho_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -51,7 +51,7 @@ CONTAINS
       TYPE(qs_ks_env_type), POINTER                      :: ks_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'admm_dm_calc_rho_aux', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(admm_dm_type), POINTER                        :: admm_dm
@@ -88,7 +88,7 @@ CONTAINS
       TYPE(qs_ks_env_type), POINTER                      :: ks_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'admm_dm_merge_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(admm_dm_type), POINTER                        :: admm_dm
@@ -132,7 +132,7 @@ CONTAINS
       TYPE(qs_ks_env_type), POINTER                      :: ks_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'map_dm_projection', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       LOGICAL                                            :: s_mstruct_changed
@@ -447,7 +447,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks_merge
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'revert_purify_mcweeny', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins, unit_nr
       TYPE(admm_dm_type), POINTER                        :: admm_dm
@@ -513,7 +513,7 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: matrix_k, matrix_s, matrix_p
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'reverse_mcweeny_step', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(dbcsr_type)                                   :: matrix_ps, matrix_sp, matrix_sum, &

@@ -14,38 +14,38 @@
 ! **************************************************************************************************
 MODULE scf_control_types
 
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE input_constants,                 ONLY: &
-        atomic_guess, core_guess, diag_ot, direct_p_mix, general_roks, high_spin_roks, &
-        ot_algo_taylor_or_diag, outer_scf_basis_center_opt, outer_scf_cdft_constraint, &
-        outer_scf_ddapc_constraint, outer_scf_none, outer_scf_optimizer_bisect, &
-        outer_scf_optimizer_broyden, outer_scf_optimizer_diis, outer_scf_optimizer_newton, &
-        outer_scf_optimizer_newton_ls, outer_scf_optimizer_none, outer_scf_optimizer_sd, &
-        outer_scf_optimizer_secant, outer_scf_s2_constraint, smear_energy_window, &
-        smear_fermi_dirac, smear_list
-   USE input_cp2k_dft,                  ONLY: create_scf_section
-   USE input_enumeration_types,         ONLY: enum_i2c,&
-                                              enumeration_type
-   USE input_keyword_types,             ONLY: keyword_get,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_get_keyword,&
-                                              section_release,&
-                                              section_type,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE outer_scf_control_types,         ONLY: outer_scf_control_type,&
-                                              outer_scf_read_parameters
-   USE qs_cdft_opt_types,               ONLY: cdft_opt_type_release
-   USE qs_ot_types,                     ONLY: ot_readwrite_input,&
-                                              qs_ot_settings_init,&
-                                              qs_ot_settings_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE input_constants, ONLY: &
+      atomic_guess, core_guess, diag_ot, direct_p_mix, general_roks, high_spin_roks, &
+      ot_algo_taylor_or_diag, outer_scf_basis_center_opt, outer_scf_cdft_constraint, &
+      outer_scf_ddapc_constraint, outer_scf_none, outer_scf_optimizer_bisect, &
+      outer_scf_optimizer_broyden, outer_scf_optimizer_diis, outer_scf_optimizer_newton, &
+      outer_scf_optimizer_newton_ls, outer_scf_optimizer_none, outer_scf_optimizer_sd, &
+      outer_scf_optimizer_secant, outer_scf_s2_constraint, smear_energy_window, &
+      smear_fermi_dirac, smear_list
+   USE input_cp2k_dft, ONLY: create_scf_section
+   USE input_enumeration_types, ONLY: enum_i2c, &
+                                      enumeration_type
+   USE input_keyword_types, ONLY: keyword_get, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_get_keyword, &
+                                  section_release, &
+                                  section_type, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE outer_scf_control_types, ONLY: outer_scf_control_type, &
+                                      outer_scf_read_parameters
+   USE qs_cdft_opt_types, ONLY: cdft_opt_type_release
+   USE qs_ot_types, ONLY: ot_readwrite_input, &
+                          qs_ot_settings_init, &
+                          qs_ot_settings_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -262,7 +262,7 @@ CONTAINS
 
       NULLIFY (scf_control%smear)
 
-      last_scf_c_id_nr = last_scf_c_id_nr+1
+      last_scf_c_id_nr = last_scf_c_id_nr + 1
 
       CALL timestop(handle)
 
@@ -284,7 +284,7 @@ CONTAINS
       CPASSERT(ASSOCIATED(scf_control))
 
       CPASSERT(scf_control%ref_count > 0)
-      scf_control%ref_count = scf_control%ref_count+1
+      scf_control%ref_count = scf_control%ref_count + 1
 
    END SUBROUTINE scf_c_retain
 
@@ -305,7 +305,7 @@ CONTAINS
 
       IF (ASSOCIATED(scf_control)) THEN
          CPASSERT(scf_control%ref_count > 0)
-         scf_control%ref_count = scf_control%ref_count-1
+         scf_control%ref_count = scf_control%ref_count - 1
          IF (scf_control%ref_count < 1) THEN
             IF (ASSOCIATED(scf_control%smear%list)) THEN
                DEALLOCATE (scf_control%smear%list)
@@ -343,7 +343,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: inp_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'scf_c_read_parameters', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: cholesky_flag, handle, ialgo
       INTEGER, DIMENSION(:), POINTER                     :: added_mos
@@ -531,7 +531,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: smear_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_smear_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp), DIMENSION(:), POINTER               :: r_vals
 
@@ -575,7 +575,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'scf_c_write_parameters', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, output_unit, roks_scheme
       LOGICAL                                            :: roks
@@ -761,7 +761,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: scf_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ot_diag_read_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, output_unit
       LOGICAL                                            :: explicit

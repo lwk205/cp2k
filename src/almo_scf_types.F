@@ -11,17 +11,17 @@
 !> \author Rustam Z Khaliullin
 ! **************************************************************************************************
 MODULE almo_scf_types
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_release,&
-                                              dbcsr_type
-   USE domain_submatrix_types,          ONLY: domain_map_type,&
-                                              domain_submatrix_type
-   USE input_constants,                 ONLY: &
-        cg_dai_yuan, cg_fletcher, cg_fletcher_reeves, cg_hager_zhang, cg_hestenes_stiefel, &
-        cg_liu_storey, cg_polak_ribiere, cg_zero, optimizer_diis, optimizer_pcg, &
-        xalmo_prec_domain, xalmo_prec_full, xalmo_prec_zero
-   USE kinds,                           ONLY: dp
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_release, &
+                        dbcsr_type
+   USE domain_submatrix_types, ONLY: domain_map_type, &
+                                     domain_submatrix_type
+   USE input_constants, ONLY: &
+      cg_dai_yuan, cg_fletcher, cg_fletcher_reeves, cg_hager_zhang, cg_hestenes_stiefel, &
+      cg_liu_storey, cg_polak_ribiere, cg_zero, optimizer_diis, optimizer_pcg, &
+      xalmo_prec_domain, xalmo_prec_full, xalmo_prec_zero
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -434,7 +434,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'print_optimizer_options', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(33)                                      :: conj_string, prec_string, type_string
 
@@ -512,7 +512,7 @@ CONTAINS
       TYPE(almo_scf_env_type), POINTER                   :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, istore
 

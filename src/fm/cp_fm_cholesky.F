@@ -10,11 +10,11 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_fm_cholesky
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_fm_types,                     ONLY: cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE kinds,                           ONLY: dp,&
-                                              sp
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_fm_types, ONLY: cp_fm_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE kinds, ONLY: dp, &
+                    sp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE

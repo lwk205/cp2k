@@ -12,26 +12,26 @@
 ! **************************************************************************************************
 MODULE extended_system_mapping
 
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE extended_system_types,           ONLY: debug_isotropic_limit,&
-                                              lnhc_parameters_type,&
-                                              map_info_type
-   USE input_constants,                 ONLY: &
-        do_thermo_communication, do_thermo_no_communication, do_thermo_only_master, &
-        isokin_ensemble, langevin_ensemble, npe_f_ensemble, npe_i_ensemble, &
-        nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, npt_f_ensemble, npt_i_ensemble, &
-        nve_ensemble, nvt_adiabatic_ensemble, nvt_ensemble, reftraj_ensemble
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: global_constraint_type,&
-                                              molecule_type
-   USE simpar_types,                    ONLY: simpar_type
-   USE thermostat_mapping,              ONLY: adiabatic_mapping_region,&
-                                              init_baro_map_info,&
-                                              thermostat_mapping_region
-   USE thermostat_types,                ONLY: thermostat_info_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE extended_system_types, ONLY: debug_isotropic_limit, &
+                                    lnhc_parameters_type, &
+                                    map_info_type
+   USE input_constants, ONLY: &
+      do_thermo_communication, do_thermo_no_communication, do_thermo_only_master, &
+      isokin_ensemble, langevin_ensemble, npe_f_ensemble, npe_i_ensemble, &
+      nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, npt_f_ensemble, npt_i_ensemble, &
+      nve_ensemble, nvt_adiabatic_ensemble, nvt_ensemble, reftraj_ensemble
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: global_constraint_type, &
+                             molecule_type
+   USE simpar_types, ONLY: simpar_type
+   USE thermostat_mapping, ONLY: adiabatic_mapping_region, &
+                                 init_baro_map_info, &
+                                 thermostat_mapping_region
+   USE thermostat_types, ONLY: thermostat_info_type
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -61,7 +61,7 @@ CONTAINS
       TYPE(lnhc_parameters_type), POINTER                :: nhc
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'nhc_to_barostat_mapping', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, number
       TYPE(map_info_type), POINTER                       :: map_info
@@ -142,7 +142,7 @@ CONTAINS
       TYPE(global_constraint_type), POINTER              :: gci
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'nhc_to_particle_mapping', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, imap, j, natoms_local, &
                                                             sum_of_thermostats
@@ -172,7 +172,7 @@ CONTAINS
          map_info%s_kin = 0.0_dp
          DO i = 1, 3
             DO j = 1, natoms_local
-               map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point+1
+               map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point + 1
             END DO
          END DO
 
@@ -182,7 +182,7 @@ CONTAINS
 
          ! We know the total number of system thermostats.
          IF ((sum_of_thermostats == 1) .AND. (map_info%dis_type /= do_thermo_no_communication)) THEN
-            fac = map_info%s_kin(1)-deg_of_freedom(1)-simpar%nfree_rot_transl
+            fac = map_info%s_kin(1) - deg_of_freedom(1) - simpar%nfree_rot_transl
             IF (fac == 0.0_dp) THEN
                CPABORT('Zero degrees of freedom. Nothing to thermalize!')
             END IF
@@ -191,7 +191,7 @@ CONTAINS
          ELSE
             DO i = 1, nhc%loc_num_nhc
                imap = map_info%map_index(i)
-               fac = (map_info%s_kin(imap)-deg_of_freedom(i))
+               fac = (map_info%s_kin(imap) - deg_of_freedom(i))
                nhc%nvt(1, i)%nkt = simpar%temp_ext*fac
                nhc%nvt(1, i)%degrees_of_freedom = FLOOR(fac)
             END DO
@@ -250,7 +250,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: shell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'setup_adiabatic_thermostat', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nkind, number, region
       LOGICAL                                            :: do_shell
@@ -310,7 +310,7 @@ CONTAINS
       TYPE(global_constraint_type), POINTER              :: gci
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'nhc_to_particle_mapping_slow', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, imap, j, natoms_local, &
                                                             sum_of_thermostats
@@ -337,7 +337,7 @@ CONTAINS
          DO i = 1, 3
             DO j = 1, natoms_local
                IF (ASSOCIATED(map_info%p_kin(i, j)%point)) &
-                  map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point+1
+                  map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point + 1
             END DO
          END DO
 
@@ -347,7 +347,7 @@ CONTAINS
 
          ! We know the total number of system thermostats.
          IF ((sum_of_thermostats == 1) .AND. (map_info%dis_type /= do_thermo_no_communication)) THEN
-            fac = map_info%s_kin(1)-deg_of_freedom(1)-simpar%nfree_rot_transl
+            fac = map_info%s_kin(1) - deg_of_freedom(1) - simpar%nfree_rot_transl
             IF (fac == 0.0_dp) THEN
                CPABORT('Zero degrees of freedom. Nothing to thermalize!')
             END IF
@@ -356,7 +356,7 @@ CONTAINS
          ELSE
             DO i = 1, nhc%loc_num_nhc
                imap = map_info%map_index(i)
-               fac = (map_info%s_kin(imap)-deg_of_freedom(i))
+               fac = (map_info%s_kin(imap) - deg_of_freedom(i))
                nhc%nvt(1, i)%nkt = simpar%temp_slow*fac
                nhc%nvt(1, i)%degrees_of_freedom = FLOOR(fac)
             END DO
@@ -406,7 +406,7 @@ CONTAINS
       TYPE(global_constraint_type), POINTER              :: gci
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'nhc_to_particle_mapping_fast', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, imap, j, natoms_local, &
                                                             sum_of_thermostats
@@ -433,7 +433,7 @@ CONTAINS
          DO i = 1, 3
             DO j = 1, natoms_local
                IF (ASSOCIATED(map_info%p_kin(i, j)%point)) &
-                  map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point+1
+                  map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point + 1
             END DO
          END DO
 
@@ -443,7 +443,7 @@ CONTAINS
 
          ! We know the total number of system thermostats.
          IF ((sum_of_thermostats == 1) .AND. (map_info%dis_type /= do_thermo_no_communication)) THEN
-            fac = map_info%s_kin(1)-deg_of_freedom(1)-simpar%nfree_rot_transl
+            fac = map_info%s_kin(1) - deg_of_freedom(1) - simpar%nfree_rot_transl
             IF (fac == 0.0_dp) THEN
                CPABORT('Zero degrees of freedom. Nothing to thermalize!')
             END IF
@@ -452,7 +452,7 @@ CONTAINS
          ELSE
             DO i = 1, nhc%loc_num_nhc
                imap = map_info%map_index(i)
-               fac = (map_info%s_kin(imap)-deg_of_freedom(i))
+               fac = (map_info%s_kin(imap) - deg_of_freedom(i))
                nhc%nvt(1, i)%nkt = simpar%temp_fast*fac
                nhc%nvt(1, i)%degrees_of_freedom = FLOOR(fac)
             END DO
@@ -511,7 +511,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: shell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'setup_nhc_thermostat', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nkind, number, region
       LOGICAL                                            :: do_shell
@@ -570,7 +570,7 @@ CONTAINS
       TYPE(global_constraint_type), POINTER              :: gci
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'nhc_to_shell_mapping', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, imap, j, nshell_local, &
                                                             sum_of_thermostats
@@ -599,7 +599,7 @@ CONTAINS
          map_info%s_kin = 0.0_dp
          DO j = 1, nshell_local
             DO i = 1, 3
-               map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point+1
+               map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point + 1
             END DO
          END DO
 

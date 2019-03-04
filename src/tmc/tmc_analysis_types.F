@@ -11,12 +11,12 @@
 ! **************************************************************************************************
 
 MODULE tmc_analysis_types
-   USE cell_types,                      ONLY: cell_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE tmc_tree_types,                  ONLY: tree_type
-   USE tmc_types,                       ONLY: tmc_atom_type
+   USE cell_types, ONLY: cell_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE tmc_tree_types, ONLY: tree_type
+   USE tmc_types, ONLY: tmc_atom_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -139,7 +139,7 @@ CONTAINS
       TYPE(tmc_analysis_env), POINTER                    :: tmc_ana
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(tmc_ana))
 
@@ -185,7 +185,7 @@ CONTAINS
       TYPE(tmc_analysis_env), POINTER                    :: tmc_ana
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(tmc_ana))
 
@@ -225,7 +225,7 @@ CONTAINS
       INTEGER, DIMENSION(3)                              :: nr_bins
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_density_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(ana_dens))
 
@@ -256,7 +256,7 @@ CONTAINS
       TYPE(density_3d_type), POINTER                     :: ana_dens
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_dens_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ana_dens))
 
@@ -281,7 +281,7 @@ CONTAINS
       INTEGER                                            :: nr_bins
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_pair_correl_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(ana_pair_correl))
       ALLOCATE (ana_pair_correl)
@@ -304,7 +304,7 @@ CONTAINS
       TYPE(pair_correl_type), POINTER                    :: ana_pair_correl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_pair_correl_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ana_pair_correl))
 
@@ -329,7 +329,7 @@ CONTAINS
       INTEGER                                            :: ind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_pair_in_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: last, list_nr
 
@@ -375,7 +375,7 @@ CONTAINS
       INTEGER                                            :: dim_per_elem
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_dipole_moment_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -406,7 +406,7 @@ CONTAINS
       TYPE(dipole_moment_type), POINTER                  :: ana_dip_mom
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_dipole_moment_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ana_dip_mom))
 
@@ -426,7 +426,7 @@ CONTAINS
       TYPE(dipole_analysis_type), POINTER                :: ana_dip_ana
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_dipole_analysis_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(ana_dip_ana))
       ALLOCATE (ana_dip_ana)
@@ -454,7 +454,7 @@ CONTAINS
       TYPE(dipole_analysis_type), POINTER                :: ana_dip_ana
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_dipole_analysis_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ana_dip_ana))
 
@@ -482,7 +482,7 @@ CONTAINS
       INTEGER                                            :: dim_per_elem
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_displacement_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(ana_disp))
       CPASSERT(dim_per_elem .GT. 0)
@@ -504,7 +504,7 @@ CONTAINS
       TYPE(displacement_type), POINTER                   :: ana_disp
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'tmc_ana_displacement_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ana_disp))
 

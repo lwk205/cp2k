@@ -8,20 +8,20 @@
 ! **************************************************************************************************
 MODULE al_system_init
 
-   USE al_system_mapping,               ONLY: al_to_particle_mapping
-   USE al_system_types,                 ONLY: al_system_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: global_constraint_type,&
-                                              molecule_type
-   USE simpar_types,                    ONLY: simpar_type
-   USE thermostat_types,                ONLY: thermostat_info_type
+   USE al_system_mapping, ONLY: al_to_particle_mapping
+   USE al_system_types, ONLY: al_system_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: global_constraint_type, &
+                             molecule_type
+   USE simpar_types, ONLY: simpar_type
+   USE thermostat_types, ONLY: thermostat_info_type
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -61,7 +61,7 @@ CONTAINS
       TYPE(global_constraint_type), POINTER              :: gci
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_al_part', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: restart
 
@@ -85,7 +85,7 @@ CONTAINS
       TYPE(al_system_type), POINTER                      :: al
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_al_variables', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       al%nvt(:)%mass = al%nvt(:)%nkt*al%tau_nh**2
       al%nvt(:)%chi = 0.0_dp

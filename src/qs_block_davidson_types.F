@@ -15,15 +15,15 @@
 ! **************************************************************************************************
 MODULE qs_block_davidson_types
 
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -58,7 +58,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: scf_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'block_davidson_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
 
@@ -109,7 +109,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nao, nmo
 
       CHARACTER(len=*), PARAMETER :: routineN = 'block_davidson_allocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nmox2
       TYPE(cp_fm_struct_type), POINTER                   :: fm_struct_tmp
@@ -147,7 +147,7 @@ CONTAINS
       TYPE(davidson_type), DIMENSION(:), POINTER         :: bdav_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'block_davidson_deallocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, nspins
 
@@ -178,7 +178,7 @@ CONTAINS
       TYPE(davidson_type), DIMENSION(:), POINTER         :: bdav_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'block_davidson_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, nspins
 

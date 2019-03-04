@@ -11,28 +11,28 @@
 ! **************************************************************************************************
 MODULE dimer_types
 
-   USE cell_types,                      ONLY: use_perd_x,&
-                                              use_perd_xy,&
-                                              use_perd_xyz,&
-                                              use_perd_xz,&
-                                              use_perd_y,&
-                                              use_perd_yz,&
-                                              use_perd_z
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_io_unit
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_constants,                 ONLY: do_first_rotation_step
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: fixd_constraint_type,&
-                                              get_molecule_kind,&
-                                              molecule_kind_type
-   USE parallel_rng_types,              ONLY: random_numbers
+   USE cell_types, ONLY: use_perd_x, &
+                         use_perd_xy, &
+                         use_perd_xyz, &
+                         use_perd_xz, &
+                         use_perd_y, &
+                         use_perd_yz, &
+                         use_perd_z
+   USE cp_log_handling, ONLY: cp_logger_get_default_io_unit
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE global_types, ONLY: global_environment_type
+   USE input_constants, ONLY: do_first_rotation_step
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_type
+   USE molecule_kind_types, ONLY: fixd_constraint_type, &
+                                  get_molecule_kind, &
+                                  molecule_kind_type
+   USE parallel_rng_types, ONLY: random_numbers
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -121,7 +121,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dimer_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dimer_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, isize, j, k, n_rep_val, natom, unit_nr
       LOGICAL                                            :: explicit
@@ -133,7 +133,7 @@ CONTAINS
       CPASSERT(.NOT. ASSOCIATED(dimer_env))
       ALLOCATE (dimer_env)
       dimer_env%ref_count = 1
-      last_dimer_id = last_dimer_id+1
+      last_dimer_id = last_dimer_id + 1
       dimer_env%id_nr = last_dimer_id
       ! Setup NVEC
       NULLIFY (dimer_env%nvec, dimer_env%rot%g0, dimer_env%rot%g1, dimer_env%rot%g1p, &
@@ -156,7 +156,7 @@ CONTAINS
          DO i = 1, n_rep_val
             CALL section_vals_val_get(nvec_section, "_DEFAULT_KEYWORD_", r_vals=array, i_rep_val=i)
             DO j = 1, SIZE(array)
-               isize = isize+1
+               isize = isize + 1
                dimer_env%nvec(isize) = array(j)
             END DO
          END DO
@@ -169,16 +169,16 @@ CONTAINS
          xval = 0.0_dp
          DO j = 1, natom
             DO k = 1, 3
-               i = (j-1)*3+k
-               xval(k) = xval(k)+dimer_env%nvec(i)
+               i = (j - 1)*3 + k
+               xval(k) = xval(k) + dimer_env%nvec(i)
             END DO
          END DO
          ! Subtract net translations
          xval = xval/REAL(natom*3, KIND=dp)
          DO j = 1, natom
             DO k = 1, 3
-               i = (j-1)*3+k
-               dimer_env%nvec(i) = dimer_env%nvec(i)-xval(k)
+               i = (j - 1)*3 + k
+               dimer_env%nvec(i) = dimer_env%nvec(i) - xval(k)
             END DO
          END DO
       END IF
@@ -219,11 +219,11 @@ CONTAINS
       TYPE(dimer_env_type), POINTER                      :: dimer_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dimer_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(dimer_env))
       CPASSERT(dimer_env%ref_count > 0)
-      dimer_env%ref_count = dimer_env%ref_count+1
+      dimer_env%ref_count = dimer_env%ref_count + 1
    END SUBROUTINE dimer_env_retain
 
 ! **************************************************************************************************
@@ -237,11 +237,11 @@ CONTAINS
       TYPE(dimer_env_type), POINTER                      :: dimer_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dimer_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(dimer_env)) THEN
          CPASSERT(dimer_env%ref_count > 0)
-         dimer_env%ref_count = dimer_env%ref_count-1
+         dimer_env%ref_count = dimer_env%ref_count - 1
          IF (dimer_env%ref_count == 0) THEN
             IF (ASSOCIATED(dimer_env%nvec)) THEN
                DEALLOCATE (dimer_env%nvec)
@@ -281,7 +281,7 @@ CONTAINS
       TYPE(cp_subsys_type), POINTER                      :: subsys
 
       CHARACTER(len=*), PARAMETER :: routineN = 'dimer_fixed_atom_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ii, ikind, ind, iparticle, nfixed_atoms, &
                                                             nkinds
@@ -309,28 +309,28 @@ CONTAINS
             DO ii = 1, nfixed_atoms
                IF (.NOT. fixd_list(ii)%restraint%active) THEN
                   iparticle = fixd_list(ii)%fixd
-                  ind = (iparticle-1)*3
+                  ind = (iparticle - 1)*3
                   ! apply constraint to nvec
-                  SELECT CASE (fixd_list (ii)%itype)
+                  SELECT CASE (fixd_list(ii)%itype)
                   CASE (use_perd_x)
-                     vec(ind+1) = 0.0_dp
+                     vec(ind + 1) = 0.0_dp
                   CASE (use_perd_y)
-                     vec(ind+2) = 0.0_dp
+                     vec(ind + 2) = 0.0_dp
                   CASE (use_perd_z)
-                     vec(ind+3) = 0.0_dp
+                     vec(ind + 3) = 0.0_dp
                   CASE (use_perd_xy)
-                     vec(ind+1) = 0.0_dp
-                     vec(ind+2) = 0.0_dp
+                     vec(ind + 1) = 0.0_dp
+                     vec(ind + 2) = 0.0_dp
                   CASE (use_perd_xz)
-                     vec(ind+1) = 0.0_dp
-                     vec(ind+3) = 0.0_dp
+                     vec(ind + 1) = 0.0_dp
+                     vec(ind + 3) = 0.0_dp
                   CASE (use_perd_yz)
-                     vec(ind+2) = 0.0_dp
-                     vec(ind+3) = 0.0_dp
+                     vec(ind + 2) = 0.0_dp
+                     vec(ind + 3) = 0.0_dp
                   CASE (use_perd_xyz)
-                     vec(ind+1) = 0.0_dp
-                     vec(ind+2) = 0.0_dp
-                     vec(ind+3) = 0.0_dp
+                     vec(ind + 1) = 0.0_dp
+                     vec(ind + 2) = 0.0_dp
+                     vec(ind + 3) = 0.0_dp
                   END SELECT
                END IF ! .NOT.fixd_list(ii)%restraint%active
             END DO ! ii

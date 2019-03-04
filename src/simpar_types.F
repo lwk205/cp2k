@@ -11,7 +11,7 @@
 ! **************************************************************************************************
 MODULE simpar_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -104,7 +104,7 @@ CONTAINS
       TYPE(simpar_type), POINTER                         :: simpar
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_simpar_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(simpar))
       ALLOCATE (simpar)
@@ -119,7 +119,7 @@ CONTAINS
       TYPE(simpar_type), POINTER                         :: simpar
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_simpar_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(simpar))
       DEALLOCATE (simpar)

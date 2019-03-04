@@ -24,9 +24,9 @@
 ! **************************************************************************************************
 MODULE qs_nl_hash_table_types
 
-   USE kinds,                           ONLY: int_8
-   USE qs_hash_table_functions,         ONLY: hash_table_matching_prime
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_task_type
+   USE kinds, ONLY: int_8
+   USE qs_hash_table_functions, ONLY: hash_table_matching_prime
+   USE qs_neighbor_list_types, ONLY: neighbor_list_task_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -108,7 +108,7 @@ CONTAINS
       TYPE(neighbor_list_task_type), INTENT(IN), POINTER :: val
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_add', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: islot
       LOGICAL                                            :: check_ok
@@ -127,7 +127,7 @@ CONTAINS
 
       ! add a new task to the list of tasks with that key
       IF (hash_table%obj%table(islot)%key == EMPTY_KEY) THEN
-         hash_table%obj%nelements = hash_table%obj%nelements+1
+         hash_table%obj%nelements = hash_table%obj%nelements + 1
          hash_table%obj%table(islot)%key = key
       END IF
 
@@ -150,7 +150,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nmax
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: my_nmax
       LOGICAL                                            :: check_ok
@@ -168,7 +168,7 @@ CONTAINS
 
       ! book keeping stuff
       hash_table%obj%ref_count = 1
-      hash_table%obj%id_nr = last_nl_hash_table_id+1
+      hash_table%obj%id_nr = last_nl_hash_table_id + 1
       last_nl_hash_table_id = hash_table%obj%id_nr
    END SUBROUTINE nl_hash_table_create
 
@@ -185,7 +185,7 @@ CONTAINS
          POINTER                                         :: val
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_get_from_index', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
@@ -220,7 +220,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nmax
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ii, my_nmax, two_to_power
       LOGICAL                                            :: check_ok
@@ -269,7 +269,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: is_null
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_is_null', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
@@ -296,7 +296,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nmax
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_rehash', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ii, my_nmax
       TYPE(nl_hash_table_element), ALLOCATABLE, &
@@ -334,14 +334,14 @@ CONTAINS
       TYPE(nl_hash_table_obj), INTENT(INOUT)             :: hash_table
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
       IF (ASSOCIATED(hash_table%obj)) THEN
          check_ok = hash_table%obj%ref_count > 0
          CPASSERT(check_ok)
-         hash_table%obj%ref_count = hash_table%obj%ref_count-1
+         hash_table%obj%ref_count = hash_table%obj%ref_count - 1
          IF (hash_table%obj%ref_count == 0) THEN
             hash_table%obj%ref_count = 1
             IF (ASSOCIATED(hash_table%obj%table)) THEN
@@ -367,7 +367,7 @@ CONTAINS
       INTEGER, INTENT(OUT), OPTIONAL                     :: nelements, nmax, prime
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nl_hash_table_status', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check_ok
 
@@ -403,7 +403,7 @@ CONTAINS
       END DO
 
       ! if unsuccessful, search from 1 to guess
-      DO islot = 1, guess-1
+      DO islot = 1, guess - 1
          IF ((hash_table%obj%table(islot)%key == key) .OR. &
              (hash_table%obj%table(islot)%key == EMPTY_KEY)) RETURN
       END DO
@@ -429,7 +429,7 @@ CONTAINS
       prime_8 = INT(hash_table%obj%prime, int_8)
 
       ! IAND with nmax-1 is equivalent to MOD nmax if nmax is alway a power of 2.
-      hash_8 = IAND(key*prime_8, nmax_8-1)+1_int_8
+      hash_8 = IAND(key*prime_8, nmax_8 - 1) + 1_int_8
       hash = INT(hash_8)
    END FUNCTION nl_hash_table_hash_function
 

@@ -10,17 +10,17 @@
 !> \author JHU
 ! **************************************************************************************************
 MODULE pwdft_environment_types
-   USE ISO_C_BINDING,                   ONLY: C_NULL_PTR,&
-                                              C_PTR
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_release,&
-                                              qs_subsys_retain,&
-                                              qs_subsys_set,&
-                                              qs_subsys_type
+   USE ISO_C_BINDING, ONLY: C_NULL_PTR, &
+                            C_PTR
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_release, &
+                              qs_subsys_retain, &
+                              qs_subsys_set, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -98,13 +98,13 @@ CONTAINS
       TYPE(pwdft_environment_type), POINTER              :: pwdft_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pwdft_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !   ------------------------------------------------------------------------
 
       CPASSERT(ASSOCIATED(pwdft_env))
       CPASSERT(pwdft_env%ref_count > 0)
-      pwdft_env%ref_count = pwdft_env%ref_count+1
+      pwdft_env%ref_count = pwdft_env%ref_count + 1
    END SUBROUTINE pwdft_env_retain
 
 ! **************************************************************************************************
@@ -119,13 +119,13 @@ CONTAINS
       TYPE(pwdft_environment_type), POINTER              :: pwdft_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pwdft_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !   ------------------------------------------------------------------------
 
       IF (ASSOCIATED(pwdft_env)) THEN
          CPASSERT(pwdft_env%ref_count > 0)
-         pwdft_env%ref_count = pwdft_env%ref_count-1
+         pwdft_env%ref_count = pwdft_env%ref_count - 1
          IF (pwdft_env%ref_count < 1) THEN
             !
             IF (ASSOCIATED(pwdft_env%qs_subsys)) THEN
@@ -290,7 +290,7 @@ CONTAINS
       TYPE(pwdft_environment_type), POINTER              :: pwdft_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pwdft_env_clear', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !   ------------------------------------------------------------------------
 
@@ -329,12 +329,12 @@ CONTAINS
       TYPE(pwdft_environment_type), POINTER              :: pwdft_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pwdft_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (pwdft_env)
 
       pwdft_env%ref_count = 1
-      last_pwdft_id = last_pwdft_id+1
+      last_pwdft_id = last_pwdft_id + 1
       pwdft_env%id_nr = last_pwdft_id
       CALL pwdft_env_clear(pwdft_env)
 

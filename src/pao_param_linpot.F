@@ -8,35 +8,35 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_param_linpot
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_create, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_type
-   USE kinds,                           ONLY: dp
-   USE machine,                         ONLY: m_flush
-   USE mathlib,                         ONLY: diamat_all
-   USE message_passing,                 ONLY: mp_min,&
-                                              mp_sum,&
-                                              mp_sync
-   USE pao_input,                       ONLY: pao_fock_param,&
-                                              pao_rotinv_param
-   USE pao_linpot_full,                 ONLY: linpot_full_calc_terms,&
-                                              linpot_full_count_terms
-   USE pao_linpot_rotinv,               ONLY: linpot_rotinv_calc_forces,&
-                                              linpot_rotinv_calc_terms,&
-                                              linpot_rotinv_count_terms
-   USE pao_param_fock,                  ONLY: pao_calc_U_block_fock
-   USE pao_potentials,                  ONLY: pao_guess_initial_potential
-   USE pao_types,                       ONLY: pao_env_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_create, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_type
+   USE kinds, ONLY: dp
+   USE machine, ONLY: m_flush
+   USE mathlib, ONLY: diamat_all
+   USE message_passing, ONLY: mp_min, &
+                              mp_sum, &
+                              mp_sync
+   USE pao_input, ONLY: pao_fock_param, &
+                        pao_rotinv_param
+   USE pao_linpot_full, ONLY: linpot_full_calc_terms, &
+                              linpot_full_count_terms
+   USE pao_linpot_rotinv, ONLY: linpot_rotinv_calc_forces, &
+                                linpot_rotinv_calc_terms, &
+                                linpot_rotinv_count_terms
+   USE pao_param_fock, ONLY: pao_calc_U_block_fock
+   USE pao_potentials, ONLY: pao_guess_initial_potential
+   USE pao_types, ONLY: pao_env_type
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -189,7 +189,7 @@ CONTAINS
             w = pao%linpot_regu_strength*MIN(1.0_dp, ABS(v))
             DO i = 1, nterms
             DO j = 1, nterms
-               block_R(i, j) = block_R(i, j)+w*S_evecs(i, k)*S_evecs(j, k)
+               block_R(i, j) = block_R(i, j) + w*S_evecs(i, k)*S_evecs(j, k)
             ENDDO
             ENDDO
          ENDDO
@@ -269,8 +269,8 @@ CONTAINS
             eval_capped = MAX(pao%linpot_precon_delta, S_evals(k)) ! too small eigenvalues are hurtful
             DO i = 1, nterms
             DO j = 1, nterms
-               block_precon(i, j) = block_precon(i, j)+S_evecs(i, k)*S_evecs(j, k)/SQRT(eval_capped)
-               block_precon_inv(i, j) = block_precon_inv(i, j)+S_evecs(i, k)*S_evecs(j, k)*SQRT(eval_capped)
+               block_precon(i, j) = block_precon(i, j) + S_evecs(i, k)*S_evecs(j, k)/SQRT(eval_capped)
+               block_precon_inv(i, j) = block_precon_inv(i, j) + S_evecs(i, k)*S_evecs(j, k)*SQRT(eval_capped)
             ENDDO
             ENDDO
          ENDDO
@@ -401,14 +401,14 @@ CONTAINS
          block_V(1:n, 1:n) => vec_V(:) ! map vector into matrix
 
          ! symmetrize
-         IF (MAXVAL(ABS(block_V-TRANSPOSE(block_V))/MAX(1.0_dp, MAXVAL(ABS(block_V)))) > 1e-12) &
+         IF (MAXVAL(ABS(block_V - TRANSPOSE(block_V))/MAX(1.0_dp, MAXVAL(ABS(block_V)))) > 1e-12) &
             CPABORT("block_V not symmetric")
-         block_V = 0.5_dp*(block_V+TRANSPOSE(block_V)) ! symmetrize exactly
+         block_V = 0.5_dp*(block_V + TRANSPOSE(block_V)) ! symmetrize exactly
 
          ! regularization energy
          ! protect against corner-case of zero pao parameters
          IF (PRESENT(penalty) .AND. nterms > 0) &
-            regu_energy = regu_energy+DOT_PRODUCT(block_X(:, 1), MATMUL(block_R, block_X(:, 1)))
+            regu_energy = regu_energy + DOT_PRODUCT(block_X(:, 1), MATMUL(block_R, block_X(:, 1)))
 
          IF (.NOT. PRESENT(matrix_G) .AND. .NOT. PRESENT(matrix_G)) THEN
             CALL pao_calc_U_block_fock(pao, iatom=iatom, penalty=penalty, V=block_V, U=block_U, &
@@ -423,7 +423,7 @@ CONTAINS
                block_M2(1:n, 1:n) => vec_M2(:) ! map vector into matrix
                CALL pao_calc_U_block_fock(pao, iatom=iatom, penalty=penalty, V=block_V, U=block_U, &
                                           M1=block_M1, G=block_M2, gap=gaps(iatom), evals=evals(:, iatom))
-               IF (MAXVAL(ABS(block_M2-TRANSPOSE(block_M2))) > 1e-14_dp) CPABORT("matrix not symmetric")
+               IF (MAXVAL(ABS(block_M2 - TRANSPOSE(block_M2))) > 1e-14_dp) CPABORT("matrix not symmetric")
 
                ! gradient dE/dX
                IF (PRESENT(matrix_G)) THEN
@@ -431,7 +431,7 @@ CONTAINS
                   CPASSERT(ASSOCIATED(block_G))
                   block_G(:, 1) = MATMUL(vec_M2, block_V_terms)
                   IF (PRESENT(penalty)) &
-                     block_G = block_G+2.0_dp*MATMUL(block_R, block_X) ! regularization gradient
+                     block_G = block_G + 2.0_dp*MATMUL(block_R, block_X) ! regularization gradient
                ENDIF
 
                ! forced dE/dR
@@ -455,7 +455,7 @@ CONTAINS
          ! sum penalty energies across ranks
          CALL mp_sum(penalty, group)
          CALL mp_sum(regu_energy, group)
-         penalty = penalty+regu_energy
+         penalty = penalty + regu_energy
       ENDIF
 
       ! print stuff, but not during second invocation for forces
@@ -591,10 +591,10 @@ CONTAINS
          ALLOCATE (S_inv(nterms, nterms))
          S_inv(:, :) = 0.0_dp
          DO k = 1, nterms
-            w = S_evals(k)/(S_evals(k)**2+pao%linpot_init_delta)
+            w = S_evals(k)/(S_evals(k)**2 + pao%linpot_init_delta)
             DO i = 1, nterms
             DO j = 1, nterms
-               S_inv(i, j) = S_inv(i, j)+w*S_evecs(i, k)*S_evecs(j, k)
+               S_inv(i, j) = S_inv(i, j) + w*S_evecs(i, k)*S_evecs(j, k)
             ENDDO
             ENDDO
          ENDDO

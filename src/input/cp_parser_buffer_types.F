@@ -10,7 +10,7 @@
 ! **************************************************************************************************
 MODULE cp_parser_buffer_types
 
-   USE kinds,                           ONLY: max_line_length
+   USE kinds, ONLY: max_line_length
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -49,7 +49,7 @@ CONTAINS
       TYPE(buffer_type), POINTER                         :: buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_buffer_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(buffer))
       ALLOCATE (buffer)
@@ -74,7 +74,7 @@ CONTAINS
       TYPE(buffer_type), POINTER                         :: buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_buffer_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(buffer))
       DEALLOCATE (buffer%input_lines)
@@ -98,7 +98,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: force
 
       CHARACTER(len=*), PARAMETER :: routineN = 'copy_buffer_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       LOGICAL                                            :: my_force
@@ -137,7 +137,7 @@ CONTAINS
       TYPE(buffer_type), POINTER                         :: sub_buffer, buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_sub_buffer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(buffer))
       CPASSERT(.NOT. ASSOCIATED(sub_buffer))
@@ -157,7 +157,7 @@ CONTAINS
       TYPE(buffer_type), POINTER                         :: sub_buffer, buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'finalize_sub_buffer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(buffer))
       CPASSERT(ASSOCIATED(sub_buffer))

@@ -11,7 +11,7 @@
 ! **************************************************************************************************
 MODULE splines_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -87,14 +87,14 @@ CONTAINS
       TYPE(spline_environment_type), POINTER             :: spline_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       TYPE(spline_data_p_type), DIMENSION(:), POINTER    :: spl_p
 
       IF (ASSOCIATED(spline_env)) THEN
          CPASSERT(spline_env%ref_count > 0)
-         spline_env%ref_count = spline_env%ref_count-1
+         spline_env%ref_count = spline_env%ref_count - 1
          IF (spline_env%ref_count < 1) THEN
             DEALLOCATE (spline_env%spltab)
             DO i = 1, SIZE(spline_env%spl_pp)
@@ -117,11 +117,11 @@ CONTAINS
       TYPE(spline_data_type), POINTER                    :: spline_data
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(spline_data)) THEN
          CPASSERT(spline_data%ref_count > 0)
-         spline_data%ref_count = spline_data%ref_count-1
+         spline_data%ref_count = spline_data%ref_count - 1
          IF (spline_data%ref_count < 1) THEN
             IF (ASSOCIATED(spline_data%y)) THEN
                DEALLOCATE (spline_data%y)
@@ -143,7 +143,7 @@ CONTAINS
       TYPE(spline_data_p_type), DIMENSION(:), POINTER    :: spl_p
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_p_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       LOGICAL                                            :: release_kind
@@ -170,11 +170,11 @@ CONTAINS
       TYPE(spline_data_type), POINTER                    :: spline_data
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(spline_data))
       CPASSERT(spline_data%ref_count > 0)
-      spline_data%ref_count = spline_data%ref_count+1
+      spline_data%ref_count = spline_data%ref_count + 1
    END SUBROUTINE spline_data_retain
 
 ! **************************************************************************************************
@@ -186,7 +186,7 @@ CONTAINS
       TYPE(spline_data_p_type), DIMENSION(:), POINTER    :: spl_p
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_p_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -207,11 +207,11 @@ CONTAINS
       TYPE(spline_environment_type), POINTER             :: spline_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(spline_env))
       CPASSERT(spline_env%ref_count > 0)
-      spline_env%ref_count = spline_env%ref_count+1
+      spline_env%ref_count = spline_env%ref_count + 1
    END SUBROUTINE spline_env_retain
 
 ! **************************************************************************************************
@@ -230,7 +230,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: ntab_in
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, isize, j, ntab
 
@@ -240,13 +240,13 @@ CONTAINS
       NULLIFY (spline_env%spl_pp)
       NULLIFY (spline_env%spltab)
       spline_env%ref_count = 1
-      last_spline_env_id_nr = last_spline_env_id_nr+1
+      last_spline_env_id_nr = last_spline_env_id_nr + 1
       spline_env%id_nr = last_spline_env_id_nr
       ! Allocate the number of spline data tables (upper triangular)
       IF (PRESENT(ntab_in)) THEN
          ntab = ntab_in
       ELSE
-         ntab = (ntype*ntype+ntype)/2
+         ntab = (ntype*ntype + ntype)/2
       END IF
       ALLOCATE (spline_env%spl_pp(ntab))
 
@@ -275,7 +275,7 @@ CONTAINS
       TYPE(spline_data_p_type), DIMENSION(:), POINTER    :: spl_p_source, spl_p_dest
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_p_copy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, nsized, nsizes
 
@@ -308,7 +308,7 @@ CONTAINS
       TYPE(spline_data_type), POINTER                    :: spline_data_source, spline_data_dest
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_copy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(spline_data_source))
       IF (.NOT. ASSOCIATED(spline_data_dest)) CALL spline_data_create(spline_data_dest)
@@ -340,11 +340,11 @@ CONTAINS
       TYPE(spline_data_type), POINTER                    :: spline_data
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_data_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (spline_data)
       spline_data%ref_count = 1
-      last_spline_data_id_nr = last_spline_data_id_nr+1
+      last_spline_data_id_nr = last_spline_data_id_nr + 1
       spline_data%id_nr = last_spline_data_id_nr
       NULLIFY (spline_data%y)
       NULLIFY (spline_data%y2)
@@ -359,7 +359,7 @@ CONTAINS
       TYPE(spline_factor_type), POINTER                  :: spline_factor
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_factor_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(spline_factor)) THEN
          IF (ASSOCIATED(spline_factor%rscale)) THEN
@@ -384,7 +384,7 @@ CONTAINS
       TYPE(spline_factor_type), POINTER                  :: spline_factor
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_factor_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(spline_factor))
       ALLOCATE (spline_factor)
@@ -408,7 +408,7 @@ CONTAINS
       TYPE(spline_factor_type), POINTER                  :: spline_factor_source, spline_factor_dest
 
       CHARACTER(len=*), PARAMETER :: routineN = 'spline_factor_copy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: isize, jsize, ksize
 

@@ -9,11 +9,11 @@
 ! **************************************************************************************************
 MODULE qs_dispersion_types
 
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE qs_neighbor_list_types,          ONLY: deallocate_neighbor_list_set,&
-                                              neighbor_list_set_p_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE qs_neighbor_list_types, ONLY: deallocate_neighbor_list_set, &
+                                     neighbor_list_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -125,7 +125,7 @@ CONTAINS
       TYPE(qs_dispersion_type), POINTER                  :: dispersion_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_dispersion_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iab
 

@@ -10,59 +10,59 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE qmmm_create
-   USE bibliography,                    ONLY: Golze2013,&
-                                              Laino2005,&
-                                              Laino2006,&
-                                              cite_reference
-   USE cell_methods,                    ONLY: write_cell
-   USE cell_types,                      ONLY: cell_clone,&
-                                              cell_release,&
-                                              cell_type,&
-                                              get_cell
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_methods,               ONLY: create_small_subsys
-   USE cp_subsys_types,                 ONLY: cp_subsys_release,&
-                                              cp_subsys_type
-   USE fist_environment,                ONLY: fist_init
-   USE fist_environment_types,          ONLY: fist_env_create,&
-                                              fist_env_get,&
-                                              fist_env_set,&
-                                              fist_environment_type
-   USE fist_nonbond_env_types,          ONLY: fist_nonbond_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE header,                          ONLY: qmmm_header
-   USE input_constants,                 ONLY: &
-        do_fist, do_multipole_section_off, do_multipole_section_on, do_qmmm, &
-        do_qmmm_center_every_step, do_qmmm_center_never, do_qmmm_center_pbc_aware, &
-        do_qmmm_center_setup_only, do_qmmm_none, do_qs
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE pw_env_types,                    ONLY: pw_env_type
-   USE qmmm_init,                       ONLY: &
-        assign_mm_charges_and_radius, move_or_add_atoms, print_image_charge_info, &
-        print_qmmm_charges, print_qmmm_links, qmmm_init_gaussian_type, &
-        qmmm_init_periodic_potential, qmmm_init_potential, setup_origin_mm_cell, setup_qmmm_links, &
-        setup_qmmm_vars_mm, setup_qmmm_vars_qm
-   USE qmmm_links_methods,              ONLY: qmmm_link_Imomm_coord
-   USE qmmm_pw_grid,                    ONLY: qmmm_pw_grid_init
-   USE qmmm_types,                      ONLY: qmmm_env_type
-   USE qmmm_types_low,                  ONLY: &
-        add_set_release, add_set_type, add_shell_type, qmmm_env_mm_create, qmmm_env_mm_release, &
-        qmmm_env_mm_type, qmmm_env_qm_create, qmmm_env_qm_type, qmmm_links_type
-   USE qs_environment,                  ONLY: qs_init
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_env_create,&
-                                              qs_environment_type,&
-                                              set_qs_env
+   USE bibliography, ONLY: Golze2013, &
+                           Laino2005, &
+                           Laino2006, &
+                           cite_reference
+   USE cell_methods, ONLY: write_cell
+   USE cell_types, ONLY: cell_clone, &
+                         cell_release, &
+                         cell_type, &
+                         get_cell
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_methods, ONLY: create_small_subsys
+   USE cp_subsys_types, ONLY: cp_subsys_release, &
+                              cp_subsys_type
+   USE fist_environment, ONLY: fist_init
+   USE fist_environment_types, ONLY: fist_env_create, &
+                                     fist_env_get, &
+                                     fist_env_set, &
+                                     fist_environment_type
+   USE fist_nonbond_env_types, ONLY: fist_nonbond_env_type
+   USE global_types, ONLY: global_environment_type
+   USE header, ONLY: qmmm_header
+   USE input_constants, ONLY: &
+      do_fist, do_multipole_section_off, do_multipole_section_on, do_qmmm, &
+      do_qmmm_center_every_step, do_qmmm_center_never, do_qmmm_center_pbc_aware, &
+      do_qmmm_center_setup_only, do_qmmm_none, do_qs
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE pw_env_types, ONLY: pw_env_type
+   USE qmmm_init, ONLY: &
+      assign_mm_charges_and_radius, move_or_add_atoms, print_image_charge_info, &
+      print_qmmm_charges, print_qmmm_links, qmmm_init_gaussian_type, &
+      qmmm_init_periodic_potential, qmmm_init_potential, setup_origin_mm_cell, setup_qmmm_links, &
+      setup_qmmm_vars_mm, setup_qmmm_vars_qm
+   USE qmmm_links_methods, ONLY: qmmm_link_Imomm_coord
+   USE qmmm_pw_grid, ONLY: qmmm_pw_grid_init
+   USE qmmm_types, ONLY: qmmm_env_type
+   USE qmmm_types_low, ONLY: &
+      add_set_release, add_set_type, add_shell_type, qmmm_env_mm_create, qmmm_env_mm_release, &
+      qmmm_env_mm_type, qmmm_env_qm_create, qmmm_env_qm_type, qmmm_links_type
+   USE qs_environment, ONLY: qs_init
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_env_create, &
+                                   qs_environment_type, &
+                                   set_qs_env
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -105,7 +105,7 @@ CONTAINS
       LOGICAL, INTENT(in), OPTIONAL                      :: ignore_outside_box
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length), &
          DIMENSION(:), POINTER                           :: qm_atom_type
@@ -282,7 +282,7 @@ CONTAINS
       CALL get_cell(mm_cell, abc=abc_mm)
 
       IF (qmmm_env_qm%image_charge) THEN
-         IF (ANY(ABS(abc_mm-abc_qm) > 1.0E-12)) &
+         IF (ANY(ABS(abc_mm - abc_qm) > 1.0E-12)) &
             CPABORT("QM and MM box need to have the same size when using image charges")
       ENDIF
 
@@ -338,7 +338,7 @@ CONTAINS
 
       CALL section_vals_val_get(qmmm_section, "DELTA_CHARGE", i_val=delta_charge)
       CALL section_vals_val_get(force_env_section, "DFT%CHARGE", i_val=orig_charge)
-      CALL section_vals_val_set(force_env_section, "DFT%CHARGE", i_val=orig_charge+delta_charge)
+      CALL section_vals_val_set(force_env_section, "DFT%CHARGE", i_val=orig_charge + delta_charge)
 
       CALL section_vals_val_set(force_env_section, "METHOD", i_val=do_qs)
       CALL create_small_subsys(subsys_qm, &

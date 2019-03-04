@@ -10,50 +10,50 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE particle_methods
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_p_type
-   USE cell_types,                      ONLY: cell_clone,&
-                                              cell_create,&
-                                              cell_release,&
-                                              cell_type,&
-                                              get_cell,&
-                                              pbc,&
-                                              real_to_scaled,&
-                                              set_cell_param
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE external_potential_types,        ONLY: fist_potential_type,&
-                                              get_potential
-   USE input_constants,                 ONLY: dump_atomic,&
-                                              dump_dcd,&
-                                              dump_dcd_aligned_cell,&
-                                              dump_pdb,&
-                                              dump_xmol
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp,&
-                                              sp
-   USE mathconstants,                   ONLY: degree
-   USE mathlib,                         ONLY: angle,&
-                                              dihedral_angle
-   USE memory_utilities,                ONLY: reallocate
-   USE particle_types,                  ONLY: get_particle_pos_or_vel,&
-                                              particle_type
-   USE physcon,                         ONLY: massunit
-   USE qmmm_ff_fist,                    ONLY: qmmm_ff_precond_only_qm
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE shell_potential_types,           ONLY: get_shell,&
-                                              shell_kind_type
-   USE string_utilities,                ONLY: uppercase
-   USE util,                            ONLY: sort,&
-                                              sort_unique
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_p_type
+   USE cell_types, ONLY: cell_clone, &
+                         cell_create, &
+                         cell_release, &
+                         cell_type, &
+                         get_cell, &
+                         pbc, &
+                         real_to_scaled, &
+                         set_cell_param
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE external_potential_types, ONLY: fist_potential_type, &
+                                       get_potential
+   USE input_constants, ONLY: dump_atomic, &
+                              dump_dcd, &
+                              dump_dcd_aligned_cell, &
+                              dump_pdb, &
+                              dump_xmol
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp, &
+                    sp
+   USE mathconstants, ONLY: degree
+   USE mathlib, ONLY: angle, &
+                      dihedral_angle
+   USE memory_utilities, ONLY: reallocate
+   USE particle_types, ONLY: get_particle_pos_or_vel, &
+                             particle_type
+   USE physcon, ONLY: massunit
+   USE qmmm_ff_fist, ONLY: qmmm_ff_precond_only_qm
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE shell_potential_types, ONLY: get_shell, &
+                                    shell_kind_type
+   USE string_utilities, ONLY: uppercase
+   USE util, ONLY: sort, &
+                   sort_unique
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -100,7 +100,7 @@ CONTAINS
          OPTIONAL, POINTER                               :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_particle_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, iparticle, isgf, nparticle, ns
 
@@ -130,14 +130,14 @@ CONTAINS
                CALL get_qs_kind(qs_kind_set(ikind), nsgf=ns)
             END IF
             IF (PRESENT(nsgf)) nsgf(iparticle) = ns
-            IF (PRESENT(first_sgf)) first_sgf(iparticle) = isgf+1
-            isgf = isgf+ns
+            IF (PRESENT(first_sgf)) first_sgf(iparticle) = isgf + 1
+            isgf = isgf + ns
             IF (PRESENT(last_sgf)) last_sgf(iparticle) = isgf
          END DO
       END IF
 
       IF (PRESENT(first_sgf)) THEN
-         IF (SIZE(first_sgf) > nparticle) first_sgf(nparticle+1) = isgf+1
+         IF (SIZE(first_sgf) > nparticle) first_sgf(nparticle + 1) = isgf + 1
       END IF
 
       IF (PRESENT(nmao)) THEN
@@ -187,7 +187,7 @@ CONTAINS
                                                             charge_extended
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_particle_coordinates', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=120)                                 :: line
       CHARACTER(LEN=2)                                   :: element_symbol
@@ -210,7 +210,7 @@ CONTAINS
 
       natom = SIZE(particle_set)
       IF (PRESENT(array)) THEN
-         SELECT CASE (TRIM (content))
+         SELECT CASE (TRIM(content))
          CASE ("POS_VEL", "POS_VEL_FORCE")
             CPABORT("Illegal usage")
          END SELECT
@@ -236,7 +236,7 @@ CONTAINS
                my_format = "(T2,A2,"
                name = TRIM(element_symbol)
             END IF
-            SELECT CASE (TRIM (content))
+            SELECT CASE (TRIM(content))
             CASE ("POS")
                IF (PRESENT(array)) THEN
                   r(1:3) = get_particle_pos_or_vel(iatom, particle_set, array)
@@ -253,14 +253,14 @@ CONTAINS
                WRITE (iunit, TRIM(my_format)//"1X,3F20.10)") TRIM(name), v(1:3)*factor
             CASE ("FORCE")
                IF (PRESENT(array)) THEN
-                  f(:) = array((iatom-1)*3+1:(iatom-1)*3+3)
+                  f(:) = array((iatom - 1)*3 + 1:(iatom - 1)*3 + 3)
                ELSE
                   f(:) = particle_set(iatom)%f(:)
                END IF
                WRITE (iunit, TRIM(my_format)//"1X,3F20.10)") TRIM(name), f(1:3)*factor
             CASE ("FORCE_MIXING_LABELS")
                IF (PRESENT(array)) THEN
-                  f(:) = array((iatom-1)*3+1:(iatom-1)*3+3)
+                  f(:) = array((iatom - 1)*3 + 1:(iatom - 1)*3 + 3)
                ELSE
                   f(:) = particle_set(iatom)%f(:)
                END IF
@@ -269,7 +269,7 @@ CONTAINS
          END DO
       CASE (dump_atomic)
          DO iatom = 1, natom
-            SELECT CASE (TRIM (content))
+            SELECT CASE (TRIM(content))
             CASE ("POS")
                IF (PRESENT(array)) THEN
                   r(1:3) = get_particle_pos_or_vel(iatom, particle_set, array)
@@ -286,14 +286,14 @@ CONTAINS
                WRITE (iunit, "(3F20.10)") v(1:3)*factor
             CASE ("FORCE")
                IF (PRESENT(array)) THEN
-                  f(:) = array((iatom-1)*3+1:(iatom-1)*3+3)
+                  f(:) = array((iatom - 1)*3 + 1:(iatom - 1)*3 + 3)
                ELSE
                   f(:) = particle_set(iatom)%f(:)
                END IF
                WRITE (iunit, "(3F20.10)") f(1:3)*factor
             CASE ("FORCE_MIXING_LABELS")
                IF (PRESENT(array)) THEN
-                  f(:) = array((iatom-1)*3+1:(iatom-1)*3+3)
+                  f(:) = array((iatom - 1)*3 + 1:(iatom - 1)*3 + 3)
                ELSE
                   f(:) = particle_set(iatom)%f(:)
                END IF
@@ -326,7 +326,7 @@ CONTAINS
          IF (PRESENT(array)) THEN
             arr(1:3, 1:natom) = RESHAPE(array, (/3, natom/))
          ELSE
-            SELECT CASE (TRIM (content))
+            SELECT CASE (TRIM(content))
             CASE ("POS")
                DO iatom = 1, natom
                   arr(1:3, iatom) = particle_set(iatom)%r(1:3)
@@ -428,7 +428,7 @@ CONTAINS
             WRITE (UNIT=line(13:16), FMT="(A4)") ADJUSTL(name)
             ! WRITE (UNIT=line(18:20),FMT="(A3)") TRIM(resname)
             ! WRITE (UNIT=line(23:26),FMT="(I4)") MODULO(idres,10000)
-            SELECT CASE (TRIM (content))
+            SELECT CASE (TRIM(content))
             CASE ("POS")
                IF (PRESENT(array)) THEN
                   r(1:3) = get_particle_pos_or_vel(iatom, particle_set, array)
@@ -481,7 +481,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), POINTER               :: charges
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_fist_particle_coordinates', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: name, unit_str
       INTEGER                                            :: iatom, ikind, iw, natom
@@ -518,7 +518,7 @@ CONTAINS
                CALL get_shell(shell=shell_kind, &
                               charge_core=qcore, &
                               charge_shell=qshell)
-               qeff = qcore+qshell
+               qeff = qcore + qshell
             END IF
             WRITE (UNIT=iw, &
                    FMT="(T2,I5,1X,I4,3X,A4,3X,3F12.6,4X,F6.2,2X,F11.4)") &
@@ -551,7 +551,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN)                       :: label
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_qs_particle_coordinates', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=2)                                   :: element_symbol
       CHARACTER(LEN=default_string_length)               :: unit_str
@@ -614,7 +614,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_particle_distances', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: unit_str
       INTEGER                                            :: handle, iatom, iw, jatom, natom
@@ -639,10 +639,10 @@ CONTAINS
          ALLOCATE (distance_matrix(natom, natom))
          distance_matrix(:, :) = 0.0_dp
          DO iatom = 1, natom
-            DO jatom = iatom+1, natom
+            DO jatom = iatom + 1, natom
                rab(:) = pbc(particle_set(iatom)%r(:), &
                             particle_set(jatom)%r(:), cell)
-               dab = SQRT(rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3))
+               dab = SQRT(rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3))
                distance_matrix(iatom, jatom) = dab*conv
                distance_matrix(jatom, iatom) = distance_matrix(iatom, jatom)
             END DO
@@ -710,11 +710,11 @@ CONTAINS
       natom = natom*my_el_per_part
       DO jatom = 1, natom, my_parts_per_line
          from = jatom
-         to = MIN(from+my_parts_per_line-1, natom)
+         to = MIN(from + my_parts_per_line - 1, natom)
          WRITE (UNIT=iw, FMT=TRIM(fmt_string1)) (icol, icol=from, to)
          DO iatom = 1, natom
             katom = iatom/my_el_per_part
-            IF (MOD(iatom, my_el_per_part) /= 0) katom = katom+1
+            IF (MOD(iatom, my_el_per_part) /= 0) katom = katom + 1
             CALL get_atomic_kind(atomic_kind=particle_set(my_list(katom))%atomic_kind, &
                                  element_symbol=element_symbol)
             WRITE (UNIT=iw, FMT=TRIM(fmt_string2)) &
@@ -745,7 +745,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: input_section
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_structure_data', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: string, unit_str
       INTEGER                                            :: handle, i, i_rep, iw, n, n_rep, n_vals, &
@@ -795,9 +795,9 @@ CONTAINS
                                          i_rep_val=i_rep, &
                                          i_vals=atomic_indices)
                n_vals = SIZE(atomic_indices)
-               new_size = old_size+n_vals
+               new_size = old_size + n_vals
                CALL reallocate(index_list, 1, new_size)
-               index_list(old_size+1:new_size) = atomic_indices(1:n_vals)
+               index_list(old_size + 1:new_size) = atomic_indices(1:n_vals)
                old_size = new_size
             END DO
             ALLOCATE (work(new_size))
@@ -812,7 +812,7 @@ CONTAINS
                END IF
                IF (i > 1) THEN
                   ! Skip redundant indices
-                  IF (index_list(i) == index_list(i-1)) CYCLE
+                  IF (index_list(i) == index_list(i - 1)) CYCLE
                END IF
                WRITE (UNIT=iw, FMT="(T3,A,T20,A,3F13.6)") &
                   "r"//TRIM(string), "=", pbc(particle_set(index_list(i))%r(1:3), cell)*conv
@@ -834,9 +834,9 @@ CONTAINS
                                          i_rep_val=i_rep, &
                                          i_vals=atomic_indices)
                n_vals = SIZE(atomic_indices)
-               new_size = old_size+n_vals
+               new_size = old_size + n_vals
                CALL reallocate(index_list, 1, new_size)
-               index_list(old_size+1:new_size) = atomic_indices(1:n_vals)
+               index_list(old_size + 1:new_size) = atomic_indices(1:n_vals)
                old_size = new_size
             END DO
             ALLOCATE (work(new_size))
@@ -851,7 +851,7 @@ CONTAINS
                END IF
                IF (i > 1) THEN
                   ! Skip redundant indices
-                  IF (index_list(i) == index_list(i-1)) CYCLE
+                  IF (index_list(i) == index_list(i - 1)) CYCLE
                END IF
                r(1:3) = pbc(particle_set(index_list(i))%r(1:3), cell)
                CALL real_to_scaled(s, r, cell)
@@ -882,7 +882,7 @@ CONTAINS
                IF (((wrk2(1) >= 1) .AND. (wrk2(SIZE(wrk2)) <= natom)) .AND. unique) THEN
                   rab(:) = pbc(particle_set(atomic_indices(1))%r(:), &
                                particle_set(atomic_indices(2))%r(:), cell)
-                  dab = SQRT(rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3))
+                  dab = SQRT(rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3))
                   WRITE (UNIT=iw, FMT="(T3,A,T20,A,3F13.6,3X,A,F13.6)") &
                      "r"//TRIM(string), "=", rab(:)*conv, &
                      "|r| =", dab*conv

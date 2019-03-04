@@ -11,8 +11,8 @@
 ! **************************************************************************************************
 MODULE task_list_types
 
-   USE kinds,                           ONLY: dp,&
-                                              int_8
+   USE kinds, ONLY: dp, &
+                    int_8
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -48,7 +48,7 @@ CONTAINS
       TYPE(task_list_type), POINTER                      :: task_list
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_task_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       ALLOCATE (task_list)
 
@@ -72,7 +72,7 @@ CONTAINS
       TYPE(task_list_type), POINTER                      :: task_list
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_task_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(task_list%tasks)) THEN
          DEALLOCATE (task_list%tasks)

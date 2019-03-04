@@ -10,79 +10,79 @@
 !> \author Martin Haeufel
 ! **************************************************************************************************
 MODULE kg_environment
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_container_types,       ONLY: add_basis_set_to_container,&
-                                              remove_basis_from_container
-   USE basis_set_types,                 ONLY: copy_gto_basis_set,&
-                                              create_primitive_basis_set,&
-                                              get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE bibliography,                    ONLY: Andermatt2016,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE distribution_2d_types,           ONLY: distribution_2d_type
-   USE external_potential_types,        ONLY: get_potential,&
-                                              local_potential_type
-   USE input_constants,                 ONLY: kg_ec_functional_harris,&
-                                              kg_tnadd_atomic,&
-                                              kg_tnadd_embed,&
-                                              kg_tnadd_embed_ri,&
-                                              kg_tnadd_none,&
-                                              xc_vdw_fun_nonloc,&
-                                              xc_vdw_fun_pairpot
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE integration_grid_types,          ONLY: allocate_intgrid,&
-                                              integration_grid_type
-   USE kg_environment_types,            ONLY: kg_environment_type
-   USE kg_vertex_coloring_methods,      ONLY: kg_vertex_coloring
-   USE kinds,                           ONLY: dp,&
-                                              int_4,&
-                                              int_4_size,&
-                                              int_8
-   USE lri_environment_init,            ONLY: lri_env_basis,&
-                                              lri_env_init
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_gather,&
-                                              mp_max
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_dispersion_nonloc,            ONLY: qs_dispersion_nonloc_init
-   USE qs_dispersion_pairpot,           ONLY: qs_dispersion_pairpot_init
-   USE qs_dispersion_types,             ONLY: qs_dispersion_type
-   USE qs_dispersion_utils,             ONLY: qs_dispersion_env_set
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_grid_atom,                    ONLY: initialize_atomic_grid
-   USE qs_interactions,                 ONLY: init_interaction_radii_orb_basis
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: deallocate_neighbor_list_set,&
-                                              get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_neighbor_lists,               ONLY: atom2d_build,&
-                                              atom2d_cleanup,&
-                                              build_neighbor_lists,&
-                                              local_atoms_type,&
-                                              pair_radius_setup,&
-                                              write_neighbor_lists
-   USE string_utilities,                ONLY: uppercase
-   USE task_list_types,                 ONLY: deallocate_task_list
-   USE util,                            ONLY: sort
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_container_types, ONLY: add_basis_set_to_container, &
+                                        remove_basis_from_container
+   USE basis_set_types, ONLY: copy_gto_basis_set, &
+                              create_primitive_basis_set, &
+                              get_gto_basis_set, &
+                              gto_basis_set_type
+   USE bibliography, ONLY: Andermatt2016, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE distribution_2d_types, ONLY: distribution_2d_type
+   USE external_potential_types, ONLY: get_potential, &
+                                       local_potential_type
+   USE input_constants, ONLY: kg_ec_functional_harris, &
+                              kg_tnadd_atomic, &
+                              kg_tnadd_embed, &
+                              kg_tnadd_embed_ri, &
+                              kg_tnadd_none, &
+                              xc_vdw_fun_nonloc, &
+                              xc_vdw_fun_pairpot
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE integration_grid_types, ONLY: allocate_intgrid, &
+                                     integration_grid_type
+   USE kg_environment_types, ONLY: kg_environment_type
+   USE kg_vertex_coloring_methods, ONLY: kg_vertex_coloring
+   USE kinds, ONLY: dp, &
+                    int_4, &
+                    int_4_size, &
+                    int_8
+   USE lri_environment_init, ONLY: lri_env_basis, &
+                                   lri_env_init
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_gather, &
+                              mp_max
+   USE molecule_types, ONLY: molecule_type
+   USE particle_types, ONLY: particle_type
+   USE qs_dispersion_nonloc, ONLY: qs_dispersion_nonloc_init
+   USE qs_dispersion_pairpot, ONLY: qs_dispersion_pairpot_init
+   USE qs_dispersion_types, ONLY: qs_dispersion_type
+   USE qs_dispersion_utils, ONLY: qs_dispersion_env_set
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_grid_atom, ONLY: initialize_atomic_grid
+   USE qs_interactions, ONLY: init_interaction_radii_orb_basis
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: deallocate_neighbor_list_set, &
+                                     get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_neighbor_lists, ONLY: atom2d_build, &
+                                atom2d_cleanup, &
+                                build_neighbor_lists, &
+                                local_atoms_type, &
+                                pair_radius_setup, &
+                                write_neighbor_lists
+   USE string_utilities, ONLY: uppercase
+   USE task_list_types, ONLY: deallocate_task_list
+   USE util, ONLY: sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -354,13 +354,13 @@ CONTAINS
          CALL allocate_intgrid(kg_env%int_grid_molecules)
          ig_mol => kg_env%int_grid_molecules
          nbatch = (natom*kg_env%int_grid_atom%nbatch)/np
-         nbatch = NINT((nbatch+1)*1.2_dp)
+         nbatch = NINT((nbatch + 1)*1.2_dp)
          ALLOCATE (bid(2, nbatch))
          nbatch = 0
          DO iatom = 1, natom
             DO ib = 1, kg_env%int_grid_atom%nbatch
-               IF (para_env%mepos == MOD(iatom+ib, np)) THEN
-                  nbatch = nbatch+1
+               IF (para_env%mepos == MOD(iatom + ib, np)) THEN
+                  nbatch = nbatch + 1
                   CPASSERT(nbatch <= SIZE(bid, 2))
                   bid(1, nbatch) = iatom
                   bid(2, nbatch) = ib
@@ -433,7 +433,7 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: current_subset
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_build_neighborlist', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, nkind
       LOGICAL                                            :: mic, molecule_only
@@ -569,7 +569,7 @@ CONTAINS
       INTEGER, INTENT(INOUT)                             :: n
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_remove_duplicates', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, npairs
       INTEGER, DIMENSION(n)                              :: ind
@@ -581,7 +581,7 @@ CONTAINS
       IF (n > 0) THEN
          ! represent a pair of int_4 as a single int_8 number, simplifies sorting.
          sort_keys(1:n) = ISHFT(INT(pairs_buffer(1, 1:n), KIND=int_8), 8*int_4_size)
-         sort_keys(1:n) = sort_keys(1:n)+pairs_buffer(2, 1:n) !upper + lower bytes
+         sort_keys(1:n) = sort_keys(1:n) + pairs_buffer(2, 1:n) !upper + lower bytes
          CALL sort(sort_keys, n, ind)
 
          ! add first pair, the case npairs==0 was excluded above
@@ -590,8 +590,8 @@ CONTAINS
 
          ! remove duplicates from the sorted list
          DO i = 2, n
-            IF (sort_keys(i) /= sort_keys(i-1)) THEN
-               npairs = npairs+1
+            IF (sort_keys(i) /= sort_keys(i - 1)) THEN
+               npairs = npairs + 1
                work(:, npairs) = pairs_buffer(:, ind(i))
             END IF
          END DO
@@ -685,7 +685,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_build_subsets', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: color, handle, i, iab, iatom, imol, &
                                                             isub, jatom, jmol, nmol, npairs, &
@@ -713,7 +713,7 @@ CONTAINS
          !IF (imol<jmol) THEN
          IF (imol .NE. jmol) THEN
 
-            npairs = npairs+2
+            npairs = npairs + 2
 
          END IF
 
@@ -735,12 +735,12 @@ CONTAINS
             ! add pair to the local list
 
             ! add both orderings - makes it easier to build the neighborlist
-            npairs = npairs+1
+            npairs = npairs + 1
 
             pairs_buffer(1, npairs) = imol
             pairs_buffer(2, npairs) = jmol
 
-            npairs = npairs+1
+            npairs = npairs + 1
 
             pairs_buffer(2, npairs) = imol
             pairs_buffer(1, npairs) = jmol
@@ -762,7 +762,7 @@ CONTAINS
       ALLOCATE (pairs(2, npairs))
 
       pairs(:, 1:npairs_local) = pairs_buffer(:, 1:npairs_local)
-      pairs(:, npairs_local+1:) = 0
+      pairs(:, npairs_local + 1:) = 0
 
       DEALLOCATE (pairs_buffer)
 
@@ -789,7 +789,7 @@ CONTAINS
 
          DO i = 1, SIZE(msg_gather, 2)
             IF (msg_gather(1, i) .NE. 0) THEN
-               npairs = npairs+1
+               npairs = npairs + 1
                msg_gather(:, npairs) = msg_gather(:, i)
             END IF
          END DO
@@ -869,7 +869,7 @@ CONTAINS
       DO i = 1, nmol ! nmol=nnodes
          color = color_of_node(i)
          kg_env%subset_of_mol(i) = color
-         nnodes_of_color(color) = nnodes_of_color(color)+1
+         nnodes_of_color(color) = nnodes_of_color(color) + 1
       END DO
 
       DEALLOCATE (nnodes_of_color)

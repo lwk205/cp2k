@@ -9,15 +9,15 @@
 !>      01.2005 created [fawzi and ale]
 ! **************************************************************************************************
 MODULE metadynamics_types
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE parallel_rng_types,              ONLY: delete_rng_stream,&
-                                              rng_stream_p_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE parallel_rng_types, ONLY: delete_rng_stream, &
+                                 rng_stream_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -168,7 +168,7 @@ CONTAINS
       meta_env%metadyn_section => metadyn_section
       meta_env%ref_count = 1
       meta_env%restart = .TRUE.
-      last_meta_env_id = last_meta_env_id+1
+      last_meta_env_id = last_meta_env_id + 1
       meta_env%id_nr = last_meta_env_id
       meta_env%n_colvar = n_colvar
       meta_env%para_env => para_env
@@ -262,11 +262,11 @@ CONTAINS
       TYPE(meta_env_type), POINTER                       :: meta_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'meta_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(meta_env))
       CPASSERT(meta_env%ref_count > 0)
-      meta_env%ref_count = meta_env%ref_count+1
+      meta_env%ref_count = meta_env%ref_count + 1
    END SUBROUTINE meta_env_retain
 
 ! **************************************************************************************************
@@ -278,13 +278,13 @@ CONTAINS
       TYPE(meta_env_type), POINTER                       :: meta_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'meta_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
       IF (ASSOCIATED(meta_env)) THEN
          CPASSERT(meta_env%ref_count > 0)
-         meta_env%ref_count = meta_env%ref_count-1
+         meta_env%ref_count = meta_env%ref_count - 1
          IF (meta_env%ref_count == 0) THEN
             CALL cp_para_env_release(meta_env%para_env)
             IF (ASSOCIATED(meta_env%metavar)) THEN
@@ -334,7 +334,7 @@ CONTAINS
       TYPE(hills_env_type), POINTER                      :: hills_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'hills_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(hills_env)) THEN
          IF (ASSOCIATED(hills_env%ss_history)) THEN

@@ -4,17 +4,17 @@
 !--------------------------------------------------------------------------------------------------!
 
 MODULE qs_fb_input
-   USE bibliography,                    ONLY: Rayson2009
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_create,&
-                                              section_type
-   USE input_val_types,                 ONLY: logical_t,&
-                                              real_t
-   USE kinds,                           ONLY: dp
+   USE bibliography, ONLY: Rayson2009
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_create, &
+                                  section_type
+   USE input_val_types, ONLY: logical_t, &
+                              real_t
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -35,7 +35,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_filtermatrix_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

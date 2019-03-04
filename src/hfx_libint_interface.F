@@ -11,27 +11,27 @@
 ! **************************************************************************************************
 MODULE hfx_libint_interface
 
-   USE cell_types,                      ONLY: cell_type,&
-                                              real_to_scaled
-   USE gamma,                           ONLY: fgamma => fgamma_0
-   USE hfx_contraction_methods,         ONLY: contract
-   USE hfx_libint_wrapper,              ONLY: get_derivs,&
-                                              get_eris
-   USE hfx_libint_wrapper_types,        ONLY: lib_deriv,&
-                                              lib_int,&
-                                              prim_data,&
-                                              prim_data_f_size
-   USE hfx_types,                       ONLY: hfx_pgf_product_list,&
-                                              hfx_potential_type
-   USE input_constants,                 ONLY: &
-        do_hfx_potential_coulomb, do_hfx_potential_gaussian, do_hfx_potential_id, &
-        do_hfx_potential_long, do_hfx_potential_mix_cl, do_hfx_potential_mix_cl_trunc, &
-        do_hfx_potential_mix_lg, do_hfx_potential_short, do_hfx_potential_truncated
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE mathconstants,                   ONLY: pi
-   USE orbital_pointers,                ONLY: nco
-   USE t_c_g0,                          ONLY: t_c_g0_n
+   USE cell_types, ONLY: cell_type, &
+                         real_to_scaled
+   USE gamma, ONLY: fgamma => fgamma_0
+   USE hfx_contraction_methods, ONLY: contract
+   USE hfx_libint_wrapper, ONLY: get_derivs, &
+                                 get_eris
+   USE hfx_libint_wrapper_types, ONLY: lib_deriv, &
+                                       lib_int, &
+                                       prim_data, &
+                                       prim_data_f_size
+   USE hfx_types, ONLY: hfx_pgf_product_list, &
+                        hfx_potential_type
+   USE input_constants, ONLY: &
+      do_hfx_potential_coulomb, do_hfx_potential_gaussian, do_hfx_potential_id, &
+      do_hfx_potential_long, do_hfx_potential_mix_cl, do_hfx_potential_mix_cl_trunc, &
+      do_hfx_potential_mix_lg, do_hfx_potential_short, do_hfx_potential_truncated
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE mathconstants, ONLY: pi
+   USE orbital_pointers, ONLY: nco
+   USE t_c_g0, ONLY: t_c_g0_n
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -85,33 +85,33 @@ CONTAINS
       INTEGER                                            :: i
       LOGICAL                                            :: use_gamma
       REAL(KIND=dp) :: AB(3), AB2, CD(3), CD2, Eta, EtaInv, factor, omega2, omega_corr, &
-         omega_corr2, P(3), PQ(3), PQ2, Q(3), R, R1, R2, Rho, RhoInv, S1234, T, tmp, W(3), Zeta, &
-         ZetaInv, ZetapEtaInv
+                       omega_corr2, P(3), PQ(3), PQ2, Q(3), R, R1, R2, Rho, RhoInv, S1234, T, tmp, W(3), Zeta, &
+                       ZetaInv, ZetapEtaInv
       REAL(KIND=dp), DIMENSION(prim_data_f_size)         :: Fm
 
-      Zeta = Zeta_A+Zeta_B
+      Zeta = Zeta_A + Zeta_B
       ZetaInv = 1.0_dp/Zeta
-      Eta = Zeta_C+Zeta_D
+      Eta = Zeta_C + Zeta_D
       EtaInv = 1.0_dp/Eta
-      ZetapEtaInv = Zeta+Eta
+      ZetapEtaInv = Zeta + Eta
       ZetapEtaInv = 1.0_dp/ZetapEtaInv
       Rho = Zeta*Eta*ZetapEtaInv
       RhoInv = 1.0_dp/Rho
 
       DO i = 1, 3
-         P(i) = (Zeta_A*A(i)+Zeta_B*B(i))*ZetaInv
-         Q(i) = (Zeta_C*C(i)+Zeta_D*D(i))*EtaInv
-         AB(i) = A(i)-B(i)
-         CD(i) = C(i)-D(i)
-         PQ(i) = P(i)-Q(i)
-         W(i) = (Zeta*P(i)+Eta*Q(i))*ZetapEtaInv
+         P(i) = (Zeta_A*A(i) + Zeta_B*B(i))*ZetaInv
+         Q(i) = (Zeta_C*C(i) + Zeta_D*D(i))*EtaInv
+         AB(i) = A(i) - B(i)
+         CD(i) = C(i) - D(i)
+         PQ(i) = P(i) - Q(i)
+         W(i) = (Zeta*P(i) + Eta*Q(i))*ZetapEtaInv
       END DO
 
       AB2 = DOT_PRODUCT(AB, AB)
       CD2 = DOT_PRODUCT(CD, CD)
       PQ2 = DOT_PRODUCT(PQ, PQ)
 
-      S1234 = EXP((-Zeta_A*Zeta_B*ZetaInv*AB2)+(-Zeta_C*Zeta_D*EtaInv*CD2))
+      S1234 = EXP((-Zeta_A*Zeta_B*ZetaInv*AB2) + (-Zeta_C*Zeta_D*EtaInv*CD2))
       T = Rho*PQ2
 
       SELECT CASE (potential_parameter%potential_type)
@@ -119,7 +119,7 @@ CONTAINS
          R = potential_parameter%cutoff_radius*SQRT(rho)
          R1 = R11
          R2 = R22
-         IF (PQ2 > (R1+R2+potential_parameter%cutoff_radius)**2) THEN
+         IF (PQ2 > (R1 + R2 + potential_parameter%cutoff_radius)**2) THEN
             RETURN
          END IF
          CALL t_c_g0_n(prim%F(1), use_gamma, R, T, m_max)
@@ -132,29 +132,29 @@ CONTAINS
          R = potential_parameter%cutoff_radius*SQRT(rho)
          R1 = R11
          R2 = R22
-         IF (PQ2 > (R1+R2+potential_parameter%cutoff_radius)**2) THEN
+         IF (PQ2 > (R1 + R2 + potential_parameter%cutoff_radius)**2) THEN
             RETURN
          END IF
          CALL fgamma(m_max, T, prim%F(1))
          omega2 = potential_parameter%omega**2
-         omega_corr2 = omega2/(omega2+Rho)
+         omega_corr2 = omega2/(omega2 + Rho)
          omega_corr = SQRT(omega_corr2)
          T = T*omega_corr2
          CALL fgamma(m_max, T, Fm)
          tmp = -omega_corr
-         DO i = 1, m_max+1
-            prim%F(i) = prim%F(i)+Fm(i)*tmp
+         DO i = 1, m_max + 1
+            prim%F(i) = prim%F(i) + Fm(i)*tmp
             tmp = tmp*omega_corr2
          END DO
          factor = 2.0_dp*Pi*RhoInv
       CASE (do_hfx_potential_long)
          omega2 = potential_parameter%omega**2
-         omega_corr2 = omega2/(omega2+Rho)
+         omega_corr2 = omega2/(omega2 + Rho)
          omega_corr = SQRT(omega_corr2)
          T = T*omega_corr2
          CALL fgamma(m_max, T, prim%F(1))
          tmp = omega_corr
-         DO i = 1, m_max+1
+         DO i = 1, m_max + 1
             prim%F(i) = prim%F(i)*tmp
             tmp = tmp*omega_corr2
          END DO
@@ -162,13 +162,13 @@ CONTAINS
       CASE (do_hfx_potential_mix_cl)
          CALL fgamma(m_max, T, prim%F(1))
          omega2 = potential_parameter%omega**2
-         omega_corr2 = omega2/(omega2+Rho)
+         omega_corr2 = omega2/(omega2 + Rho)
          omega_corr = SQRT(omega_corr2)
          T = T*omega_corr2
          CALL fgamma(m_max, T, Fm)
          tmp = omega_corr
-         DO i = 1, m_max+1
-            prim%F(i) = prim%F(i)*potential_parameter%scale_coulomb+Fm(i)*tmp*potential_parameter%scale_longrange
+         DO i = 1, m_max + 1
+            prim%F(i) = prim%F(i)*potential_parameter%scale_coulomb + Fm(i)*tmp*potential_parameter%scale_longrange
             tmp = tmp*omega_corr2
          END DO
          factor = 2.0_dp*Pi*RhoInv
@@ -178,7 +178,7 @@ CONTAINS
          R = potential_parameter%cutoff_radius*SQRT(rho)
          R1 = R11
          R2 = R22
-         IF (PQ2 > (R1+R2+potential_parameter%cutoff_radius)**2) THEN
+         IF (PQ2 > (R1 + R2 + potential_parameter%cutoff_radius)**2) THEN
             RETURN
          END IF
          CALL t_c_g0_n(prim%F(1), use_gamma, R, T, m_max)
@@ -187,55 +187,55 @@ CONTAINS
          ! Coulomb
          CALL fgamma(m_max, T, Fm)
 
-         DO i = 1, m_max+1
-            prim%F(i) = prim%F(i)*(potential_parameter%scale_coulomb+potential_parameter%scale_longrange)- &
+         DO i = 1, m_max + 1
+            prim%F(i) = prim%F(i)*(potential_parameter%scale_coulomb + potential_parameter%scale_longrange) - &
                         Fm(i)*potential_parameter%scale_longrange
          ENDDO
 
          ! longrange
          omega2 = potential_parameter%omega**2
-         omega_corr2 = omega2/(omega2+Rho)
+         omega_corr2 = omega2/(omega2 + Rho)
          omega_corr = SQRT(omega_corr2)
          T = T*omega_corr2
          CALL fgamma(m_max, T, Fm)
          tmp = omega_corr
-         DO i = 1, m_max+1
-            prim%F(i) = prim%F(i)+Fm(i)*tmp*potential_parameter%scale_longrange
+         DO i = 1, m_max + 1
+            prim%F(i) = prim%F(i) + Fm(i)*tmp*potential_parameter%scale_longrange
             tmp = tmp*omega_corr2
          END DO
          factor = 2.0_dp*Pi*RhoInv
 
       CASE (do_hfx_potential_gaussian)
          omega2 = potential_parameter%omega**2
-         T = -omega2*T/(Rho+omega2)
+         T = -omega2*T/(Rho + omega2)
          tmp = 1.0_dp
-         DO i = 1, m_max+1
+         DO i = 1, m_max + 1
             prim%F(i) = EXP(T)*tmp
-            tmp = tmp*omega2/(Rho+omega2)
+            tmp = tmp*omega2/(Rho + omega2)
          END DO
-         factor = (Pi/(Rho+omega2))**(1.5_dp)
+         factor = (Pi/(Rho + omega2))**(1.5_dp)
       CASE (do_hfx_potential_mix_lg)
          omega2 = potential_parameter%omega**2
-         omega_corr2 = omega2/(omega2+Rho)
+         omega_corr2 = omega2/(omega2 + Rho)
          omega_corr = SQRT(omega_corr2)
          T = T*omega_corr2
          CALL fgamma(m_max, T, Fm)
          tmp = omega_corr*2.0_dp*Pi*RhoInv*potential_parameter%scale_longrange
-         DO i = 1, m_max+1
+         DO i = 1, m_max + 1
             Fm(i) = Fm(i)*tmp
             tmp = tmp*omega_corr2
          END DO
          T = Rho*PQ2
-         T = -omega2*T/(Rho+omega2)
-         tmp = (Pi/(Rho+omega2))**(1.5_dp)*potential_parameter%scale_gaussian
-         DO i = 1, m_max+1
-            prim%F(i) = EXP(T)*tmp+Fm(i)
-            tmp = tmp*omega2/(Rho+omega2)
+         T = -omega2*T/(Rho + omega2)
+         tmp = (Pi/(Rho + omega2))**(1.5_dp)*potential_parameter%scale_gaussian
+         DO i = 1, m_max + 1
+            prim%F(i) = EXP(T)*tmp + Fm(i)
+            tmp = tmp*omega2/(Rho + omega2)
          END DO
          factor = 1.0_dp
       CASE (do_hfx_potential_id)
          prim%F(1) = (Pi*RhoInv)**(1.5_dp)
-         DO i = 2, m_max+1
+         DO i = 2, m_max + 1
             prim%F(i) = 0.0_dp
          END DO
          factor = 1.0_dp
@@ -244,13 +244,13 @@ CONTAINS
       tmp = (Pi*ZetapEtaInv)**3
       factor = factor*S1234*SQRT(tmp)
 
-      DO i = 1, m_max+1
+      DO i = 1, m_max + 1
          prim%F(i) = prim%F(i)*factor
       ENDDO
-      prim%U(1:3, 1) = P-A
-      prim%U(1:3, 3) = Q-C
-      prim%U(1:3, 5) = W-P
-      prim%U(1:3, 6) = W-Q
+      prim%U(1:3, 1) = P - A
+      prim%U(1:3, 3) = Q - C
+      prim%U(1:3, 5) = W - P
+      prim%U(1:3, 6) = W - Q
       prim%oo2z = 0.5_dp*ZetaInv
       prim%oo2n = 0.5_dp*EtaInv
       prim%oo2zn = 0.5_dp*ZetapEtaInv
@@ -293,12 +293,12 @@ CONTAINS
                                                             EtaInv, ZetapEtaInv, Rho, RhoInv, &
                                                             P(3), Q(3), W(3)
 
-      prim%U(1:3, 1) = P-A
-      prim%U(1:3, 2) = P-B
-      prim%U(1:3, 3) = Q-C
-      prim%U(1:3, 4) = Q-D
-      prim%U(1:3, 5) = W-P
-      prim%U(1:3, 6) = W-Q
+      prim%U(1:3, 1) = P - A
+      prim%U(1:3, 2) = P - B
+      prim%U(1:3, 3) = Q - C
+      prim%U(1:3, 4) = Q - D
+      prim%U(1:3, 5) = W - P
+      prim%U(1:3, 6) = W - Q
       prim%twozeta_a = 2.0_dp*Zeta_A
       prim%twozeta_b = 2.0_dp*Zeta_B
       prim%twozeta_c = 2.0_dp*Zeta_C
@@ -407,15 +407,15 @@ CONTAINS
       REAL(dp), DIMENSION(ncoc, nsoc*nl_c)               :: sphi_c
       REAL(dp), DIMENSION(ncod, nsod*nl_d)               :: sphi_d
       REAL(dp) :: work(ncoa*ncob*ncoc*ncod, 12), work2(ncoa, ncob, ncoc, ncod, 12), &
-         work_forces(ncoa*ncob*ncoc*ncod, 12)
+                  work_forces(ncoa*ncob*ncoc*ncod, 12)
       REAL(dp), DIMENSION(ncoa*ncob*ncoc*ncod)           :: buffer1, buffer2
-      REAL(dp), DIMENSION(nsoa*nl_a, nsob*nl_b, nsoc*&
-         nl_c, nsod*nl_d)                                :: primitives_tmp
+      REAL(dp), DIMENSION(nsoa*nl_a, nsob*nl_b, nsoc* &
+                          nl_c, nsod*nl_d)                                :: primitives_tmp
       LOGICAL, INTENT(IN)                                :: use_virial
       REAL(dp) :: work_virial(ncoa*ncob*ncoc*ncod, 12, 3), &
-         work2_virial(ncoa, ncob, ncoc, ncod, 12, 3)
-      REAL(dp), DIMENSION(nsoa*nl_a, nsob*nl_b, nsoc*&
-         nl_c, nsod*nl_d)                                :: primitives_tmp_virial
+                  work2_virial(ncoa, ncob, ncoc, ncod, 12, 3)
+      REAL(dp), DIMENSION(nsoa*nl_a, nsob*nl_b, nsoc* &
+                          nl_c, nsod*nl_d)                                :: primitives_tmp_virial
       REAL(dp), &
          DIMENSION(nsgfa, nsgfb, nsgfc, nsgfd, 12, 3)    :: primitives_virial
       TYPE(cell_type), POINTER                           :: cell
@@ -429,8 +429,8 @@ CONTAINS
                                                             ZetapEtaInv
       TYPE(prim_data), TARGET                            :: prim
 
-      m_max = n_a+n_b+n_c+n_d
-      m_max = m_max+1
+      m_max = n_a + n_b + n_c + n_d
+      m_max = m_max + 1
       mysize = ncoa*ncob*ncoc*ncod
       a_mysize = mysize
 
@@ -444,13 +444,13 @@ CONTAINS
 
       perm_case = 1
       IF (n_a < n_b) THEN
-         perm_case = perm_case+1
+         perm_case = perm_case + 1
       END IF
       IF (n_c < n_d) THEN
-         perm_case = perm_case+2
+         perm_case = perm_case + 2
       END IF
-      IF (n_a+n_b > n_c+n_d) THEN
-         perm_case = perm_case+4
+      IF (n_a + n_b > n_c + n_d) THEN
+         perm_case = perm_case + 4
       END IF
 
       SELECT CASE (perm_case)
@@ -468,7 +468,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, A, B, C, D, &
                                   Zeta_A, Zeta_B, Zeta_C, Zeta_D, &
@@ -479,17 +479,17 @@ CONTAINS
             CALL get_derivs(n_d, n_c, n_b, n_a, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), A, cell)
                CALL real_to_scaled(scoord(4:6), B, cell)
@@ -498,7 +498,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -514,13 +514,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO i = 1, ncoa
-               p1 = (i-1)*ncob
+               p1 = (i - 1)*ncob
                DO j = 1, ncob
-                  p2 = (p1+j-1)*ncoc
+                  p2 = (p1 + j - 1)*ncoc
                   DO k = 1, ncoc
-                     p3 = (p2+k-1)*ncod
+                     p3 = (p2 + k - 1)*ncod
                      DO l = 1, ncod
-                        p4 = p3+l
+                        p4 = p3 + l
                         work2(i, j, k, l, full_perm1(n)) = work(p4, n)
                      END DO
                   END DO
@@ -538,13 +538,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO i = 1, ncoa
-                  p1 = (i-1)*ncob
+                  p1 = (i - 1)*ncob
                   DO j = 1, ncob
-                     p2 = (p1+j-1)*ncoc
+                     p2 = (p1 + j - 1)*ncoc
                      DO k = 1, ncoc
-                        p3 = (p2+k-1)*ncod
+                        p3 = (p2 + k - 1)*ncod
                         DO l = 1, ncod
-                           p4 = p3+l
+                           p4 = p3 + l
                            work2_virial(i, j, k, l, full_perm1(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -566,7 +566,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, B, A, C, D, &
                                   Zeta_B, Zeta_A, Zeta_C, Zeta_D, &
@@ -577,17 +577,17 @@ CONTAINS
             CALL get_derivs(n_d, n_c, n_a, n_b, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                ENDDO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), B, cell)
                CALL real_to_scaled(scoord(4:6), A, cell)
@@ -596,7 +596,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -612,13 +612,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO j = 1, ncob
-               p1 = (j-1)*ncoa
+               p1 = (j - 1)*ncoa
                DO i = 1, ncoa
-                  p2 = (p1+i-1)*ncoc
+                  p2 = (p1 + i - 1)*ncoc
                   DO k = 1, ncoc
-                     p3 = (p2+k-1)*ncod
+                     p3 = (p2 + k - 1)*ncod
                      DO l = 1, ncod
-                        p4 = p3+l
+                        p4 = p3 + l
                         work2(i, j, k, l, full_perm2(n)) = work(p4, n)
                      END DO
                   END DO
@@ -636,13 +636,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO j = 1, ncob
-                  p1 = (j-1)*ncoa
+                  p1 = (j - 1)*ncoa
                   DO i = 1, ncoa
-                     p2 = (p1+i-1)*ncoc
+                     p2 = (p1 + i - 1)*ncoc
                      DO k = 1, ncoc
-                        p3 = (p2+k-1)*ncod
+                        p3 = (p2 + k - 1)*ncod
                         DO l = 1, ncod
-                           p4 = p3+l
+                           p4 = p3 + l
                            work2_virial(i, j, k, l, full_perm2(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -664,7 +664,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, A, B, D, C, &
                                   Zeta_A, Zeta_B, Zeta_D, Zeta_C, &
@@ -675,17 +675,17 @@ CONTAINS
             CALL get_derivs(n_c, n_d, n_b, n_a, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), A, cell)
                CALL real_to_scaled(scoord(4:6), B, cell)
@@ -694,7 +694,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -710,13 +710,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO i = 1, ncoa
-               p1 = (i-1)*ncob
+               p1 = (i - 1)*ncob
                DO j = 1, ncob
-                  p2 = (p1+j-1)*ncod
+                  p2 = (p1 + j - 1)*ncod
                   DO l = 1, ncod
-                     p3 = (p2+l-1)*ncoc
+                     p3 = (p2 + l - 1)*ncoc
                      DO k = 1, ncoc
-                        p4 = p3+k
+                        p4 = p3 + k
                         work2(i, j, k, l, full_perm3(n)) = work(p4, n)
                      END DO
                   END DO
@@ -734,13 +734,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO i = 1, ncoa
-                  p1 = (i-1)*ncob
+                  p1 = (i - 1)*ncob
                   DO j = 1, ncob
-                     p2 = (p1+j-1)*ncod
+                     p2 = (p1 + j - 1)*ncod
                      DO l = 1, ncod
-                        p3 = (p2+l-1)*ncoc
+                        p3 = (p2 + l - 1)*ncoc
                         DO k = 1, ncoc
-                           p4 = p3+k
+                           p4 = p3 + k
                            work2_virial(i, j, k, l, full_perm3(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -762,7 +762,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, B, A, D, C, &
                                   Zeta_B, Zeta_A, Zeta_D, Zeta_C, &
@@ -773,17 +773,17 @@ CONTAINS
             CALL get_derivs(n_c, n_d, n_a, n_b, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), B, cell)
                CALL real_to_scaled(scoord(4:6), A, cell)
@@ -792,7 +792,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -808,13 +808,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO j = 1, ncob
-               p1 = (j-1)*ncoa
+               p1 = (j - 1)*ncoa
                DO i = 1, ncoa
-                  p2 = (p1+i-1)*ncod
+                  p2 = (p1 + i - 1)*ncod
                   DO l = 1, ncod
-                     p3 = (p2+l-1)*ncoc
+                     p3 = (p2 + l - 1)*ncoc
                      DO k = 1, ncoc
-                        p4 = p3+k
+                        p4 = p3 + k
                         work2(i, j, k, l, full_perm4(n)) = work(p4, n)
                      END DO
                   END DO
@@ -832,13 +832,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO j = 1, ncob
-                  p1 = (j-1)*ncoa
+                  p1 = (j - 1)*ncoa
                   DO i = 1, ncoa
-                     p2 = (p1+i-1)*ncod
+                     p2 = (p1 + i - 1)*ncod
                      DO l = 1, ncod
-                        p3 = (p2+l-1)*ncoc
+                        p3 = (p2 + l - 1)*ncoc
                         DO k = 1, ncoc
-                           p4 = p3+k
+                           p4 = p3 + k
                            work2_virial(i, j, k, l, full_perm4(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -860,7 +860,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, C, D, A, B, &
                                   Zeta_C, Zeta_D, Zeta_A, Zeta_B, &
@@ -871,17 +871,17 @@ CONTAINS
             CALL get_derivs(n_b, n_a, n_d, n_c, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), C, cell)
                CALL real_to_scaled(scoord(4:6), D, cell)
@@ -890,7 +890,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -906,13 +906,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO k = 1, ncoc
-               p1 = (k-1)*ncod
+               p1 = (k - 1)*ncod
                DO l = 1, ncod
-                  p2 = (p1+l-1)*ncoa
+                  p2 = (p1 + l - 1)*ncoa
                   DO i = 1, ncoa
-                     p3 = (p2+i-1)*ncob
+                     p3 = (p2 + i - 1)*ncob
                      DO j = 1, ncob
-                        p4 = p3+j
+                        p4 = p3 + j
                         work2(i, j, k, l, full_perm5(n)) = work(p4, n)
                      END DO
                   END DO
@@ -930,13 +930,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO k = 1, ncoc
-                  p1 = (k-1)*ncod
+                  p1 = (k - 1)*ncod
                   DO l = 1, ncod
-                     p2 = (p1+l-1)*ncoa
+                     p2 = (p1 + l - 1)*ncoa
                      DO i = 1, ncoa
-                        p3 = (p2+i-1)*ncob
+                        p3 = (p2 + i - 1)*ncob
                         DO j = 1, ncob
-                           p4 = p3+j
+                           p4 = p3 + j
                            work2_virial(i, j, k, l, full_perm5(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -958,7 +958,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, C, D, B, A, &
                                   Zeta_C, Zeta_D, Zeta_B, Zeta_A, &
@@ -969,17 +969,17 @@ CONTAINS
             CALL get_derivs(n_a, n_b, n_d, n_c, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), C, cell)
                CALL real_to_scaled(scoord(4:6), D, cell)
@@ -988,7 +988,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -1004,13 +1004,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO k = 1, ncoc
-               p1 = (k-1)*ncod
+               p1 = (k - 1)*ncod
                DO l = 1, ncod
-                  p2 = (p1+l-1)*ncob
+                  p2 = (p1 + l - 1)*ncob
                   DO j = 1, ncob
-                     p3 = (p2+j-1)*ncoa
+                     p3 = (p2 + j - 1)*ncoa
                      DO i = 1, ncoa
-                        p4 = p3+i
+                        p4 = p3 + i
                         work2(i, j, k, l, full_perm6(n)) = work(p4, n)
                      END DO
                   END DO
@@ -1028,13 +1028,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO k = 1, ncoc
-                  p1 = (k-1)*ncod
+                  p1 = (k - 1)*ncod
                   DO l = 1, ncod
-                     p2 = (p1+l-1)*ncob
+                     p2 = (p1 + l - 1)*ncob
                      DO j = 1, ncob
-                        p3 = (p2+j-1)*ncoa
+                        p3 = (p2 + j - 1)*ncoa
                         DO i = 1, ncoa
-                           p4 = p3+i
+                           p4 = p3 + i
                            work2_virial(i, j, k, l, full_perm6(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -1056,7 +1056,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, D, C, A, B, &
                                   Zeta_D, Zeta_C, Zeta_A, Zeta_B, &
@@ -1067,17 +1067,17 @@ CONTAINS
             CALL get_derivs(n_b, n_a, n_c, n_d, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), D, cell)
                CALL real_to_scaled(scoord(4:6), C, cell)
@@ -1086,7 +1086,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -1102,13 +1102,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO l = 1, ncod
-               p1 = (l-1)*ncoc
+               p1 = (l - 1)*ncoc
                DO k = 1, ncoc
-                  p2 = (p1+k-1)*ncoa
+                  p2 = (p1 + k - 1)*ncoa
                   DO i = 1, ncoa
-                     p3 = (p2+i-1)*ncob
+                     p3 = (p2 + i - 1)*ncob
                      DO j = 1, ncob
-                        p4 = p3+j
+                        p4 = p3 + j
                         work2(i, j, k, l, full_perm7(n)) = work(p4, n)
                      END DO
                   END DO
@@ -1126,13 +1126,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO l = 1, ncod
-                  p1 = (l-1)*ncoc
+                  p1 = (l - 1)*ncoc
                   DO k = 1, ncoc
-                     p2 = (p1+k-1)*ncoa
+                     p2 = (p1 + k - 1)*ncoa
                      DO i = 1, ncoa
-                        p3 = (p2+i-1)*ncob
+                        p3 = (p2 + i - 1)*ncob
                         DO j = 1, ncob
-                           p4 = p3+j
+                           p4 = p3 + j
                            work2_virial(i, j, k, l, full_perm7(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -1154,7 +1154,7 @@ CONTAINS
             AB = pgf_product_list(i)%AB
             CD = pgf_product_list(i)%CD
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_deriv_data(prim, D, C, B, A, &
                                   Zeta_D, Zeta_C, Zeta_B, Zeta_A, &
@@ -1165,17 +1165,17 @@ CONTAINS
             CALL get_derivs(n_a, n_b, n_c, n_d, deriv, prim, work_forces, a_mysize)
             DO k = 4, 6
                DO j = 1, mysize
-                  work_forces(j, k) = -1.0_dp*(work_forces(j, k-3)+ &
-                                               work_forces(j, k+3)+ &
-                                               work_forces(j, k+6))
+                  work_forces(j, k) = -1.0_dp*(work_forces(j, k - 3) + &
+                                               work_forces(j, k + 3) + &
+                                               work_forces(j, k + 6))
                END DO
             END DO
             DO k = 1, 12
                DO j = 1, mysize
-                  work(j, k) = work(j, k)+work_forces(j, k)
+                  work(j, k) = work(j, k) + work_forces(j, k)
                END DO
             END DO
-            neris = neris+12*mysize
+            neris = neris + 12*mysize
             IF (use_virial) THEN
                CALL real_to_scaled(scoord(1:3), D, cell)
                CALL real_to_scaled(scoord(4:6), C, cell)
@@ -1184,7 +1184,7 @@ CONTAINS
                DO k = 1, 12
                   DO j = 1, mysize
                      DO m = 1, 3
-                        work_virial(j, k, m) = work_virial(j, k, m)+work_forces(j, k)*scoord(INT((k-1)/3)*3+m)
+                        work_virial(j, k, m) = work_virial(j, k, m) + work_forces(j, k)*scoord(INT((k - 1)/3)*3 + m)
                      END DO
                   END DO
                END DO
@@ -1200,13 +1200,13 @@ CONTAINS
             tmp_max_all = MAX(tmp_max_all, tmp_max)
 
             DO l = 1, ncod
-               p1 = (l-1)*ncoc
+               p1 = (l - 1)*ncoc
                DO k = 1, ncoc
-                  p2 = (p1+k-1)*ncob
+                  p2 = (p1 + k - 1)*ncob
                   DO j = 1, ncob
-                     p3 = (p2+j-1)*ncoa
+                     p3 = (p2 + j - 1)*ncoa
                      DO i = 1, ncoa
-                        p4 = p3+i
+                        p4 = p3 + i
                         work2(i, j, k, l, full_perm8(n)) = work(p4, n)
                      END DO
                   END DO
@@ -1224,13 +1224,13 @@ CONTAINS
                tmp_max_all_virial = MAX(tmp_max_all_virial, tmp_max_virial)
 
                DO l = 1, ncod
-                  p1 = (l-1)*ncoc
+                  p1 = (l - 1)*ncoc
                   DO k = 1, ncoc
-                     p2 = (p1+k-1)*ncob
+                     p2 = (p1 + k - 1)*ncob
                      DO j = 1, ncob
-                        p3 = (p2+j-1)*ncoa
+                        p3 = (p2 + j - 1)*ncoa
                         DO i = 1, ncoa
-                           p4 = p3+i
+                           p4 = p3 + i
                            work2_virial(i, j, k, l, full_perm8(n), 1:3) = work_virial(p4, n, 1:3)
                         END DO
                      END DO
@@ -1256,14 +1256,14 @@ CONTAINS
                           primitives_tmp(1, 1, 1, 1), &
                           buffer1, buffer2)
 
-            primitives(s_offset_a+1:s_offset_a+nsoa*nl_a, &
-                       s_offset_b+1:s_offset_b+nsob*nl_b, &
-                       s_offset_c+1:s_offset_c+nsoc*nl_c, &
-                       s_offset_d+1:s_offset_d+nsod*nl_d, i) = &
-               primitives(s_offset_a+1:s_offset_a+nsoa*nl_a, &
-                          s_offset_b+1:s_offset_b+nsob*nl_b, &
-                          s_offset_c+1:s_offset_c+nsoc*nl_c, &
-                          s_offset_d+1:s_offset_d+nsod*nl_d, i)+primitives_tmp(:, :, :, :)
+            primitives(s_offset_a + 1:s_offset_a + nsoa*nl_a, &
+                       s_offset_b + 1:s_offset_b + nsob*nl_b, &
+                       s_offset_c + 1:s_offset_c + nsoc*nl_c, &
+                       s_offset_d + 1:s_offset_d + nsod*nl_d, i) = &
+               primitives(s_offset_a + 1:s_offset_a + nsoa*nl_a, &
+                          s_offset_b + 1:s_offset_b + nsob*nl_b, &
+                          s_offset_c + 1:s_offset_c + nsoc*nl_c, &
+                          s_offset_d + 1:s_offset_d + nsod*nl_d, i) + primitives_tmp(:, :, :, :)
          END DO
       END IF
 
@@ -1280,14 +1280,14 @@ CONTAINS
                              primitives_tmp_virial(1, 1, 1, 1), &
                              buffer1, buffer2)
 
-               primitives_virial(s_offset_a+1:s_offset_a+nsoa*nl_a, &
-                                 s_offset_b+1:s_offset_b+nsob*nl_b, &
-                                 s_offset_c+1:s_offset_c+nsoc*nl_c, &
-                                 s_offset_d+1:s_offset_d+nsod*nl_d, i, m) = &
-                  primitives_virial(s_offset_a+1:s_offset_a+nsoa*nl_a, &
-                                    s_offset_b+1:s_offset_b+nsob*nl_b, &
-                                    s_offset_c+1:s_offset_c+nsoc*nl_c, &
-                                    s_offset_d+1:s_offset_d+nsod*nl_d, i, m)+primitives_tmp_virial(:, :, :, :)
+               primitives_virial(s_offset_a + 1:s_offset_a + nsoa*nl_a, &
+                                 s_offset_b + 1:s_offset_b + nsob*nl_b, &
+                                 s_offset_c + 1:s_offset_c + nsoc*nl_c, &
+                                 s_offset_d + 1:s_offset_d + nsod*nl_d, i, m) = &
+                  primitives_virial(s_offset_a + 1:s_offset_a + nsoa*nl_a, &
+                                    s_offset_b + 1:s_offset_b + nsob*nl_b, &
+                                    s_offset_c + 1:s_offset_c + nsoc*nl_c, &
+                                    s_offset_d + 1:s_offset_d + nsod*nl_d, i, m) + primitives_tmp_virial(:, :, :, :)
             END DO
          END DO
       END IF
@@ -1336,28 +1336,28 @@ CONTAINS
       INTEGER                                            :: a_mysize(1), i, m_max, mysize, perm_case
       TYPE(prim_data), TARGET                            :: prim
 
-      m_max = n_a+n_b+n_c+n_d
+      m_max = n_a + n_b + n_c + n_d
       mysize = nco(n_a)*nco(n_b)*nco(n_c)*nco(n_d)
       a_mysize = mysize
 
       IF (m_max /= 0) THEN
          perm_case = 1
          IF (n_a < n_b) THEN
-            perm_case = perm_case+1
+            perm_case = perm_case + 1
          END IF
          IF (n_c < n_d) THEN
-            perm_case = perm_case+2
+            perm_case = perm_case + 2
          END IF
-         IF (n_a+n_b > n_c+n_d) THEN
-            perm_case = perm_case+4
+         IF (n_a + n_b > n_c + n_d) THEN
+            perm_case = perm_case + 4
          END IF
 
          SELECT CASE (perm_case)
          CASE (1)
             CALL build_quartet_data_screen(A, B, C, D, Zeta_A, Zeta_B, Zeta_C, Zeta_D, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = A-B
-            lib%CD = C-D
+            lib%AB = A - B
+            lib%CD = C - D
             CALL get_eris(n_d, n_c, n_b, n_a, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1365,8 +1365,8 @@ CONTAINS
          CASE (2)
             CALL build_quartet_data_screen(B, A, C, D, Zeta_B, Zeta_A, Zeta_C, Zeta_D, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = B-A
-            lib%CD = C-D
+            lib%AB = B - A
+            lib%CD = C - D
             CALL get_eris(n_d, n_c, n_a, n_b, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1374,8 +1374,8 @@ CONTAINS
          CASE (3)
             CALL build_quartet_data_screen(A, B, D, C, Zeta_A, Zeta_B, Zeta_D, Zeta_C, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = A-B
-            lib%CD = D-C
+            lib%AB = A - B
+            lib%CD = D - C
             CALL get_eris(n_c, n_d, n_b, n_a, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1383,8 +1383,8 @@ CONTAINS
          CASE (4)
             CALL build_quartet_data_screen(B, A, D, C, Zeta_B, Zeta_A, Zeta_D, Zeta_C, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = B-A
-            lib%CD = D-C
+            lib%AB = B - A
+            lib%CD = D - C
             CALL get_eris(n_c, n_d, n_a, n_b, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1392,8 +1392,8 @@ CONTAINS
          CASE (5)
             CALL build_quartet_data_screen(C, D, A, B, Zeta_C, Zeta_D, Zeta_A, Zeta_B, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = C-D
-            lib%CD = A-B
+            lib%AB = C - D
+            lib%CD = A - B
             CALL get_eris(n_b, n_a, n_d, n_c, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1401,8 +1401,8 @@ CONTAINS
          CASE (6)
             CALL build_quartet_data_screen(C, D, B, A, Zeta_C, Zeta_D, Zeta_B, Zeta_A, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = C-D
-            lib%CD = B-A
+            lib%AB = C - D
+            lib%CD = B - A
             CALL get_eris(n_a, n_b, n_d, n_c, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1410,8 +1410,8 @@ CONTAINS
          CASE (7)
             CALL build_quartet_data_screen(D, C, A, B, Zeta_D, Zeta_C, Zeta_A, Zeta_B, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = D-C
-            lib%CD = A-B
+            lib%AB = D - C
+            lib%CD = A - B
             CALL get_eris(n_b, n_a, n_c, n_d, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1419,8 +1419,8 @@ CONTAINS
          CASE (8)
             CALL build_quartet_data_screen(D, C, B, A, Zeta_D, Zeta_C, Zeta_B, Zeta_A, m_max, &
                                            potential_parameter, prim, R1, R2)
-            lib%AB = D-C
-            lib%CD = B-A
+            lib%AB = D - C
+            lib%CD = B - A
             CALL get_eris(n_a, n_b, n_c, n_d, lib, prim, p_work, a_mysize)
             DO i = 1, mysize
                max_val = MAX(max_val, ABS(p_work(i)))
@@ -1517,8 +1517,8 @@ CONTAINS
       REAL(dp)                                           :: work(ncoa*ncob*ncoc*ncod), &
                                                             work2(ncoa, ncob, ncoc, ncod)
       REAL(dp), DIMENSION(ncoa*ncob*ncoc*ncod)           :: buffer1, buffer2
-      REAL(dp), DIMENSION(nsoa*nl_a, nsob*nl_b, nsoc*&
-         nl_c, nsod*nl_d)                                :: primitives_tmp
+      REAL(dp), DIMENSION(nsoa*nl_a, nsob*nl_b, nsoc* &
+                          nl_c, nsod*nl_d)                                :: primitives_tmp
       REAL(dp), DIMENSION(:), POINTER                    :: p_work
 
       INTEGER                                            :: a_mysize(1), i, j, k, l, m_max, mysize, &
@@ -1528,7 +1528,7 @@ CONTAINS
                                                             ZetapEtaInv
       TYPE(prim_data), TARGET                            :: prim
 
-      m_max = n_a+n_b+n_c+n_d
+      m_max = n_a + n_b + n_c + n_d
       mysize = ncoa*ncob*ncoc*ncod
       a_mysize = mysize
 
@@ -1536,13 +1536,13 @@ CONTAINS
       IF (m_max /= 0) THEN
          perm_case = 1
          IF (n_a < n_b) THEN
-            perm_case = perm_case+1
+            perm_case = perm_case + 1
          END IF
          IF (n_c < n_d) THEN
-            perm_case = perm_case+2
+            perm_case = perm_case + 2
          END IF
-         IF (n_a+n_b > n_c+n_d) THEN
-            perm_case = perm_case+4
+         IF (n_a + n_b > n_c + n_d) THEN
+            perm_case = perm_case + 4
          END IF
          SELECT CASE (perm_case)
          CASE (1)
@@ -1559,7 +1559,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, A, C, &
                                        ZetaInv, EtaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1567,8 +1567,8 @@ CONTAINS
                lib%AB = AB !A-B
                lib%CD = CD !C-D
                CALL get_eris(n_d, n_c, n_b, n_a, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1579,13 +1579,13 @@ CONTAINS
             END IF
 
             DO i = 1, ncoa
-               p1 = (i-1)*ncob
+               p1 = (i - 1)*ncob
                DO j = 1, ncob
-                  p2 = (p1+j-1)*ncoc
+                  p2 = (p1 + j - 1)*ncoc
                   DO k = 1, ncoc
-                     p3 = (p2+k-1)*ncod
+                     p3 = (p2 + k - 1)*ncod
                      DO l = 1, ncod
-                        p4 = p3+l
+                        p4 = p3 + l
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1605,7 +1605,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, B, C, &
                                        ZetaInv, EtaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1613,8 +1613,8 @@ CONTAINS
                lib%AB = -AB !B-A
                lib%CD = CD !C-D
                CALL get_eris(n_d, n_c, n_a, n_b, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1625,13 +1625,13 @@ CONTAINS
             END IF
 
             DO j = 1, ncob
-               p1 = (j-1)*ncoa
+               p1 = (j - 1)*ncoa
                DO i = 1, ncoa
-                  p2 = (p1+i-1)*ncoc
+                  p2 = (p1 + i - 1)*ncoc
                   DO k = 1, ncoc
-                     p3 = (p2+k-1)*ncod
+                     p3 = (p2 + k - 1)*ncod
                      DO l = 1, ncod
-                        p4 = p3+l
+                        p4 = p3 + l
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1651,7 +1651,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, A, D, &
                                        ZetaInv, EtaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1659,8 +1659,8 @@ CONTAINS
                lib%AB = AB !A-B
                lib%CD = -CD !D-C
                CALL get_eris(n_c, n_d, n_b, n_a, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1671,13 +1671,13 @@ CONTAINS
             END IF
 
             DO i = 1, ncoa
-               p1 = (i-1)*ncob
+               p1 = (i - 1)*ncob
                DO j = 1, ncob
-                  p2 = (p1+j-1)*ncod
+                  p2 = (p1 + j - 1)*ncod
                   DO l = 1, ncod
-                     p3 = (p2+l-1)*ncoc
+                     p3 = (p2 + l - 1)*ncoc
                      DO k = 1, ncoc
-                        p4 = p3+k
+                        p4 = p3 + k
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1697,7 +1697,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, B, D, &
                                        ZetaInv, EtaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1705,8 +1705,8 @@ CONTAINS
                lib%AB = -AB !B-A
                lib%CD = -CD !D-C
                CALL get_eris(n_c, n_d, n_a, n_b, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1717,13 +1717,13 @@ CONTAINS
             END IF
 
             DO j = 1, ncob
-               p1 = (j-1)*ncoa
+               p1 = (j - 1)*ncoa
                DO i = 1, ncoa
-                  p2 = (p1+i-1)*ncod
+                  p2 = (p1 + i - 1)*ncod
                   DO l = 1, ncod
-                     p3 = (p2+l-1)*ncoc
+                     p3 = (p2 + l - 1)*ncoc
                      DO k = 1, ncoc
-                        p4 = p3+k
+                        p4 = p3 + k
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1743,7 +1743,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, C, A, &
                                        EtaInv, ZetaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1751,8 +1751,8 @@ CONTAINS
                lib%AB = CD !C-D
                lib%CD = AB !A-B
                CALL get_eris(n_b, n_a, n_d, n_c, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1763,13 +1763,13 @@ CONTAINS
             END IF
 
             DO k = 1, ncoc
-               p1 = (k-1)*ncod
+               p1 = (k - 1)*ncod
                DO l = 1, ncod
-                  p2 = (p1+l-1)*ncoa
+                  p2 = (p1 + l - 1)*ncoa
                   DO i = 1, ncoa
-                     p3 = (p2+i-1)*ncob
+                     p3 = (p2 + i - 1)*ncob
                      DO j = 1, ncob
-                        p4 = p3+j
+                        p4 = p3 + j
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1789,7 +1789,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, C, B, &
                                        EtaInv, ZetaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1797,8 +1797,8 @@ CONTAINS
                lib%AB = CD !C-D
                lib%CD = -AB !B-A
                CALL get_eris(n_a, n_b, n_d, n_c, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1809,13 +1809,13 @@ CONTAINS
             END IF
 
             DO k = 1, ncoc
-               p1 = (k-1)*ncod
+               p1 = (k - 1)*ncod
                DO l = 1, ncod
-                  p2 = (p1+l-1)*ncob
+                  p2 = (p1 + l - 1)*ncob
                   DO j = 1, ncob
-                     p3 = (p2+j-1)*ncoa
+                     p3 = (p2 + j - 1)*ncoa
                      DO i = 1, ncoa
-                        p4 = p3+i
+                        p4 = p3 + i
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1835,7 +1835,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, D, A, &
                                        EtaInv, ZetaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1843,8 +1843,8 @@ CONTAINS
                lib%AB = -CD !D-C
                lib%CD = AB !A-B
                CALL get_eris(n_b, n_a, n_c, n_d, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1855,13 +1855,13 @@ CONTAINS
             END IF
 
             DO l = 1, ncod
-               p1 = (l-1)*ncoc
+               p1 = (l - 1)*ncoc
                DO k = 1, ncoc
-                  p2 = (p1+k-1)*ncoa
+                  p2 = (p1 + k - 1)*ncoa
                   DO i = 1, ncoa
-                     p3 = (p2+i-1)*ncob
+                     p3 = (p2 + i - 1)*ncob
                      DO j = 1, ncob
-                        p4 = p3+j
+                        p4 = p3 + j
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1881,7 +1881,7 @@ CONTAINS
                AB = pgf_product_list(i)%AB
                CD = pgf_product_list(i)%CD
                ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-               prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+               prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
                CALL build_quartet_data(prim, D, B, &
                                        EtaInv, ZetaInv, ZetapEtaInv, Rho, RhoInv, &
@@ -1889,8 +1889,8 @@ CONTAINS
                lib%AB = -CD !D-C
                lib%CD = -AB !B-A
                CALL get_eris(n_a, n_b, n_c, n_d, lib, prim, p_work, a_mysize)
-               work(1:mysize) = work(1:mysize)+p_work(1:mysize)
-               neris = neris+mysize
+               work(1:mysize) = work(1:mysize) + p_work(1:mysize)
+               neris = neris + mysize
             END DO
             DO i = 1, mysize
                tmp_max = MAX(tmp_max, ABS(work(i)))
@@ -1901,13 +1901,13 @@ CONTAINS
             END IF
 
             DO l = 1, ncod
-               p1 = (l-1)*ncoc
+               p1 = (l - 1)*ncoc
                DO k = 1, ncoc
-                  p2 = (p1+k-1)*ncob
+                  p2 = (p1 + k - 1)*ncob
                   DO j = 1, ncob
-                     p3 = (p2+j-1)*ncoa
+                     p3 = (p2 + j - 1)*ncoa
                      DO i = 1, ncoa
-                        p4 = p3+i
+                        p4 = p3 + i
                         work2(i, j, k, l) = work(p4)
                      END DO
                   END DO
@@ -1926,13 +1926,13 @@ CONTAINS
             Q = pgf_product_list(i)%Q
             W = pgf_product_list(i)%W
             ZetapEtaInv = pgf_product_list(i)%ZetapEtaInv
-            prim%F(1:m_max+1) = pgf_product_list(i)%Fm(1:m_max+1)
+            prim%F(1:m_max + 1) = pgf_product_list(i)%Fm(1:m_max + 1)
 
             CALL build_quartet_data(prim, A, C, &
                                     ZetaInv, EtaInv, ZetapEtaInv, Rho, RhoInv, &
                                     P, Q, W)
-            work(1) = work(1)+prim%F(1)
-            neris = neris+mysize
+            work(1) = work(1) + prim%F(1)
+            neris = neris + mysize
          END DO
          work2(1, 1, 1, 1) = work(1)
          tmp_max = max_contraction*ABS(work(1))
@@ -1951,14 +1951,14 @@ CONTAINS
                     primitives_tmp, &
                     buffer1, buffer2)
 
-      primitives(s_offset_a+1:s_offset_a+nsoa*nl_a, &
-                 s_offset_b+1:s_offset_b+nsob*nl_b, &
-                 s_offset_c+1:s_offset_c+nsoc*nl_c, &
-                 s_offset_d+1:s_offset_d+nsod*nl_d) = &
-         primitives(s_offset_a+1:s_offset_a+nsoa*nl_a, &
-                    s_offset_b+1:s_offset_b+nsob*nl_b, &
-                    s_offset_c+1:s_offset_c+nsoc*nl_c, &
-                    s_offset_d+1:s_offset_d+nsod*nl_d)+primitives_tmp(:, :, :, :)
+      primitives(s_offset_a + 1:s_offset_a + nsoa*nl_a, &
+                 s_offset_b + 1:s_offset_b + nsob*nl_b, &
+                 s_offset_c + 1:s_offset_c + nsoc*nl_c, &
+                 s_offset_d + 1:s_offset_d + nsod*nl_d) = &
+         primitives(s_offset_a + 1:s_offset_a + nsoa*nl_a, &
+                    s_offset_b + 1:s_offset_b + nsob*nl_b, &
+                    s_offset_c + 1:s_offset_c + nsoc*nl_c, &
+                    s_offset_d + 1:s_offset_d + nsod*nl_d) + primitives_tmp(:, :, :, :)
 
    END SUBROUTINE evaluate_eri
 
@@ -1989,10 +1989,10 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: ZetaInv, EtaInv, ZetapEtaInv, Rho, &
                                                             RhoInv, P(3), Q(3), W(3)
 
-      prim%U(1:3, 1) = P-A
-      prim%U(1:3, 3) = Q-C
-      prim%U(1:3, 5) = W-P
-      prim%U(1:3, 6) = W-Q
+      prim%U(1:3, 1) = P - A
+      prim%U(1:3, 3) = Q - C
+      prim%U(1:3, 5) = W - P
+      prim%U(1:3, 6) = W - Q
       prim%oo2z = 0.5_dp*ZetaInv
       prim%oo2n = 0.5_dp*EtaInv
       prim%oo2zn = 0.5_dp*ZetapEtaInv

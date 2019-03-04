@@ -11,33 +11,33 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE kpoint_types
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_env,                     ONLY: cp_cart_release,&
-                                              cp_para_env_release
-   USE cp_para_types,                   ONLY: cp_para_cart_type,&
-                                              cp_para_env_type
-   USE input_cp2k_kpoints,              ONLY: use_complex_wfn,&
-                                              use_real_wfn
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: twopi
-   USE physcon,                         ONLY: angstrom
-   USE qs_matrix_pools,                 ONLY: mpools_release,&
-                                              qs_matrix_pools_type
-   USE qs_mo_types,                     ONLY: deallocate_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE string_utilities,                ONLY: uppercase
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_env, ONLY: cp_cart_release, &
+                          cp_para_env_release
+   USE cp_para_types, ONLY: cp_para_cart_type, &
+                            cp_para_env_type
+   USE input_cp2k_kpoints, ONLY: use_complex_wfn, &
+                                 use_real_wfn
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: twopi
+   USE physcon, ONLY: angstrom
+   USE qs_matrix_pools, ONLY: mpools_release, &
+                              qs_matrix_pools_type
+   USE qs_mo_types, ONLY: deallocate_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE string_utilities, ONLY: uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -347,7 +347,7 @@ CONTAINS
          OPTIONAL, POINTER                               :: sab_nl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_kpoint_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(kpoint))
 
@@ -453,7 +453,7 @@ CONTAINS
          OPTIONAL, POINTER                               :: sab_nl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'set_kpoint_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(kpoint))
 
@@ -508,7 +508,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(3, 3), INTENT(IN)         :: a_vec
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_kpoint_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: ustr
       CHARACTER(LEN=default_string_length), &
@@ -538,15 +538,15 @@ CONTAINS
          CASE ("MONKHORST-PACK")
             CPASSERT(nval >= 4)
             DO i = 2, 4
-               READ (tmpstringlist(i), *) kpoint%nkp_grid(i-1)
+               READ (tmpstringlist(i), *) kpoint%nkp_grid(i - 1)
             END DO
          CASE ("MACDONALD")
             CPASSERT(nval >= 7)
             DO i = 2, 4
-               READ (tmpstringlist(i), *) kpoint%nkp_grid(i-1)
+               READ (tmpstringlist(i), *) kpoint%nkp_grid(i - 1)
             END DO
             DO i = 5, 7
-               READ (tmpstringlist(i), *) kpoint%kp_shift(i-4)
+               READ (tmpstringlist(i), *) kpoint%kp_shift(i - 4)
             END DO
          CASE ("GENERAL")
             CALL section_vals_val_get(kpoint_section, "UNITS", c_val=ustr)
@@ -563,12 +563,12 @@ CONTAINS
                CASE ("B_VECTOR")
                   kpoint%xkp(1:3, i) = reallist(1:3)
                CASE ("CART_ANGSTROM")
-                  kpoint%xkp(1:3, i) = (reallist(1)*a_vec(1, 1:3)+ &
-                                        reallist(2)*a_vec(2, 1:3)+ &
+                  kpoint%xkp(1:3, i) = (reallist(1)*a_vec(1, 1:3) + &
+                                        reallist(2)*a_vec(2, 1:3) + &
                                         reallist(3)*a_vec(3, 1:3))/twopi*angstrom
                CASE ("CART_BOHR")
-                  kpoint%xkp(1:3, i) = (reallist(1)*a_vec(1, 1:3)+ &
-                                        reallist(2)*a_vec(2, 1:3)+ &
+                  kpoint%xkp(1:3, i) = (reallist(1)*a_vec(1, 1:3) + &
+                                        reallist(2)*a_vec(2, 1:3) + &
                                         reallist(3)*a_vec(3, 1:3))/twopi
                CASE DEFAULT
                   CPABORT("Unknown Unit for kpoint definition")
@@ -614,7 +614,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: dft_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_kpoint_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, punit
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -689,7 +689,7 @@ CONTAINS
       TYPE(kpoint_env_type), POINTER                     :: kp_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kpoint_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(kp_env))
 
@@ -715,7 +715,7 @@ CONTAINS
       TYPE(kpoint_env_type), POINTER                     :: kp_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kpoint_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ic, is
 
@@ -794,7 +794,7 @@ CONTAINS
       TYPE(kpoint_sym_type), POINTER                     :: kp_sym
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kpoint_sym_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(kp_sym))
 
@@ -818,7 +818,7 @@ CONTAINS
       TYPE(kpoint_sym_type), POINTER                     :: kp_sym
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kpoint_sym_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(kp_sym)) THEN
 

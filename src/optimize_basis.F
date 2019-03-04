@@ -3,60 +3,60 @@
 !   Copyright (C) 2000 - 2019  CP2K developers group                                               !
 !--------------------------------------------------------------------------------------------------!
 MODULE optimize_basis
-   USE admm_methods,                    ONLY: admm_fit_mo_coeffs
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_env,                     ONLY: cp_para_env_create,&
-                                              cp_para_env_release
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE f77_interface,                   ONLY: create_force_env,&
-                                              destroy_force_env,&
-                                              f_env_add_defaults,&
-                                              f_env_get_from_id,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE input_cp2k_read,                 ONLY: empty_initial_variables,&
-                                              read_input
-   USE input_section_types,             ONLY: section_type,&
-                                              section_vals_release,&
-                                              section_vals_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE machine,                         ONLY: m_chdir,&
-                                              m_getcwd,&
-                                              m_walltime
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_comm_free,&
-                                              mp_comm_split,&
-                                              mp_sum,&
-                                              mp_sync
-   USE optbas_fenv_manipulation,        ONLY: allocate_mo_sets,&
-                                              calculate_ks_matrix,&
-                                              calculate_overlap,&
-                                              calculate_overlap_inverse,&
-                                              create_opt_admm_env,&
-                                              modify_input_settings,&
-                                              update_basis_set
-   USE optbas_opt_utils,                ONLY: evaluate_energy,&
-                                              evaluate_fval
-   USE optimize_basis_types,            ONLY: basis_optimization_type,&
-                                              deallocate_basis_optimization_type,&
-                                              subset_type
-   USE optimize_basis_utils,            ONLY: get_set_and_basis_id,&
-                                              optimize_basis_init_read_input,&
-                                              update_derived_basis_sets
-   USE powell,                          ONLY: powell_optimize
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_neighbor_lists,               ONLY: build_qs_neighbor_lists
+   USE admm_methods, ONLY: admm_fit_mo_coeffs
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_env, ONLY: cp_para_env_create, &
+                          cp_para_env_release
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE f77_interface, ONLY: create_force_env, &
+                            destroy_force_env, &
+                            f_env_add_defaults, &
+                            f_env_get_from_id, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE input_cp2k_read, ONLY: empty_initial_variables, &
+                              read_input
+   USE input_section_types, ONLY: section_type, &
+                                  section_vals_release, &
+                                  section_vals_type
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE machine, ONLY: m_chdir, &
+                      m_getcwd, &
+                      m_walltime
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_comm_free, &
+                              mp_comm_split, &
+                              mp_sum, &
+                              mp_sync
+   USE optbas_fenv_manipulation, ONLY: allocate_mo_sets, &
+                                       calculate_ks_matrix, &
+                                       calculate_overlap, &
+                                       calculate_overlap_inverse, &
+                                       create_opt_admm_env, &
+                                       modify_input_settings, &
+                                       update_basis_set
+   USE optbas_opt_utils, ONLY: evaluate_energy, &
+                               evaluate_fval
+   USE optimize_basis_types, ONLY: basis_optimization_type, &
+                                   deallocate_basis_optimization_type, &
+                                   subset_type
+   USE optimize_basis_utils, ONLY: get_set_and_basis_id, &
+                                   optimize_basis_init_read_input, &
+                                   update_derived_basis_sets
+   USE powell, ONLY: powell_optimize
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_neighbor_lists, ONLY: build_qs_neighbor_lists
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -81,7 +81,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'run_optimize_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(basis_optimization_type)                      :: opt_bas
@@ -111,17 +111,17 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'driver_para_opt_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, n_groups_created, opt_group
       INTEGER, DIMENSION(:), POINTER                     :: group_distribution_p
-      INTEGER, DIMENSION(0:para_env%num_pe-1), TARGET    :: group_distribution
+      INTEGER, DIMENSION(0:para_env%num_pe - 1), TARGET    :: group_distribution
 
       CALL timeset(routineN, handle)
       group_distribution_p => group_distribution
       CALL mp_comm_split(para_env%group, opt_group, n_groups_created, group_distribution_p, &
                          n_subgroups=SIZE(opt_bas%group_partition), group_partition=opt_bas%group_partition)
-      opt_bas%opt_id = group_distribution(para_env%mepos)+1
+      opt_bas%opt_id = group_distribution(para_env%mepos) + 1
 
       CALL driver_optimization_para_low(opt_bas, input_declaration, para_env, opt_group)
 
@@ -147,7 +147,7 @@ CONTAINS
       INTEGER                                            :: mpi_comm_opt
 
       CHARACTER(len=*), PARAMETER :: routineN = 'driver_optimization_para_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icalc, iopt, mp_id, stat
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: f_env_id
@@ -240,7 +240,7 @@ CONTAINS
       INTEGER                                            :: iopt
 
       CHARACTER(len=*), PARAMETER :: routineN = 'compute_residuum_vectors', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: bas_id, handle, icalc, icomb, mp_id, &
                                                             my_id, ncalc, set_id
@@ -264,7 +264,7 @@ CONTAINS
       ALLOCATE (start_time(SIZE(opt_bas%comp_group(mp_id)%member_list)))
 
       DO icalc = 1, SIZE(opt_bas%comp_group(mp_id)%member_list)
-         my_id = opt_bas%comp_group(mp_id)%member_list(icalc)+1
+         my_id = opt_bas%comp_group(mp_id)%member_list(icalc) + 1
          ! setup timings
          start_time(icalc) = m_walltime()
 
@@ -288,7 +288,7 @@ CONTAINS
          CALL evaluate_energy(qs_env%mos_aux_fit, matrix_ks, matrix_s_inv(icalc)%matrix, qs_env%admm_env%Q, &
                               qs_env%admm_env%work_aux_aux, energy(my_id))
 
-         my_time(my_id) = m_walltime()-start_time(icalc)
+         my_time(my_id) = m_walltime() - start_time(icalc)
       END DO
       IF (.NOT. para_env%ionode) THEN
          f_vec = 0.0_dp; cond_vec = 0.0_dp; my_time = 0.0_dp; energy = 0.0_dp
@@ -302,11 +302,11 @@ CONTAINS
       CALL mp_sum(energy, para_env_top%group)
       opt_bas%powell_param%f = 0.0_dp
       DO icalc = 1, SIZE(f_vec)
-         icomb = MOD(icalc-1, opt_bas%ncombinations)
-         opt_bas%powell_param%f = opt_bas%powell_param%f+ &
-                                  (f_vec(icalc)+energy(icalc))*opt_bas%fval_weight(icomb)
+         icomb = MOD(icalc - 1, opt_bas%ncombinations)
+         opt_bas%powell_param%f = opt_bas%powell_param%f + &
+                                  (f_vec(icalc) + energy(icalc))*opt_bas%fval_weight(icomb)
          IF (opt_bas%use_condition_number) &
-            opt_bas%powell_param%f = opt_bas%powell_param%f+ &
+            opt_bas%powell_param%f = opt_bas%powell_param%f + &
                                      LOG(cond_vec(icalc))*opt_bas%condition_weight(icomb)
       END DO
 
@@ -340,7 +340,7 @@ CONTAINS
       INTEGER                                            :: mpi_comm_opt
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_training_force_envs', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: main_dir
       INTEGER                                            :: bas_id, handle, icalc, ierr, mp_id, &
@@ -416,7 +416,7 @@ CONTAINS
       TYPE(basis_optimization_type)                      :: opt_bas
 
       CHARACTER(len=*), PARAMETER :: routineN = 'update_free_vars', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, iset, ix
 
@@ -445,7 +445,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:)                        :: x
 
       CHARACTER(len=*), PARAMETER :: routineN = 'update_subset_freevars', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icon1, icon2, icont, iexp, il, &
                                                             istart
@@ -454,12 +454,12 @@ CONTAINS
       CALL timeset(routineN, handle)
       DO iexp = 1, subset%nexp
          IF (subset%opt_exps(iexp)) THEN
-            ix = ix+1
+            ix = ix + 1
             subset%exps(iexp) = ABS(x(ix))
             IF (subset%exp_has_const(iexp)) THEN
                !use a fermi function to keep expoenents in a given range around their initial value
-               fermi_f = 1.0_dp/(EXP((x(ix)-1.0_dp)/0.5_dp)+1.0_dp)
-               subset%exps(iexp) = (2.0_dp*fermi_f-1.0_dp)*subset%exp_const(iexp)%var_fac*subset%exp_const(iexp)%init+ &
+               fermi_f = 1.0_dp/(EXP((x(ix) - 1.0_dp)/0.5_dp) + 1.0_dp)
+               subset%exps(iexp) = (2.0_dp*fermi_f - 1.0_dp)*subset%exp_const(iexp)%var_fac*subset%exp_const(iexp)%init + &
                                    subset%exp_const(iexp)%init
             ELSE
 
@@ -467,7 +467,7 @@ CONTAINS
          END IF
          DO icont = 1, subset%ncon_tot
             IF (subset%opt_coeff(iexp, icont)) THEN
-               ix = ix+1
+               ix = ix + 1
                subset%coeff(iexp, icont) = x(ix)
             END IF
          END DO
@@ -476,14 +476,14 @@ CONTAINS
       ! orthonormalize contraction coefficients using gram schmidt
       istart = 1
       DO il = 1, subset%nl
-         DO icon1 = istart, istart+subset%l(il)-2
-            DO icon2 = icon1+1, istart+subset%l(il)-1
+         DO icon1 = istart, istart + subset%l(il) - 2
+            DO icon2 = icon1 + 1, istart + subset%l(il) - 1
                gs_scale = DOT_PRODUCT(subset%coeff(:, icon2), subset%coeff(:, icon1))/ &
                           DOT_PRODUCT(subset%coeff(:, icon1), subset%coeff(:, icon1))
-               subset%coeff(:, icon2) = subset%coeff(:, icon2)-gs_scale*subset%coeff(:, icon1)
+               subset%coeff(:, icon2) = subset%coeff(:, icon2) - gs_scale*subset%coeff(:, icon1)
             END DO
          END DO
-         istart = istart+subset%l(il)
+         istart = istart + subset%l(il)
       END DO
 
       DO icon1 = 1, subset%ncon_tot
@@ -533,7 +533,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:)                        :: x
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_subset_freevars', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icont, iexp
       REAL(KIND=dp)                                      :: fract
@@ -542,13 +542,13 @@ CONTAINS
 
       DO iexp = 1, subset%nexp
          IF (subset%opt_exps(iexp)) THEN
-            ix = ix+1
+            ix = ix + 1
             x(ix) = subset%exps(iexp)
             IF (subset%exp_has_const(iexp)) THEN
                IF (subset%exp_const(iexp)%const_type == 0) THEN
-                  fract = 1.0_dp+(subset%exps(iexp)-subset%exp_const(iexp)%init)/ &
+                  fract = 1.0_dp + (subset%exps(iexp) - subset%exp_const(iexp)%init)/ &
                           (subset%exp_const(iexp)%init*subset%exp_const(iexp)%var_fac)
-                  x(ix) = 0.5_dp*LOG((2.0_dp/fract-1.0_dp))+1.0_dp
+                  x(ix) = 0.5_dp*LOG((2.0_dp/fract - 1.0_dp)) + 1.0_dp
                END IF
                IF (subset%exp_const(iexp)%const_type == 1) THEN
                   x(ix) = 1.0_dp
@@ -557,7 +557,7 @@ CONTAINS
          END IF
          DO icont = 1, subset%ncon_tot
             IF (subset%opt_coeff(iexp, icont)) THEN
-               ix = ix+1
+               ix = ix + 1
                x(ix) = subset%coeff(iexp, icont)
             END IF
          END DO
@@ -585,7 +585,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env_top
 
       CHARACTER(len=*), PARAMETER :: routineN = 'output_opt_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ibasis, icalc, iset, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -593,7 +593,7 @@ CONTAINS
       CALL timeset(routineN, handle)
       logger => cp_get_default_logger()
 
-      tot_time = tot_time+my_time
+      tot_time = tot_time + my_time
 
       unit_nr = -1
       IF (para_env_top%ionode .AND. (MOD(iopt, opt_bas%write_frequency) == 0 .OR. iopt == opt_bas%powell_param%maxfun)) &
@@ -606,7 +606,7 @@ CONTAINS
          icalc = 0
          DO iset = 1, opt_bas%ntraining_sets
             DO ibasis = 1, opt_bas%ncombinations
-               icalc = icalc+1
+               icalc = icalc + 1
                WRITE (unit_nr, '(1X,A,2(5X,I3,5X,A),2(1X,E14.8,1X,A),1X,F8.3)') &
                   'BASOPT| ', iset, "|", ibasis, "|", f_vec(icalc), "|", cond_vec(icalc), "|", tot_time(icalc)
             END DO

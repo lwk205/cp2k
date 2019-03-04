@@ -9,53 +9,53 @@
 !>      10.2015 created [Jan Wilhelm]
 ! **************************************************************************************************
 MODULE rpa_im_time
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell,&
-                                              pbc
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_fm_to_dbcsr,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_scale
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_set_element,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_filter, dbcsr_finalize, dbcsr_get_diag, &
-        dbcsr_get_info, dbcsr_get_num_blocks, dbcsr_get_occupation, dbcsr_get_stored_coordinates, &
-        dbcsr_init_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
-        dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_p_type, dbcsr_release_p, &
-        dbcsr_reserve_all_blocks, dbcsr_reserve_blocks, dbcsr_scale, dbcsr_set, dbcsr_transposed, &
-        dbcsr_type, dbcsr_type_no_symmetry
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_env_type,&
-                                              kpoint_type
-   USE mathconstants,                   ONLY: twopi
-   USE message_passing,                 ONLY: mp_alltoall,&
-                                              mp_irecv,&
-                                              mp_isend,&
-                                              mp_sum,&
-                                              mp_sync,&
-                                              mp_waitall
-   USE mp2_types,                       ONLY: integ_mat_buffer_type,&
-                                              mp2_type,&
-                                              two_dim_int_array
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
+   USE cell_types, ONLY: cell_type, &
+                         get_cell, &
+                         pbc
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_fm_to_dbcsr, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_scale
+   USE cp_fm_struct, ONLY: cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_set_element, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_filter, dbcsr_finalize, dbcsr_get_diag, &
+      dbcsr_get_info, dbcsr_get_num_blocks, dbcsr_get_occupation, dbcsr_get_stored_coordinates, &
+      dbcsr_init_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
+      dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_p_type, dbcsr_release_p, &
+      dbcsr_reserve_all_blocks, dbcsr_reserve_blocks, dbcsr_scale, dbcsr_set, dbcsr_transposed, &
+      dbcsr_type, dbcsr_type_no_symmetry
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_env_type, &
+                           kpoint_type
+   USE mathconstants, ONLY: twopi
+   USE message_passing, ONLY: mp_alltoall, &
+                              mp_irecv, &
+                              mp_isend, &
+                              mp_sum, &
+                              mp_sync, &
+                              mp_waitall
+   USE mp2_types, ONLY: integ_mat_buffer_type, &
+                        mp2_type, &
+                        two_dim_int_array
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -180,7 +180,7 @@ CONTAINS
 
       TYPE(dbcsr_p_type), DIMENSION(:, :), POINTER       :: mat_P_omega, mat_P_omega_im_part
       TYPE(cp_fm_type), POINTER :: fm_scaled_dm_occ_tau, fm_scaled_dm_virt_tau, fm_mo_coeff_occ, &
-         fm_mo_coeff_virt, fm_mo_coeff_occ_scaled, fm_mo_coeff_virt_scaled
+                                   fm_mo_coeff_virt, fm_mo_coeff_occ_scaled, fm_mo_coeff_virt_scaled
       TYPE(dbcsr_p_type)                                 :: mat_P_local, mat_P_global, &
                                                             mat_P_global_copy
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: mat_M_mu_Pnu_occ, mat_M_mu_Pnu_virt, &
@@ -188,7 +188,7 @@ CONTAINS
       INTEGER                                            :: ispin
       TYPE(dbcsr_p_type)                                 :: mat_M_P_munu_occ, mat_M_P_munu_virt
       TYPE(dbcsr_p_type), DIMENSION(:, :, :, :), POINTER :: mat_3c_overl_int_cut, &
-         mat_3c_overl_int_mao_for_occ_cut, mat_3c_overl_int_mao_for_virt_cut
+                                                            mat_3c_overl_int_mao_for_occ_cut, mat_3c_overl_int_mao_for_virt_cut
       TYPE(dbcsr_p_type), DIMENSION(:, :, :), POINTER    :: mat_dm_loc_occ_cut, mat_dm_loc_virt_cut
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: weights_cos_tf_t_to_w
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: tj, tau_tj
@@ -201,8 +201,8 @@ CONTAINS
       TYPE(mp2_type), POINTER                            :: mp2_env
       TYPE(cp_para_env_type), POINTER                    :: para_env, para_env_sub
       INTEGER, ALLOCATABLE, DIMENSION(:, :) :: starts_array_prim_col, ends_array_prim_col, &
-         starts_array_prim_row, ends_array_prim_row, starts_array_prim_fullcol, &
-         ends_array_prim_fullcol, starts_array_prim_fullrow, ends_array_prim_fullrow
+                                               starts_array_prim_row, ends_array_prim_row, starts_array_prim_fullcol, &
+                                               ends_array_prim_fullcol, starts_array_prim_fullrow, ends_array_prim_fullrow
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: my_group_L_starts_im_time, &
                                                             my_group_L_sizes_im_time
       TYPE(two_dim_int_array), ALLOCATABLE, &
@@ -228,15 +228,15 @@ CONTAINS
       LOGICAL                                            :: do_ri_sos_laplace_mp2
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_mat_P_omega', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, handle4, handle5, i_cell, i_cell_R_1, i_cell_R_1_minus_S, &
-         i_cell_R_1_minus_T, i_cell_R_2, i_cell_R_2_minus_S_minus_T, i_cell_S, i_cell_T, i_cut_RI, &
-         i_mem, iquad, j_mem, my_group_L_size, num_3c_repl, num_cells_dm
+                 i_cell_R_1_minus_T, i_cell_R_2, i_cell_R_2_minus_S_minus_T, i_cell_S, i_cell_T, i_cut_RI, &
+                 i_mem, iquad, j_mem, my_group_L_size, num_3c_repl, num_cells_dm
       INTEGER(KIND=int_8)                                :: flop_occ, flop_virt, num_flops_mat_P
       INTEGER, DIMENSION(:, :), POINTER                  :: index_to_cell_dm
       LOGICAL :: do_Gamma_RPA, do_kpoints_cubic_RPA, first_cycle_im_time, first_cycle_omega_loop, &
-         memory_info, R_1_minus_S_needed, R_1_minus_T_needed, R_2_minus_S_minus_T_needed
+                 memory_info, R_1_minus_S_needed, R_1_minus_T_needed, R_2_minus_S_minus_T_needed
       LOGICAL, ALLOCATABLE, DIMENSION(:)                 :: does_mat_P_T_tau_have_blocks
       REAL(KIND=dp)                                      :: omega, omega_old, tau, weight, weight_old
       TYPE(dbcsr_p_type), DIMENSION(:, :), POINTER       :: mat_dm_occ_global, mat_dm_virt_global
@@ -271,7 +271,7 @@ CONTAINS
          CALL timestop(handle4)
 
          ! loop over T for chi^T(it)
-         DO i_cell_T = 1, num_cells_dm/2+1
+         DO i_cell_T = 1, num_cells_dm/2 + 1
 
             IF (does_mat_P_T_tau_have_blocks(i_cell_T) .EQV. .FALSE.) CYCLE
 
@@ -563,7 +563,7 @@ CONTAINS
       INTEGER(KIND=int_8)                                :: num_flops_mat_P
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'check_if_mat_P_T_tau_has_blocks', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nblks
 
@@ -608,7 +608,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), POINTER                  :: index_to_cell_dm
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'sync_does_mat_P_T_tau_have_blocks', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, j_cell_T, j_cell_T_new
       INTEGER, ALLOCATABLE, DIMENSION(:) :: integ_does_mat_P_T_tau_have_blocks
@@ -641,7 +641,7 @@ CONTAINS
       END DO
 
       IF ((jquad == 1) .AND. (does_mat_P_T_tau_have_blocks(i_cell_T) .EQV. .FALSE.)) THEN
-         DO j_cell_T_new = i_cell_T+1, SIZE(does_mat_P_T_tau_have_blocks)
+         DO j_cell_T_new = i_cell_T + 1, SIZE(does_mat_P_T_tau_have_blocks)
 
             ! check if there is a cell which is closer to the 0-cell where the P matrix is already zero
             IF (ABS(index_to_cell_dm(1, i_cell_T)) .LE. ABS(index_to_cell_dm(1, j_cell_T_new)) .AND. &
@@ -665,7 +665,7 @@ CONTAINS
 
       END DO
 
-      IF (SUM(integ_does_mat_P_T_tau_have_blocks(i_cell_T+1:SIZE(integ_does_mat_P_T_tau_have_blocks))) == 0) THEN
+      IF (SUM(integ_does_mat_P_T_tau_have_blocks(i_cell_T + 1:SIZE(integ_does_mat_P_T_tau_have_blocks))) == 0) THEN
          IF (unit_nr > 0) WRITE (UNIT=unit_nr, FMT="(T3,A,T75,i6)") &
             "RPA_IM_TIME_INFO| Number of periodic images T for Chi_PQ^T(it):", &
             SUM(integ_does_mat_P_T_tau_have_blocks)
@@ -739,16 +739,16 @@ CONTAINS
       INTEGER, DIMENSION(:, :), POINTER                  :: index_to_cell_dm
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'replicate_dm_to_subgroup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: block_counter, block_offset, block_size, col, col_counter, col_from_buffer, &
-         col_offset, col_size, handle, handle1, i_block, i_cell, i_cell_S, i_cut_RI, i_entry, &
-         i_mepos, igroup, imepos, imepos_sub, j_mem, msg_offset, nblkrows_total, ngroup, &
-         num_blocks, num_cells_dm, num_pe_sub, offset, row, row_from_buffer, row_offset, row_size, &
-         total_num_entries
+                 col_offset, col_size, handle, handle1, i_block, i_cell, i_cell_S, i_cut_RI, i_entry, &
+                 i_mepos, igroup, imepos, imepos_sub, j_mem, msg_offset, nblkrows_total, ngroup, &
+                 num_blocks, num_cells_dm, num_pe_sub, offset, row, row_from_buffer, row_offset, row_size, &
+                 total_num_entries
       INTEGER, ALLOCATABLE, DIMENSION(:) :: blk_counter, cols_to_allocate_all, &
-         counter_blk_to_alloc, entry_counter, num_entries_blocks_rec, num_entries_blocks_send, &
-         row_block_from_index, rows_to_allocate_all, sizes_rec, sizes_send
+                                            counter_blk_to_alloc, entry_counter, num_entries_blocks_rec, num_entries_blocks_send, &
+                                            row_block_from_index, rows_to_allocate_all, sizes_rec, sizes_send
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: cols_to_allocate, &
                                                             multiply_needed_tmp_int, &
                                                             rows_to_allocate
@@ -771,10 +771,10 @@ CONTAINS
 
          NULLIFY (data_block)
 
-         ALLOCATE (num_entries_blocks_send(0:2*para_env%num_pe-1))
+         ALLOCATE (num_entries_blocks_send(0:2*para_env%num_pe - 1))
          num_entries_blocks_send(:) = 0
 
-         ALLOCATE (num_entries_blocks_rec(0:2*para_env%num_pe-1))
+         ALLOCATE (num_entries_blocks_rec(0:2*para_env%num_pe - 1))
          num_entries_blocks_rec(:) = 0
 
          ngroup = para_env%num_pe/para_env_sub%num_pe
@@ -789,16 +789,16 @@ CONTAINS
                                            row_offset=row_offset, col_offset=col_offset)
 
             ! check whether block is in the range of the memory cutoff
-            IF (row_offset+row_size-1 >= starts_array_cm(i_mem) .AND. row_offset < ends_array_cm(i_mem)) THEN
+            IF (row_offset + row_size - 1 >= starts_array_cm(i_mem) .AND. row_offset < ends_array_cm(i_mem)) THEN
 
                CALL dbcsr_get_stored_coordinates(mat_dm_loc_cut(1, 1, 1)%matrix, row, col, imepos_sub)
 
-               DO igroup = 0, ngroup-1
+               DO igroup = 0, ngroup - 1
 
-                  imepos = imepos_sub+igroup*num_pe_sub
+                  imepos = imepos_sub + igroup*num_pe_sub
 
-                  num_entries_blocks_send(2*imepos) = num_entries_blocks_send(2*imepos)+row_size*col_size
-                  num_entries_blocks_send(2*imepos+1) = num_entries_blocks_send(2*imepos+1)+1
+                  num_entries_blocks_send(2*imepos) = num_entries_blocks_send(2*imepos) + row_size*col_size
+                  num_entries_blocks_send(2*imepos + 1) = num_entries_blocks_send(2*imepos + 1) + 1
 
                END DO
 
@@ -829,11 +829,11 @@ CONTAINS
 
          CALL timeset("get_data_D", handle1)
 
-         ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-         ALLOCATE (buffer_send(0:para_env%num_pe-1))
+         ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+         ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
          ! allocate data message and corresponding indices
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             ALLOCATE (buffer_rec(imepos)%msg(num_entries_blocks_rec(2*imepos)))
             buffer_rec(imepos)%msg = 0.0_dp
@@ -841,18 +841,18 @@ CONTAINS
             ALLOCATE (buffer_send(imepos)%msg(num_entries_blocks_send(2*imepos)))
             buffer_send(imepos)%msg = 0.0_dp
 
-            ALLOCATE (buffer_rec(imepos)%indx(num_entries_blocks_rec(2*imepos+1), 3))
+            ALLOCATE (buffer_rec(imepos)%indx(num_entries_blocks_rec(2*imepos + 1), 3))
             buffer_rec(imepos)%indx = 0
 
-            ALLOCATE (buffer_send(imepos)%indx(num_entries_blocks_send(2*imepos+1), 3))
+            ALLOCATE (buffer_send(imepos)%indx(num_entries_blocks_send(2*imepos + 1), 3))
             buffer_send(imepos)%indx = 0
 
          END DO
 
-         ALLOCATE (entry_counter(0:para_env%num_pe-1))
+         ALLOCATE (entry_counter(0:para_env%num_pe - 1))
          entry_counter(:) = 0
 
-         ALLOCATE (blk_counter(0:para_env%num_pe-1))
+         ALLOCATE (blk_counter(0:para_env%num_pe - 1))
          blk_counter = 0
 
          CALL dbcsr_iterator_start(iter, mat_dm_global(jquad, i_cell)%matrix)
@@ -863,24 +863,24 @@ CONTAINS
                                            row_offset=row_offset, col_offset=col_offset)
 
             ! check whether block is in the range of the memory cutoff
-            IF (row_offset+row_size-1 >= starts_array_cm(i_mem) .AND. row_offset < ends_array_cm(i_mem)) THEN
+            IF (row_offset + row_size - 1 >= starts_array_cm(i_mem) .AND. row_offset < ends_array_cm(i_mem)) THEN
 
                CALL dbcsr_get_stored_coordinates(mat_dm_loc_cut(1, 1, 1)%matrix, row, col, imepos_sub)
 
-               DO igroup = 0, ngroup-1
+               DO igroup = 0, ngroup - 1
 
-                  imepos = imepos_sub+igroup*num_pe_sub
+                  imepos = imepos_sub + igroup*num_pe_sub
 
                   msg_offset = entry_counter(imepos)
 
                   block_size = row_size*col_size
 
-                  buffer_send(imepos)%msg(msg_offset+1:msg_offset+block_size) = &
+                  buffer_send(imepos)%msg(msg_offset + 1:msg_offset + block_size) = &
                      RESHAPE(data_block(1:row_size, 1:col_size), (/block_size/))
 
-                  entry_counter(imepos) = entry_counter(imepos)+block_size
+                  entry_counter(imepos) = entry_counter(imepos) + block_size
 
-                  blk_counter(imepos) = blk_counter(imepos)+1
+                  blk_counter(imepos) = blk_counter(imepos) + 1
 
                   block_offset = blk_counter(imepos)
 
@@ -902,10 +902,10 @@ CONTAINS
 
          ALLOCATE (req_array(1:para_env%num_pe, 4))
 
-         ALLOCATE (sizes_rec(0:para_env%num_pe-1))
-         ALLOCATE (sizes_send(0:para_env%num_pe-1))
+         ALLOCATE (sizes_rec(0:para_env%num_pe - 1))
+         ALLOCATE (sizes_send(0:para_env%num_pe - 1))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             sizes_send(imepos) = num_entries_blocks_send(2*imepos)
             sizes_rec(imepos) = num_entries_blocks_rec(2*imepos)
@@ -932,7 +932,7 @@ CONTAINS
             DO i_block = 1, nblkrows_total
 
                IF (i_entry >= row_blk_offset(i_block) .AND. &
-                   i_entry <= row_blk_offset(i_block)+row_blk_size(i_block)-1) THEN
+                   i_entry <= row_blk_offset(i_block) + row_blk_size(i_block) - 1) THEN
 
                   row_block_from_index(i_entry) = i_block
 
@@ -948,8 +948,8 @@ CONTAINS
          num_blocks = 0
 
          ! get the number of blocks, which have to be allocated
-         DO imepos = 0, para_env%num_pe-1
-            num_blocks = num_blocks+num_entries_blocks_rec(2*imepos+1)
+         DO imepos = 0, para_env%num_pe - 1
+            num_blocks = num_blocks + num_entries_blocks_rec(2*imepos + 1)
          END DO
 
          ALLOCATE (rows_to_allocate_all(num_blocks))
@@ -960,11 +960,11 @@ CONTAINS
 
          block_counter = 0
 
-         DO i_mepos = 0, para_env%num_pe-1
+         DO i_mepos = 0, para_env%num_pe - 1
 
-            DO i_block = 1, num_entries_blocks_rec(2*i_mepos+1)
+            DO i_block = 1, num_entries_blocks_rec(2*i_mepos + 1)
 
-               block_counter = block_counter+1
+               block_counter = block_counter + 1
 
                rows_to_allocate_all(block_counter) = buffer_rec(i_mepos)%indx(i_block, 1)
                cols_to_allocate_all(block_counter) = buffer_rec(i_mepos)%indx(i_block, 2)
@@ -990,7 +990,7 @@ CONTAINS
 
                IF (ANY(non_zero_blocks_3c(i_cut_RI, :, :) == col)) THEN
 
-                  counter_blk_to_alloc(i_cut_RI) = counter_blk_to_alloc(i_cut_RI)+1
+                  counter_blk_to_alloc(i_cut_RI) = counter_blk_to_alloc(i_cut_RI) + 1
                   block_counter = counter_blk_to_alloc(i_cut_RI)
 
                   rows_to_allocate(block_counter, i_cut_RI) = row
@@ -1056,9 +1056,9 @@ CONTAINS
                CALL dbcsr_iterator_next_block(iter, row, col, data_block, &
                                               row_size=row_size, col_size=col_size)
 
-               DO imepos = 0, para_env%num_pe-1
+               DO imepos = 0, para_env%num_pe - 1
 
-                  DO i_block = 1, num_entries_blocks_rec(2*imepos+1)
+                  DO i_block = 1, num_entries_blocks_rec(2*imepos + 1)
 
                      row_from_buffer = buffer_rec(imepos)%indx(i_block, 1)
                      col_from_buffer = buffer_rec(imepos)%indx(i_block, 2)
@@ -1067,7 +1067,7 @@ CONTAINS
                      IF (row == row_from_buffer .AND. col == col_from_buffer) THEN
 
                         data_block(1:row_size, 1:col_size) = &
-                           RESHAPE(buffer_rec(imepos)%msg(offset+1:offset+row_size*col_size), &
+                           RESHAPE(buffer_rec(imepos)%msg(offset + 1:offset + row_size*col_size), &
                                    (/row_size, col_size/))
 
                      END IF
@@ -1084,7 +1084,7 @@ CONTAINS
 
          CALL timestop(handle1)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             DEALLOCATE (buffer_rec(imepos)%msg)
             DEALLOCATE (buffer_rec(imepos)%indx)
             DEALLOCATE (buffer_send(imepos)%msg)
@@ -1156,14 +1156,14 @@ CONTAINS
       REAL(KIND=dp)                                      :: eps_filter_im_time
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fill_mat_P_global_from_mat_P_local', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: block, block_size, col, col_size, &
                                                             handle, handle1, imepos, offset, &
                                                             rec_counter, row, row_size, &
                                                             send_counter
       INTEGER, ALLOCATABLE, DIMENSION(:) :: block_counter, entry_counter, num_blocks_rec, &
-         num_blocks_send, num_entries_rec, num_entries_send, sizes_rec, sizes_send
+                                            num_blocks_send, num_entries_rec, num_entries_send, sizes_rec, sizes_send
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_block
       TYPE(dbcsr_iterator_type)                          :: iter
@@ -1177,13 +1177,13 @@ CONTAINS
       CALL dbcsr_set(mat_P_global%matrix, 0.0_dp)
       CALL dbcsr_set(mat_P_global_copy%matrix, 0.0_dp)
 
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
-      ALLOCATE (num_entries_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_blocks_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_entries_send(0:para_env%num_pe-1))
-      ALLOCATE (num_blocks_send(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_blocks_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_entries_send(0:para_env%num_pe - 1))
+      ALLOCATE (num_blocks_send(0:para_env%num_pe - 1))
       num_entries_rec = 0
       num_blocks_rec = 0
       num_entries_send = 0
@@ -1197,8 +1197,8 @@ CONTAINS
 
          CALL dbcsr_get_stored_coordinates(mat_P_global%matrix, row, col, imepos)
 
-         num_entries_send(imepos) = num_entries_send(imepos)+row_size*col_size
-         num_blocks_send(imepos) = num_blocks_send(imepos)+1
+         num_entries_send(imepos) = num_entries_send(imepos) + row_size*col_size
+         num_blocks_send(imepos) = num_blocks_send(imepos) + 1
 
       END DO
 
@@ -1210,21 +1210,21 @@ CONTAINS
 
       IF (para_env%num_pe > 1) THEN
 
-         ALLOCATE (sizes_rec(0:2*para_env%num_pe-1))
-         ALLOCATE (sizes_send(0:2*para_env%num_pe-1))
+         ALLOCATE (sizes_rec(0:2*para_env%num_pe - 1))
+         ALLOCATE (sizes_send(0:2*para_env%num_pe - 1))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             sizes_send(2*imepos) = num_entries_send(imepos)
-            sizes_send(2*imepos+1) = num_blocks_send(imepos)
+            sizes_send(2*imepos + 1) = num_blocks_send(imepos)
 
          END DO
 
          CALL mp_alltoall(sizes_send, sizes_rec, 2, para_env%group)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             num_entries_rec(imepos) = sizes_rec(2*imepos)
-            num_blocks_rec(imepos) = sizes_rec(2*imepos+1)
+            num_blocks_rec(imepos) = sizes_rec(2*imepos + 1)
          END DO
 
          DEALLOCATE (sizes_rec, sizes_send)
@@ -1241,7 +1241,7 @@ CONTAINS
       CALL timeset("fill_Q_2_fill_buffer", handle1)
 
       ! allocate data message and corresponding indices
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(imepos)%msg(num_entries_rec(imepos)))
          buffer_rec(imepos)%msg = 0.0_dp
@@ -1257,10 +1257,10 @@ CONTAINS
 
       END DO
 
-      ALLOCATE (block_counter(0:para_env%num_pe-1))
+      ALLOCATE (block_counter(0:para_env%num_pe - 1))
       block_counter(:) = 0
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
       ! fill buffer_send
@@ -1276,18 +1276,18 @@ CONTAINS
 
          offset = entry_counter(imepos)
 
-         buffer_send(imepos)%msg(offset+1:offset+block_size) = &
+         buffer_send(imepos)%msg(offset + 1:offset + block_size) = &
             RESHAPE(data_block(1:row_size, 1:col_size), (/block_size/))
 
-         block = block_counter(imepos)+1
+         block = block_counter(imepos) + 1
 
          buffer_send(imepos)%indx(block, 1) = row
          buffer_send(imepos)%indx(block, 2) = col
          buffer_send(imepos)%indx(block, 3) = offset
 
-         entry_counter(imepos) = entry_counter(imepos)+block_size
+         entry_counter(imepos) = entry_counter(imepos) + block_size
 
-         block_counter(imepos) = block_counter(imepos)+1
+         block_counter(imepos) = block_counter(imepos) + 1
 
       END DO
 
@@ -1304,9 +1304,9 @@ CONTAINS
          send_counter = 0
          rec_counter = 0
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             IF (num_entries_rec(imepos) > 0) THEN
-               rec_counter = rec_counter+1
+               rec_counter = rec_counter + 1
                CALL mp_irecv(buffer_rec(imepos)%indx, imepos, para_env%group, req_array(rec_counter, 3), tag=4)
             END IF
             IF (num_entries_rec(imepos) > 0) THEN
@@ -1314,9 +1314,9 @@ CONTAINS
             END IF
          END DO
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             IF (num_entries_send(imepos) > 0) THEN
-               send_counter = send_counter+1
+               send_counter = send_counter + 1
                CALL mp_isend(buffer_send(imepos)%indx, imepos, para_env%group, req_array(send_counter, 1), tag=4)
             END IF
             IF (num_entries_send(imepos) > 0) THEN
@@ -1347,7 +1347,7 @@ CONTAINS
 
          block_size = row_size*col_size
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             DO block = 1, num_blocks_rec(imepos)
 
@@ -1357,8 +1357,8 @@ CONTAINS
 
                      offset = buffer_rec(imepos)%indx(block, 3)
 
-                     data_block(1:row_size, 1:col_size) = data_block(1:row_size, 1:col_size)+ &
-                                                          RESHAPE(buffer_rec(imepos)%msg(offset+1:offset+ &
+                     data_block(1:row_size, 1:col_size) = data_block(1:row_size, 1:col_size) + &
+                                                          RESHAPE(buffer_rec(imepos)%msg(offset + 1:offset + &
                                                                                          row_size*col_size), &
                                                                   (/row_size, col_size/))
 
@@ -1381,7 +1381,7 @@ CONTAINS
 
       CALL dbcsr_filter(mat_P_global%matrix, eps_filter_im_time)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(imepos)%msg)
          DEALLOCATE (buffer_send(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%indx)
@@ -1420,7 +1420,7 @@ CONTAINS
       INTEGER                                            :: cut_RI
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_occupation_3c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_cut_RI, imepos
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
@@ -1436,16 +1436,16 @@ CONTAINS
 
       DO i_cut_RI = 1, cut_RI
 
-         local_occupation = local_occupation+dbcsr_get_occupation(mat_munu_array(i_cut_RI)%matrix)
+         local_occupation = local_occupation + dbcsr_get_occupation(mat_munu_array(i_cut_RI)%matrix)
 
       END DO
 
       local_occupation = local_occupation/REAL(cut_RI, KIND=dp)
 
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          ALLOCATE (buffer_send(imepos)%msg(1))
          buffer_send(imepos)%msg(1) = local_occupation
 
@@ -1454,9 +1454,9 @@ CONTAINS
 
       IF (para_env%num_pe > 1) THEN
 
-         ALLOCATE (req_array(0:para_env%num_pe-1, 2))
+         ALLOCATE (req_array(0:para_env%num_pe - 1, 2))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             CALL mp_isend(buffer_send(imepos)%msg, imepos, para_env%group, req_array(imepos, 1), tag=2)
             CALL mp_irecv(buffer_rec(imepos)%msg, imepos, para_env%group, req_array(imepos, 2), tag=2)
          END DO
@@ -1471,9 +1471,9 @@ CONTAINS
 
       END IF
 
-      ALLOCATE (occupation(0:para_env%num_pe-1))
+      ALLOCATE (occupation(0:para_env%num_pe - 1))
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          occupation(imepos) = buffer_rec(imepos)%msg(1)
 
@@ -1483,7 +1483,7 @@ CONTAINS
 
       min_occupation = MINVAL(occupation)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_send(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%msg)
       END DO
@@ -1514,7 +1514,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: one_number
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_occupation_2c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, imepos
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
@@ -1535,10 +1535,10 @@ CONTAINS
 
       local_occupation = dbcsr_get_occupation(mat_munu)
 
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          ALLOCATE (buffer_send(imepos)%msg(1))
          buffer_send(imepos)%msg(1) = local_occupation
 
@@ -1547,9 +1547,9 @@ CONTAINS
 
       IF (para_env%num_pe > 1) THEN
 
-         ALLOCATE (req_array(0:para_env%num_pe-1, 2))
+         ALLOCATE (req_array(0:para_env%num_pe - 1, 2))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             CALL mp_isend(buffer_send(imepos)%msg, imepos, para_env%group, req_array(imepos, 1), tag=2)
             CALL mp_irecv(buffer_rec(imepos)%msg, imepos, para_env%group, req_array(imepos, 2), tag=2)
          END DO
@@ -1564,9 +1564,9 @@ CONTAINS
 
       END IF
 
-      ALLOCATE (occupation(0:para_env%num_pe-1))
+      ALLOCATE (occupation(0:para_env%num_pe - 1))
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          occupation(imepos) = buffer_rec(imepos)%msg(1)
 
@@ -1576,7 +1576,7 @@ CONTAINS
 
       min_occupation = MINVAL(occupation)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_send(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%msg)
       END DO
@@ -1671,7 +1671,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
       LOGICAL, ALLOCATABLE, DIMENSION(:, :, :)           :: cycle_due_to_sparse_dm
       INTEGER, DIMENSION(:) :: starts_array_cm_mao_occ, starts_array_cm_mao_virt, &
-         ends_array_cm_mao_occ, ends_array_cm_mao_virt, my_group_L_sizes_im_time
+                               ends_array_cm_mao_occ, ends_array_cm_mao_virt, my_group_L_sizes_im_time
       INTEGER                                            :: cut_memory, cut_RI, jquad
       LOGICAL                                            :: do_mao
       REAL(KIND=dp)                                      :: stabilize_exp
@@ -1682,7 +1682,7 @@ CONTAINS
       LOGICAL, ALLOCATABLE, DIMENSION(:)                 :: does_mat_P_T_tau_have_blocks
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_mat_dm_global', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_global, iiB, iquad, jjB, &
                                                             ncol_local, nmao_occ, nmao_virt, &
@@ -1733,9 +1733,9 @@ CONTAINS
 
                ! hard coded: exponential function gets NaN if argument is negative with large absolute value
                ! use 69, since e^(-69) = 10^(-30) which should be sufficiently small that it does not matter
-               IF (ABS(tau*0.5_dp*(Eigenval(i_global)-e_fermi)) < stabilize_exp) THEN
+               IF (ABS(tau*0.5_dp*(Eigenval(i_global) - e_fermi)) < stabilize_exp) THEN
                   fm_mo_coeff_occ_scaled%local_data(jjB, iiB) = &
-                     fm_mo_coeff_occ%local_data(jjB, iiB)*EXP(tau*0.5_dp*(Eigenval(i_global)-e_fermi))
+                     fm_mo_coeff_occ%local_data(jjB, iiB)*EXP(tau*0.5_dp*(Eigenval(i_global) - e_fermi))
                ELSE
                   fm_mo_coeff_occ_scaled%local_data(jjB, iiB) = 0.0_dp
                END IF
@@ -1755,9 +1755,9 @@ CONTAINS
             DO iiB = 1, ncol_local
                i_global = col_indices(iiB)
 
-               IF (ABS(tau*0.5_dp*(Eigenval(i_global)-e_fermi)) < stabilize_exp) THEN
+               IF (ABS(tau*0.5_dp*(Eigenval(i_global) - e_fermi)) < stabilize_exp) THEN
                   fm_mo_coeff_virt_scaled%local_data(jjB, iiB) = &
-                     fm_mo_coeff_virt%local_data(jjB, iiB)*EXP(-tau*0.5_dp*(Eigenval(i_global)-e_fermi))
+                     fm_mo_coeff_virt%local_data(jjB, iiB)*EXP(-tau*0.5_dp*(Eigenval(i_global) - e_fermi))
                ELSE
                   fm_mo_coeff_virt_scaled%local_data(jjB, iiB) = 0.0_dp
                END IF
@@ -1842,10 +1842,10 @@ CONTAINS
 
          ! release memory
          IF (jquad > 1) THEN
-            CALL dbcsr_set(mat_dm_occ_global(jquad-1, 1)%matrix, 0.0_dp)
-            CALL dbcsr_set(mat_dm_virt_global(jquad-1, 1)%matrix, 0.0_dp)
-            CALL dbcsr_filter(mat_dm_occ_global(jquad-1, 1)%matrix, 0.0_dp)
-            CALL dbcsr_filter(mat_dm_virt_global(jquad-1, 1)%matrix, 0.0_dp)
+            CALL dbcsr_set(mat_dm_occ_global(jquad - 1, 1)%matrix, 0.0_dp)
+            CALL dbcsr_set(mat_dm_virt_global(jquad - 1, 1)%matrix, 0.0_dp)
+            CALL dbcsr_filter(mat_dm_occ_global(jquad - 1, 1)%matrix, 0.0_dp)
+            CALL dbcsr_filter(mat_dm_virt_global(jquad - 1, 1)%matrix, 0.0_dp)
          END IF
 
          CALL get_cycle_due_to_sparse_dm(cycle_due_to_sparse_dm, mat_dm_occ_global, mat_dm_virt_global, &
@@ -1864,7 +1864,7 @@ CONTAINS
       END IF ! do kpoints
 
       IF (jquad == 1) THEN
-         ALLOCATE (does_mat_P_T_tau_have_blocks(num_cells_dm/2+1))
+         ALLOCATE (does_mat_P_T_tau_have_blocks(num_cells_dm/2 + 1))
          does_mat_P_T_tau_have_blocks(:) = .TRUE.
       END IF
 
@@ -1900,19 +1900,19 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:, :, :, :), POINTER :: mat_3c_overl_int_cut
       INTEGER                                            :: num_integ_points, cut_memory, cut_RI
       INTEGER, DIMENSION(:) :: starts_array_cm_mao_occ, starts_array_cm_mao_virt, &
-         ends_array_cm_mao_occ, ends_array_cm_mao_virt, my_group_L_sizes_im_time
+                               ends_array_cm_mao_occ, ends_array_cm_mao_virt, my_group_L_sizes_im_time
       TYPE(cp_para_env_type), POINTER                    :: para_env
       INTEGER                                            :: jquad
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_cycle_due_to_sparse_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: col, col_offset, col_size, handle, &
                                                             i_cut_RI, i_mem, j_mem, &
                                                             my_group_L_size, natom, row, &
                                                             row_offset, row_size
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :) :: cycle_combined, cycle_due_to_sparse_dm_occ_tmp, &
-         cycle_due_to_sparse_dm_virt_tmp, non_zero_blocks_in_dm_occ, non_zero_blocks_in_dm_virt
+                                              cycle_due_to_sparse_dm_virt_tmp, non_zero_blocks_in_dm_occ, non_zero_blocks_in_dm_virt
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_block
       TYPE(dbcsr_iterator_type)                          :: iter
 
@@ -1958,7 +1958,7 @@ CONTAINS
                DO j_mem = 1, cut_memory
 
                   ! check whether row index is restricted due to mem_cut and col index due to sparse virt dm
-                  IF (row_offset+row_size-1 >= starts_array_cm_mao_virt(i_mem) .AND. &
+                  IF (row_offset + row_size - 1 >= starts_array_cm_mao_virt(i_mem) .AND. &
                       row_offset < ends_array_cm_mao_virt(i_mem) .AND. &
                       ANY(non_zero_blocks_in_dm_virt(jquad, j_mem, :) == col)) THEN
 
@@ -1968,7 +1968,7 @@ CONTAINS
 
                   ! check whether row index is restricted due to sparse occ dm and col index due to j_mem
                   ! use the fact that mat_3c_overl_int_cut is symmetric (neglecting the combined col index)
-                  IF (row_offset+row_size-1 >= starts_array_cm_mao_occ(i_mem) .AND. &
+                  IF (row_offset + row_size - 1 >= starts_array_cm_mao_occ(i_mem) .AND. &
                       row_offset < ends_array_cm_mao_occ(i_mem) .AND. &
                       ANY(non_zero_blocks_in_dm_occ(jquad, j_mem, :) == col)) THEN
 
@@ -2006,7 +2006,7 @@ CONTAINS
       ALLOCATE (cycle_combined(cut_memory, cut_memory, num_integ_points))
       cycle_combined = 0
 
-      cycle_combined(:, :, :) = cycle_due_to_sparse_dm_occ_tmp(:, :, :)+ &
+      cycle_combined(:, :, :) = cycle_due_to_sparse_dm_occ_tmp(:, :, :) + &
                                 cycle_due_to_sparse_dm_virt_tmp(:, :, :)
 
       DO i_mem = 1, cut_memory
@@ -2051,7 +2051,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_non_zero_blocks_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: col, handle, i_mem, row, row_offset, &
                                                             row_size
@@ -2069,7 +2069,7 @@ CONTAINS
          DO i_mem = 1, cut_memory
 
             ! check whether block is in the range of the memory cutoff
-            IF (row_offset+row_size-1 >= starts_array_cm(i_mem) .AND. row_offset < ends_array_cm(i_mem)) THEN
+            IF (row_offset + row_size - 1 >= starts_array_cm(i_mem) .AND. row_offset < ends_array_cm(i_mem)) THEN
 
                ! 1 means that the block is there
                non_zero_blocks_in_dm(jquad, i_mem, col) = 1
@@ -2151,30 +2151,30 @@ CONTAINS
       INTEGER                                            :: n_group_col, cut_RI
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: row_from_LLL
       INTEGER, ALLOCATABLE, DIMENSION(:, :) :: starts_array_prim_row, ends_array_prim_row, &
-         starts_array_prim_col, ends_array_prim_col, offset_combi_block, &
-         starts_array_prim_fullcol, ends_array_prim_fullcol, starts_array_prim_fullrow, &
-         ends_array_prim_fullrow
+                                               starts_array_prim_col, ends_array_prim_col, offset_combi_block, &
+                                               starts_array_prim_fullcol, ends_array_prim_fullcol, starts_array_prim_fullrow, &
+                                               ends_array_prim_fullrow
       INTEGER                                            :: group_size_P, i_mem, j_mem
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: buffer_mat_M
       REAL(KIND=dp)                                      :: eps_filter_im_time
       LOGICAL                                            :: do_occ, do_virt
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fill_mat_M_P_munu_from_M_mu_Pnu', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: block, block_counter_int, block_size, col, col_end_in_data_block, col_offset, &
-         col_offset_data_block, col_offset_orig, col_offset_prim, col_offset_rec_prim, &
-         col_rec_prim, col_rec_prim_rel, col_size, col_size_in_data_block, col_size_orig, &
-         col_size_to_send, col_start_in_data_block, color_sub_col, color_sub_P, color_sub_row, &
-         end_col, end_row, handle, handle1, i_cut_RI, imepos, LLL, mepos_P, my_group_L_size, &
-         my_group_L_start, n_entries_rec, num_blocks, offset, offset_rec, old_block, rec_counter, &
-         row, row_end_in_data_block, row_offset, row_offset_data_block, row_offset_prim
+                 col_offset_data_block, col_offset_orig, col_offset_prim, col_offset_rec_prim, &
+                 col_rec_prim, col_rec_prim_rel, col_size, col_size_in_data_block, col_size_orig, &
+                 col_size_to_send, col_start_in_data_block, color_sub_col, color_sub_P, color_sub_row, &
+                 end_col, end_row, handle, handle1, i_cut_RI, imepos, LLL, mepos_P, my_group_L_size, &
+                 my_group_L_start, n_entries_rec, num_blocks, offset, offset_rec, old_block, rec_counter, &
+                 row, row_end_in_data_block, row_offset, row_offset_data_block, row_offset_prim
       INTEGER :: row_offset_rec_prim, row_rec_prim, row_rec_prim_rel, row_size, &
-         row_size_in_data_block, row_size_to_send, row_start_in_data_block, send_counter, &
-         start_col, start_row
+                 row_size_in_data_block, row_size_to_send, row_start_in_data_block, send_counter, &
+                 start_col, start_row
       INTEGER, ALLOCATABLE, DIMENSION(:) :: block_counter, cols_to_allocate, entry_counter, &
-         num_blocks_rec, num_blocks_send, num_entries_rec, num_entries_send, rows_to_allocate, &
-         sizes_rec, sizes_send
+                                            num_blocks_rec, num_blocks_send, num_entries_rec, num_entries_send, rows_to_allocate, &
+                                            sizes_rec, sizes_send
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
       LOGICAL                                            :: is_new_block
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_block
@@ -2192,10 +2192,10 @@ CONTAINS
 
       NULLIFY (data_block)
 
-      ALLOCATE (num_entries_send(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_send(0:para_env%num_pe - 1))
       num_entries_send(:) = 0
 
-      ALLOCATE (num_blocks_send(0:para_env%num_pe-1))
+      ALLOCATE (num_blocks_send(0:para_env%num_pe - 1))
       num_blocks_send(:) = 0
 
       CALL timestop(handle1)
@@ -2216,7 +2216,7 @@ CONTAINS
                                            row_offset=row_offset, col_offset=col_offset)
 
             ! process to send to
-            DO imepos = 0, para_env%num_pe-1
+            DO imepos = 0, para_env%num_pe - 1
 
                color_sub_P = imepos/group_size_P
                mepos_P = MODULO(imepos, group_size_P)
@@ -2235,19 +2235,19 @@ CONTAINS
 
                         start_row = starts_array_prim_fullrow(color_sub_row, i_mem)
                         end_row = ends_array_prim_fullrow(color_sub_row, i_mem)
-                        row_size_to_send = end_row-start_row+1
+                        row_size_to_send = end_row - start_row + 1
 
                      ELSE IF (row == starts_array_prim_row(color_sub_row, i_mem)) THEN
 
                         start_row = starts_array_prim_fullrow(color_sub_row, i_mem)
-                        end_row = row_offset+row_size-1
-                        row_size_to_send = end_row-start_row+1
+                        end_row = row_offset + row_size - 1
+                        row_size_to_send = end_row - start_row + 1
 
                      ELSE IF (row == ends_array_prim_row(color_sub_row, i_mem)) THEN
 
                         start_row = row_offset
                         end_row = ends_array_prim_fullrow(color_sub_row, i_mem)
-                        row_size_to_send = end_row-start_row+1
+                        row_size_to_send = end_row - start_row + 1
 
                      ELSE
 
@@ -2258,21 +2258,21 @@ CONTAINS
                      IF (col == starts_array_prim_col(color_sub_col, j_mem) .AND. &
                          col == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
-                        start_col = (starts_array_prim_fullcol(color_sub_col, j_mem)-1)*my_group_L_size+1
+                        start_col = (starts_array_prim_fullcol(color_sub_col, j_mem) - 1)*my_group_L_size + 1
                         end_col = ends_array_prim_fullcol(color_sub_col, j_mem)*my_group_L_size
-                        col_size_to_send = end_col-start_col+1
+                        col_size_to_send = end_col - start_col + 1
 
                      ELSE IF (col == starts_array_prim_col(color_sub_col, j_mem)) THEN
 
-                        start_col = (starts_array_prim_fullcol(color_sub_col, j_mem)-1)*my_group_L_size+1
-                        end_col = col_offset+col_size-1
-                        col_size_to_send = end_col-start_col+1
+                        start_col = (starts_array_prim_fullcol(color_sub_col, j_mem) - 1)*my_group_L_size + 1
+                        end_col = col_offset + col_size - 1
+                        col_size_to_send = end_col - start_col + 1
 
                      ELSE IF (col == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
                         start_col = col_offset
                         end_col = ends_array_prim_fullcol(color_sub_col, j_mem)*my_group_L_size
-                        col_size_to_send = end_col-start_col+1
+                        col_size_to_send = end_col - start_col + 1
 
                      ELSE
 
@@ -2282,12 +2282,12 @@ CONTAINS
 
                      DO LLL = 1, my_group_L_size
 
-                        IF (mepos_P == mepos_P_from_RI_row(row_from_LLL(LLL+my_group_L_start-1))) THEN
+                        IF (mepos_P == mepos_P_from_RI_row(row_from_LLL(LLL + my_group_L_start - 1))) THEN
 
-                           num_entries_send(imepos) = num_entries_send(imepos)+ &
+                           num_entries_send(imepos) = num_entries_send(imepos) + &
                                                       row_size_to_send*col_size_to_send/my_group_L_size
 
-                           num_blocks_send(imepos) = num_blocks_send(imepos)+1
+                           num_blocks_send(imepos) = num_blocks_send(imepos) + 1
 
                         END IF
 
@@ -2302,7 +2302,7 @@ CONTAINS
 
                   !             col_offset_orig = col_offset/my_group_L_size
 
-                  col_offset_orig = (col_offset-1)/my_group_L_size+1
+                  col_offset_orig = (col_offset - 1)/my_group_L_size + 1
 
                   IF (col >= starts_array_prim_row(color_sub_row, i_mem) .AND. &
                       col <= ends_array_prim_row(color_sub_row, i_mem) .AND. &
@@ -2314,19 +2314,19 @@ CONTAINS
 
                         start_col = starts_array_prim_fullrow(color_sub_row, i_mem)
                         end_col = ends_array_prim_fullrow(color_sub_row, i_mem)
-                        col_size_to_send = (end_col-start_col+1)*my_group_L_size
+                        col_size_to_send = (end_col - start_col + 1)*my_group_L_size
 
                      ELSE IF (col == starts_array_prim_row(color_sub_row, i_mem)) THEN
 
                         start_col = starts_array_prim_fullrow(color_sub_row, i_mem)
-                        end_col = col_offset_orig+col_size_orig-1
-                        col_size_to_send = (end_col-start_col+1)*my_group_L_size
+                        end_col = col_offset_orig + col_size_orig - 1
+                        col_size_to_send = (end_col - start_col + 1)*my_group_L_size
 
                      ELSE IF (col == ends_array_prim_row(color_sub_row, i_mem)) THEN
 
                         start_col = col_offset_orig
                         end_col = ends_array_prim_fullrow(color_sub_row, i_mem)
-                        col_size_to_send = (end_col-start_col+1)*my_group_L_size
+                        col_size_to_send = (end_col - start_col + 1)*my_group_L_size
 
                      ELSE
 
@@ -2339,19 +2339,19 @@ CONTAINS
 
                         start_row = starts_array_prim_fullcol(color_sub_col, j_mem)
                         end_row = ends_array_prim_fullcol(color_sub_col, j_mem)
-                        row_size_to_send = end_row-start_row+1
+                        row_size_to_send = end_row - start_row + 1
 
                      ELSE IF (row == starts_array_prim_col(color_sub_col, j_mem)) THEN
 
                         start_row = starts_array_prim_fullcol(color_sub_col, j_mem)
-                        end_row = row_offset+row_size-1
-                        row_size_to_send = end_row-start_row+1
+                        end_row = row_offset + row_size - 1
+                        row_size_to_send = end_row - start_row + 1
 
                      ELSE IF (row == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
                         start_row = row_offset
                         end_row = ends_array_prim_fullcol(color_sub_col, j_mem)
-                        row_size_to_send = end_row-start_row+1
+                        row_size_to_send = end_row - start_row + 1
 
                      ELSE
 
@@ -2361,12 +2361,12 @@ CONTAINS
 
                      DO LLL = 1, my_group_L_size
 
-                        IF (mepos_P == mepos_P_from_RI_row(row_from_LLL(LLL+my_group_L_start-1))) THEN
+                        IF (mepos_P == mepos_P_from_RI_row(row_from_LLL(LLL + my_group_L_start - 1))) THEN
 
-                           num_entries_send(imepos) = num_entries_send(imepos)+ &
+                           num_entries_send(imepos) = num_entries_send(imepos) + &
                                                       row_size_to_send*col_size_to_send/my_group_L_size
 
-                           num_blocks_send(imepos) = num_blocks_send(imepos)+1
+                           num_blocks_send(imepos) = num_blocks_send(imepos) + 1
 
                         END IF
 
@@ -2391,27 +2391,27 @@ CONTAINS
 
       CALL timeset("send_sizes_M", handle1)
 
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
-      ALLOCATE (num_entries_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_blocks_rec(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_blocks_rec(0:para_env%num_pe - 1))
 
       IF (para_env%num_pe > 1) THEN
 
-         ALLOCATE (sizes_rec(0:2*para_env%num_pe-1))
-         ALLOCATE (sizes_send(0:2*para_env%num_pe-1))
+         ALLOCATE (sizes_rec(0:2*para_env%num_pe - 1))
+         ALLOCATE (sizes_send(0:2*para_env%num_pe - 1))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             sizes_send(2*imepos) = num_entries_send(imepos)
-            sizes_send(2*imepos+1) = num_blocks_send(imepos)
+            sizes_send(2*imepos + 1) = num_blocks_send(imepos)
          END DO
 
          CALL mp_alltoall(sizes_send, sizes_rec, 2, para_env%group)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             num_entries_rec(imepos) = sizes_rec(2*imepos)
-            num_blocks_rec(imepos) = sizes_rec(2*imepos+1)
+            num_blocks_rec(imepos) = sizes_rec(2*imepos + 1)
          END DO
 
          DEALLOCATE (sizes_rec, sizes_send)
@@ -2428,7 +2428,7 @@ CONTAINS
       CALL timeset("fill_buffer_send_M", handle1)
 
       ! allocate data message and corresponding indices
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(imepos)%msg(num_entries_rec(imepos)))
          buffer_rec(imepos)%msg = 0.0_dp
@@ -2444,10 +2444,10 @@ CONTAINS
 
       END DO
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
-      ALLOCATE (block_counter(0:para_env%num_pe-1))
+      ALLOCATE (block_counter(0:para_env%num_pe - 1))
       block_counter(:) = 0
 
       DO i_cut_RI = 1, cut_RI
@@ -2463,7 +2463,7 @@ CONTAINS
                                            row_size=row_size, col_size=col_size, &
                                            row_offset=row_offset, col_offset=col_offset)
 
-            DO imepos = 0, para_env%num_pe-1
+            DO imepos = 0, para_env%num_pe - 1
 
 !             color_sub_row = imepos/n_group_col
 !             color_sub_col = MODULO(imepos,n_group_col)
@@ -2486,20 +2486,20 @@ CONTAINS
                      IF (row == starts_array_prim_row(color_sub_row, i_mem) .AND. &
                          row == ends_array_prim_row(color_sub_row, i_mem)) THEN
 
-                        row_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem)-row_offset+1
-                        row_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem)-row_offset+1
+                        row_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem) - row_offset + 1
+                        row_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem) - row_offset + 1
 
                      ELSE IF (row == starts_array_prim_row(color_sub_row, i_mem) .AND. &
                               row .NE. ends_array_prim_row(color_sub_row, i_mem)) THEN
 
-                        row_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem)-row_offset+1
+                        row_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem) - row_offset + 1
                         row_end_in_data_block = row_size
 
                      ELSE IF (row .NE. starts_array_prim_row(color_sub_row, i_mem) .AND. &
                               row == ends_array_prim_row(color_sub_row, i_mem)) THEN
 
                         row_start_in_data_block = 1
-                        row_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem)-row_offset+1
+                        row_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem) - row_offset + 1
 
                      ELSE
 
@@ -2509,28 +2509,28 @@ CONTAINS
 
                      END IF
 
-                     row_size_in_data_block = row_end_in_data_block-row_start_in_data_block+1
+                     row_size_in_data_block = row_end_in_data_block - row_start_in_data_block + 1
 
-                     col_offset_orig = (col_offset-1)/my_group_L_size+1
+                     col_offset_orig = (col_offset - 1)/my_group_L_size + 1
 
                      ! For terminal blocks, we have to compute the sizes
                      IF (col == starts_array_prim_col(color_sub_col, j_mem) .AND. &
                          col == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
-                        col_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem)-col_offset_orig+1
-                        col_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem)-col_offset_orig+1
+                        col_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem) - col_offset_orig + 1
+                        col_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem) - col_offset_orig + 1
 
                      ELSE IF (col == starts_array_prim_col(color_sub_col, j_mem) .AND. &
                               col .NE. ends_array_prim_col(color_sub_col, j_mem)) THEN
 
-                        col_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem)-col_offset_orig+1
+                        col_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem) - col_offset_orig + 1
                         col_end_in_data_block = col_size_orig
 
                      ELSE IF (col .NE. starts_array_prim_col(color_sub_col, j_mem) .AND. &
                               col == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
                         col_start_in_data_block = 1
-                        col_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem)-col_offset_orig+1
+                        col_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem) - col_offset_orig + 1
 
                      ELSE
 
@@ -2539,26 +2539,26 @@ CONTAINS
 
                      END IF
 
-                     col_size_in_data_block = col_end_in_data_block-col_start_in_data_block+1
+                     col_size_in_data_block = col_end_in_data_block - col_start_in_data_block + 1
 
                      block_size = row_size_in_data_block*col_size_in_data_block
 
                      DO LLL = 1, my_group_L_size
 
-                        IF (mepos_P .NE. mepos_P_from_RI_row(row_from_LLL(LLL+my_group_L_start-1))) CYCLE
+                        IF (mepos_P .NE. mepos_P_from_RI_row(row_from_LLL(LLL + my_group_L_start - 1))) CYCLE
 
                         offset = entry_counter(imepos)
 
-                        col_offset_data_block = (LLL-1)*col_size_orig+col_start_in_data_block
+                        col_offset_data_block = (LLL - 1)*col_size_orig + col_start_in_data_block
 
-                        buffer_send(imepos)%msg(offset+1:offset+block_size) = &
+                        buffer_send(imepos)%msg(offset + 1:offset + block_size) = &
                            RESHAPE(data_block(row_start_in_data_block:row_end_in_data_block, &
-                                              col_offset_data_block:col_offset_data_block+col_size_in_data_block-1), &
+                                              col_offset_data_block:col_offset_data_block + col_size_in_data_block - 1), &
                                    (/block_size/))
 
-                        block = block_counter(imepos)+1
+                        block = block_counter(imepos) + 1
 
-                        buffer_send(imepos)%indx(block, 1) = LLL+my_group_L_start-1
+                        buffer_send(imepos)%indx(block, 1) = LLL + my_group_L_start - 1
                         buffer_send(imepos)%indx(block, 2) = row
                         buffer_send(imepos)%indx(block, 3) = row_offset
                         buffer_send(imepos)%indx(block, 4) = row_size
@@ -2568,9 +2568,9 @@ CONTAINS
                         buffer_send(imepos)%indx(block, 8) = offset
                         buffer_send(imepos)%indx(block, 9) = block_size
 
-                        entry_counter(imepos) = entry_counter(imepos)+block_size
+                        entry_counter(imepos) = entry_counter(imepos) + block_size
 
-                        block_counter(imepos) = block_counter(imepos)+1
+                        block_counter(imepos) = block_counter(imepos) + 1
 
                      END DO
 
@@ -2585,26 +2585,26 @@ CONTAINS
 
                      col_size_orig = col_size/my_group_L_size
 
-                     col_offset_orig = (col_offset-1)/my_group_L_size+1
+                     col_offset_orig = (col_offset - 1)/my_group_L_size + 1
 
                      ! For terminal blocks, we have to compute the sizes
                      IF (col == starts_array_prim_row(color_sub_row, i_mem) .AND. &
                          col == ends_array_prim_row(color_sub_row, i_mem)) THEN
 
-                        col_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem)-col_offset_orig+1
-                        col_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem)-col_offset_orig+1
+                        col_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem) - col_offset_orig + 1
+                        col_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem) - col_offset_orig + 1
 
                      ELSE IF (col == starts_array_prim_row(color_sub_row, i_mem) .AND. &
                               col .NE. ends_array_prim_row(color_sub_row, i_mem)) THEN
 
-                        col_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem)-col_offset_orig+1
+                        col_start_in_data_block = starts_array_prim_fullrow(color_sub_row, i_mem) - col_offset_orig + 1
                         col_end_in_data_block = col_size_orig
 
                      ELSE IF (col .NE. starts_array_prim_row(color_sub_row, i_mem) .AND. &
                               col == ends_array_prim_row(color_sub_row, i_mem)) THEN
 
                         col_start_in_data_block = 1
-                        col_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem)-col_offset_orig+1
+                        col_end_in_data_block = ends_array_prim_fullrow(color_sub_row, i_mem) - col_offset_orig + 1
 
                      ELSE
 
@@ -2613,26 +2613,26 @@ CONTAINS
 
                      END IF
 
-                     col_size_in_data_block = col_end_in_data_block-col_start_in_data_block+1
+                     col_size_in_data_block = col_end_in_data_block - col_start_in_data_block + 1
 
                      ! For terminal blocks, we have to compute the sizes
                      IF (row == starts_array_prim_col(color_sub_col, j_mem) .AND. &
                          row == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
-                        row_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem)-row_offset+1
-                        row_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem)-row_offset+1
+                        row_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem) - row_offset + 1
+                        row_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem) - row_offset + 1
 
                      ELSE IF (row == starts_array_prim_col(color_sub_col, j_mem) .AND. &
                               row .NE. ends_array_prim_col(color_sub_col, j_mem)) THEN
 
-                        row_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem)-row_offset+1
+                        row_start_in_data_block = starts_array_prim_fullcol(color_sub_col, j_mem) - row_offset + 1
                         row_end_in_data_block = row_size
 
                      ELSE IF (row .NE. starts_array_prim_col(color_sub_col, j_mem) .AND. &
                               row == ends_array_prim_col(color_sub_col, j_mem)) THEN
 
                         row_start_in_data_block = 1
-                        row_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem)-row_offset+1
+                        row_end_in_data_block = ends_array_prim_fullcol(color_sub_col, j_mem) - row_offset + 1
 
                      ELSE
 
@@ -2642,27 +2642,27 @@ CONTAINS
 
                      END IF
 
-                     row_size_in_data_block = row_end_in_data_block-row_start_in_data_block+1
+                     row_size_in_data_block = row_end_in_data_block - row_start_in_data_block + 1
 
                      block_size = row_size_in_data_block*col_size_in_data_block
 
                      DO LLL = 1, my_group_L_size
 
-                        IF (mepos_P .NE. mepos_P_from_RI_row(row_from_LLL(LLL+my_group_L_start-1))) CYCLE
+                        IF (mepos_P .NE. mepos_P_from_RI_row(row_from_LLL(LLL + my_group_L_start - 1))) CYCLE
 
                         offset = entry_counter(imepos)
 
-                        col_offset_data_block = (LLL-1)*col_size_orig+col_start_in_data_block
+                        col_offset_data_block = (LLL - 1)*col_size_orig + col_start_in_data_block
 
-                        buffer_send(imepos)%msg(offset+1:offset+block_size) = &
+                        buffer_send(imepos)%msg(offset + 1:offset + block_size) = &
                            RESHAPE(TRANSPOSE(data_block(row_start_in_data_block:row_end_in_data_block, &
-                                                        col_offset_data_block:col_offset_data_block+ &
-                                                        col_size_in_data_block-1)), &
+                                                        col_offset_data_block:col_offset_data_block + &
+                                                        col_size_in_data_block - 1)), &
                                    (/block_size/))
 
-                        block = block_counter(imepos)+1
+                        block = block_counter(imepos) + 1
 
-                        buffer_send(imepos)%indx(block, 1) = LLL+my_group_L_start-1
+                        buffer_send(imepos)%indx(block, 1) = LLL + my_group_L_start - 1
                         buffer_send(imepos)%indx(block, 2) = col
                         buffer_send(imepos)%indx(block, 3) = col_offset
                         buffer_send(imepos)%indx(block, 4) = col_size_orig
@@ -2672,9 +2672,9 @@ CONTAINS
                         buffer_send(imepos)%indx(block, 8) = offset
                         buffer_send(imepos)%indx(block, 9) = block_size
 
-                        entry_counter(imepos) = entry_counter(imepos)+block_size
+                        entry_counter(imepos) = entry_counter(imepos) + block_size
 
-                        block_counter(imepos) = block_counter(imepos)+1
+                        block_counter(imepos) = block_counter(imepos) + 1
 
                      END DO
 
@@ -2706,9 +2706,9 @@ CONTAINS
          send_counter = 0
          rec_counter = 0
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             IF (num_entries_rec(imepos) > 0) THEN
-               rec_counter = rec_counter+1
+               rec_counter = rec_counter + 1
                CALL mp_irecv(buffer_rec(imepos)%indx, imepos, para_env%group, req_array(rec_counter, 3), tag=4)
             END IF
             IF (num_entries_rec(imepos) > 0) THEN
@@ -2716,9 +2716,9 @@ CONTAINS
             END IF
          END DO
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             IF (num_entries_send(imepos) > 0) THEN
-               send_counter = send_counter+1
+               send_counter = send_counter + 1
                CALL mp_isend(buffer_send(imepos)%indx, imepos, para_env%group, req_array(send_counter, 1), tag=4)
             END IF
             IF (num_entries_send(imepos) > 0) THEN
@@ -2736,7 +2736,7 @@ CONTAINS
 
       END IF
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_send(imepos)%msg)
          DEALLOCATE (buffer_send(imepos)%indx)
       END DO
@@ -2748,9 +2748,9 @@ CONTAINS
       num_blocks = 0
 
       ! get the number of blocks, which have to be allocated
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
-         num_blocks = num_blocks+num_blocks_rec(imepos)
+         num_blocks = num_blocks + num_blocks_rec(imepos)
 
       END DO
 
@@ -2761,7 +2761,7 @@ CONTAINS
 
       block_counter_int = 0
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          DO block = 1, num_blocks_rec(imepos)
 
@@ -2780,7 +2780,7 @@ CONTAINS
 
             IF (is_new_block .AND. buffer_rec(imepos)%indx(block, 1) .NE. 0) THEN
 
-               block_counter_int = block_counter_int+1
+               block_counter_int = block_counter_int + 1
 
                rows_to_allocate(block_counter_int) = row_from_LLL(buffer_rec(imepos)%indx(block, 1))
 
@@ -2825,13 +2825,13 @@ CONTAINS
 
          buffer_mat_M(:, :) = 0.0_dp
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             DO block = 1, num_blocks_rec(imepos)
 
                LLL = buffer_rec(imepos)%indx(block, 1)
 
-               IF (LLL >= row_offset .AND. LLL < row_offset+row_size) THEN
+               IF (LLL >= row_offset .AND. LLL < row_offset + row_size) THEN
 
                   row_rec_prim = buffer_rec(imepos)%indx(block, 2)
                   row_offset_rec_prim = buffer_rec(imepos)%indx(block, 3)
@@ -2840,15 +2840,15 @@ CONTAINS
                   offset_rec = buffer_rec(imepos)%indx(block, 8)
                   block_size = buffer_rec(imepos)%indx(block, 9)
 
-                  row_rec_prim_rel = row_rec_prim-row_offset_prim+1
-                  col_rec_prim_rel = col_rec_prim-col_offset_prim+1
+                  row_rec_prim_rel = row_rec_prim - row_offset_prim + 1
+                  col_rec_prim_rel = col_rec_prim - col_offset_prim + 1
 
-                  row_offset_data_block = LLL-row_offset
+                  row_offset_data_block = LLL - row_offset
 
                   col_offset_data_block = offset_combi_block(row_rec_prim, col_rec_prim)
 
-                  buffer_mat_M(row_offset_data_block+1, col_offset_data_block+1:col_offset_data_block+block_size) = &
-                     buffer_rec(imepos)%msg(offset_rec+1:offset_rec+block_size)
+                  buffer_mat_M(row_offset_data_block + 1, col_offset_data_block + 1:col_offset_data_block + block_size) = &
+                     buffer_rec(imepos)%msg(offset_rec + 1:offset_rec + block_size)
 
                END IF
 
@@ -2864,7 +2864,7 @@ CONTAINS
 
       CALL dbcsr_filter(mat_M_P_munu%matrix, eps_filter_im_time)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%indx)
       END DO
@@ -2904,10 +2904,10 @@ CONTAINS
       REAL(KIND=dp)                                      :: eps_filter
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'setup_mat_for_mem_cut_3c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: blk, col, col_end_in_data_block, col_offset, col_size, col_start_in_data_block, &
-         handle, i_cell, i_cut_RI, i_mem, j_cell, my_group_L_size, num_3c_repl, row
+                 handle, i_cell, i_cut_RI, i_mem, j_cell, my_group_L_size, num_3c_repl, row
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_block
       TYPE(dbcsr_iterator_type)                          :: iter
 
@@ -2939,27 +2939,27 @@ CONTAINS
 
                      ! set the block to zero if it is outside the range for cutting the mu-sigma combined index
                      IF (col_offset > ends_array_cm(i_mem)*my_group_L_size .OR. &
-                         col_offset+col_size-1 < (starts_array_cm(i_mem)-1)*my_group_L_size+1) THEN
+                         col_offset + col_size - 1 < (starts_array_cm(i_mem) - 1)*my_group_L_size + 1) THEN
 
                         data_block = 0.0_dp
 
                      END IF
 
                      IF (col_offset >= ends_array_cm(i_mem)*my_group_L_size .AND. &
-                         col_offset+col_size-1 < ends_array_cm(i_mem)*my_group_L_size) THEN
+                         col_offset + col_size - 1 < ends_array_cm(i_mem)*my_group_L_size) THEN
 
-                        col_end_in_data_block = ends_array_cm(i_mem)*my_group_L_size-col_offset+1
+                        col_end_in_data_block = ends_array_cm(i_mem)*my_group_L_size - col_offset + 1
 
-                        data_block(:, col_end_in_data_block+1:col_size) = 0.0_dp
+                        data_block(:, col_end_in_data_block + 1:col_size) = 0.0_dp
 
                      END IF
 
-                     IF (col_offset > (starts_array_cm(i_mem)-1)*my_group_L_size+1 .AND. &
-                         col_offset+col_size-1 <= (starts_array_cm(i_mem)-1)*my_group_L_size+1) THEN
+                     IF (col_offset > (starts_array_cm(i_mem) - 1)*my_group_L_size + 1 .AND. &
+                         col_offset + col_size - 1 <= (starts_array_cm(i_mem) - 1)*my_group_L_size + 1) THEN
 
-                        col_start_in_data_block = (starts_array_cm(i_mem)-1)*my_group_L_size+1
+                        col_start_in_data_block = (starts_array_cm(i_mem) - 1)*my_group_L_size + 1
 
-                        data_block(:, 1:col_start_in_data_block-1) = 0.0_dp
+                        data_block(:, 1:col_start_in_data_block - 1) = 0.0_dp
 
                      END IF
 
@@ -3013,7 +3013,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: do_indx, do_msg
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'communicate_buffer', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, imepos, rec_counter, send_counter
       LOGICAL                                            :: my_do_indx, my_do_msg
@@ -3030,9 +3030,9 @@ CONTAINS
          send_counter = 0
          rec_counter = 0
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             IF (num_entries_rec(imepos) > 0) THEN
-               rec_counter = rec_counter+1
+               rec_counter = rec_counter + 1
                IF (my_do_indx) THEN
                   CALL mp_irecv(buffer_rec(imepos)%indx, imepos, para_env%group, req_array(rec_counter, 3), tag=4)
                END IF
@@ -3042,9 +3042,9 @@ CONTAINS
             END IF
          END DO
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             IF (num_entries_send(imepos) > 0) THEN
-               send_counter = send_counter+1
+               send_counter = send_counter + 1
                IF (my_do_indx) THEN
                   CALL mp_isend(buffer_send(imepos)%indx, imepos, para_env%group, req_array(send_counter, 1), tag=4)
                END IF
@@ -3126,7 +3126,7 @@ CONTAINS
       LOGICAL, OPTIONAL                                  :: do_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_mat_3c_overl_int_gw', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_cut_RI, icol_global, &
                                                             irow_global, n_level_gw, n_level_gw_ref
@@ -3150,10 +3150,10 @@ CONTAINS
 
       ! set MO coeffs to zero where
       DO irow_global = 1, nmo
-         DO icol_global = 1, homo-gw_corr_lev_occ
+         DO icol_global = 1, homo - gw_corr_lev_occ
             CALL cp_fm_set_element(fm_mat_mo_coeff_gw, irow_global, icol_global, 0.0_dp)
          END DO
-         DO icol_global = homo+gw_corr_lev_virt+1, nmo
+         DO icol_global = homo + gw_corr_lev_virt + 1, nmo
             CALL cp_fm_set_element(fm_mat_mo_coeff_gw, irow_global, icol_global, 0.0_dp)
          END DO
       END DO
@@ -3231,9 +3231,9 @@ CONTAINS
          END DO
 
          NULLIFY (mat_3c_overl_int_gw_dummy)
-         CALL dbcsr_allocate_matrix_set(mat_3c_overl_int_gw_dummy, gw_corr_lev_occ+gw_corr_lev_virt)
+         CALL dbcsr_allocate_matrix_set(mat_3c_overl_int_gw_dummy, gw_corr_lev_occ + gw_corr_lev_virt)
 
-         DO n_level_gw = 1, gw_corr_lev_occ+gw_corr_lev_virt
+         DO n_level_gw = 1, gw_corr_lev_occ + gw_corr_lev_virt
 
             ALLOCATE (mat_3c_overl_int_gw_dummy(n_level_gw)%matrix)
             CALL dbcsr_create(matrix=mat_3c_overl_int_gw_dummy(n_level_gw)%matrix, &
@@ -3274,9 +3274,9 @@ CONTAINS
 
          CALL mp_sum(norm, para_env%group)
 
-         DO n_level_gw = 1, gw_corr_lev_occ+gw_corr_lev_virt
+         DO n_level_gw = 1, gw_corr_lev_occ + gw_corr_lev_virt
 
-            n_level_gw_ref = n_level_gw+homo-gw_corr_lev_occ
+            n_level_gw_ref = n_level_gw + homo - gw_corr_lev_occ
 
             CALL dbcsr_scale(mat_3c_overl_nnP_ic_reflected(n_level_gw)%matrix, 1.0_dp/norm(n_level_gw_ref))
 
@@ -3317,7 +3317,7 @@ CONTAINS
       LOGICAL                                            :: do_ic_opt_homo_lumo
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fill_mat_3c_overl_nnP_ic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: col, col_global, col_offset, col_size, &
                                                             handle, i_col, n_level_gw, &
@@ -3336,9 +3336,9 @@ CONTAINS
                         template=mat_mo_coeff_gw, &
                         matrix_type=dbcsr_type_no_symmetry)
 
-      DO n_level_gw = 1, gw_corr_lev_occ+gw_corr_lev_virt
+      DO n_level_gw = 1, gw_corr_lev_occ + gw_corr_lev_virt
 
-         n_level_gw_ref = n_level_gw+homo-gw_corr_lev_occ
+         n_level_gw_ref = n_level_gw + homo - gw_corr_lev_occ
 
          CALL dbcsr_copy(mat_mo_coeff_gw_copy, mat_mo_coeff_gw)
 
@@ -3357,7 +3357,7 @@ CONTAINS
 
                DO i_col = 1, col_size
 
-                  col_global = i_col+col_offset-1
+                  col_global = i_col + col_offset - 1
 
                   IF (is_occ) THEN
 
@@ -3384,7 +3384,7 @@ CONTAINS
 
                DO i_col = 1, col_size
 
-                  col_global = i_col+col_offset-1
+                  col_global = i_col + col_offset - 1
 
                   IF (col_global .NE. n_level_gw_ref) THEN
 
@@ -3439,16 +3439,16 @@ CONTAINS
       INTEGER                                            :: gw_corr_lev_occ, gw_corr_lev_virt, homo
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fill_mat_3c_overl_int_gw', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: block, col, col_offset, col_offset_data_block, col_prim, col_size, col_size_orig, &
-         handle, handle1, i_block, i_col_orig, i_cut_RI, i_row_rec, imepos, imepos_dest, &
-         integer_block_counter, LLL, my_group_L_size, my_group_L_start, n_level_gw, offset, &
-         offset_buffer, old_block, RI_index_data_block, row, row_offset, row_offset_rec, row_RI, &
-         row_size, row_size_rec
+                 handle, handle1, i_block, i_col_orig, i_cut_RI, i_row_rec, imepos, imepos_dest, &
+                 integer_block_counter, LLL, my_group_L_size, my_group_L_start, n_level_gw, offset, &
+                 offset_buffer, old_block, RI_index_data_block, row, row_offset, row_offset_rec, row_RI, &
+                 row_size, row_size_rec
       INTEGER, ALLOCATABLE, DIMENSION(:) :: block_counter, cols_tmp, cols_to_allocate, &
-         entry_counter, num_blocks_rec, num_blocks_send, num_entries_rec, num_entries_send, &
-         rows_tmp, rows_to_allocate, sizes_rec, sizes_send
+                                            entry_counter, num_blocks_rec, num_blocks_send, num_entries_rec, num_entries_send, &
+                                            rows_tmp, rows_to_allocate, sizes_rec, sizes_send
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
       LOGICAL                                            :: first_cycle, is_new_block
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_block
@@ -3462,10 +3462,10 @@ CONTAINS
 
       NULLIFY (data_block)
 
-      ALLOCATE (num_entries_send(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_send(0:para_env%num_pe - 1))
       num_entries_send(:) = 0
 
-      ALLOCATE (num_blocks_send(0:para_env%num_pe-1))
+      ALLOCATE (num_blocks_send(0:para_env%num_pe - 1))
       num_blocks_send(:) = 0
 
       CALL timestop(handle1)
@@ -3485,15 +3485,15 @@ CONTAINS
                                            row_size=row_size, col_size=col_size, &
                                            row_offset=row_offset, col_offset=col_offset)
 
-            DO LLL = my_group_L_start, my_group_L_start+my_group_L_size-1
+            DO LLL = my_group_L_start, my_group_L_start + my_group_L_size - 1
 
                row_RI = row_from_LLL(LLL)
 
                CALL dbcsr_get_stored_coordinates(mat_3c_overl_int_gw(1)%matrix, row_RI, col, imepos_dest)
 
-               num_entries_send(imepos_dest) = num_entries_send(imepos_dest)+row_size*col_size/my_group_L_size
+               num_entries_send(imepos_dest) = num_entries_send(imepos_dest) + row_size*col_size/my_group_L_size
 
-               num_blocks_send(imepos_dest) = num_blocks_send(imepos_dest)+col_size/my_group_L_size
+               num_blocks_send(imepos_dest) = num_blocks_send(imepos_dest) + col_size/my_group_L_size
 
             END DO
 
@@ -3507,24 +3507,24 @@ CONTAINS
 
       CALL timeset("GW3c_send_sizes", handle1)
 
-      ALLOCATE (num_entries_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_blocks_rec(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_blocks_rec(0:para_env%num_pe - 1))
 
       IF (para_env%num_pe > 1) THEN
 
-         ALLOCATE (sizes_rec(0:2*para_env%num_pe-1))
-         ALLOCATE (sizes_send(0:2*para_env%num_pe-1))
+         ALLOCATE (sizes_rec(0:2*para_env%num_pe - 1))
+         ALLOCATE (sizes_send(0:2*para_env%num_pe - 1))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             sizes_send(2*imepos) = num_entries_send(imepos)
-            sizes_send(2*imepos+1) = num_blocks_send(imepos)
+            sizes_send(2*imepos + 1) = num_blocks_send(imepos)
          END DO
 
          CALL mp_alltoall(sizes_send, sizes_rec, 2, para_env%group)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             num_entries_rec(imepos) = sizes_rec(2*imepos)
-            num_blocks_rec(imepos) = sizes_rec(2*imepos+1)
+            num_blocks_rec(imepos) = sizes_rec(2*imepos + 1)
          END DO
 
          DEALLOCATE (sizes_rec, sizes_send)
@@ -3540,11 +3540,11 @@ CONTAINS
 
       CALL timeset("GW3c_fill_buffer_send", handle1)
 
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
       ! allocate data message and corresponding indices
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(imepos)%msg(num_entries_rec(imepos)))
          buffer_rec(imepos)%msg = 0.0_dp
@@ -3560,10 +3560,10 @@ CONTAINS
 
       END DO
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
-      ALLOCATE (block_counter(0:para_env%num_pe-1))
+      ALLOCATE (block_counter(0:para_env%num_pe - 1))
       block_counter(:) = 0
 
       DO i_cut_RI = 1, cut_RI
@@ -3579,7 +3579,7 @@ CONTAINS
                                            row_size=row_size, col_size=col_size, &
                                            row_offset=row_offset, col_offset=col_offset)
 
-            DO LLL = my_group_L_start, my_group_L_start+my_group_L_size-1
+            DO LLL = my_group_L_start, my_group_L_start + my_group_L_size - 1
 
                row_RI = row_from_LLL(LLL)
 
@@ -3588,18 +3588,18 @@ CONTAINS
 
                col_size_orig = col_size/my_group_L_size
 
-               col_offset_data_block = (LLL-my_group_L_start)*col_size_orig+1
+               col_offset_data_block = (LLL - my_group_L_start)*col_size_orig + 1
 
                DO i_col_orig = 1, col_size_orig
 
-                  block = block_counter(imepos_dest)+1
+                  block = block_counter(imepos_dest) + 1
 
                   CALL dbcsr_get_stored_coordinates(mat_3c_overl_int_gw(1)%matrix, row_RI, col, imepos_dest)
 
                   offset = entry_counter(imepos_dest)
 
-                  buffer_send(imepos_dest)%msg(offset+1:offset+row_size) = &
-                     data_block(1:row_size, col_offset_data_block+i_col_orig-1)
+                  buffer_send(imepos_dest)%msg(offset + 1:offset + row_size) = &
+                     data_block(1:row_size, col_offset_data_block + i_col_orig - 1)
 
                   buffer_send(imepos_dest)%indx(block, 1) = LLL
                   buffer_send(imepos_dest)%indx(block, 2) = col
@@ -3611,9 +3611,9 @@ CONTAINS
                   buffer_send(imepos_dest)%indx(block, 8) = offset
                   buffer_send(imepos_dest)%indx(block, 9) = i_col_orig
 
-                  entry_counter(imepos_dest) = entry_counter(imepos_dest)+row_size
+                  entry_counter(imepos_dest) = entry_counter(imepos_dest) + row_size
 
-                  block_counter(imepos_dest) = block_counter(imepos_dest)+1
+                  block_counter(imepos_dest) = block_counter(imepos_dest) + 1
 
                END DO
 
@@ -3649,7 +3649,7 @@ CONTAINS
 
       first_cycle = .TRUE.
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          DO i_block = 1, num_blocks_rec(imepos)
 
@@ -3689,8 +3689,8 @@ CONTAINS
                   DEALLOCATE (rows_to_allocate)
                   DEALLOCATE (cols_to_allocate)
 
-                  ALLOCATE (rows_to_allocate(integer_block_counter+1))
-                  ALLOCATE (cols_to_allocate(integer_block_counter+1))
+                  ALLOCATE (rows_to_allocate(integer_block_counter + 1))
+                  ALLOCATE (cols_to_allocate(integer_block_counter + 1))
 
                   rows_to_allocate(1:integer_block_counter) = rows_tmp(1:integer_block_counter)
                   cols_to_allocate(1:integer_block_counter) = cols_tmp(1:integer_block_counter)
@@ -3698,10 +3698,10 @@ CONTAINS
                   DEALLOCATE (rows_tmp)
                   DEALLOCATE (cols_tmp)
 
-                  rows_to_allocate(integer_block_counter+1) = row_RI
-                  cols_to_allocate(integer_block_counter+1) = col_prim
+                  rows_to_allocate(integer_block_counter + 1) = row_RI
+                  cols_to_allocate(integer_block_counter + 1) = col_prim
 
-                  integer_block_counter = integer_block_counter+1
+                  integer_block_counter = integer_block_counter + 1
 
                END IF
 
@@ -3715,7 +3715,7 @@ CONTAINS
 
       CALL timeset("GW3c_fill_mat", handle1)
 
-      DO n_level_gw = 1, gw_corr_lev_occ+gw_corr_lev_virt
+      DO n_level_gw = 1, gw_corr_lev_occ + gw_corr_lev_virt
 
          IF (rows_to_allocate(1) .NE. 0) THEN
 
@@ -3727,7 +3727,7 @@ CONTAINS
 
          CALL dbcsr_finalize(mat_3c_overl_int_gw(n_level_gw)%matrix)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             DO i_block = 1, num_blocks_rec(imepos)
 
@@ -3750,14 +3750,14 @@ CONTAINS
                      offset_buffer = buffer_rec(imepos)%indx(i_block, 8)
                      i_col_orig = buffer_rec(imepos)%indx(i_block, 9)
 
-                     DO i_row_rec = row_offset_rec, row_offset_rec+row_size_rec-1
+                     DO i_row_rec = row_offset_rec, row_offset_rec + row_size_rec - 1
 
-                        IF (i_row_rec == n_level_gw+homo-gw_corr_lev_occ) THEN
+                        IF (i_row_rec == n_level_gw + homo - gw_corr_lev_occ) THEN
 
-                           RI_index_data_block = LLL-row_offset+1
+                           RI_index_data_block = LLL - row_offset + 1
 
                            data_block(RI_index_data_block, i_col_orig) = &
-                              buffer_rec(imepos)%msg(offset_buffer+1+i_row_rec-row_offset_rec)
+                              buffer_rec(imepos)%msg(offset_buffer + 1 + i_row_rec - row_offset_rec)
 
                         END IF
 
@@ -3780,12 +3780,12 @@ CONTAINS
 
       CALL timestop(handle1)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_send(imepos)%msg)
          DEALLOCATE (buffer_send(imepos)%indx)
       END DO
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%indx)
       END DO
@@ -3815,15 +3815,15 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: mat_local
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'replicate_mat_to_subgroup_simple', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: block_counter, block_offset, block_size, col, col_from_buffer, col_offset, &
-         col_size, handle, handle1, i_block, i_entry, i_mepos, igroup, imepos, imepos_sub, &
-         msg_offset, nblkrows_total, ngroup, num_blocks, num_pe_sub, offset, row, row_from_buffer, &
-         row_offset, row_size, total_num_entries
+                 col_size, handle, handle1, i_block, i_entry, i_mepos, igroup, imepos, imepos_sub, &
+                 msg_offset, nblkrows_total, ngroup, num_blocks, num_pe_sub, offset, row, row_from_buffer, &
+                 row_offset, row_size, total_num_entries
       INTEGER, ALLOCATABLE, DIMENSION(:) :: blk_counter, cols_to_allocate_all, entry_counter, &
-         num_entries_blocks_rec, num_entries_blocks_send, row_block_from_index, &
-         rows_to_allocate_all, sizes_rec, sizes_send
+                                            num_entries_blocks_rec, num_entries_blocks_send, row_block_from_index, &
+                                            rows_to_allocate_all, sizes_rec, sizes_send
       INTEGER, DIMENSION(:), POINTER                     :: row_blk_offset, row_blk_size
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: data_block
@@ -3837,10 +3837,10 @@ CONTAINS
 
       NULLIFY (data_block)
 
-      ALLOCATE (num_entries_blocks_send(0:2*para_env%num_pe-1))
+      ALLOCATE (num_entries_blocks_send(0:2*para_env%num_pe - 1))
       num_entries_blocks_send(:) = 0
 
-      ALLOCATE (num_entries_blocks_rec(0:2*para_env%num_pe-1))
+      ALLOCATE (num_entries_blocks_rec(0:2*para_env%num_pe - 1))
       num_entries_blocks_rec(:) = 0
 
       ngroup = para_env%num_pe/para_env_sub%num_pe
@@ -3856,12 +3856,12 @@ CONTAINS
 
          CALL dbcsr_get_stored_coordinates(mat_local, row, col, imepos_sub)
 
-         DO igroup = 0, ngroup-1
+         DO igroup = 0, ngroup - 1
 
-            imepos = imepos_sub+igroup*num_pe_sub
+            imepos = imepos_sub + igroup*num_pe_sub
 
-            num_entries_blocks_send(2*imepos) = num_entries_blocks_send(2*imepos)+row_size*col_size
-            num_entries_blocks_send(2*imepos+1) = num_entries_blocks_send(2*imepos+1)+1
+            num_entries_blocks_send(2*imepos) = num_entries_blocks_send(2*imepos) + row_size*col_size
+            num_entries_blocks_send(2*imepos + 1) = num_entries_blocks_send(2*imepos + 1) + 1
 
          END DO
 
@@ -3890,11 +3890,11 @@ CONTAINS
 
       CALL timeset("get_data_D", handle1)
 
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
       ! allocate data message and corresponding indices
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(imepos)%msg(num_entries_blocks_rec(2*imepos)))
          buffer_rec(imepos)%msg = 0.0_dp
@@ -3902,18 +3902,18 @@ CONTAINS
          ALLOCATE (buffer_send(imepos)%msg(num_entries_blocks_send(2*imepos)))
          buffer_send(imepos)%msg = 0.0_dp
 
-         ALLOCATE (buffer_rec(imepos)%indx(num_entries_blocks_rec(2*imepos+1), 3))
+         ALLOCATE (buffer_rec(imepos)%indx(num_entries_blocks_rec(2*imepos + 1), 3))
          buffer_rec(imepos)%indx = 0
 
-         ALLOCATE (buffer_send(imepos)%indx(num_entries_blocks_send(2*imepos+1), 3))
+         ALLOCATE (buffer_send(imepos)%indx(num_entries_blocks_send(2*imepos + 1), 3))
          buffer_send(imepos)%indx = 0
 
       END DO
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
-      ALLOCATE (blk_counter(0:para_env%num_pe-1))
+      ALLOCATE (blk_counter(0:para_env%num_pe - 1))
       blk_counter = 0
 
       CALL dbcsr_iterator_start(iter, mat_dm_global)
@@ -3925,20 +3925,20 @@ CONTAINS
 
          CALL dbcsr_get_stored_coordinates(mat_local, row, col, imepos_sub)
 
-         DO igroup = 0, ngroup-1
+         DO igroup = 0, ngroup - 1
 
-            imepos = imepos_sub+igroup*num_pe_sub
+            imepos = imepos_sub + igroup*num_pe_sub
 
             msg_offset = entry_counter(imepos)
 
             block_size = row_size*col_size
 
-            buffer_send(imepos)%msg(msg_offset+1:msg_offset+block_size) = &
+            buffer_send(imepos)%msg(msg_offset + 1:msg_offset + block_size) = &
                RESHAPE(data_block(1:row_size, 1:col_size), (/block_size/))
 
-            entry_counter(imepos) = entry_counter(imepos)+block_size
+            entry_counter(imepos) = entry_counter(imepos) + block_size
 
-            blk_counter(imepos) = blk_counter(imepos)+1
+            blk_counter(imepos) = blk_counter(imepos) + 1
 
             block_offset = blk_counter(imepos)
 
@@ -3958,10 +3958,10 @@ CONTAINS
 
       ALLOCATE (req_array(1:para_env%num_pe, 4))
 
-      ALLOCATE (sizes_rec(0:para_env%num_pe-1))
-      ALLOCATE (sizes_send(0:para_env%num_pe-1))
+      ALLOCATE (sizes_rec(0:para_env%num_pe - 1))
+      ALLOCATE (sizes_send(0:para_env%num_pe - 1))
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          sizes_send(imepos) = num_entries_blocks_send(2*imepos)
          sizes_rec(imepos) = num_entries_blocks_rec(2*imepos)
@@ -3987,7 +3987,7 @@ CONTAINS
       DO i_entry = 1, nmo
          DO i_block = 1, nblkrows_total
 
-            IF (i_entry >= row_blk_offset(i_block) .AND. i_entry <= row_blk_offset(i_block)+row_blk_size(i_block)-1) THEN
+            IF (i_entry >= row_blk_offset(i_block) .AND. i_entry <= row_blk_offset(i_block) + row_blk_size(i_block) - 1) THEN
 
                row_block_from_index(i_entry) = i_block
 
@@ -4003,8 +4003,8 @@ CONTAINS
       num_blocks = 0
 
       ! get the number of blocks, which have to be allocated
-      DO imepos = 0, para_env%num_pe-1
-         num_blocks = num_blocks+num_entries_blocks_rec(2*imepos+1)
+      DO imepos = 0, para_env%num_pe - 1
+         num_blocks = num_blocks + num_entries_blocks_rec(2*imepos + 1)
       END DO
 
       ALLOCATE (rows_to_allocate_all(num_blocks))
@@ -4015,11 +4015,11 @@ CONTAINS
 
       block_counter = 0
 
-      DO i_mepos = 0, para_env%num_pe-1
+      DO i_mepos = 0, para_env%num_pe - 1
 
-         DO i_block = 1, num_entries_blocks_rec(2*i_mepos+1)
+         DO i_block = 1, num_entries_blocks_rec(2*i_mepos + 1)
 
-            block_counter = block_counter+1
+            block_counter = block_counter + 1
 
             rows_to_allocate_all(block_counter) = buffer_rec(i_mepos)%indx(i_block, 1)
             cols_to_allocate_all(block_counter) = buffer_rec(i_mepos)%indx(i_block, 2)
@@ -4046,9 +4046,9 @@ CONTAINS
          CALL dbcsr_iterator_next_block(iter, row, col, data_block, &
                                         row_size=row_size, col_size=col_size)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
-            DO i_block = 1, num_entries_blocks_rec(2*imepos+1)
+            DO i_block = 1, num_entries_blocks_rec(2*imepos + 1)
 
                row_from_buffer = buffer_rec(imepos)%indx(i_block, 1)
                col_from_buffer = buffer_rec(imepos)%indx(i_block, 2)
@@ -4057,7 +4057,7 @@ CONTAINS
                IF (row == row_from_buffer .AND. col == col_from_buffer) THEN
 
                   data_block(1:row_size, 1:col_size) = &
-                     RESHAPE(buffer_rec(imepos)%msg(offset+1:offset+row_size*col_size), &
+                     RESHAPE(buffer_rec(imepos)%msg(offset + 1:offset + row_size*col_size), &
                              (/row_size, col_size/))
 
                END IF
@@ -4072,7 +4072,7 @@ CONTAINS
 
       CALL timestop(handle1)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%indx)
          DEALLOCATE (buffer_send(imepos)%msg)
@@ -4123,13 +4123,13 @@ CONTAINS
       LOGICAL                                            :: do_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'reflect_mat_row', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: block, block_size, col, col_rec, col_size, handle, i_atom, i_block, imepos, &
-         j_atom, natom, nblkcols_total, nblkrows_total, offset, row, row_rec, row_reflected, &
-         row_size
+                 j_atom, natom, nblkcols_total, nblkrows_total, offset, row, row_rec, row_reflected, &
+                 row_size
       INTEGER, ALLOCATABLE, DIMENSION(:) :: block_counter, entry_counter, image_atom, &
-         num_blocks_rec, num_blocks_send, num_entries_rec, num_entries_send, sizes_rec, sizes_send
+                                           num_blocks_rec, num_blocks_send, num_entries_rec, num_entries_send, sizes_rec, sizes_send
       INTEGER, DIMENSION(:), POINTER                     :: col_blk_sizes, row_blk_sizes
       INTEGER, DIMENSION(:, :), POINTER                  :: req_array
       LOGICAL                                            :: found_image_atom
@@ -4172,7 +4172,7 @@ CONTAINS
 
          ra(:) = pbc(particle_set(i_atom)%r, cell)
 
-         sum_z = sum_z+ra(3)
+         sum_z = sum_z + ra(3)
 
       END DO
 
@@ -4184,7 +4184,7 @@ CONTAINS
 
          ra(:) = pbc(particle_set(i_atom)%r, cell)
 
-         sum_z = sum_z+ABS(ra(3)-z_reflection)
+         sum_z = sum_z + ABS(ra(3) - z_reflection)
 
       END DO
 
@@ -4196,8 +4196,8 @@ CONTAINS
 
          ra(:) = pbc(particle_set(i_atom)%r, cell)
 
-         IF (ABS(ra(3)-z_reflection) < min_z_dist) THEN
-            min_z_dist = ABS(ra(3)-z_reflection)
+         IF (ABS(ra(3) - z_reflection) < min_z_dist) THEN
+            min_z_dist = ABS(ra(3) - z_reflection)
          END IF
 
       END DO
@@ -4222,7 +4222,7 @@ CONTAINS
 
             rb(:) = pbc(particle_set(j_atom)%r, cell)
 
-            delta = (ra(1)-rb(1))**2+(ra(2)-rb(2))**2+(ra(3)+rb(3)-2.0_dp*z_reflection)**2
+            delta = (ra(1) - rb(1))**2 + (ra(2) - rb(2))**2 + (ra(3) + rb(3) - 2.0_dp*z_reflection)**2
 
             ! SQRT(delta) < eps_dist
             IF (delta < eps_dist2) THEN
@@ -4242,13 +4242,13 @@ CONTAINS
 
       END DO
 
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
-      ALLOCATE (num_entries_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_blocks_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_entries_send(0:para_env%num_pe-1))
-      ALLOCATE (num_blocks_send(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_blocks_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_entries_send(0:para_env%num_pe - 1))
+      ALLOCATE (num_blocks_send(0:para_env%num_pe - 1))
       num_entries_rec = 0
       num_blocks_rec = 0
       num_entries_send = 0
@@ -4264,8 +4264,8 @@ CONTAINS
 
          CALL dbcsr_get_stored_coordinates(mat_reflected, row_reflected, col, imepos)
 
-         num_entries_send(imepos) = num_entries_send(imepos)+row_size*col_size
-         num_blocks_send(imepos) = num_blocks_send(imepos)+1
+         num_entries_send(imepos) = num_entries_send(imepos) + row_size*col_size
+         num_blocks_send(imepos) = num_blocks_send(imepos) + 1
 
       END DO
 
@@ -4273,21 +4273,21 @@ CONTAINS
 
       IF (para_env%num_pe > 1) THEN
 
-         ALLOCATE (sizes_rec(0:2*para_env%num_pe-1))
-         ALLOCATE (sizes_send(0:2*para_env%num_pe-1))
+         ALLOCATE (sizes_rec(0:2*para_env%num_pe - 1))
+         ALLOCATE (sizes_send(0:2*para_env%num_pe - 1))
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             sizes_send(2*imepos) = num_entries_send(imepos)
-            sizes_send(2*imepos+1) = num_blocks_send(imepos)
+            sizes_send(2*imepos + 1) = num_blocks_send(imepos)
 
          END DO
 
          CALL mp_alltoall(sizes_send, sizes_rec, 2, para_env%group)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
             num_entries_rec(imepos) = sizes_rec(2*imepos)
-            num_blocks_rec(imepos) = sizes_rec(2*imepos+1)
+            num_blocks_rec(imepos) = sizes_rec(2*imepos + 1)
          END DO
 
          DEALLOCATE (sizes_rec, sizes_send)
@@ -4300,7 +4300,7 @@ CONTAINS
       END IF
 
       ! allocate data message and corresponding indices
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(imepos)%msg(num_entries_rec(imepos)))
          buffer_rec(imepos)%msg = 0.0_dp
@@ -4316,10 +4316,10 @@ CONTAINS
 
       END DO
 
-      ALLOCATE (block_counter(0:para_env%num_pe-1))
+      ALLOCATE (block_counter(0:para_env%num_pe - 1))
       block_counter(:) = 0
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
       CALL dbcsr_iterator_start(iter, mat_orig)
@@ -4336,18 +4336,18 @@ CONTAINS
 
          offset = entry_counter(imepos)
 
-         buffer_send(imepos)%msg(offset+1:offset+block_size) = &
+         buffer_send(imepos)%msg(offset + 1:offset + block_size) = &
             RESHAPE(data_block(1:row_size, 1:col_size), (/block_size/))
 
-         block = block_counter(imepos)+1
+         block = block_counter(imepos) + 1
 
          buffer_send(imepos)%indx(block, 1) = row_reflected
          buffer_send(imepos)%indx(block, 2) = col
          buffer_send(imepos)%indx(block, 3) = offset
 
-         entry_counter(imepos) = entry_counter(imepos)+block_size
+         entry_counter(imepos) = entry_counter(imepos) + block_size
 
-         block_counter(imepos) = block_counter(imepos)+1
+         block_counter(imepos) = block_counter(imepos) + 1
 
       END DO
 
@@ -4360,7 +4360,7 @@ CONTAINS
       DEALLOCATE (req_array)
 
       ! fill the reflected matrix
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          DO i_block = 1, num_blocks_rec(imepos)
 
@@ -4377,7 +4377,7 @@ CONTAINS
 
                   offset = buffer_rec(imepos)%indx(i_block, 3)
 
-                  data_block(:, :) = RESHAPE(buffer_rec(imepos)%msg(offset+1:offset+row_size*col_size), &
+                  data_block(:, :) = RESHAPE(buffer_rec(imepos)%msg(offset + 1:offset + row_size*col_size), &
                                              (/row_size, col_size/))
 
                END IF
@@ -4390,7 +4390,7 @@ CONTAINS
 
       END DO
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%indx)
          DEALLOCATE (buffer_send(imepos)%msg)
@@ -4424,7 +4424,7 @@ CONTAINS
       LOGICAL                                            :: remove_occ, remove_virt
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kpoint_density_matrices_rpa', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_mo, ikpgr, ispin, kplocal, &
                                                             nao, nmo, nspin
@@ -4454,7 +4454,7 @@ CONTAINS
       CALL cp_fm_create(fwork, matrix_struct)
 
       CALL get_kpoint_info(kpoint, kp_range=kp_range)
-      kplocal = kp_range(2)-kp_range(1)+1
+      kplocal = kp_range(2) - kp_range(1) + 1
 
       DO ikpgr = 1, kplocal
          kp => kpoint%kp_env(ikpgr)%kpoint_env
@@ -4471,7 +4471,7 @@ CONTAINS
                CALL cp_fm_column_scale(fwork, occupation)
             END IF
             IF (remove_occ) THEN
-               CALL cp_fm_column_scale(fwork, 2.0_dp/REAL(nspin, KIND=dp)-occupation)
+               CALL cp_fm_column_scale(fwork, 2.0_dp/REAL(nspin, KIND=dp) - occupation)
             END IF
 
             ! proper spin
@@ -4480,8 +4480,8 @@ CONTAINS
             END IF
 
             DO i_mo = 1, nmo
-               IF (ABS(tau*0.5_dp*(eigenvalues(i_mo)-e_fermi)) < stabilize_exp) THEN
-                  exp_scaling(i_mo) = EXP(-ABS(tau*(eigenvalues(i_mo)-e_fermi)))
+               IF (ABS(tau*0.5_dp*(eigenvalues(i_mo) - e_fermi)) < stabilize_exp) THEN
+                  exp_scaling(i_mo) = EXP(-ABS(tau*(eigenvalues(i_mo) - e_fermi)))
                ELSE
                   exp_scaling(i_mo) = 0.0_dp
                END IF
@@ -4503,7 +4503,7 @@ CONTAINS
                CALL cp_fm_column_scale(fwork, occupation)
             END IF
             IF (remove_occ) THEN
-               CALL cp_fm_column_scale(fwork, 2.0_dp/REAL(nspin, KIND=dp)-occupation)
+               CALL cp_fm_column_scale(fwork, 2.0_dp/REAL(nspin, KIND=dp) - occupation)
             END IF
 
             ! proper spin
@@ -4512,8 +4512,8 @@ CONTAINS
             END IF
 
             DO i_mo = 1, nmo
-               IF (ABS(tau*0.5_dp*(eigenvalues(i_mo)-e_fermi)) < stabilize_exp) THEN
-                  exp_scaling(i_mo) = EXP(-ABS(tau*(eigenvalues(i_mo)-e_fermi)))
+               IF (ABS(tau*0.5_dp*(eigenvalues(i_mo) - e_fermi)) < stabilize_exp) THEN
+                  exp_scaling(i_mo) = EXP(-ABS(tau*(eigenvalues(i_mo) - e_fermi)))
                ELSE
                   exp_scaling(i_mo) = 0.0_dp
                END IF
@@ -4562,7 +4562,7 @@ CONTAINS
       LOGICAL                                            :: remove_occ, remove_virt
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_transl_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_dim, i_img, iquad, jspin, nspin
       INTEGER, DIMENSION(3)                              :: cell_grid_dm
@@ -4592,7 +4592,7 @@ CONTAINS
       ! we always use an odd number of image cells
       ! CAUTION: also at another point, cell_grid_dm is defined, these definitions have to be identical
       DO i_dim = 1, 3
-         cell_grid_dm(i_dim) = (kpoints%nkp_grid(i_dim)/2)*2-1
+         cell_grid_dm(i_dim) = (kpoints%nkp_grid(i_dim)/2)*2 - 1
       END DO
 
       num_cells_dm = cell_grid_dm(1)*cell_grid_dm(2)*cell_grid_dm(3)
@@ -4679,7 +4679,7 @@ CONTAINS
       INTEGER, DIMENSION(:, :), OPTIONAL, POINTER        :: index_to_cell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'density_matrix_from_kp_to_transl', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icell, ik, ispin, nkp, nspin, &
                                                             xcell, ycell, zcell
@@ -4741,7 +4741,7 @@ CONTAINS
                ycell = index_to_cell(2, icell)
                zcell = index_to_cell(3, icell)
 
-               arg = REAL(xcell, dp)*xkp(1, ik)+REAL(ycell, dp)*xkp(2, ik)+REAL(zcell, dp)*xkp(3, ik)
+               arg = REAL(xcell, dp)*xkp(1, ik) + REAL(ycell, dp)*xkp(2, ik) + REAL(zcell, dp)*xkp(3, ik)
                coskl = wkp(ik)*COS(twopi*arg)
                sinkl = wkp(ik)*SIN(twopi*arg)
 
@@ -4776,7 +4776,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: gap, max_eig_diff, e_fermi
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'gap_and_max_eig_diff_kpoints', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, ikpgr, ispin, kplocal, &
                                                             nmo, nspin
@@ -4798,7 +4798,7 @@ CONTAINS
       CALL get_mo_set(mo_set, nmo=nmo)
 
       CALL get_kpoint_info(kpoint, kp_range=kp_range)
-      kplocal = kp_range(2)-kp_range(1)+1
+      kplocal = kp_range(2) - kp_range(1) + 1
 
       gap = 1000.0_dp
       max_eig_diff = 0.0_dp
@@ -4812,24 +4812,24 @@ CONTAINS
             mo_set => kp%mos(1, ispin)%mo_set
             CALL get_mo_set(mo_set, eigenvalues=eigenvalues, homo=homo)
             e_homo_temp = eigenvalues(homo)
-            e_lumo_temp = eigenvalues(homo+1)
+            e_lumo_temp = eigenvalues(homo + 1)
 
             IF (e_homo_temp > e_homo) e_homo = e_homo_temp
             IF (e_lumo_temp < e_lumo) e_lumo = e_lumo_temp
-            IF (eigenvalues(nmo)-eigenvalues(1) > max_eig_diff) max_eig_diff = eigenvalues(nmo)-eigenvalues(1)
+            IF (eigenvalues(nmo) - eigenvalues(1) > max_eig_diff) max_eig_diff = eigenvalues(nmo) - eigenvalues(1)
 
          END DO
       END DO
 
-      ALLOCATE (e_homo_array(0:para_env%num_pe-1))
+      ALLOCATE (e_homo_array(0:para_env%num_pe - 1))
       e_homo_array = 0.0_dp
       e_homo_array(para_env%mepos) = e_homo
 
-      ALLOCATE (e_lumo_array(0:para_env%num_pe-1))
+      ALLOCATE (e_lumo_array(0:para_env%num_pe - 1))
       e_lumo_array = 0.0_dp
       e_lumo_array(para_env%mepos) = e_lumo
 
-      ALLOCATE (max_eig_diff_array(0:para_env%num_pe-1))
+      ALLOCATE (max_eig_diff_array(0:para_env%num_pe - 1))
       max_eig_diff_array = 0.0_dp
       max_eig_diff_array(para_env%mepos) = max_eig_diff
 
@@ -4839,9 +4839,9 @@ CONTAINS
 
       CALL mp_sum(max_eig_diff_array, para_env%group)
 
-      gap = MINVAL(e_lumo_array)-MAXVAL(e_homo_array)
+      gap = MINVAL(e_lumo_array) - MAXVAL(e_homo_array)
 
-      e_fermi = (MAXVAL(e_homo_array)+MINVAL(e_lumo_array))/2.0_dp
+      e_fermi = (MAXVAL(e_homo_array) + MINVAL(e_lumo_array))/2.0_dp
 
       max_eig_diff = MAXVAL(max_eig_diff_array)
 
@@ -4865,7 +4865,7 @@ CONTAINS
       TYPE(cell_type), POINTER                           :: cell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'init_cell_index_rpa', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: cell_counter, handle, i_cell, &
                                                             index_min_dist, num_cells, xcell, &
@@ -4913,7 +4913,7 @@ CONTAINS
          DO ycell = -itm(2), itm(2)
             DO zcell = -itm(3), itm(3)
 
-               cell_counter = cell_counter+1
+               cell_counter = cell_counter + 1
                cell_to_index_unsorted(xcell, ycell, zcell) = cell_counter
 
                index_to_cell_unsorted(1, cell_counter) = xcell
@@ -4922,7 +4922,7 @@ CONTAINS
 
                cell_vector(1:3) = MATMUL(hmat, REAL(index_to_cell_unsorted(1:3, cell_counter), dp))
 
-               abs_cell_vectors(cell_counter) = SQRT(cell_vector(1)**2+cell_vector(2)**2+cell_vector(3)**2)
+               abs_cell_vectors(cell_counter) = SQRT(cell_vector(1)**2 + cell_vector(2)**2 + cell_vector(3)**2)
 
             END DO
          END DO
@@ -4930,9 +4930,9 @@ CONTAINS
 
       ! first only do all symmetry non-equivalent cells, we need that because chi^T is computed for
       ! cell indices T from index_to_cell(:,1:num_cells/2+1)
-      DO i_cell = 1, num_cells/2+1
+      DO i_cell = 1, num_cells/2 + 1
 
-         index_min_dist = MINLOC(abs_cell_vectors(1:num_cells/2+1), DIM=1)
+         index_min_dist = MINLOC(abs_cell_vectors(1:num_cells/2 + 1), DIM=1)
 
          xcell = index_to_cell_unsorted(1, index_min_dist)
          ycell = index_to_cell_unsorted(2, index_min_dist)
@@ -4949,7 +4949,7 @@ CONTAINS
       END DO
 
       ! now all the remaining cells
-      DO i_cell = num_cells/2+2, num_cells
+      DO i_cell = num_cells/2 + 2, num_cells
 
          index_min_dist = MINLOC(abs_cell_vectors(1:num_cells), DIM=1)
 
@@ -4995,10 +4995,10 @@ CONTAINS
       LOGICAL                                            :: R_minus_S_needed, do_kpoints_cubic_RPA
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_diff_index_3c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, x_cell_R, x_cell_R_minus_S, x_cell_S, y_cell_R, y_cell_R_minus_S, &
-         y_cell_S, z_cell_R, z_cell_R_minus_S, z_cell_S
+                 y_cell_S, z_cell_R, z_cell_R_minus_S, z_cell_S
 
       CALL timeset(routineN, handle)
 
@@ -5012,9 +5012,9 @@ CONTAINS
          y_cell_S = index_to_cell_dm(2, i_cell_S)
          z_cell_S = index_to_cell_dm(3, i_cell_S)
 
-         x_cell_R_minus_S = x_cell_R-x_cell_S
-         y_cell_R_minus_S = y_cell_R-y_cell_S
-         z_cell_R_minus_S = z_cell_R-z_cell_S
+         x_cell_R_minus_S = x_cell_R - x_cell_S
+         y_cell_R_minus_S = y_cell_R - y_cell_S
+         z_cell_R_minus_S = z_cell_R - z_cell_S
 
          IF (x_cell_R_minus_S .GE. LBOUND(cell_to_index_3c, 1) .AND. &
              x_cell_R_minus_S .LE. UBOUND(cell_to_index_3c, 1) .AND. &
@@ -5083,11 +5083,11 @@ CONTAINS
                                                             do_kpoints_cubic_RPA
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_diff_diff_index_3c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, x_cell_R, x_cell_R_minus_S_minus_T, x_cell_S, x_cell_T, y_cell_R, &
-         y_cell_R_minus_S_minus_T, y_cell_S, y_cell_T, z_cell_R, z_cell_R_minus_S_minus_T, &
-         z_cell_S, z_cell_T
+                 y_cell_R_minus_S_minus_T, y_cell_S, y_cell_T, z_cell_R, z_cell_R_minus_S_minus_T, &
+                 z_cell_S, z_cell_T
 
       CALL timeset(routineN, handle)
 
@@ -5105,9 +5105,9 @@ CONTAINS
          y_cell_T = index_to_cell_dm(2, i_cell_T)
          z_cell_T = index_to_cell_dm(3, i_cell_T)
 
-         x_cell_R_minus_S_minus_T = x_cell_R-x_cell_S-x_cell_T
-         y_cell_R_minus_S_minus_T = y_cell_R-y_cell_S-y_cell_T
-         z_cell_R_minus_S_minus_T = z_cell_R-z_cell_S-z_cell_T
+         x_cell_R_minus_S_minus_T = x_cell_R - x_cell_S - x_cell_T
+         y_cell_R_minus_S_minus_T = y_cell_R - y_cell_S - y_cell_T
+         z_cell_R_minus_S_minus_T = z_cell_R - z_cell_S - z_cell_T
 
          IF (x_cell_R_minus_S_minus_T .GE. LBOUND(cell_to_index_3c, 1) .AND. &
              x_cell_R_minus_S_minus_T .LE. UBOUND(cell_to_index_3c, 1) .AND. &
@@ -5164,7 +5164,7 @@ CONTAINS
       TYPE(kpoint_type), POINTER                         :: kpoints
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'real_space_to_kpoint_transform_rpa', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_cell, ik, iquad, nkp, &
                                                             num_cells, num_integ_points
@@ -5191,7 +5191,7 @@ CONTAINS
 
       num_cells = SIZE(index_to_cell, 2)
 
-      CPASSERT(SIZE(mat_real_space, 2) >= num_cells/2+1)
+      CPASSERT(SIZE(mat_real_space, 2) >= num_cells/2 + 1)
 
       num_integ_points = SIZE(real_mat_kp, 1)
       CPASSERT(SIZE(imag_mat_kp, 1) == num_integ_points)
@@ -5204,11 +5204,11 @@ CONTAINS
             CALL dbcsr_set(real_mat_kp(iquad, ik)%matrix, 0.0_dp)
             CALL dbcsr_set(imag_mat_kp(iquad, ik)%matrix, 0.0_dp)
 
-            DO i_cell = 1, num_cells/2+1
+            DO i_cell = 1, num_cells/2 + 1
 
                cell(:) = index_to_cell(:, i_cell)
 
-               arg = REAL(cell(1), dp)*xkp(1, ik)+REAL(cell(2), dp)*xkp(2, ik)+REAL(cell(3), dp)*xkp(3, ik)
+               arg = REAL(cell(1), dp)*xkp(1, ik) + REAL(cell(2), dp)*xkp(2, ik) + REAL(cell(3), dp)*xkp(3, ik)
                coskl = COS(twopi*arg)
                sinkl = SIN(twopi*arg)
 
@@ -5250,7 +5250,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'transform_P_from_real_space_to_kpoints', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_kp, jquad, nkp, &
                                                             num_integ_points

@@ -10,23 +10,23 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE qs_matrix_pools
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type,&
-                                              cp_fm_pool_type,&
-                                              fm_pool_create,&
-                                              fm_pool_get_el_struct,&
-                                              fm_pool_release,&
-                                              fm_pool_retain,&
-                                              fm_pools_dealloc
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_get,&
-                                              cp_fm_struct_get_ncol_block,&
-                                              cp_fm_struct_get_nrow_block,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type, &
+                               cp_fm_pool_type, &
+                               fm_pool_create, &
+                               fm_pool_get_el_struct, &
+                               fm_pool_release, &
+                               fm_pool_retain, &
+                               fm_pools_dealloc
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_get, &
+                           cp_fm_struct_get_ncol_block, &
+                           cp_fm_struct_get_nrow_block, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -89,7 +89,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(mpools))
       CPASSERT(mpools%ref_count > 0)
-      mpools%ref_count = mpools%ref_count+1
+      mpools%ref_count = mpools%ref_count + 1
    END SUBROUTINE mpools_retain
 
 ! **************************************************************************************************
@@ -106,7 +106,7 @@ CONTAINS
 
       IF (ASSOCIATED(mpools)) THEN
          CPASSERT(mpools%ref_count > 0)
-         mpools%ref_count = mpools%ref_count-1
+         mpools%ref_count = mpools%ref_count - 1
          IF (mpools%ref_count == 0) THEN
             CALL fm_pools_dealloc(mpools%ao_mo_fm_pools)
             CALL fm_pools_dealloc(mpools%ao_ao_fm_pools)
@@ -198,7 +198,7 @@ CONTAINS
                mpools%mo_mo_fm_pools, mpools%ao_mosub_fm_pools, &
                mpools%mosub_mosub_fm_pools)
       mpools%ref_count = 1
-      last_mpools_id = last_mpools_id+1
+      last_mpools_id = last_mpools_id + 1
       mpools%id_nr = last_mpools_id
    END SUBROUTINE mpools_create
 
@@ -225,7 +225,7 @@ CONTAINS
       INTEGER, DIMENSION(2), INTENT(IN), OPTIONAL        :: nmosub
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mpools_rebuild_fm_pools', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, max_nmo, min_nmo, nao, &
                                                             ncg, ncol_block, nmo, nrg, nrow_block, &

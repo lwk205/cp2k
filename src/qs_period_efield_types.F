@@ -13,9 +13,9 @@
 
 MODULE qs_period_efield_types
 
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE kinds,                           ONLY: dp
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -45,7 +45,7 @@ CONTAINS
       TYPE(efield_berry_type), POINTER                   :: efield
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_efield_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: field_energy
       REAL(KIND=dp), DIMENSION(3)                        :: polarisation
@@ -85,7 +85,7 @@ CONTAINS
          POINTER                                         :: sinmat, cosmat, dipmat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_efield_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(cosmat)) efield%cosmat => cosmat
       IF (PRESENT(sinmat)) efield%sinmat => sinmat
@@ -101,7 +101,7 @@ CONTAINS
       TYPE(efield_berry_type), POINTER                   :: efield
 
       CHARACTER(len=*), PARAMETER :: routineN = 'efield_berry_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(efield)) THEN
          IF (ASSOCIATED(efield%sinmat) .AND. ASSOCIATED(efield%cosmat)) THEN

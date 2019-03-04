@@ -12,48 +12,48 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_subsys_types
-   USE atomic_kind_list_types,          ONLY: atomic_kind_list_release,&
-                                              atomic_kind_list_retain,&
-                                              atomic_kind_list_type
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE atprop_types,                    ONLY: atprop_release,&
-                                              atprop_type
-   USE cell_types,                      ONLY: cell_release,&
-                                              cell_retain,&
-                                              cell_type,&
-                                              real_to_scaled,&
-                                              scaled_to_real
-   USE colvar_types,                    ONLY: colvar_p_release,&
-                                              colvar_p_type
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_result_types,                 ONLY: cp_result_release,&
-                                              cp_result_retain,&
-                                              cp_result_type
-   USE distribution_1d_types,           ONLY: distribution_1d_release,&
-                                              distribution_1d_retain,&
-                                              distribution_1d_type
-   USE kinds,                           ONLY: dp
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_release,&
-                                              molecule_kind_list_retain,&
-                                              molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_list_types,             ONLY: molecule_list_release,&
-                                              molecule_list_retain,&
-                                              molecule_list_type
-   USE molecule_types,                  ONLY: deallocate_global_constraint,&
-                                              global_constraint_type,&
-                                              molecule_type
-   USE multipole_types,                 ONLY: multipole_type,&
-                                              release_multipole_type,&
-                                              retain_multipole_type
-   USE particle_list_types,             ONLY: particle_list_release,&
-                                              particle_list_retain,&
-                                              particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE virial_types,                    ONLY: virial_release,&
-                                              virial_type
+   USE atomic_kind_list_types, ONLY: atomic_kind_list_release, &
+                                     atomic_kind_list_retain, &
+                                     atomic_kind_list_type
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE atprop_types, ONLY: atprop_release, &
+                           atprop_type
+   USE cell_types, ONLY: cell_release, &
+                         cell_retain, &
+                         cell_type, &
+                         real_to_scaled, &
+                         scaled_to_real
+   USE colvar_types, ONLY: colvar_p_release, &
+                           colvar_p_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_result_types, ONLY: cp_result_release, &
+                              cp_result_retain, &
+                              cp_result_type
+   USE distribution_1d_types, ONLY: distribution_1d_release, &
+                                    distribution_1d_retain, &
+                                    distribution_1d_type
+   USE kinds, ONLY: dp
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_release, &
+                                       molecule_kind_list_retain, &
+                                       molecule_kind_list_type
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_list_types, ONLY: molecule_list_release, &
+                                  molecule_list_retain, &
+                                  molecule_list_type
+   USE molecule_types, ONLY: deallocate_global_constraint, &
+                             global_constraint_type, &
+                             molecule_type
+   USE multipole_types, ONLY: multipole_type, &
+                              release_multipole_type, &
+                              retain_multipole_type
+   USE particle_list_types, ONLY: particle_list_release, &
+                                  particle_list_retain, &
+                                  particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE virial_types, ONLY: virial_release, &
+                           virial_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -137,11 +137,11 @@ CONTAINS
       TYPE(cp_subsys_type), POINTER                      :: subsys
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_subsys_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(subsys))
       CPASSERT(subsys%ref_count > 0)
-      subsys%ref_count = subsys%ref_count+1
+      subsys%ref_count = subsys%ref_count + 1
    END SUBROUTINE cp_subsys_retain
 
 ! **************************************************************************************************
@@ -155,11 +155,11 @@ CONTAINS
       TYPE(cp_subsys_type), POINTER                      :: subsys
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_subsys_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(subsys)) THEN
          CPASSERT(subsys%ref_count > 0)
-         subsys%ref_count = subsys%ref_count-1
+         subsys%ref_count = subsys%ref_count - 1
          IF (subsys%ref_count == 0) THEN
             CALL atomic_kind_list_release(subsys%atomic_kinds)
             CALL particle_list_release(subsys%particles)
@@ -427,7 +427,7 @@ CONTAINS
             n_shell = 0
          END IF
          IF (PRESENT(natom)) natom = n_atom
-         IF (PRESENT(nparticle)) nparticle = n_atom+n_shell
+         IF (PRESENT(nparticle)) nparticle = n_atom + n_shell
          IF (PRESENT(ncore)) ncore = n_core
          IF (PRESENT(nshell)) nshell = n_shell
       END IF
@@ -456,7 +456,7 @@ CONTAINS
       TYPE(cell_type), OPTIONAL, POINTER                 :: cell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'pack_subsys_particles', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iatom, j, k, natom, nparticle, nsize, &
                                                             shell_index
@@ -492,17 +492,17 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   f(j) = particles%els(iatom)%f(i)
                END DO
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   f(j) = core_particles%els(shell_index)%f(i)
                END DO
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  f(k+i) = shell_particles%els(shell_index)%f(i)
+                  f(k + i) = shell_particles%els(shell_index)%f(i)
                END DO
             END IF
          END DO
@@ -518,17 +518,17 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   r(j) = particles%els(iatom)%r(i)
                END DO
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   r(j) = core_particles%els(shell_index)%r(i)
                END DO
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  r(k+i) = shell_particles%els(shell_index)%r(i)
+                  r(k + i) = shell_particles%els(shell_index)%r(i)
                END DO
             END IF
          END DO
@@ -545,19 +545,19 @@ CONTAINS
             IF (shell_index == 0) THEN
                CALL real_to_scaled(rs, particles%els(iatom)%r, cell)
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   s(j) = rs(i)
                END DO
             ELSE
                CALL real_to_scaled(rs, core_particles%els(shell_index)%r, cell)
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   s(j) = rs(i)
                END DO
                CALL real_to_scaled(rs, shell_particles%els(shell_index)%r, cell)
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  s(k+i) = rs(i)
+                  s(k + i) = rs(i)
                END DO
             END IF
          END DO
@@ -572,17 +572,17 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   v(j) = particles%els(iatom)%v(i)
                END DO
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   v(j) = core_particles%els(shell_index)%v(i)
                END DO
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  v(k+i) = shell_particles%els(shell_index)%v(i)
+                  v(k + i) = shell_particles%els(shell_index)%v(i)
                END DO
             END IF
          END DO
@@ -611,7 +611,7 @@ CONTAINS
       TYPE(cell_type), OPTIONAL, POINTER                 :: cell
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'unpack_subsys_particles', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iatom, j, k, natom, nparticle, nsize, &
                                                             shell_index
@@ -649,17 +649,17 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   particles%els(iatom)%f(i) = my_fscale*f(j)
                END DO
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   core_particles%els(shell_index)%f(i) = my_fscale*f(j)
                END DO
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  shell_particles%els(shell_index)%f(i) = my_fscale*f(k+i)
+                  shell_particles%els(shell_index)%f(i) = my_fscale*f(k + i)
                END DO
             END IF
          END DO
@@ -674,23 +674,23 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   particles%els(iatom)%r(i) = r(j)
                END DO
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   core_particles%els(shell_index)%r(i) = r(j)
                END DO
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  shell_particles%els(shell_index)%r(i) = r(k+i)
+                  shell_particles%els(shell_index)%r(i) = r(k + i)
                END DO
                ! Update atomic position due to core and shell motion
                mass = particles%els(iatom)%atomic_kind%mass
                fc = core_particles%els(shell_index)%atomic_kind%shell%mass_core/mass
                fs = shell_particles%els(shell_index)%atomic_kind%shell%mass_shell/mass
-               particles%els(iatom)%r(1:3) = fc*core_particles%els(shell_index)%r(1:3)+ &
+               particles%els(iatom)%r(1:3) = fc*core_particles%els(shell_index)%r(1:3) + &
                                              fs*shell_particles%els(shell_index)%r(1:3)
             END IF
          END DO
@@ -706,26 +706,26 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   rs(i) = s(j)
                END DO
                CALL scaled_to_real(particles%els(iatom)%r, rs, cell)
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   rs(i) = s(j)
                END DO
                CALL scaled_to_real(core_particles%els(shell_index)%r, rs, cell)
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  rs(i) = s(k+i)
+                  rs(i) = s(k + i)
                END DO
                CALL scaled_to_real(shell_particles%els(shell_index)%r, rs, cell)
                ! Update atomic position due to core and shell motion
                mass = particles%els(iatom)%atomic_kind%mass
                fc = core_particles%els(shell_index)%atomic_kind%shell%mass_core/mass
                fs = shell_particles%els(shell_index)%atomic_kind%shell%mass_shell/mass
-               particles%els(iatom)%r(1:3) = fc*core_particles%els(shell_index)%r(1:3)+ &
+               particles%els(iatom)%r(1:3) = fc*core_particles%els(shell_index)%r(1:3) + &
                                              fs*shell_particles%els(shell_index)%r(1:3)
             END IF
          END DO
@@ -740,23 +740,23 @@ CONTAINS
             shell_index = particles%els(iatom)%shell_index
             IF (shell_index == 0) THEN
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   particles%els(iatom)%v(i) = v(j)
                END DO
             ELSE
                DO i = 1, 3
-                  j = j+1
+                  j = j + 1
                   core_particles%els(shell_index)%v(i) = v(j)
                END DO
-               k = 3*(natom+shell_index-1)
+               k = 3*(natom + shell_index - 1)
                DO i = 1, 3
-                  shell_particles%els(shell_index)%v(i) = v(k+i)
+                  shell_particles%els(shell_index)%v(i) = v(k + i)
                END DO
                ! Update atomic velocity due to core and shell motion
                mass = particles%els(iatom)%atomic_kind%mass
                fc = core_particles%els(shell_index)%atomic_kind%shell%mass_core/mass
                fs = shell_particles%els(shell_index)%atomic_kind%shell%mass_shell/mass
-               particles%els(iatom)%v(1:3) = fc*core_particles%els(shell_index)%v(1:3)+ &
+               particles%els(iatom)%v(1:3) = fc*core_particles%els(shell_index)%v(1:3) + &
                                              fs*shell_particles%els(shell_index)%v(1:3)
             END IF
          END DO

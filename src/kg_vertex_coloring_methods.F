@@ -15,24 +15,24 @@
 !> \author Martin Haeufel
 ! **************************************************************************************************
 MODULE kg_vertex_coloring_methods
-   USE bibliography,                    ONLY: Andermatt2016,&
-                                              Brelaz1979,&
-                                              cite_reference
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_min_heap,                     ONLY: cp_heap_fill,&
-                                              cp_heap_new,&
-                                              cp_heap_pop,&
-                                              cp_heap_release,&
-                                              cp_heap_reset_node,&
-                                              cp_heap_type,&
-                                              valt
-   USE input_constants,                 ONLY: kg_color_dsatur,&
-                                              kg_color_greedy
-   USE kg_environment_types,            ONLY: kg_environment_type
-   USE kinds,                           ONLY: int_4,&
-                                              int_8
+   USE bibliography, ONLY: Andermatt2016, &
+                           Brelaz1979, &
+                           cite_reference
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_min_heap, ONLY: cp_heap_fill, &
+                          cp_heap_new, &
+                          cp_heap_pop, &
+                          cp_heap_release, &
+                          cp_heap_reset_node, &
+                          cp_heap_type, &
+                          valt
+   USE input_constants, ONLY: kg_color_dsatur, &
+                              kg_color_greedy
+   USE kg_environment_types, ONLY: kg_environment_type
+   USE kinds, ONLY: int_4, &
+                    int_8
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -70,7 +70,7 @@ CONTAINS
       TYPE(vertex_p_type), DIMENSION(:), POINTER         :: graph
 
       CHARACTER(len=*), PARAMETER :: routineN = 'kg_create_graph', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, imol, ineighbor, jmol, kmol, &
                                                             maxdegree, nneighbors, nnodes
@@ -116,7 +116,7 @@ CONTAINS
             imol = jmol
             nneighbors = 0
          END IF
-         nneighbors = nneighbors+1
+         nneighbors = nneighbors + 1
       END DO
 
       IF (imol .NE. 0) THEN
@@ -140,7 +140,7 @@ CONTAINS
             ineighbor = 0
             imol = jmol
          END IF
-         ineighbor = ineighbor+1
+         ineighbor = ineighbor + 1
          kmol = pairs(2, i)
          graph(imol)%vertex%neighbors(ineighbor)%vertex => graph(kmol)%vertex
       END DO
@@ -169,7 +169,7 @@ CONTAINS
       INTEGER, INTENT(out)                               :: ncolors
 
       CHARACTER(len=*), PARAMETER :: routineN = 'color_graph_greedy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: color, handle, i, j, newcolor, &
                                                             nneighbors, nnodes
@@ -181,7 +181,7 @@ CONTAINS
 
       nnodes = SIZE(graph)
 
-      ALLOCATE (color_present(maxdegree+1))
+      ALLOCATE (color_present(maxdegree + 1))
 
       DO i = 1, nnodes
          color_present(:) = .FALSE.
@@ -192,7 +192,7 @@ CONTAINS
                IF (color .NE. 0) color_present(color) = .TRUE.
             END DO
          END IF
-         DO j = 1, maxdegree+1 !nnodes
+         DO j = 1, maxdegree + 1 !nnodes
             IF (color_present(j) .EQV. .FALSE.) THEN
                newcolor = j
                EXIT
@@ -237,13 +237,13 @@ CONTAINS
             counter = 0
             DO j = 1, nnodes
                IF (graph(j)%vertex%color .EQ. i) THEN
-                  counter = counter+1
+                  counter = counter + 1
                   IF (MOD(counter, 13) .EQ. 0) THEN
-                     counter = counter+1
+                     counter = counter + 1
                      WRITE (unit_nr, '()') ! line break
                      WRITE (unit_nr, '(6X,A)', ADVANCE='NO') " |" ! indent next line
                   END IF
-                  WRITE (unit_nr, '(I5,1X)', ADVANCE='NO') graph(j)%vertex%id-1
+                  WRITE (unit_nr, '(I5,1X)', ADVANCE='NO') graph(j)%vertex%id - 1
                END IF
             END DO
             WRITE (unit_nr, '()')
@@ -270,7 +270,7 @@ CONTAINS
 !   INTEGER, PARAMETER                       :: huge_4 = HUGE(0_int_4) ! PR67219 workaround
 ! we actually need a max_heap
 
-      value = (huge_4-INT(dsat, KIND=int_8))*huge_4+huge_4-degree
+      value = (huge_4 - INT(dsat, KIND=int_8))*huge_4 + huge_4 - degree
 
    END FUNCTION
 
@@ -285,7 +285,7 @@ CONTAINS
          POINTER                                         :: graph
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_cp_heap_fill', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, nnodes
       INTEGER(kind=valt), ALLOCATABLE, DIMENSION(:)      :: values
@@ -397,7 +397,7 @@ CONTAINS
                this%color = 1
                CYCLE
             END IF
-            DO i = 1, this%degree+1
+            DO i = 1, this%degree + 1
                IF (this%color_present(i) .EQV. .FALSE.) THEN
                   this%color = i ! smallest possible
                   EXIT
@@ -410,7 +410,7 @@ CONTAINS
                neighbor => this%neighbors(i)%vertex
                IF (neighbor%color_present(this%color)) CYCLE
                neighbor%color_present(this%color) = .TRUE.
-               neighbor%dsat = neighbor%dsat+1
+               neighbor%dsat = neighbor%dsat + 1
                IF (neighbor%color /= 0) CYCLE
                CALL kg_update_node(heap, neighbor)
 
@@ -426,7 +426,7 @@ CONTAINS
                   DO j = 1, color_limit
                      graph(i)%vertex%color_present(j) = color_present(j)
                   END DO
-                  DO j = color_limit+1, 2*color_limit
+                  DO j = color_limit + 1, 2*color_limit
                      graph(i)%vertex%color_present(j) = .FALSE.
                   END DO
                END DO
@@ -468,7 +468,7 @@ CONTAINS
       INTEGER                                            :: i
 
       switchable = .TRUE.
-      low_col = ncolors+1
+      low_col = ncolors + 1
 
       DO i = 1, this%degree
          IF (this%neighbors(i)%vertex%id == neighbor%id) CYCLE
@@ -509,7 +509,7 @@ CONTAINS
       INTEGER                                            :: ncolors
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_pair_switching', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: depth, handle, i, iter, j, low_col, &
                                                             low_col_neigh, maxdepth, &
@@ -532,10 +532,10 @@ CONTAINS
             DO i = 1, nnodes
                this => graph(i)%vertex
                IF (.NOT. ASSOCIATED(this%neighbors)) CYCLE
-               IF (graph(i)%vertex%color < ncolors-depth+1) CYCLE !Node already has a low color
+               IF (graph(i)%vertex%color < ncolors - depth + 1) CYCLE !Node already has a low color
 
                partner = 0
-               low_col = this%color+1
+               low_col = this%color + 1
 
                DO j = 1, this%degree
                   neighbor => this%neighbors(j)%vertex
@@ -639,7 +639,7 @@ CONTAINS
          INTENT(out)                                     :: color_of_node
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'kg_vertex_coloring', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: color, handle, i, nnodes, unit_nr
       LOGICAL                                            :: valid

@@ -10,83 +10,83 @@
 ! **************************************************************************************************
 MODULE qs_loc_utils
 
-   USE ai_moments,                      ONLY: contract_cossin,&
-                                              cossin
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE block_p_types,                   ONLY: block_p_type
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_array_utils,                  ONLY: cp_1d_r_p_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_maxabsval, &
-        cp_fm_p_type, cp_fm_release, cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type, &
-        cp_fm_write_unformatted
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_generate_filename,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_get_block_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE input_constants,                 ONLY: &
-        do_loc_crazy, do_loc_direct, do_loc_jacobi, do_loc_l1_norm_sd, do_loc_none, &
-        energy_loc_range, op_loc_berry, op_loc_boys, op_loc_pipek, state_loc_all, state_loc_list, &
-        state_loc_none, state_loc_range
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: pi,&
-                                              twopi
-   USE memory_utilities,                ONLY: reallocate
-   USE message_passing,                 ONLY: mp_bcast
-   USE orbital_pointers,                ONLY: ncoset
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_loc_types,                    ONLY: get_qs_loc_env,&
-                                              localized_wfn_control_create,&
-                                              localized_wfn_control_release,&
-                                              localized_wfn_control_type,&
-                                              qs_loc_env_new_type,&
-                                              set_qs_loc_env
-   USE qs_localization_methods,         ONLY: initialize_weights,&
-                                              rotate_orbitals
-   USE qs_mo_methods,                   ONLY: make_mo_eig
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_scf_types,                    ONLY: ot_method_nr
-   USE scf_control_types,               ONLY: scf_control_type
+   USE ai_moments, ONLY: contract_cossin, &
+                         cossin
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE block_p_types, ONLY: block_p_type
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_array_utils, ONLY: cp_1d_r_p_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_element, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_maxabsval, &
+      cp_fm_p_type, cp_fm_release, cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type, &
+      cp_fm_write_unformatted
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_generate_filename, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_get_block_p, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE input_constants, ONLY: &
+      do_loc_crazy, do_loc_direct, do_loc_jacobi, do_loc_l1_norm_sd, do_loc_none, &
+      energy_loc_range, op_loc_berry, op_loc_boys, op_loc_pipek, state_loc_all, state_loc_list, &
+      state_loc_none, state_loc_range
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE mathconstants, ONLY: pi, &
+                            twopi
+   USE memory_utilities, ONLY: reallocate
+   USE message_passing, ONLY: mp_bcast
+   USE orbital_pointers, ONLY: ncoset
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_loc_types, ONLY: get_qs_loc_env, &
+                           localized_wfn_control_create, &
+                           localized_wfn_control_release, &
+                           localized_wfn_control_type, &
+                           qs_loc_env_new_type, &
+                           set_qs_loc_env
+   USE qs_localization_methods, ONLY: initialize_weights, &
+                                      rotate_orbitals
+   USE qs_mo_methods, ONLY: make_mo_eig
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_scf_types, ONLY: ot_method_nr
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -150,7 +150,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_S
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rotate_state_to_ref', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ncol, ncol_ref, nrow
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: eigenvalues
@@ -230,7 +230,7 @@ CONTAINS
       INTEGER                                            :: sweeps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'jacobi_rotation_pipek', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, istate, jstate, natom, nstate
       REAL(KIND=dp)                                      :: aij, bij, ct, mii, mij, mjj, ratio, st, &
@@ -248,17 +248,17 @@ CONTAINS
       natom = SIZE(zij_fm_set, 1)
       ! do jacobi sweeps until converged
       DO WHILE (tolerance >= 1.0e-4_dp)
-         sweeps = sweeps+1
+         sweeps = sweeps + 1
          DO istate = 1, nstate
-            DO jstate = istate+1, nstate
+            DO jstate = istate + 1, nstate
                aij = 0.0_dp
                bij = 0.0_dp
                DO iatom = 1, natom
                   CALL cp_fm_get_element(zij_fm_set(iatom, 1)%matrix, istate, istate, mii)
                   CALL cp_fm_get_element(zij_fm_set(iatom, 1)%matrix, istate, jstate, mij)
                   CALL cp_fm_get_element(zij_fm_set(iatom, 1)%matrix, jstate, jstate, mjj)
-                  aij = aij+mij*(mii-mjj)
-                  bij = bij+mij*mij-0.25_dp*(mii-mjj)*(mii-mjj)
+                  aij = aij + mij*(mii - mjj)
+                  bij = bij + mij*mij - 0.25_dp*(mii - mjj)*(mii - mjj)
 
                END DO
                IF (ABS(bij) > 1.E-10_dp) THEN
@@ -271,9 +271,9 @@ CONTAINS
                ! Check max or min
                ! To minimize the spread
                IF (theta > pi*0.5_dp) THEN
-                  theta = theta-pi*0.25_dp
+                  theta = theta - pi*0.25_dp
                ELSE IF (theta < -pi*0.5_dp) THEN
-                  theta = theta+pi*0.25_dp
+                  theta = theta + pi*0.25_dp
                END IF
 
                ct = COS(theta)
@@ -386,7 +386,7 @@ CONTAINS
       REAL(dp), INTENT(OUT)                              :: tolerance
 
       CHARACTER(len=*), PARAMETER :: routineN = 'check_tolerance_real', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, istate, jstate, natom, &
                                                             ncol_local, nrow_global, nrow_local
@@ -418,7 +418,7 @@ CONTAINS
                zii = diag(istate, iatom)
                zjj = diag(jstate, iatom)
                zij = zij_fm_set(iatom, 1)%matrix%local_data(istate, jstate)
-               grad_ij = grad_ij+4.0_dp*zij*(zjj-zii)
+               grad_ij = grad_ij + 4.0_dp*zij*(zjj - zii)
             END DO
             force%local_data(istate, jstate) = grad_ij
          END DO
@@ -459,7 +459,7 @@ CONTAINS
          POINTER                                         :: loc_coeff, mo_loc_history
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_loc_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dim_op, handle, i, iatom, imo, imoloc, &
                                                             ispin, j, l_spin, lb, nao, naosub, &
@@ -507,7 +507,7 @@ CONTAINS
             IF (localized_wfn_control%do_homo) THEN
                CPASSERT(nmo >= nmosub)
             ELSE
-               CPASSERT(nao-nmo >= nmosub)
+               CPASSERT(nao - nmo >= nmosub)
             END IF
             CALL cp_fm_set_all(moloc_coeff(ispin)%matrix, 0.0_dp)
             CALL cp_fm_struct_release(tmp_fm_struct)
@@ -535,12 +535,12 @@ CONTAINS
                imoloc = 0
                DO i = lb, ub
                   ! Get the index in the subset
-                  imoloc = imoloc+1
+                  imoloc = imoloc + 1
                   ! Get the index in the full set
                   imo = localized_wfn_control%loc_states(i, ispin)
                   IF (localized_wfn_control%do_homo) THEN
                      occ_imo = occupations(imo)
-                     IF (ABS(occ_imo-my_occ) > localized_wfn_control%eps_occ) THEN
+                     IF (ABS(occ_imo - my_occ) > localized_wfn_control%eps_occ) THEN
                         IF (localized_wfn_control%localization_method /= do_loc_none) &
                            CALL cp_abort(__LOCATION__, &
                                          "States with different occupations "// &
@@ -557,7 +557,7 @@ CONTAINS
             ELSE
                my_occ = occupations(lb)
                occ_imo = occupations(ub)
-               IF (ABS(occ_imo-my_occ) > localized_wfn_control%eps_occ) THEN
+               IF (ABS(occ_imo - my_occ) > localized_wfn_control%eps_occ) THEN
                   IF (localized_wfn_control%localization_method /= do_loc_none) &
                      CALL cp_abort(__LOCATION__, &
                                    "States with different occupations "// &
@@ -670,11 +670,11 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'get_berry_operator', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: dim_op, handle, i, iatom, icol, ikind, inode, irow, iset, jatom, jkind, jset, &
-         last_jatom, ldab, ldsa, ldsb, ldwork, maxl, ncoa, ncob, nkind, nrow, nseta, nsetb, sgfa, &
-         sgfb
+                 last_jatom, ldab, ldsa, ldsb, ldwork, maxl, ncoa, ncob, nkind, nrow, nseta, nsetb, sgfa, &
+                 sgfb
       INTEGER, DIMENSION(3)                              :: perd0
       INTEGER, DIMENSION(:), POINTER                     :: la_max, la_min, lb_max, lb_min, npgfa, &
                                                             npgfb, nsgfa, nsgfb
@@ -737,9 +737,9 @@ CONTAINS
       vector_k(:, 1) = twopi*cell%h_inv(1, :)
       vector_k(:, 2) = twopi*cell%h_inv(2, :)
       vector_k(:, 3) = twopi*cell%h_inv(3, :)
-      vector_k(:, 4) = twopi*(cell%h_inv(1, :)+cell%h_inv(2, :))
-      vector_k(:, 5) = twopi*(cell%h_inv(1, :)+cell%h_inv(3, :))
-      vector_k(:, 6) = twopi*(cell%h_inv(2, :)+cell%h_inv(3, :))
+      vector_k(:, 4) = twopi*(cell%h_inv(1, :) + cell%h_inv(2, :))
+      vector_k(:, 5) = twopi*(cell%h_inv(1, :) + cell%h_inv(3, :))
+      vector_k(:, 6) = twopi*(cell%h_inv(2, :) + cell%h_inv(3, :))
 
       ! This operator can be used only for periodic systems
       ! If an isolated system is used the periodicity is overimposed
@@ -792,7 +792,7 @@ CONTAINS
          ldsb = SIZE(sphi_b, 1)
          IF (inode == 1) last_jatom = 0
 
-         rb = rab+ra
+         rb = rab + ra
 
          IF (jatom /= last_jatom) THEN
             new_atom_b = .TRUE.
@@ -820,7 +820,7 @@ CONTAINS
             END DO
          END IF ! new_atom_b
 
-         rab2 = rab(1)*rab(1)+rab(2)*rab(2)+rab(3)*rab(3)
+         rab2 = rab(1)*rab(1) + rab(2)*rab(2) + rab(3)*rab(3)
          dab = SQRT(rab2)
 
          nrow = 0
@@ -834,7 +834,7 @@ CONTAINS
                ncob = npgfb(jset)*ncoset(lb_max(jset))
                sgfb = first_sgfb(1, jset)
 
-               IF (set_radius_a(iset)+set_radius_b(jset) >= dab) THEN
+               IF (set_radius_a(iset) + set_radius_b(jset) >= dab) THEN
 
 !           *** Calculate the primitive overlap integrals ***
                   DO i = 1, dim_op
@@ -857,7 +857,7 @@ CONTAINS
 
             END DO ! jset
 
-            nrow = nrow+ncoa
+            nrow = nrow + ncoa
 
          END DO ! iset
 
@@ -898,7 +898,7 @@ CONTAINS
          POINTER                                         :: evals
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'loc_write_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename
       CHARACTER(LEN=default_string_length)               :: my_middle
@@ -1008,13 +1008,13 @@ CONTAINS
          POINTER                                         :: evals
 
       CHARACTER(len=*), PARAMETER :: routineN = 'loc_read_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=25)                                  :: fname_key
       CHARACTER(LEN=default_path_length)                 :: filename
       CHARACTER(LEN=default_string_length)               :: my_middle
       INTEGER :: group, handle, homo_read, i, ispin, lfomo_read, max_nloc, n_rep_val, nao, &
-         nelectron_read, nloc, nmo, nmo_read, nspin, output_unit, rst_unit, source
+                 nelectron_read, nloc, nmo, nmo_read, nspin, output_unit, rst_unit, source
       LOGICAL                                            :: file_exists
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: eig_read, occ_read
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: vecbuffer
@@ -1190,7 +1190,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nloc_xas, spin_xas
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_loc_control_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(localized_wfn_control_type), POINTER          :: localized_wfn_control
 
@@ -1298,7 +1298,7 @@ CONTAINS
                   nmoloc(ispin) = NINT(nelectron/occupation(1))
                   IF (n_mo(ispin) > homo) THEN
                      DO i = nmoloc(ispin), 1, -1
-                        IF (occupation(1)-occupation(i) < localized_wfn_control%eps_occ) THEN
+                        IF (occupation(1) - occupation(i) < localized_wfn_control%eps_occ) THEN
                            ilast_intocc = i
                            EXIT
                         END IF
@@ -1333,9 +1333,9 @@ CONTAINS
                   END DO
                   localized_wfn_control%lu_bound_states(1, ispin) = ilow
                   localized_wfn_control%lu_bound_states(2, ispin) = iup
-                  localized_wfn_control%nloc_states(ispin) = iup-ilow+1
+                  localized_wfn_control%nloc_states(ispin) = iup - ilow + 1
                   nmoloc(ispin) = localized_wfn_control%nloc_states(ispin)
-                  IF (occupation(ilow)-occupation(iup) > localized_wfn_control%eps_occ) THEN
+                  IF (occupation(ilow) - occupation(iup) > localized_wfn_control%eps_occ) THEN
                      CALL cp_abort(__LOCATION__, &
                                    "The selected energy range includes orbitals with different occupation number. "// &
                                    " The localization procedure cannot be applied.")
@@ -1343,14 +1343,14 @@ CONTAINS
                   IF (output_unit > 0) WRITE (output_unit, "(/,T2,A,I4,A,I6,A)") "LOCALIZATION| Spin ", ispin, " : ", &
                      nmoloc(ispin), " orbitals in the selected energy range are localized."
                ELSE IF (localized_wfn_control%set_of_states == state_loc_all .AND. (.NOT. my_do_homo)) THEN
-                  nmoloc(ispin) = n_mo(ispin)-homo
-                  localized_wfn_control%lu_bound_states(1, ispin) = homo+1
+                  nmoloc(ispin) = n_mo(ispin) - homo
+                  localized_wfn_control%lu_bound_states(1, ispin) = homo + 1
                   localized_wfn_control%lu_bound_states(2, ispin) = n_mo(ispin)
                   IF (output_unit > 0) &
                      WRITE (output_unit, "(/,T2,A,I4,A,I6,A,/,T15,A,F12.6,A,F12.6,A)") &
                      "LOCALIZATION| Spin ", ispin, " The first ", &
                      nmoloc(ispin), " virtual orbitals are localized,", " with energies from ", &
-                     mo_eigenvalues(homo+1), " to ", mo_eigenvalues(n_mo(ispin)), " [a.u.]."
+                     mo_eigenvalues(homo + 1), " to ", mo_eigenvalues(n_mo(ispin)), " [a.u.]."
                ELSE
                   nmoloc(ispin) = MIN(localized_wfn_control%nloc_states(1), n_mo(ispin))
                   IF (output_unit > 0 .AND. my_do_homo) WRITE (output_unit, "(/,T2,A,I4,A,I6,A)") "LOCALIZATION| Spin ", ispin, &
@@ -1361,7 +1361,7 @@ CONTAINS
                      ilow = localized_wfn_control%loc_states(1, ispin)
                      DO i = 2, nmoloc(ispin)
                         iup = localized_wfn_control%loc_states(i, ispin)
-                        IF (ABS(occupation(ilow)-occupation(iup)) > localized_wfn_control%eps_occ) THEN
+                        IF (ABS(occupation(ilow) - occupation(iup)) > localized_wfn_control%eps_occ) THEN
                            ! write warning
                            CALL cp_warn(__LOCATION__, &
                                         "User requested the calculation of localized wavefunction from a subset of MOs, "// &
@@ -1373,7 +1373,7 @@ CONTAINS
                   END IF
                ENDIF
             ENDDO ! ispin
-            n_mos(:) = nao-n_mo(:)
+            n_mos(:) = nao - n_mo(:)
             IF (my_do_homo) n_mos = n_mo
             CALL set_loc_wfn_lists(localized_wfn_control, nmoloc, n_mos, nspin)
          END IF
@@ -1414,7 +1414,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nloc_xas, spin_channel_xas
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_loc_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ind, ir, n_list, n_rep, n_state, &
                                                             nline, other_spin, output_unit, &
@@ -1483,11 +1483,11 @@ CONTAINS
                   NULLIFY (list)
                   CALL section_vals_val_get(loc_section, "LIST", i_rep_val=ir, i_vals=list)
                   IF (ASSOCIATED(list)) THEN
-                     CALL reallocate(loc_list, 1, n_list+SIZE(list))
+                     CALL reallocate(loc_list, 1, n_list + SIZE(list))
                      DO i = 1, SIZE(list)
-                        loc_list(n_list+i) = list(i)
+                        loc_list(n_list + i) = list(i)
                      END DO ! i
-                     n_list = n_list+SIZE(list)
+                     n_list = n_list + SIZE(list)
                   END IF
                END DO ! ir
                IF (n_list /= 0) THEN
@@ -1517,11 +1517,11 @@ CONTAINS
                   NULLIFY (list)
                   CALL section_vals_val_get(loc_section, "LIST_UNOCCUPIED", i_rep_val=ir, i_vals=list)
                   IF (ASSOCIATED(list)) THEN
-                     CALL reallocate(loc_list, 1, n_list+SIZE(list))
+                     CALL reallocate(loc_list, 1, n_list + SIZE(list))
                      DO i = 1, SIZE(list)
-                        loc_list(n_list+i) = list(i)
+                        loc_list(n_list + i) = list(i)
                      END DO ! i
-                     n_list = n_list+SIZE(list)
+                     n_list = n_list + SIZE(list)
                   END IF
                END DO ! ir
                IF (n_list /= 0) THEN
@@ -1592,15 +1592,15 @@ CONTAINS
             CASE (state_loc_list)
                WRITE (UNIT=output_unit, FMT="(T2,A)") &
                   "LOCALIZE| Orbitals to be localized: Those with index in the following list"
-               nline = localized_wfn_control%nloc_states(1)/10+1
+               nline = localized_wfn_control%nloc_states(1)/10 + 1
                ind = 0
                DO i = 1, nline
-                  IF (ind+10 < localized_wfn_control%nloc_states(1)) THEN
-                     WRITE (UNIT=output_unit, FMT="(T8,10I7)") localized_wfn_control%loc_states(ind+1:ind+10, 1)
-                     ind = ind+10
+                  IF (ind + 10 < localized_wfn_control%nloc_states(1)) THEN
+                     WRITE (UNIT=output_unit, FMT="(T8,10I7)") localized_wfn_control%loc_states(ind + 1:ind + 10, 1)
+                     ind = ind + 10
                   ELSE
                      WRITE (UNIT=output_unit, FMT="(T8,10I7)") &
-                        localized_wfn_control%loc_states(ind+1:localized_wfn_control%nloc_states(1), 1)
+                        localized_wfn_control%loc_states(ind + 1:localized_wfn_control%nloc_states(1), 1)
                      ind = localized_wfn_control%nloc_states(1)
                   END IF
                END DO
@@ -1679,7 +1679,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nspins
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_loc_centers', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
 
@@ -1708,7 +1708,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: my_spin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'set_loc_wfn_lists', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ispin, max_iloc, max_nmoloc, state
 
@@ -1737,10 +1737,10 @@ CONTAINS
             localized_wfn_control%lu_bound_states(1, ispin) = &
                localized_wfn_control%lu_bound_states(1, my_spin)
             localized_wfn_control%lu_bound_states(2, ispin) = &
-               localized_wfn_control%lu_bound_states(1, my_spin)+nmoloc(ispin)-1
+               localized_wfn_control%lu_bound_states(1, my_spin) + nmoloc(ispin) - 1
             max_iloc = localized_wfn_control%lu_bound_states(2, ispin)
             DO i = 1, nmoloc(ispin)
-               localized_wfn_control%loc_states(i, ispin) = localized_wfn_control%lu_bound_states(1, ispin)+i-1
+               localized_wfn_control%loc_states(i, ispin) = localized_wfn_control%lu_bound_states(1, ispin) + i - 1
             END DO
             CPASSERT(max_iloc <= nmo(ispin))
          END DO
@@ -1750,7 +1750,7 @@ CONTAINS
          localized_wfn_control%loc_states = 0
          DO ispin = 1, nspins
             DO i = 1, nmoloc(ispin)
-               localized_wfn_control%loc_states(i, ispin) = localized_wfn_control%lu_bound_states(1, ispin)+i-1
+               localized_wfn_control%loc_states(i, ispin) = localized_wfn_control%lu_bound_states(1, ispin) + i - 1
             END DO
          END DO
       CASE (state_loc_all)
@@ -1772,7 +1772,7 @@ CONTAINS
                IF (nmoloc(ispin) < 1) localized_wfn_control%lu_bound_states(1, ispin) = 0
                DO i = 1, nmoloc(ispin)
                   localized_wfn_control%loc_states(i, ispin) = &
-                     localized_wfn_control%lu_bound_states(1, ispin)+i-1
+                     localized_wfn_control%lu_bound_states(1, ispin) + i - 1
                END DO
             END DO
          END IF

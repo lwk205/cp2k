@@ -9,83 +9,83 @@
 !>       2006.03 Moved here from qs_scf.F [Joost VandeVondele]
 ! **************************************************************************************************
 MODULE qs_initial_guess
-   USE atom_kind_orbitals,              ONLY: calculate_atomic_orbitals
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              cp_fm_to_dbcsr_row_template
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_submatrix, cp_fm_init_random, cp_fm_p_type, cp_fm_release, &
-        cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add_on_diag, dbcsr_checksum, dbcsr_copy, dbcsr_filter, dbcsr_get_diag, &
-        dbcsr_get_info, dbcsr_get_num_blocks, dbcsr_get_occupation, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_multiply, dbcsr_nfullrows_total, dbcsr_p_type, dbcsr_release, dbcsr_scale, &
-        dbcsr_set, dbcsr_set_diag, dbcsr_trace, dbcsr_type, dbcsr_verify_matrix
-   USE external_potential_types,        ONLY: all_potential_type,&
-                                              gth_potential_type,&
-                                              sgp_potential_type
-   USE input_constants,                 ONLY: atomic_guess,&
-                                              core_guess,&
-                                              history_guess,&
-                                              mopac_guess,&
-                                              no_guess,&
-                                              random_guess,&
-                                              restart_guess,&
-                                              sparse_guess
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE kpoint_io,                       ONLY: read_kpoints_restart
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE message_passing,                 ONLY: mp_bcast,&
-                                              mp_sum
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_mo_io,                        ONLY: read_mo_set,&
-                                              wfn_restart_file_name
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix,&
-                                              make_basis_lowdin,&
-                                              make_basis_simple,&
-                                              make_basis_sm
-   USE qs_mo_occupation,                ONLY: set_mo_occupation
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_restrict
-   USE qs_mom_methods,                  ONLY: do_mom_guess
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_methods,                  ONLY: eigensolver,&
-                                              eigensolver_simple
-   USE qs_scf_types,                    ONLY: block_davidson_diag_method_nr,&
-                                              block_krylov_diag_method_nr,&
-                                              ot_diag_method_nr,&
-                                              qs_scf_env_type
-   USE qs_wf_history_methods,           ONLY: wfi_update
-   USE scf_control_types,               ONLY: scf_control_type
-   USE util,                            ONLY: sort
+   USE atom_kind_orbitals, ONLY: calculate_atomic_orbitals
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  cp_fm_to_dbcsr_row_template
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_submatrix, cp_fm_init_random, cp_fm_p_type, cp_fm_release, &
+      cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add_on_diag, dbcsr_checksum, dbcsr_copy, dbcsr_filter, dbcsr_get_diag, &
+      dbcsr_get_info, dbcsr_get_num_blocks, dbcsr_get_occupation, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_multiply, dbcsr_nfullrows_total, dbcsr_p_type, dbcsr_release, dbcsr_scale, &
+      dbcsr_set, dbcsr_set_diag, dbcsr_trace, dbcsr_type, dbcsr_verify_matrix
+   USE external_potential_types, ONLY: all_potential_type, &
+                                       gth_potential_type, &
+                                       sgp_potential_type
+   USE input_constants, ONLY: atomic_guess, &
+                              core_guess, &
+                              history_guess, &
+                              mopac_guess, &
+                              no_guess, &
+                              random_guess, &
+                              restart_guess, &
+                              sparse_guess
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE kpoint_io, ONLY: read_kpoints_restart
+   USE kpoint_types, ONLY: kpoint_type
+   USE message_passing, ONLY: mp_bcast, &
+                              mp_sum
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_mo_io, ONLY: read_mo_set, &
+                       wfn_restart_file_name
+   USE qs_mo_methods, ONLY: calculate_density_matrix, &
+                            make_basis_lowdin, &
+                            make_basis_simple, &
+                            make_basis_sm
+   USE qs_mo_occupation, ONLY: set_mo_occupation
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_restrict
+   USE qs_mom_methods, ONLY: do_mom_guess
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_methods, ONLY: eigensolver, &
+                             eigensolver_simple
+   USE qs_scf_types, ONLY: block_davidson_diag_method_nr, &
+                           block_krylov_diag_method_nr, &
+                           ot_diag_method_nr, &
+                           qs_scf_env_type
+   USE qs_wf_history_methods, ONLY: wfi_update
+   USE scf_control_types, ONLY: scf_control_type
+   USE util, ONLY: sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -122,13 +122,13 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_first_density_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, filename
       INTEGER :: atom_a, blk, density_guess, group, handle, homo, i, iatom, ic, icol, id_nr, &
-         ikind, irow, iseed(4), ispin, istart_col, istart_row, j, last_read, n, n_cols, n_rows, &
-         nao, natom, natoms, natoms_tmp, nelectron, nmo, nmo_tmp, not_read, nsgf, nspin, nvec, &
-         ounit, qs_env_id, safe_density_guess, size_atomic_kind_set, z
+                 ikind, irow, iseed(4), ispin, istart_col, istart_row, j, last_read, n, n_cols, n_rows, &
+                 nao, natom, natoms, natoms_tmp, nelectron, nmo, nmo_tmp, not_read, nsgf, nspin, nvec, &
+                 ounit, qs_env_id, safe_density_guess, size_atomic_kind_set, z
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: first_sgf, kind_of, last_sgf
       INTEGER, DIMENSION(2)                              :: nelectron_spin
       INTEGER, DIMENSION(:), POINTER                     :: atom_list, elec_conf, nelec_kind, &
@@ -276,10 +276,10 @@ CONTAINS
          CALL mp_bcast(exist, para_env%source, para_env%group)
          CALL mp_bcast(file_name, para_env%source, para_env%group)
          nvec = qs_env%wf_history%memory_depth
-         not_read = nvec+1
+         not_read = nvec + 1
          ! At this level we read the saved backup RESTART files..
          DO i = 1, nvec
-            j = i-1
+            j = i - 1
             filename = TRIM(file_name)
             IF (j /= 0) filename = TRIM(file_name)//".bak-"//ADJUSTL(cp_to_string(j))
             IF (para_env%ionode) &
@@ -305,7 +305,7 @@ CONTAINS
                density_guess = safe_density_guess
             END IF
          END IF
-         last_read = not_read-1
+         last_read = not_read - 1
       END IF
 
       did_guess = .FALSE.
@@ -378,7 +378,7 @@ CONTAINS
       IF (density_guess == history_guess) THEN
          IF (not_read > 1) THEN
             DO i = 1, last_read
-               j = last_read-i
+               j = last_read - i
                CALL read_mo_set(mo_array, atomic_kind_set, qs_kind_set, particle_set, para_env, &
                                 id_nr=j, multiplicity=dft_control%multiplicity, &
                                 dft_section=dft_section)
@@ -649,10 +649,10 @@ CONTAINS
                ikind = kind_of(irow)
                IF (icol .EQ. irow) THEN
                   IF (ispin == 1) THEN
-                     pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale+ &
+                     pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale + &
                                    pmat(ikind)%mat(:, :, 2)*rscale
                   ELSE
-                     pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale- &
+                     pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale - &
                                    pmat(ikind)%mat(:, :, 2)*rscale
                   END IF
                END IF
@@ -689,7 +689,7 @@ CONTAINS
                                nmo=nmo, nao=nao, homo=homo)
                CALL cp_fm_set_all(mo_coeff, 0.0_dp)
 
-               n = MAXVAL(last_sgf-first_sgf)+1
+               n = MAXVAL(last_sgf - first_sgf) + 1
                size_atomic_kind_set = SIZE(atomic_kind_set)
 
                ALLOCATE (buff(n, n), sort_kind(size_atomic_kind_set), &
@@ -723,14 +723,14 @@ CONTAINS
                      !
                      atom_a = atom_list(iatom)
                      istart_row = first_sgf(atom_a)
-                     n_rows = last_sgf(atom_a)-first_sgf(atom_a)+1
+                     n_rows = last_sgf(atom_a) - first_sgf(atom_a) + 1
                      !
                      ! compute the "potential" nbr of states for this atom
                      n_cols = MAX(INT(REAL(nmo_tmp, dp)/REAL(natoms_tmp, dp)), 1)
                      IF (n_cols .GT. n_rows) n_cols = n_rows
                      !
-                     nmo_tmp = nmo_tmp-n_cols
-                     natoms_tmp = natoms_tmp-1
+                     nmo_tmp = nmo_tmp - n_cols
+                     natoms_tmp = natoms_tmp - 1
                      IF (nmo_tmp .LT. 0 .OR. natoms_tmp .LT. 0) THEN
                         CPABORT("Wrong1!")
                      END IF
@@ -739,7 +739,7 @@ CONTAINS
                      ENDDO
                      CALL cp_fm_set_submatrix(mo_coeff, buff, istart_row, istart_col, &
                                               n_rows, n_cols)
-                     istart_col = istart_col+n_cols
+                     istart_col = istart_col + n_cols
                   ENDDO
                ENDDO
 
@@ -758,11 +758,11 @@ CONTAINS
                      ENDIF
                      length = SQRT(DOT_PRODUCT(buff(:, 1), buff(:, 1)))
                      buff(:, :) = buff(:, :)/length
-                     DO j = i+1, nmo
+                     DO j = i + 1, nmo
                         CALL cp_fm_get_submatrix(mo_coeff, buff2, 1, j, nao, 1)
                         length = SQRT(DOT_PRODUCT(buff2(:, 1), buff2(:, 1)))
                         buff2(:, :) = buff2(:, :)/length
-                        IF (ABS(DOT_PRODUCT(buff(:, 1), buff2(:, 1))-1.0_dp) .LT. 1E-10_dp) THEN
+                        IF (ABS(DOT_PRODUCT(buff(:, 1), buff2(:, 1)) - 1.0_dp) .LT. 1E-10_dp) THEN
                            WRITE (*, *) 'wrong2', i, j, DOT_PRODUCT(buff(:, 1), buff2(:, 1))
                            DO ikind = 1, nao
                               IF (ABS(mo_coeff%local_data(ikind, i)) .GT. 1e-10_dp) THEN
@@ -945,7 +945,7 @@ CONTAINS
       TYPE(cp_para_env_type)                             :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_atomic_block_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: blk, group, handle, icol, ikind, irow, &
                                                             ispin, natom, nc, nkind, nocc(2)
@@ -1000,13 +1000,13 @@ CONTAINS
             ikind = kind_of(irow)
             IF (icol .EQ. irow) THEN
                IF (ispin == 1) THEN
-                  pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale+ &
+                  pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale + &
                                 pmat(ikind)%mat(:, :, 2)*rscale
                ELSE
-                  pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale- &
+                  pdata(:, :) = pmat(ikind)%mat(:, :, 1)*rscale - &
                                 pmat(ikind)%mat(:, :, 2)*rscale
                END IF
-               nocc(ispin) = nocc(ispin)+nok(ispin, ikind)
+               nocc(ispin) = nocc(ispin) + nok(ispin, ikind)
             END IF
          ENDDO
          CALL dbcsr_iterator_stop(iter)
@@ -1037,7 +1037,7 @@ CONTAINS
             IF (nelectron_spin(ispin) > nocc(ispin)) THEN
                rds = 0.99_dp
                CALL dbcsr_scale(matrix_p, rds)
-               rds = (1.0_dp-rds)*nelectron_spin(ispin)
+               rds = (1.0_dp - rds)*nelectron_spin(ispin)
                CALL dbcsr_get_info(matrix_p, nfullcols_total=nc)
                rds = rds/REAL(nc, KIND=dp)
                CALL dbcsr_add_on_diag(matrix_p, rds)
@@ -1081,7 +1081,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ounit
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_atomic_fock_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, icol, ikind, irow
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: kind_of
@@ -1160,7 +1160,7 @@ CONTAINS
       TYPE(cp_para_env_type)                             :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_mopac_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: atom_a, group, handle, iatom, ikind, &
                                                             iset, isgf, isgfa, ishell, ispin, la, &
@@ -1239,7 +1239,7 @@ CONTAINS
             ELSEIF (has_pot) THEN
                CALL get_atomic_kind(atomic_kind_set(ikind), z=z)
                CALL get_qs_kind(qs_kind_set(ikind), nsgf=nsgf, elec_conf=elec_conf, zeff=zeff)
-               maxll = MIN(SIZE(elec_conf)-1, maxl)
+               maxll = MIN(SIZE(elec_conf) - 1, maxl)
                econf(:) = 0.0_dp
                econf(0:maxll) = 0.5_dp*maxocc*REAL(elec_conf(0:maxll), dp)
             ELSE
@@ -1256,23 +1256,23 @@ CONTAINS
                      CASE (0)
                         pdiag(isgfa) = econf(0)
                      CASE (1)
-                        pdiag(isgfa+1) = econf(1)/3._dp
-                        pdiag(isgfa+2) = econf(1)/3._dp
-                        pdiag(isgfa+3) = econf(1)/3._dp
+                        pdiag(isgfa + 1) = econf(1)/3._dp
+                        pdiag(isgfa + 2) = econf(1)/3._dp
+                        pdiag(isgfa + 3) = econf(1)/3._dp
                      CASE (2)
-                        pdiag(isgfa+4) = econf(2)/5._dp
-                        pdiag(isgfa+5) = econf(2)/5._dp
-                        pdiag(isgfa+6) = econf(2)/5._dp
-                        pdiag(isgfa+7) = econf(2)/5._dp
-                        pdiag(isgfa+8) = econf(2)/5._dp
+                        pdiag(isgfa + 4) = econf(2)/5._dp
+                        pdiag(isgfa + 5) = econf(2)/5._dp
+                        pdiag(isgfa + 6) = econf(2)/5._dp
+                        pdiag(isgfa + 7) = econf(2)/5._dp
+                        pdiag(isgfa + 8) = econf(2)/5._dp
                      CASE (3)
-                        pdiag(isgfa+9) = econf(3)/7._dp
-                        pdiag(isgfa+10) = econf(3)/7._dp
-                        pdiag(isgfa+11) = econf(3)/7._dp
-                        pdiag(isgfa+12) = econf(3)/7._dp
-                        pdiag(isgfa+13) = econf(3)/7._dp
-                        pdiag(isgfa+14) = econf(3)/7._dp
-                        pdiag(isgfa+15) = econf(3)/7._dp
+                        pdiag(isgfa + 9) = econf(3)/7._dp
+                        pdiag(isgfa + 10) = econf(3)/7._dp
+                        pdiag(isgfa + 11) = econf(3)/7._dp
+                        pdiag(isgfa + 12) = econf(3)/7._dp
+                        pdiag(isgfa + 13) = econf(3)/7._dp
+                        pdiag(isgfa + 14) = econf(3)/7._dp
+                        pdiag(isgfa + 15) = econf(3)/7._dp
                      CASE DEFAULT
                         CPABORT("")
                      END SELECT
@@ -1285,49 +1285,49 @@ CONTAINS
                   isgfa = first_sgf(atom_a)
                   SELECT CASE (nsgf)
                   CASE (1) ! s-basis
-                     pdiag(isgfa) = (zeff-yy)*0.5_dp*maxocc
+                     pdiag(isgfa) = (zeff - yy)*0.5_dp*maxocc
                   CASE (4) ! sp-basis
                      IF (z == 1) THEN
                         ! special case: hydrogen with sp basis
-                        pdiag(isgfa) = (zeff-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+1) = 0._dp
-                        pdiag(isgfa+2) = 0._dp
-                        pdiag(isgfa+3) = 0._dp
+                        pdiag(isgfa) = (zeff - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 1) = 0._dp
+                        pdiag(isgfa + 2) = 0._dp
+                        pdiag(isgfa + 3) = 0._dp
                      ELSE
-                        pdiag(isgfa) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+1) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+2) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+3) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
+                        pdiag(isgfa) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 1) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 2) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 3) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
                      END IF
                   CASE (9) ! spd-basis
                      IF (z < 21 .OR. z > 30 .AND. z < 39 .OR. z > 48 .AND. z < 57) THEN
                         !   Main Group Element:  The "d" shell is formally empty.
-                        pdiag(isgfa) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+1) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+2) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+3) = (zeff*0.25_dp-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+4) = (-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+5) = (-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+6) = (-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+7) = (-yy)*0.5_dp*maxocc
-                        pdiag(isgfa+8) = (-yy)*0.5_dp*maxocc
+                        pdiag(isgfa) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 1) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 2) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 3) = (zeff*0.25_dp - yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 4) = (-yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 5) = (-yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 6) = (-yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 7) = (-yy)*0.5_dp*maxocc
+                        pdiag(isgfa + 8) = (-yy)*0.5_dp*maxocc
                      ELSE IF (z < 99) THEN
-                        my_sum = zeff-9.0_dp*yy
+                        my_sum = zeff - 9.0_dp*yy
                         !   First, put 2 electrons in the 's' shell
                         pdiag(isgfa) = (MAX(0.0_dp, MIN(my_sum, 2.0_dp)))*0.5_dp*maxocc
-                        my_sum = my_sum-2.0_dp
+                        my_sum = my_sum - 2.0_dp
                         IF (my_sum > 0.0_dp) THEN
                            !   Now put as many electrons as possible into the 'd' shell
-                           pdiag(isgfa+4) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
-                           pdiag(isgfa+5) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
-                           pdiag(isgfa+6) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
-                           pdiag(isgfa+7) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
-                           pdiag(isgfa+8) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
-                           my_sum = MAX(0.0_dp, my_sum-10.0_dp)
+                           pdiag(isgfa + 4) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
+                           pdiag(isgfa + 5) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
+                           pdiag(isgfa + 6) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
+                           pdiag(isgfa + 7) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
+                           pdiag(isgfa + 8) = (MAX(0.0_dp, MIN(my_sum*0.2_dp, 2.0_dp)))*0.5_dp*maxocc
+                           my_sum = MAX(0.0_dp, my_sum - 10.0_dp)
                            !   Put the remaining electrons in the 'p' shell
-                           pdiag(isgfa+1) = (my_sum/3.0_dp)*0.5_dp*maxocc
-                           pdiag(isgfa+2) = (my_sum/3.0_dp)*0.5_dp*maxocc
-                           pdiag(isgfa+3) = (my_sum/3.0_dp)*0.5_dp*maxocc
+                           pdiag(isgfa + 1) = (my_sum/3.0_dp)*0.5_dp*maxocc
+                           pdiag(isgfa + 2) = (my_sum/3.0_dp)*0.5_dp*maxocc
+                           pdiag(isgfa + 3) = (my_sum/3.0_dp)*0.5_dp*maxocc
                         END IF
                      END IF
                   CASE DEFAULT
@@ -1345,25 +1345,25 @@ CONTAINS
                DO iset = 1, nset
                   DO ishell = 1, nshell(iset)
                      la = l(ishell, iset)
-                     nelec = maxocc*REAL(2*la+1, dp)
+                     nelec = maxocc*REAL(2*la + 1, dp)
                      IF (econf(la) > 0.0_dp) THEN
                         IF (econf(la) >= nelec) THEN
                            paa = maxocc
-                           econf(la) = econf(la)-nelec
+                           econf(la) = econf(la) - nelec
                         ELSE
                            paa = maxocc*econf(la)/nelec
                            econf(la) = 0.0_dp
-                           ncount = ncount+NINT(nelec/maxocc)
+                           ncount = ncount + NINT(nelec/maxocc)
                         END IF
                         DO isgfa = first_sgfa(ishell, iset), last_sgfa(ishell, iset)
                            DO iatom = 1, natom
                               atom_a = atom_list(iatom)
-                              isgf = first_sgf(atom_a)+isgfa-1
+                              isgf = first_sgf(atom_a) + isgfa - 1
                               pdiag(isgf) = paa
                               IF (paa == maxocc) THEN
-                                 trps1 = trps1+paa*sdiag(isgf)
+                                 trps1 = trps1 + paa*sdiag(isgf)
                               ELSE
-                                 trps2 = trps2+paa*sdiag(isgf)
+                                 trps2 = trps2 + paa*sdiag(isgf)
                               END IF
                            END DO
                         END DO
@@ -1386,7 +1386,7 @@ CONTAINS
          ELSE
             DO ispin = 1, nspin
                IF (nelectron_spin(ispin) /= 0) THEN
-                  rscale = (REAL(nelectron_spin(ispin), dp)-trps1)/trps2
+                  rscale = (REAL(nelectron_spin(ispin), dp) - trps1)/trps2
                   DO isgf = 1, nao
                      IF (pdiag(isgf) < maxocc) pdiag(isgf) = rscale*pdiag(isgf)
                   END DO

@@ -12,61 +12,61 @@
 !> \author teo & fawzi
 ! **************************************************************************************************
 MODULE input_cp2k_qmmm
-   USE bibliography,                    ONLY: Bernstein2009,&
-                                              Bernstein2012,&
-                                              Golze2013,&
-                                              Laino2005,&
-                                              Laino2006
-   USE cell_types,                      ONLY: use_perd_none
-   USE cp_eri_mme_interface,            ONLY: create_eri_mme_section
-   USE cp_output_handling,              ONLY: add_last_numeric,&
-                                              cp_print_key_section_create,&
-                                              debug_print_level,&
-                                              high_print_level,&
-                                              low_print_level,&
-                                              medium_print_level,&
-                                              silent_print_level
-   USE cp_units,                        ONLY: cp_unit_to_cp2k
-   USE input_constants,                 ONLY: &
-        alpha_imomm_default, charge_scale_factor, do_eri_gpw, do_eri_mme, &
-        do_fm_mom_conserv_buffer, do_fm_mom_conserv_core, do_fm_mom_conserv_equal_a, &
-        do_fm_mom_conserv_equal_f, do_fm_mom_conserv_none, do_fm_mom_conserv_qm, &
-        do_multipole_section_off, do_multipole_section_on, do_par_atom, do_par_grid, &
-        do_qmmm_center_every_step, do_qmmm_center_max_minus_min, do_qmmm_center_never, &
-        do_qmmm_center_pbc_aware, do_qmmm_center_setup_only, do_qmmm_coulomb, do_qmmm_gauss, &
-        do_qmmm_image_calcmatrix, do_qmmm_image_iter, do_qmmm_link_gho, do_qmmm_link_imomm, &
-        do_qmmm_link_pseudo, do_qmmm_none, do_qmmm_pcharge, do_qmmm_swave, do_qmmm_wall_none, &
-        do_qmmm_wall_quadratic, do_qmmm_wall_reflective, gaussian, radius_qmmm_default, &
-        spline3_nopbc_interp
-   USE input_cp2k_mm,                   ONLY: create_GENPOT_section,&
-                                              create_Goodwin_section,&
-                                              create_LJ_section,&
-                                              create_NONBONDED14_section,&
-                                              create_Williams_section
-   USE input_cp2k_poisson,              ONLY: create_gspace_interp_section,&
-                                              create_poisson_section
-   USE input_cp2k_subsys,               ONLY: create_cell_section
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type
-   USE input_val_types,                 ONLY: char_t,&
-                                              integer_t,&
-                                              lchar_t,&
-                                              logical_t,&
-                                              real_t
-   USE kinds,                           ONLY: dp
-   USE pw_spline_utils,                 ONLY: no_precond,&
-                                              precond_spl3_1,&
-                                              precond_spl3_2,&
-                                              precond_spl3_3,&
-                                              precond_spl3_aint,&
-                                              precond_spl3_aint2
-   USE string_utilities,                ONLY: s2a
+   USE bibliography, ONLY: Bernstein2009, &
+                           Bernstein2012, &
+                           Golze2013, &
+                           Laino2005, &
+                           Laino2006
+   USE cell_types, ONLY: use_perd_none
+   USE cp_eri_mme_interface, ONLY: create_eri_mme_section
+   USE cp_output_handling, ONLY: add_last_numeric, &
+                                 cp_print_key_section_create, &
+                                 debug_print_level, &
+                                 high_print_level, &
+                                 low_print_level, &
+                                 medium_print_level, &
+                                 silent_print_level
+   USE cp_units, ONLY: cp_unit_to_cp2k
+   USE input_constants, ONLY: &
+      alpha_imomm_default, charge_scale_factor, do_eri_gpw, do_eri_mme, &
+      do_fm_mom_conserv_buffer, do_fm_mom_conserv_core, do_fm_mom_conserv_equal_a, &
+      do_fm_mom_conserv_equal_f, do_fm_mom_conserv_none, do_fm_mom_conserv_qm, &
+      do_multipole_section_off, do_multipole_section_on, do_par_atom, do_par_grid, &
+      do_qmmm_center_every_step, do_qmmm_center_max_minus_min, do_qmmm_center_never, &
+      do_qmmm_center_pbc_aware, do_qmmm_center_setup_only, do_qmmm_coulomb, do_qmmm_gauss, &
+      do_qmmm_image_calcmatrix, do_qmmm_image_iter, do_qmmm_link_gho, do_qmmm_link_imomm, &
+      do_qmmm_link_pseudo, do_qmmm_none, do_qmmm_pcharge, do_qmmm_swave, do_qmmm_wall_none, &
+      do_qmmm_wall_quadratic, do_qmmm_wall_reflective, gaussian, radius_qmmm_default, &
+      spline3_nopbc_interp
+   USE input_cp2k_mm, ONLY: create_GENPOT_section, &
+                            create_Goodwin_section, &
+                            create_LJ_section, &
+                            create_NONBONDED14_section, &
+                            create_Williams_section
+   USE input_cp2k_poisson, ONLY: create_gspace_interp_section, &
+                                 create_poisson_section
+   USE input_cp2k_subsys, ONLY: create_cell_section
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type
+   USE input_val_types, ONLY: char_t, &
+                              integer_t, &
+                              lchar_t, &
+                              logical_t, &
+                              real_t
+   USE kinds, ONLY: dp
+   USE pw_spline_utils, ONLY: no_precond, &
+                              precond_spl3_1, &
+                              precond_spl3_2, &
+                              precond_spl3_3, &
+                              precond_spl3_aint, &
+                              precond_spl3_aint2
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -89,7 +89,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -281,7 +281,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_mm_kinds', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -321,7 +321,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_force_mixing_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: link_subsection, print_key, &
@@ -558,7 +558,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_qm_kinds', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -592,7 +592,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_walls_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 
@@ -644,7 +644,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_image_charge_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -739,7 +739,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_periodic_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -803,7 +803,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_multipole_qmmm_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -883,7 +883,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_forcefield_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -921,7 +921,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_ff_nb_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_type), POINTER                        :: subsection
 
@@ -958,7 +958,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_link_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -1157,7 +1157,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_qmmm_interp_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key
@@ -1256,7 +1256,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_print_qmmm_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: print_key

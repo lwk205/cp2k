@@ -18,133 +18,133 @@
 !>      - SCCS implementation (16.10.2013,MK)
 ! **************************************************************************************************
 MODULE qs_ks_methods
-   USE admm_dm_methods,                 ONLY: admm_dm_calc_rho_aux,&
-                                              admm_dm_merge_ks_matrix
-   USE admm_methods,                    ONLY: admm_mo_calc_rho_aux,&
-                                              admm_mo_merge_derivs,&
-                                              admm_mo_merge_ks_matrix
-   USE admm_types,                      ONLY: admm_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_copy_columns_hack
-   USE cp_ddapc,                        ONLY: qs_ks_ddapc
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_scale_and_add,&
-                                              cp_fm_symm,&
-                                              cp_fm_transpose,&
-                                              cp_fm_upper_to_full
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_should_output
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_filter, dbcsr_get_info, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_type, dbcsr_type_symmetric
-   USE dft_plus_u,                      ONLY: plus_u
-   USE efield_utils,                    ONLY: efield_potential
-   USE hartree_local_methods,           ONLY: Vh_1c_gg_integrals
-   USE hfx_admm_utils,                  ONLY: hfx_admm_init,&
-                                              hfx_ks_matrix
-   USE input_constants,                 ONLY: do_ppl_grid,&
-                                              outer_scf_becke_constraint,&
-                                              outer_scf_hirshfeld_constraint
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kg_correction,                   ONLY: kg_ekin_subset
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE lri_environment_methods,         ONLY: v_int_ppl_energy
-   USE lri_environment_types,           ONLY: lri_density_type,&
-                                              lri_environment_type,&
-                                              lri_kind_type
-   USE mathlib,                         ONLY: abnormal_value
-   USE message_passing,                 ONLY: mp_sum
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_integral_ab,&
-                                              pw_integrate_function,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_implicit,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_release
-   USE qmmm_image_charge,               ONLY: add_image_pot_to_hartree_pot,&
-                                              calculate_image_pot,&
-                                              integrate_potential_devga_rspace
-   USE qs_cdft_types,                   ONLY: cdft_control_type
-   USE qs_charges_types,                ONLY: qs_charges_type
-   USE qs_core_energies,                ONLY: calculate_ptrace
-   USE qs_dftb_matrices,                ONLY: build_dftb_ks_matrix
-   USE qs_efield_berry,                 ONLY: qs_efield_berry_phase
-   USE qs_efield_local,                 ONLY: qs_efield_local_operator
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_gapw_densities,               ONLY: prepare_gapw_den
-   USE qs_integrate_potential,          ONLY: integrate_ppl_rspace,&
-                                              integrate_rho_nlcc,&
-                                              integrate_v_core_rspace
-   USE qs_ks_apply_restraints,          ONLY: qs_ks_cdft_constraint,&
-                                              qs_ks_mulliken_restraint,&
-                                              qs_ks_s2_restraint
-   USE qs_ks_atom,                      ONLY: update_ks_atom
-   USE qs_ks_qmmm_methods,              ONLY: qmmm_calculate_energy,&
-                                              qmmm_modify_hartree_pot
-   USE qs_ks_types,                     ONLY: qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_ks_utils,                     ONLY: &
-        calc_v_sic_rspace, calculate_zmp_potential, compute_matrix_vxc, &
-        get_embed_potential_energy, low_spin_roks, print_densities, print_detailed_energy, &
-        sic_explicit_orbitals, sum_up_and_integrate
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho0_ggrid,                   ONLY: integrate_vhg0_rspace
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_sccs,                         ONLY: sccs
-   USE qs_vxc,                          ONLY: qs_vxc_create
-   USE qs_vxc_atom,                     ONLY: calculate_vxc_atom
-   USE rtp_admm_methods,                ONLY: rtp_admm_calc_rho_aux,&
-                                              rtp_admm_merge_ks_matrix
-   USE se_fock_matrix,                  ONLY: build_se_fock_matrix
-   USE surface_dipole,                  ONLY: calc_dipsurf_potential
-   USE virial_types,                    ONLY: virial_type
+   USE admm_dm_methods, ONLY: admm_dm_calc_rho_aux, &
+                              admm_dm_merge_ks_matrix
+   USE admm_methods, ONLY: admm_mo_calc_rho_aux, &
+                           admm_mo_merge_derivs, &
+                           admm_mo_merge_ks_matrix
+   USE admm_types, ONLY: admm_type
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_copy_columns_hack
+   USE cp_ddapc, ONLY: qs_ks_ddapc
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_scale_and_add, &
+                                 cp_fm_symm, &
+                                 cp_fm_transpose, &
+                                 cp_fm_upper_to_full
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_should_output
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_filter, dbcsr_get_info, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_type, dbcsr_type_symmetric
+   USE dft_plus_u, ONLY: plus_u
+   USE efield_utils, ONLY: efield_potential
+   USE hartree_local_methods, ONLY: Vh_1c_gg_integrals
+   USE hfx_admm_utils, ONLY: hfx_admm_init, &
+                             hfx_ks_matrix
+   USE input_constants, ONLY: do_ppl_grid, &
+                              outer_scf_becke_constraint, &
+                              outer_scf_hirshfeld_constraint
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kg_correction, ONLY: kg_ekin_subset
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE lri_environment_methods, ONLY: v_int_ppl_energy
+   USE lri_environment_types, ONLY: lri_density_type, &
+                                    lri_environment_type, &
+                                    lri_kind_type
+   USE mathlib, ONLY: abnormal_value
+   USE message_passing, ONLY: mp_sum
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_integral_ab, &
+                         pw_integrate_function, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_implicit, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_release
+   USE qmmm_image_charge, ONLY: add_image_pot_to_hartree_pot, &
+                                calculate_image_pot, &
+                                integrate_potential_devga_rspace
+   USE qs_cdft_types, ONLY: cdft_control_type
+   USE qs_charges_types, ONLY: qs_charges_type
+   USE qs_core_energies, ONLY: calculate_ptrace
+   USE qs_dftb_matrices, ONLY: build_dftb_ks_matrix
+   USE qs_efield_berry, ONLY: qs_efield_berry_phase
+   USE qs_efield_local, ONLY: qs_efield_local_operator
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_gapw_densities, ONLY: prepare_gapw_den
+   USE qs_integrate_potential, ONLY: integrate_ppl_rspace, &
+                                     integrate_rho_nlcc, &
+                                     integrate_v_core_rspace
+   USE qs_ks_apply_restraints, ONLY: qs_ks_cdft_constraint, &
+                                     qs_ks_mulliken_restraint, &
+                                     qs_ks_s2_restraint
+   USE qs_ks_atom, ONLY: update_ks_atom
+   USE qs_ks_qmmm_methods, ONLY: qmmm_calculate_energy, &
+                                 qmmm_modify_hartree_pot
+   USE qs_ks_types, ONLY: qs_ks_env_type, &
+                          set_ks_env
+   USE qs_ks_utils, ONLY: &
+      calc_v_sic_rspace, calculate_zmp_potential, compute_matrix_vxc, &
+      get_embed_potential_energy, low_spin_roks, print_densities, print_detailed_energy, &
+      sic_explicit_orbitals, sum_up_and_integrate
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho0_ggrid, ONLY: integrate_vhg0_rspace
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_sccs, ONLY: sccs
+   USE qs_vxc, ONLY: qs_vxc_create
+   USE qs_vxc_atom, ONLY: calculate_vxc_atom
+   USE rtp_admm_methods, ONLY: rtp_admm_calc_rho_aux, &
+                               rtp_admm_merge_ks_matrix
+   USE se_fock_matrix, ONLY: build_se_fock_matrix
+   USE surface_dipole, ONLY: calc_dipsurf_potential
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -208,13 +208,13 @@ CONTAINS
          POINTER                                         :: ext_ks_matrix
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_ks_build_kohn_sham_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: name
       INTEGER                                            :: handle, iatom, img, ispin, nimages, ns, &
                                                             nspins
       LOGICAL :: do_adiabatic_rescaling, do_ddapc, do_hfx, do_ppl, gapw, gapw_xc, &
-         hfx_treat_lsd_in_core, just_energy_xc, lrigpw, my_print, rigpw, use_virial
+                 hfx_treat_lsd_in_core, just_energy_xc, lrigpw, my_print, rigpw, use_virial
       REAL(KIND=dp)                                      :: ecore_ppl, edisp, ee_ener, ekin_mol, &
                                                             mulliken_order_p
       REAL(KIND=dp), DIMENSION(3, 3)                     :: h_stress
@@ -232,7 +232,7 @@ CONTAINS
       TYPE(lri_kind_type), DIMENSION(:), POINTER         :: lri_v_int
       TYPE(pw_env_type), POINTER                         :: pw_env
       TYPE(pw_p_type) :: rho_tot_gspace, v_efield_rspace, v_hartree_gspace, v_hartree_rspace, &
-         v_minus_veps, v_sccs_rspace, v_sic_rspace, v_spin_ddapc_rest_r
+                         v_minus_veps, v_sccs_rspace, v_sic_rspace, v_spin_ddapc_rest_r
       TYPE(pw_p_type), DIMENSION(:), POINTER             :: rho_r, v_rspace_embed, v_rspace_new, &
                                                             v_rspace_new_aux_fit, v_tau_rspace, &
                                                             v_tau_rspace_aux_fit
@@ -416,7 +416,7 @@ CONTAINS
          IF (use_virial .AND. calculate_forces) THEN
             CALL sccs(qs_env, rho_tot_gspace%pw, v_hartree_gspace%pw, v_sccs_rspace%pw, &
                       h_stress=h_stress)
-            virial%pv_virial = virial%pv_virial+h_stress/REAL(para_env%num_pe, dp)
+            virial%pv_virial = virial%pv_virial + h_stress/REAL(para_env%num_pe, dp)
          ELSE
             CALL sccs(qs_env, rho_tot_gspace%pw, v_hartree_gspace%pw, v_sccs_rspace%pw)
          END IF
@@ -428,7 +428,7 @@ CONTAINS
             CALL pw_poisson_solve(poisson_env, rho_tot_gspace%pw, energy%hartree, &
                                   v_hartree_gspace%pw, h_stress=h_stress, &
                                   rho_core=rho_core)
-            virial%pv_virial = virial%pv_virial+h_stress/REAL(para_env%num_pe, dp)
+            virial%pv_virial = virial%pv_virial + h_stress/REAL(para_env%num_pe, dp)
          ELSE
             CALL pw_poisson_solve(poisson_env, rho_tot_gspace%pw, energy%hartree, &
                                   v_hartree_gspace%pw, rho_core=rho_core)
@@ -461,7 +461,7 @@ CONTAINS
 
       IF (dft_control%correct_surf_dip) THEN
          CALL calc_dipsurf_potential(qs_env, energy)
-         energy%hartree = energy%hartree+energy%surf_dipole
+         energy%hartree = energy%hartree + energy%surf_dipole
       END IF
 
       ! SIC
@@ -478,14 +478,14 @@ CONTAINS
          ! Compute the energy due to the external potential
          ee_ener = 0.0_dp
          DO ispin = 1, nspins
-            ee_ener = ee_ener+pw_integral_ab(rho_r(ispin)%pw, vee%pw)
+            ee_ener = ee_ener + pw_integral_ab(rho_r(ispin)%pw, vee%pw)
          END DO
          IF (.NOT. just_energy) THEN
             IF (gapw) THEN
                CALL get_qs_env(qs_env=qs_env, &
                                rho0_s_rs=rho0_s_rs)
                CPASSERT(ASSOCIATED(rho0_s_rs))
-               ee_ener = ee_ener+pw_integral_ab(rho0_s_rs%pw, vee%pw)
+               ee_ener = ee_ener + pw_integral_ab(rho0_s_rs%pw, vee%pw)
             END IF
          END IF
          ! the sign accounts for the charge of the electrons
@@ -561,7 +561,7 @@ CONTAINS
          NULLIFY (rho_struct)
 
          IF (use_virial .AND. calculate_forces) THEN
-            virial%pv_virial = virial%pv_virial-virial%pv_xc
+            virial%pv_virial = virial%pv_virial - virial%pv_xc
             ! ** virial%pv_xc will be zeroed in the xc routines
          END IF
          xc_section => admm_env%xc_section_primary
@@ -606,7 +606,7 @@ CONTAINS
 
       NULLIFY (rho_struct)
       IF (use_virial .AND. calculate_forces) THEN
-         virial%pv_virial = virial%pv_virial-virial%pv_xc
+         virial%pv_virial = virial%pv_virial - virial%pv_xc
       ENDIF
 
       ! *** Add Hartree-Fock contribution if required ***
@@ -639,7 +639,7 @@ CONTAINS
          CALL kg_ekin_subset(qs_env, ksmat, ekin_mol, calculate_forces)
 
          ! substract kg corr from the total energy
-         energy%exc = energy%exc-ekin_mol
+         energy%exc = energy%exc - ekin_mol
 
       END IF
 
@@ -684,10 +684,10 @@ CONTAINS
             ksmat => ks_matrix(:, 1)
             CALL kg_ekin_subset(qs_env, ksmat, ekin_mol, calculate_forces)
             ! substract kg corr from the total energy
-            energy%exc = energy%exc-ekin_mol
+            energy%exc = energy%exc - ekin_mol
             ! virial corrections
             IF (use_virial .AND. calculate_forces) THEN
-               virial%pv_virial = virial%pv_virial+virial%pv_xc
+               virial%pv_virial = virial%pv_virial + virial%pv_xc
                virial%pv_xc = 0.0_dp
             END IF
          END IF
@@ -818,11 +818,11 @@ CONTAINS
          ! update core energy for grid based local pseudopotential
          ecore_ppl = 0._dp
          DO ispin = 1, nspins
-            ecore_ppl = ecore_ppl+ &
+            ecore_ppl = ecore_ppl + &
                         SUM(vppl_rspace%pw%cr3d*rho_r(ispin)%pw%cr3d)*vppl_rspace%pw%pw_grid%dvol
          END DO
          CALL mp_sum(ecore_ppl, para_env%group)
-         energy%core = energy%core+ecore_ppl
+         energy%core = energy%core + ecore_ppl
       END IF
 
       IF (lrigpw) THEN
@@ -834,21 +834,21 @@ CONTAINS
                lri_v_int => lri_density%lri_coefs(ispin)%lri_kinds
                CALL v_int_ppl_energy(qs_env, lri_v_int, ecore_ppl)
             END DO
-            energy%core = energy%core+ecore_ppl
+            energy%core = energy%core + ecore_ppl
          END IF
       END IF
 
       ! Sum all energy terms to obtain the total energy
-      energy%total = energy%core_overlap+energy%core_self+energy%core+energy%hartree+ &
-                     energy%hartree_1c+energy%exc+energy%exc1+energy%ex+ &
-                     energy%dispersion+energy%qmmm_el+energy%mulliken+ &
-                     SUM(energy%ddapc_restraint)+energy%s2_restraint+ &
-                     energy%dft_plus_u+energy%kTS+ &
-                     energy%efield+energy%efield_core+energy%ee+ &
-                     energy%ee_core+energy%exc_aux_fit+energy%image_charge+ &
-                     energy%sccs_pol+energy%sccs_mpc+energy%cdft
+      energy%total = energy%core_overlap + energy%core_self + energy%core + energy%hartree + &
+                     energy%hartree_1c + energy%exc + energy%exc1 + energy%ex + &
+                     energy%dispersion + energy%qmmm_el + energy%mulliken + &
+                     SUM(energy%ddapc_restraint) + energy%s2_restraint + &
+                     energy%dft_plus_u + energy%kTS + &
+                     energy%efield + energy%efield_core + energy%ee + &
+                     energy%ee_core + energy%exc_aux_fit + energy%image_charge + &
+                     energy%sccs_pol + energy%sccs_mpc + energy%cdft
 
-      IF (dft_control%apply_embed_pot) energy%total = energy%total+energy%embed_corr
+      IF (dft_control%apply_embed_pot) energy%total = energy%total + energy%embed_corr
 
       IF (abnormal_value(energy%total)) &
          CPABORT("KS energy is an abnormal value (NaN/Inf).")
@@ -876,7 +876,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: skip_nuclear_density
 
       CHARACTER(*), PARAMETER :: routineN = 'calc_rho_tot_gspace', &
-         routineP = moduleN//':'//routineN
+                                 routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       LOGICAL                                            :: my_skip
@@ -933,7 +933,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: ks_matrix, mo_derivs
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calc_mo_derivatives', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin
       LOGICAL                                            :: uniform_occupation
@@ -1055,7 +1055,7 @@ CONTAINS
                                                             print_active
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_ks_update_qs_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, unit_nr
       LOGICAL                                            :: c_forces, do_rebuild, energy_only, &
@@ -1125,7 +1125,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'evaluate_core_matrix_traces', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(dbcsr_p_type), DIMENSION(:, :), POINTER       :: matrixkp_h, matrixkp_t, rho_ao_kp
@@ -1168,7 +1168,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: print_active
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rebuild_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(dft_control_type), POINTER                    :: dft_control
@@ -1217,7 +1217,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: w_matrix
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_w_matrix_1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, imo
       REAL(KIND=dp), DIMENSION(:), POINTER               :: eigocc
@@ -1269,7 +1269,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: mo_deriv, w_matrix, s_matrix
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_w_matrix_ot', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       LOGICAL, PARAMETER                                 :: check_gradient = .FALSE., &
                                                             do_symm = .FALSE.
 
@@ -1337,7 +1337,7 @@ CONTAINS
          CALL cp_fm_column_scale(weighted_vectors, scaling_factor)
          DEALLOCATE (scaling_factor)
 
-         WRITE (*, *) " maxabs difference ", MAXVAL(ABS(weighted_vectors%local_data-2.0_dp*gradient%local_data))
+         WRITE (*, *) " maxabs difference ", MAXVAL(ABS(weighted_vectors%local_data - 2.0_dp*gradient%local_data))
          CALL cp_fm_release(gradient)
       ENDIF
 
@@ -1363,7 +1363,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_ks, matrix_p, matrix_w
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_w_matrix_roks', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nao
       TYPE(cp_blacs_env_type), POINTER                   :: context
@@ -1417,7 +1417,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_ks_allocate_basics', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: headline
       INTEGER                                            :: ic, ispin, nimg

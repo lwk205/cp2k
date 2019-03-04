@@ -6,57 +6,57 @@
 ! **************************************************************************************************
 MODULE qs_rho0_methods
 
-   USE ao_util,                         ONLY: exp_radius,&
-                                              gaussint_sph,&
-                                              trace_r_AxB
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp_control_types,                ONLY: dft_control_type,&
-                                              gapw_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: dfac,&
-                                              fourpi
-   USE memory_utilities,                ONLY: reallocate
-   USE orbital_pointers,                ONLY: indco,&
-                                              indso,&
-                                              nco,&
-                                              ncoset,&
-                                              nso,&
-                                              nsoset
+   USE ao_util, ONLY: exp_radius, &
+                      gaussint_sph, &
+                      trace_r_AxB
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp_control_types, ONLY: dft_control_type, &
+                               gapw_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: dfac, &
+                            fourpi
+   USE memory_utilities, ONLY: reallocate
+   USE orbital_pointers, ONLY: indco, &
+                               indso, &
+                               nco, &
+                               ncoset, &
+                               nso, &
+                               nsoset
    USE orbital_transformation_matrices, ONLY: orbtramat
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_harmonics_atom,               ONLY: get_none0_cg_list,&
-                                              harmonics_atom_type
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type,&
-                                              set_qs_kind
-   USE qs_local_rho_types,              ONLY: allocate_rhoz,&
-                                              calculate_rhoz,&
-                                              local_rho_type,&
-                                              rhoz_type
-   USE qs_oce_methods,                  ONLY: prj_scatter
-   USE qs_rho0_ggrid,                   ONLY: rho0_s_grid_create
-   USE qs_rho0_types,                   ONLY: &
-        allocate_multipoles, allocate_rho0_atom, allocate_rho0_atom_rad, allocate_rho0_mpole, &
-        calculate_g0, get_rho0_mpole, initialize_mpole_rho, mpole_gau_overlap, mpole_rho_atom, &
-        rho0_atom_type, rho0_mpole_type, write_rho0_info
-   USE qs_rho_atom_types,               ONLY: get_rho_atom,&
-                                              rho_atom_coeff,&
-                                              rho_atom_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_harmonics_atom, ONLY: get_none0_cg_list, &
+                                harmonics_atom_type
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type, &
+                            set_qs_kind
+   USE qs_local_rho_types, ONLY: allocate_rhoz, &
+                                 calculate_rhoz, &
+                                 local_rho_type, &
+                                 rhoz_type
+   USE qs_oce_methods, ONLY: prj_scatter
+   USE qs_rho0_ggrid, ONLY: rho0_s_grid_create
+   USE qs_rho0_types, ONLY: &
+      allocate_multipoles, allocate_rho0_atom, allocate_rho0_atom_rad, allocate_rho0_mpole, &
+      calculate_g0, get_rho0_mpole, initialize_mpole_rho, mpole_gau_overlap, mpole_rho_atom, &
+      rho0_atom_type, rho0_mpole_type, write_rho0_info
+   USE qs_rho_atom_types, ONLY: get_rho_atom, &
+                                rho_atom_coeff, &
+                                rho_atom_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -89,10 +89,10 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: nchannels, nsotot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_mpole_gau', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, icg, ig1, ig2, ipgf1, ipgf2, iset1, iset2, iso, iso1, iso2, l, l1, l2, &
-         llmax, m1, m2, max_iso_not0_local, max_s_harm, maxl, maxso, n1, n2, nset
+                 llmax, m1, m2, max_iso_not0_local, max_s_harm, maxl, maxso, n1, n2, nset
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: cg_n_list
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: cg_list
       INTEGER, DIMENSION(:), POINTER                     :: lmax, lmin, npgf
@@ -141,19 +141,19 @@ CONTAINS
 
                         l1 = indso(1, iso1)
                         l2 = indso(1, iso2)
-                        ig1 = iso1+n1*(ipgf1-1)+m1
-                        ig2 = iso2+n2*(ipgf2-1)+m2
+                        ig1 = iso1 + n1*(ipgf1 - 1) + m1
+                        ig2 = iso2 + n2*(ipgf2 - 1) + m2
 
-                        mp_gau%Qlm_gg(ig1, ig2, iso) = fourpi/(2._dp*l+1._dp)* &
-                                                       my_CG(iso1, iso2, iso)*gaussint_sph(zet1+zet2, l+l1+l2)
+                        mp_gau%Qlm_gg(ig1, ig2, iso) = fourpi/(2._dp*l + 1._dp)* &
+                                                       my_CG(iso1, iso2, iso)*gaussint_sph(zet1 + zet2, l + l1 + l2)
                      END DO ! icg
                   END DO ! iso
 
                END DO ! ipgf2
             END DO ! ipgf1
-            m2 = m2+maxso
+            m2 = m2 + maxso
          END DO ! iset2
-         m1 = m1+maxso
+         m1 = m1 + maxso
       END DO ! iset1
 
       DEALLOCATE (cg_list, cg_n_list)
@@ -194,7 +194,7 @@ CONTAINS
       REAL(dp), INTENT(INOUT)                            :: rho0_h_tot
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_rho0_atom', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iat, iatom, ic, ico, ir, is, &
                                                             iso, ispin, l, lmax0, lshell, lx, ly, &
@@ -259,8 +259,8 @@ CONTAINS
                DO ispin = 1, nspins
                   mpole_rho%Q0(ispin) = (trace_r_AxB(mpole_gau%Qlm_gg(:, :, 1), nsotot, &
                                                      cpc_ah(:, :, ispin), nsotot, nsotot, nsotot) &
-                                         -trace_r_AxB(mpole_gau%Qlm_gg(:, :, 1), nsotot, &
-                                                      cpc_as(:, :, ispin), nsotot, nsotot, nsotot))/SQRT(fourpi)
+                                         - trace_r_AxB(mpole_gau%Qlm_gg(:, :, 1), nsotot, &
+                                                       cpc_as(:, :, ispin), nsotot, nsotot, nsotot))/SQRT(fourpi)
                END DO
             END IF
             ! Multipoles of local charge distribution
@@ -271,16 +271,16 @@ CONTAINS
                   mpole_rho%Qlm_s(iso) = 0.0_dp
 
                   DO ispin = 1, nspins
-                     mpole_rho%Qlm_h(iso) = mpole_rho%Qlm_h(iso)+ &
+                     mpole_rho%Qlm_h(iso) = mpole_rho%Qlm_h(iso) + &
                                             trace_r_AxB(mpole_gau%Qlm_gg(:, :, iso), nsotot, &
                                                         cpc_ah(:, :, ispin), nsotot, nsotot, nsotot)
-                     mpole_rho%Qlm_s(iso) = mpole_rho%Qlm_s(iso)+ &
+                     mpole_rho%Qlm_s(iso) = mpole_rho%Qlm_s(iso) + &
                                             trace_r_AxB(mpole_gau%Qlm_gg(:, :, iso), nsotot, &
                                                         cpc_as(:, :, ispin), nsotot, nsotot, nsotot)
                   END DO ! ispin
 
-                  mpole_rho%Qlm_tot(iso) = mpole_rho%Qlm_tot(iso)+ &
-                                           mpole_rho%Qlm_h(iso)-mpole_rho%Qlm_s(iso)
+                  mpole_rho%Qlm_tot(iso) = mpole_rho%Qlm_tot(iso) + &
+                                           mpole_rho%Qlm_h(iso) - mpole_rho%Qlm_s(iso)
                END IF
 
                rho0_atom_set(iatom)%rho0_rad_h%r_coef(1:nr, iso) = &
@@ -290,10 +290,10 @@ CONTAINS
 
                sum1 = 0.0_dp
                DO ir = 1, nr
-                  sum1 = sum1+g_atom%wr(ir)* &
+                  sum1 = sum1 + g_atom%wr(ir)* &
                          rho0_atom_set(iatom)%rho0_rad_h%r_coef(ir, iso)
                ENDDO
-               rho0_h_tot = rho0_h_tot+sum1*harmonics%slm_int(iso)
+               rho0_h_tot = rho0_h_tot + sum1*harmonics%slm_int(iso)
             END DO ! iso
             IF (paw_atom) THEN
                DEALLOCATE (cpc_ah, cpc_as)
@@ -309,7 +309,7 @@ CONTAINS
 
             DO lshell = 0, lmax0
                DO ic = 1, nco(lshell)
-                  ico = ic+ncoset(lshell-1)
+                  ico = ic + ncoset(lshell - 1)
                   mpole_rho%Qlm_car(ico) = 0.0_dp
                END DO
             END DO
@@ -321,19 +321,19 @@ CONTAINS
 
             DO lshell = 0, lmax0
                DO ic = 1, nco(lshell)
-                  ico = ic+ncoset(lshell-1)
+                  ico = ic + ncoset(lshell - 1)
                   mpole_rho%Qlm_car(ico) = 0.0_dp
                   lx = indco(1, ico)
                   ly = indco(2, ico)
                   lz = indco(3, ico)
 
                   DO is = 1, nso(lshell)
-                     iso = is+nsoset(lshell-1)
+                     iso = is + nsoset(lshell - 1)
 
-                     mpole_rho%Qlm_car(ico) = mpole_rho%Qlm_car(ico)+ &
+                     mpole_rho%Qlm_car(ico) = mpole_rho%Qlm_car(ico) + &
                                               orbtramat(lshell)%c2s(is, ic)*mpole_rho%Qlm_tot(iso)* &
                                               norm_g0l_h(lshell) &
-                                              /SQRT(dfac(2*lx-1)*dfac(2*ly-1)*dfac(2*lz-1)*fourpi/dfac(2*lshell+1))
+                                              /SQRT(dfac(2*lx - 1)*dfac(2*ly - 1)*dfac(2*lz - 1)*fourpi/dfac(2*lshell + 1))
 
                   END DO
                END DO
@@ -365,7 +365,7 @@ CONTAINS
 
       CHARACTER(LEN=default_string_length)               :: unit_str
       INTEGER :: handle, iat, iatom, ikind, l, l_rho1_max, laddg, lmaxg, maxl, maxnset, maxso, &
-         nat, natom, nchan_c, nchan_s, nkind, nr, nset, nsotot, output_unit
+                 nat, natom, nchan_c, nchan_s, nkind, nr, nset, nsotot, output_unit
       INTEGER, DIMENSION(:), POINTER                     :: atom_list
       LOGICAL                                            :: my_tddft, paw_atom
       REAL(dp)                                           :: alpha_core, eps_Vrho0, max_rpgf0_s, &
@@ -453,7 +453,7 @@ CONTAINS
 
          l_rho1_max = indso(1, harmonics%max_iso_not0)
          IF (paw_atom) THEN
-            rho0_mpole%lmax0_kind(ikind) = MIN(2*maxl, l_rho1_max, maxl+laddg, lmaxg)
+            rho0_mpole%lmax0_kind(ikind) = MIN(2*maxl, l_rho1_max, maxl + laddg, lmaxg)
          ELSE
             rho0_mpole%lmax0_kind(ikind) = 0
          END IF
@@ -503,7 +503,7 @@ CONTAINS
          DO
             radius = exp_radius(rho0_mpole%lmax_0, rho0_mpole%zet0_h, eps_Vrho0, 1.0_dp)
             IF (radius <= rc_min) EXIT
-            rho0_mpole%zet0_h = rho0_mpole%zet0_h+0.1_dp
+            rho0_mpole%zet0_h = rho0_mpole%zet0_h + 0.1_dp
          END DO
 
       END IF
@@ -511,7 +511,7 @@ CONTAINS
 !   Allocate and calculate the normalization factors for g0_lm_h and g0_lm_s
       CALL reallocate(rho0_mpole%norm_g0l_h, 0, rho0_mpole%lmax_0)
       DO l = 0, rho0_mpole%lmax_0
-         rho0_mpole%norm_g0l_h(l) = (2._dp*l+1._dp)/ &
+         rho0_mpole%norm_g0l_h(l) = (2._dp*l + 1._dp)/ &
                                     (fourpi*gaussint_sph(rho0_mpole%zet0_h, 2*l))
       END DO
 
@@ -567,7 +567,7 @@ CONTAINS
       REAL(dp), INTENT(INOUT)                            :: max_rpgf0_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'interaction_radii_g0', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: l, lmax
       REAL(dp)                                           :: r_h, z0_h

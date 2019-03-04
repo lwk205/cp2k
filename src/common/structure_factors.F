@@ -9,9 +9,9 @@
 ! **************************************************************************************************
 MODULE structure_factors
 
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: twopi
-   USE structure_factor_types,          ONLY: structure_factor_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: twopi
+   USE structure_factor_types, ONLY: structure_factor_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -48,7 +48,7 @@ CONTAINS
       TYPE(structure_factor_type), INTENT(INOUT)         :: exp_igr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'structure_factor_deallocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       DEALLOCATE (exp_igr%ex)
       DEALLOCATE (exp_igr%ey)
@@ -99,11 +99,11 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: nshell
 
       CHARACTER(len=*), PARAMETER :: routineN = 'structure_factor_allocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
-      ALLOCATE (exp_igr%ex(bds(1, 1):bds(2, 1)+1, nparts))
-      ALLOCATE (exp_igr%ey(bds(1, 2):bds(2, 2)+1, nparts))
-      ALLOCATE (exp_igr%ez(bds(1, 3):bds(2, 3)+1, nparts))
+      ALLOCATE (exp_igr%ex(bds(1, 1):bds(2, 1) + 1, nparts))
+      ALLOCATE (exp_igr%ey(bds(1, 2):bds(2, 2) + 1, nparts))
+      ALLOCATE (exp_igr%ez(bds(1, 3):bds(2, 3) + 1, nparts))
       NULLIFY (exp_igr%centre)
 
       exp_igr%lb(1) = LBOUND(exp_igr%ex, 1)
@@ -118,14 +118,14 @@ CONTAINS
 
       IF (PRESENT(allocate_shell_e)) THEN
          IF (allocate_shell_e) THEN
-            ALLOCATE (exp_igr%shell_ex(bds(1, 1):bds(2, 1)+1, nshell))
-            ALLOCATE (exp_igr%shell_ey(bds(1, 2):bds(2, 2)+1, nshell))
-            ALLOCATE (exp_igr%shell_ez(bds(1, 3):bds(2, 3)+1, nshell))
+            ALLOCATE (exp_igr%shell_ex(bds(1, 1):bds(2, 1) + 1, nshell))
+            ALLOCATE (exp_igr%shell_ey(bds(1, 2):bds(2, 2) + 1, nshell))
+            ALLOCATE (exp_igr%shell_ez(bds(1, 3):bds(2, 3) + 1, nshell))
             NULLIFY (exp_igr%shell_centre)
 
-            ALLOCATE (exp_igr%core_ex(bds(1, 1):bds(2, 1)+1, nshell))
-            ALLOCATE (exp_igr%core_ey(bds(1, 2):bds(2, 2)+1, nshell))
-            ALLOCATE (exp_igr%core_ez(bds(1, 3):bds(2, 3)+1, nshell))
+            ALLOCATE (exp_igr%core_ex(bds(1, 1):bds(2, 1) + 1, nshell))
+            ALLOCATE (exp_igr%core_ey(bds(1, 2):bds(2, 2) + 1, nshell))
+            ALLOCATE (exp_igr%core_ez(bds(1, 3):bds(2, 3) + 1, nshell))
             NULLIFY (exp_igr%core_centre)
 
             IF (PRESENT(allocate_shell_centre)) THEN
@@ -171,7 +171,7 @@ CONTAINS
       n1 = UBOUND(ez, 1)
 
       ! delta is in scaled coordinates
-      vec(:) = twopi*(delta(:)+0.5_dp)
+      vec(:) = twopi*(delta(:) + 0.5_dp)
 
       ex(l0) = 1.0_dp
       ey(m0) = 1.0_dp
@@ -183,22 +183,22 @@ CONTAINS
       fp = CMPLX(COS(vec(1)), -SIN(vec(1)), KIND=dp)
       fm = CONJG(fp)
       DO j = 1, -l0
-         ex(j+l0) = ex(j+l0-1)*fp
-         ex(-j+l1) = ex(-j+l1+1)*fm
+         ex(j + l0) = ex(j + l0 - 1)*fp
+         ex(-j + l1) = ex(-j + l1 + 1)*fm
       END DO
 
       fp = CMPLX(COS(vec(2)), -SIN(vec(2)), KIND=dp)
       fm = CONJG(fp)
       DO j = 1, -m0
-         ey(j+m0) = ey(j+m0-1)*fp
-         ey(-j+m1) = ey(-j+m1+1)*fm
+         ey(j + m0) = ey(j + m0 - 1)*fp
+         ey(-j + m1) = ey(-j + m1 + 1)*fm
       END DO
 
       fp = CMPLX(COS(vec(3)), -SIN(vec(3)), KIND=dp)
       fm = CONJG(fp)
       DO j = 1, -n0
-         ez(j+n0) = ez(j+n0-1)*fp
-         ez(-j+n1) = ez(-j+n1+1)*fm
+         ez(j + n0) = ez(j + n0 - 1)*fp
+         ez(-j + n1) = ez(-j + n1 + 1)*fm
       END DO
 
    END SUBROUTINE structure_factor_evaluate

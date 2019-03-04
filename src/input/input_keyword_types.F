@@ -10,28 +10,28 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE input_keyword_types
-   USE cp_units,                        ONLY: cp_unit_create,&
-                                              cp_unit_desc,&
-                                              cp_unit_release,&
-                                              cp_unit_type
-   USE input_enumeration_types,         ONLY: enum_create,&
-                                              enum_release,&
-                                              enum_retain,&
-                                              enumeration_type
-   USE input_val_types,                 ONLY: &
-        char_t, enum_t, integer_t, lchar_t, logical_t, no_t, real_t, val_create, val_release, &
-        val_retain, val_type, val_write, val_write_internal
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE print_messages,                  ONLY: print_message
-   USE reference_manager,               ONLY: get_citation_key,&
-                                              print_format_journal,&
-                                              print_reference
-   USE string_utilities,                ONLY: a2s,&
-                                              compress,&
-                                              substitute_special_xml_tokens,&
-                                              typo_match,&
-                                              uppercase
+   USE cp_units, ONLY: cp_unit_create, &
+                       cp_unit_desc, &
+                       cp_unit_release, &
+                       cp_unit_type
+   USE input_enumeration_types, ONLY: enum_create, &
+                                      enum_release, &
+                                      enum_retain, &
+                                      enumeration_type
+   USE input_val_types, ONLY: &
+      char_t, enum_t, integer_t, lchar_t, logical_t, no_t, real_t, val_create, val_release, &
+      val_retain, val_type, val_write, val_write_internal
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE print_messages, ONLY: print_message
+   USE reference_manager, ONLY: get_citation_key, &
+                                print_format_journal, &
+                                print_reference
+   USE string_utilities, ONLY: a2s, &
+                               compress, &
+                               substitute_special_xml_tokens, &
+                               typo_match, &
+                               uppercase
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -190,15 +190,15 @@ CONTAINS
       CPASSERT(.NOT. ASSOCIATED(keyword))
       ALLOCATE (keyword)
       keyword%ref_count = 1
-      last_keyword_id = last_keyword_id+1
+      last_keyword_id = last_keyword_id + 1
       keyword%id_nr = last_keyword_id
       NULLIFY (keyword%unit)
 
       IF (PRESENT(variants)) THEN
-         ALLOCATE (keyword%names(SIZE(variants)+1))
+         ALLOCATE (keyword%names(SIZE(variants) + 1))
          keyword%names(1) = name
          DO i = 1, SIZE(variants)
-            keyword%names(i+1) = variants(i)
+            keyword%names(i + 1) = variants(i)
          END DO
       ELSE
          ALLOCATE (keyword%names(1))
@@ -397,7 +397,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(keyword))
       CPASSERT(keyword%ref_count > 0)
-      keyword%ref_count = keyword%ref_count+1
+      keyword%ref_count = keyword%ref_count + 1
    END SUBROUTINE keyword_retain
 
 ! **************************************************************************************************
@@ -409,11 +409,11 @@ CONTAINS
       TYPE(keyword_type), POINTER                        :: keyword
 
       CHARACTER(len=*), PARAMETER :: routineN = 'keyword_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(keyword)) THEN
          CPASSERT(keyword%ref_count > 0)
-         keyword%ref_count = keyword%ref_count-1
+         keyword%ref_count = keyword%ref_count - 1
          IF (keyword%ref_count == 0) THEN
             DEALLOCATE (keyword%names)
             DEALLOCATE (keyword%description)
@@ -487,7 +487,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: unit_nr, level
 
       CHARACTER(len=*), PARAMETER :: routineN = 'keyword_describe', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: c_string
       INTEGER                                            :: i, l
@@ -576,12 +576,12 @@ CONTAINS
                   l = 17
                   DO i = 1, SIZE(keyword%enum%c_vals)
                      c_string = keyword%enum%c_vals(i)
-                     IF (l+LEN_TRIM(c_string) > 72 .AND. l > 14) THEN
+                     IF (l + LEN_TRIM(c_string) > 72 .AND. l > 14) THEN
                         WRITE (unit_nr, "(/,'    ')", advance='NO')
                         l = 4
                      END IF
                      WRITE (unit_nr, "(' ',a)", advance='NO') TRIM(c_string)
-                     l = LEN_TRIM(c_string)+3
+                     l = LEN_TRIM(c_string) + 3
                   END DO
                   WRITE (unit_nr, "()")
                END IF
@@ -623,7 +623,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'keyword_describe_html', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: c_string, my_unit
       INTEGER                                            :: i, iref
@@ -776,7 +776,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: level, unit_number
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_keyword_xml', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=1000)                                :: string
       CHARACTER(LEN=3)                                   :: repeats
@@ -789,10 +789,10 @@ CONTAINS
       ! Indentation for current level, next level, etc.
 
       l0 = level
-      l1 = level+1
-      l2 = level+2
-      l3 = level+3
-      l4 = level+4
+      l1 = level + 1
+      l2 = level + 2
+      l3 = level + 3
+      l4 = level + 4
 
       IF (keyword%repeats) THEN
          repeats = "yes"
@@ -957,7 +957,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: bonus
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'keyword_typo_match', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=LEN(matching_string(1)))             :: line
       INTEGER                                            :: i, imatch, imax, irank, j, k
@@ -968,16 +968,16 @@ CONTAINS
       DO i = 1, SIZE(keyword%names)
          imatch = typo_match(TRIM(keyword%names(i)), TRIM(unknown_string))
          IF (imatch > 0) THEN
-            imatch = imatch+bonus
+            imatch = imatch + bonus
             WRITE (line, '(T2,A)') " keyword "//TRIM(keyword%names(i))//" in section "//TRIM(location_string)
             imax = SIZE(matching_rank, 1)
-            irank = imax+1
+            irank = imax + 1
             DO k = imax, 1, -1
                IF (imatch > matching_rank(k)) irank = k
             ENDDO
             IF (irank <= imax) THEN
-               matching_rank(irank+1:imax) = matching_rank(irank:imax-1)
-               matching_string(irank+1:imax) = matching_string(irank:imax-1)
+               matching_rank(irank + 1:imax) = matching_rank(irank:imax - 1)
+               matching_string(irank + 1:imax) = matching_string(irank:imax - 1)
                matching_rank(irank) = imatch
                matching_string(irank) = line
             ENDIF
@@ -987,18 +987,18 @@ CONTAINS
             DO j = 1, SIZE(keyword%enum%c_vals)
                imatch = typo_match(TRIM(keyword%enum%c_vals(j)), TRIM(unknown_string))
                IF (imatch > 0) THEN
-                  imatch = imatch+bonus
+                  imatch = imatch + bonus
                   WRITE (line, '(T2,A)') " enum "//TRIM(keyword%enum%c_vals(j))// &
                      " in section "//TRIM(location_string)// &
                      " for keyword "//TRIM(keyword%names(i))
                   imax = SIZE(matching_rank, 1)
-                  irank = imax+1
+                  irank = imax + 1
                   DO k = imax, 1, -1
                      IF (imatch > matching_rank(k)) irank = k
                   ENDDO
                   IF (irank <= imax) THEN
-                     matching_rank(irank+1:imax) = matching_rank(irank:imax-1)
-                     matching_string(irank+1:imax) = matching_string(irank:imax-1)
+                     matching_rank(irank + 1:imax) = matching_rank(irank:imax - 1)
+                     matching_string(irank + 1:imax) = matching_string(irank:imax - 1)
                      matching_rank(irank) = imatch
                      matching_string(irank) = line
                   ENDIF

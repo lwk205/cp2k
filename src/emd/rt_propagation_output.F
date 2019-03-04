@@ -9,80 +9,80 @@
 ! **************************************************************************************************
 
 MODULE rt_propagation_output
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_scale_and_add
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_double,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_iter_string,&
-                                              cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_binary_write, dbcsr_checksum, dbcsr_copy, dbcsr_create, &
-        dbcsr_deallocate_matrix, dbcsr_desymmetrize, dbcsr_filter, dbcsr_get_info, &
-        dbcsr_get_occupation, dbcsr_init_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_scale, &
-        dbcsr_set, dbcsr_type
-   USE input_constants,                 ONLY: ehrenfest,&
-                                              real_time_propagation
-   USE input_section_types,             ONLY: section_get_ivals,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE machine,                         ONLY: m_flush
-   USE message_passing,                 ONLY: mp_max
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_linres_current,               ONLY: calculate_jrho_resp
-   USE qs_linres_types,                 ONLY: current_env_type
-   USE qs_mo_io,                        ONLY: write_rt_mos_to_restart
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_post_dftb,                ONLY: scf_post_calculation_dftb
-   USE qs_scf_post_gpw,                 ONLY: qs_scf_post_moments,&
-                                              write_available_results,&
-                                              write_mo_free_results
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
-   USE rt_propagation_types,            ONLY: get_rtp,&
-                                              rt_prop_type
-   USE rt_propagation_utils,            ONLY: calculate_P_imaginary
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_scale_and_add
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_double, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_iter_string, &
+                                 cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_binary_write, dbcsr_checksum, dbcsr_copy, dbcsr_create, &
+      dbcsr_deallocate_matrix, dbcsr_desymmetrize, dbcsr_filter, dbcsr_get_info, &
+      dbcsr_get_occupation, dbcsr_init_p, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_p_type, dbcsr_scale, &
+      dbcsr_set, dbcsr_type
+   USE input_constants, ONLY: ehrenfest, &
+                              real_time_propagation
+   USE input_section_types, ONLY: section_get_ivals, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE machine, ONLY: m_flush
+   USE message_passing, ONLY: mp_max
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_linres_current, ONLY: calculate_jrho_resp
+   USE qs_linres_types, ONLY: current_env_type
+   USE qs_mo_io, ONLY: write_rt_mos_to_restart
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_post_dftb, ONLY: scf_post_calculation_dftb
+   USE qs_scf_post_gpw, ONLY: qs_scf_post_moments, &
+                              write_available_results, &
+                              write_mo_free_results
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
+   USE rt_propagation_types, ONLY: get_rtp, &
+                                   rt_prop_type
+   USE rt_propagation_utils, ONLY: calculate_P_imaginary
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -142,7 +142,7 @@ CONTAINS
       rtp_section => section_vals_get_subs_vals(input, "DFT%REAL_TIME_PROPAGATION")
 
       CALL get_qs_kind_set(qs_kind_set, nelectron=n_electrons)
-      n_electrons = n_electrons-dft_control%charge
+      n_electrons = n_electrons - dft_control%charge
 
       CALL qs_rho_get(rho_struct=rho, tot_rho_r=qs_tot_rho_r)
 
@@ -157,16 +157,16 @@ CONTAINS
          WRITE (UNIT=output_unit, FMT="((T3,A,T41,2F20.10))") &
             "Total electronic density (r-space): ", &
             tot_rho_r, &
-            tot_rho_r+ &
+            tot_rho_r + &
             REAL(n_electrons, dp)
          WRITE (UNIT=output_unit, FMT="((T3,A,T59,F22.14))") &
             "Total energy:", rtp%energy_new
          IF (run_type == ehrenfest) &
             WRITE (UNIT=output_unit, FMT="((T3,A,T61,F20.14))") &
-            "Energy difference to previous iteration step:", rtp%energy_new-rtp%energy_old
+            "Energy difference to previous iteration step:", rtp%energy_new - rtp%energy_old
          IF (run_type == real_time_propagation) &
             WRITE (UNIT=output_unit, FMT="((T3,A,T61,F20.14))") &
-            "Energy difference to initial state:", rtp%energy_new-rtp%energy_old
+            "Energy difference to initial state:", rtp%energy_new - rtp%energy_old
          IF (PRESENT(delta_iter)) &
             WRITE (UNIT=output_unit, FMT="((T3,A,T61,E20.6))") &
             "Convergence:", delta_iter
@@ -175,7 +175,7 @@ CONTAINS
                WRITE (UNIT=output_unit, FMT="((T3,A,T61,F12.2))") &
                "Time needed for propagation:", used_time
             WRITE (UNIT=output_unit, FMT="(/,(T3,A,3X,F16.14))") &
-               "CONVERGENCE REACHED", rtp%energy_new-rtp%energy_old
+               "CONVERGENCE REACHED", rtp%energy_new - rtp%energy_old
          END IF
       END IF
 
@@ -265,7 +265,7 @@ CONTAINS
       TYPE(dbcsr_type), OPTIONAL, POINTER                :: matrix_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rt_calculate_orthonormality', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, im, ispin, j, k, n, &
                                                             ncol_local, nrow_local, nspin, re
@@ -282,7 +282,7 @@ CONTAINS
       max_alpha = 0.0_dp
       max_beta = 0.0_dp
       DO ispin = 1, nspin
-         re = ispin*2-1
+         re = ispin*2 - 1
          im = ispin*2
          ! get S*C
          CALL cp_fm_create(svec_re, mos_new(im)%matrix%matrix_struct)
@@ -315,7 +315,7 @@ CONTAINS
          DO i = 1, nrow_local
             DO j = 1, ncol_local
                alpha = overlap_re%local_data(i, j)
-               IF (row_indices(i) .EQ. col_indices(j)) alpha = alpha-1.0_dp
+               IF (row_indices(i) .EQ. col_indices(j)) alpha = alpha - 1.0_dp
                max_alpha = MAX(max_alpha, ABS(alpha))
             ENDDO
          ENDDO
@@ -370,7 +370,7 @@ CONTAINS
       END DO
 
       DO ispin = 1, nspin
-         re = ispin*2-1
+         re = ispin*2 - 1
          im = ispin*2
 
          double_col = .TRUE.
@@ -392,7 +392,7 @@ CONTAINS
 
          DO icol = 1, lcol
             work%local_data(:, icol) = delta_mos(re)%matrix%local_data(:, icol)
-            work%local_data(:, icol+lcol) = delta_mos(im)%matrix%local_data(:, icol)
+            work%local_data(:, icol + lcol) = delta_mos(im)%matrix%local_data(:, icol)
          END DO
 
          CALL cp_dbcsr_sm_fm_multiply(matrix_s, work, work1, ncol=newdim)
@@ -420,8 +420,8 @@ CONTAINS
          CALL cp_fm_get_info(work, nrow_local=lrow)
          DO i = 1, lrow
             DO j = 1, lcol
-               alpha = SQRT((work%local_data(i, j)+work2%local_data(i, j+lcol))**2+ &
-                            (work%local_data(i, j+lcol)-work2%local_data(i, j))**2)
+               alpha = SQRT((work%local_data(i, j) + work2%local_data(i, j + lcol))**2 + &
+                            (work%local_data(i, j + lcol) - work2%local_data(i, j))**2)
                max_alpha = MAX(max_alpha, ABS(alpha))
             ENDDO
          ENDDO
@@ -457,7 +457,7 @@ CONTAINS
       REAL(dp), INTENT(out)                              :: delta_eps
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rt_convergence_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: one = 1.0_dp, zero = 0.0_dp
 
       INTEGER                                            :: col_atom, group, handle, i, ispin, &
@@ -489,7 +489,7 @@ CONTAINS
       ALLOCATE (tmp)
       CALL dbcsr_create(tmp, template=delta_P(1)%matrix, matrix_type="N")
       DO ispin = 1, SIZE(delta_P)/2
-         CALL dbcsr_desymmetrize(delta_P(2*ispin-1)%matrix, tmp)
+         CALL dbcsr_desymmetrize(delta_P(2*ispin - 1)%matrix, tmp)
          CALL dbcsr_add(delta_P(2*ispin)%matrix, tmp, one, one)
       END DO
       !the absolute values are now in the even entries of delta_P
@@ -558,7 +558,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: rho
 
       CHARACTER(len=*), PARAMETER :: routineN = 'report_density_occupation', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, im, ispin, re, unit_nr
       REAL(KIND=dp)                                      :: eps, occ
@@ -577,7 +577,7 @@ CONTAINS
          CALL dbcsr_copy(tmp(i)%matrix, rho(i)%matrix)
       ENDDO
       DO ispin = 1, SIZE(rho)/2
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
          eps = MAX(filter_eps, 10E-12_dp)
          DO WHILE (eps < 1.1_dp)
@@ -614,7 +614,7 @@ CONTAINS
       LOGICAL                                            :: history
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_rt_p_to_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, project_name
       INTEGER                                            :: handle, im, ispin, re, unit_nr
@@ -631,7 +631,7 @@ CONTAINS
 
       project_name = logger%iter_info%project_name
       DO ispin = 1, SIZE(rho_new)/2
-         re = 2*ispin-1
+         re = 2*ispin - 1
          im = 2*ispin
          IF (history) THEN
             WRITE (file_name, '(A,I0,A)') &

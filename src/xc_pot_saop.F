@@ -7,95 +7,95 @@
 !> \brief Calculate the saop potential
 ! **************************************************************************************************
 MODULE xc_pot_saop
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cp_array_utils,                  ONLY: cp_1d_r_p_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_plus_fm_fm_t,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_get_submatrix,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_set_submatrix,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set
-   USE input_constants,                 ONLY: do_method_gapw,&
-                                              oe_gllb,&
-                                              oe_lb,&
-                                              oe_saop,&
-                                              xc_funct_no_shortcut
-   USE input_section_types,             ONLY: &
-        section_vals_create, section_vals_duplicate, section_vals_get_subs_vals, &
-        section_vals_release, section_vals_retain, section_vals_set_subs_vals, section_vals_type, &
-        section_vals_val_get, section_vals_val_set
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_zero
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type,&
-                                              pw_release
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_gapw_densities,               ONLY: prepare_gapw_den
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE qs_harmonics_atom,               ONLY: harmonics_atom_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_atom,                      ONLY: update_ks_atom
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_local_rho_types,              ONLY: local_rho_set_create,&
-                                              local_rho_set_release,&
-                                              local_rho_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_atom_methods,             ONLY: allocate_rho_atom_internals,&
-                                              calculate_rho_atom_coeff
-   USE qs_rho_atom_types,               ONLY: get_rho_atom,&
-                                              rho_atom_coeff,&
-                                              rho_atom_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_vxc_atom,                     ONLY: calc_rho_angular,&
-                                              gaVxcgb_noGC
-   USE util,                            ONLY: get_limit
-   USE virial_types,                    ONLY: virial_type
-   USE xc,                              ONLY: xc_vxc_pw_create
-   USE xc_atom,                         ONLY: fill_rho_set,&
-                                              vxc_of_r_new,&
-                                              xc_rho_set_atom_update
-   USE xc_derivative_set_types,         ONLY: xc_derivative_set_type,&
-                                              xc_dset_create,&
-                                              xc_dset_get_derivative,&
-                                              xc_dset_release,&
-                                              xc_dset_zero_all
-   USE xc_derivative_types,             ONLY: xc_derivative_get,&
-                                              xc_derivative_type
-   USE xc_derivatives,                  ONLY: xc_functionals_eval
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_setall,&
-                                              xc_rho_cflags_type
-   USE xc_rho_set_types,                ONLY: xc_rho_set_create,&
-                                              xc_rho_set_release,&
-                                              xc_rho_set_type,&
-                                              xc_rho_set_update
-   USE xc_xbecke88,                     ONLY: xb88_lda_info,&
-                                              xb88_lsd_info
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cp_array_utils, ONLY: cp_1d_r_p_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_plus_fm_fm_t, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_get_submatrix, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_set_submatrix, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_deallocate_matrix, &
+                        dbcsr_p_type, &
+                        dbcsr_set
+   USE input_constants, ONLY: do_method_gapw, &
+                              oe_gllb, &
+                              oe_lb, &
+                              oe_saop, &
+                              xc_funct_no_shortcut
+   USE input_section_types, ONLY: &
+      section_vals_create, section_vals_duplicate, section_vals_get_subs_vals, &
+      section_vals_release, section_vals_retain, section_vals_set_subs_vals, section_vals_type, &
+      section_vals_val_get, section_vals_val_set
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_zero
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type, &
+                       pw_release
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_gapw_densities, ONLY: prepare_gapw_den
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE qs_harmonics_atom, ONLY: harmonics_atom_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_atom, ONLY: update_ks_atom
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_local_rho_types, ONLY: local_rho_set_create, &
+                                 local_rho_set_release, &
+                                 local_rho_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_atom_methods, ONLY: allocate_rho_atom_internals, &
+                                  calculate_rho_atom_coeff
+   USE qs_rho_atom_types, ONLY: get_rho_atom, &
+                                rho_atom_coeff, &
+                                rho_atom_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_vxc_atom, ONLY: calc_rho_angular, &
+                          gaVxcgb_noGC
+   USE util, ONLY: get_limit
+   USE virial_types, ONLY: virial_type
+   USE xc, ONLY: xc_vxc_pw_create
+   USE xc_atom, ONLY: fill_rho_set, &
+                      vxc_of_r_new, &
+                      xc_rho_set_atom_update
+   USE xc_derivative_set_types, ONLY: xc_derivative_set_type, &
+                                      xc_dset_create, &
+                                      xc_dset_get_derivative, &
+                                      xc_dset_release, &
+                                      xc_dset_zero_all
+   USE xc_derivative_types, ONLY: xc_derivative_get, &
+                                  xc_derivative_type
+   USE xc_derivatives, ONLY: xc_functionals_eval
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_setall, &
+                                  xc_rho_cflags_type
+   USE xc_rho_set_types, ONLY: xc_rho_set_create, &
+                               xc_rho_set_release, &
+                               xc_rho_set_type, &
+                               xc_rho_set_update
+   USE xc_xbecke88, ONLY: xb88_lda_info, &
+                          xb88_lsd_info
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -322,9 +322,9 @@ CONTAINS
 
          CALL pw_zero(vxc_tmp(ispin)%pw)
 
-         DO orb = 1, homo-1
+         DO orb = 1, homo - 1
 
-            efac = K_rho*SQRT(mo_eigenvalues(homo)-mo_eigenvalues(orb))
+            efac = K_rho*SQRT(mo_eigenvalues(homo) - mo_eigenvalues(orb))
             IF (.NOT. lsd) efac = 2.0_dp*efac
 
             CALL cp_fm_set_all(single_mo_coeff(ispin)%matrix, 0.0_dp)
@@ -386,8 +386,8 @@ CONTAINS
 
          DO orb = 1, homo
 
-            we_LB = EXP(-2.0_dp*(mo_eigenvalues(homo)-mo_eigenvalues(orb))**2)
-            we_GLLB = 1.0_dp-we_LB
+            we_LB = EXP(-2.0_dp*(mo_eigenvalues(homo) - mo_eigenvalues(orb))**2)
+            we_GLLB = 1.0_dp - we_LB
             IF (.NOT. lsd) THEN
                we_LB = 2.0_dp*we_LB
                we_GLLB = 2.0_dp*we_GLLB
@@ -498,7 +498,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: oe_corr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'gapw_add_atomic_saop_pot', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ia, iat, iatom, ikind, ir, ispin, mepos, &
                                                             na, natom, nr, ns, nspins, num_pe, orb
@@ -722,11 +722,11 @@ CONTAINS
             CALL xc_dset_zero_all(deriv_set)
             CALL vxc_of_r_new(xc_fun_section_tmp, rho_set_h, deriv_set, 1, needs, &
                               weight, lsd, na, nr, exc, vxc_LB_h, vxg, vtau)
-            vxc_LB_h = vxc_LB_h+alpha*vxc_tmp_h
+            vxc_LB_h = vxc_LB_h + alpha*vxc_tmp_h
             DO ispin = 1, nspins
                dummy => vxc_tmp_h(:, :, ispin:ispin)
                CALL add_lb_pot(dummy, rho_set_h, lsd, ispin)
-               vxc_LB_h(:, :, ispin) = vxc_LB_h(:, :, ispin)-weight(:, :)*vxc_tmp_h(:, :, ispin)
+               vxc_LB_h(:, :, ispin) = vxc_LB_h(:, :, ispin) - weight(:, :)*vxc_tmp_h(:, :, ispin)
             END DO
             NULLIFY (dummy)
 
@@ -748,11 +748,11 @@ CONTAINS
             CALL vxc_of_r_new(xc_fun_section_tmp, rho_set_s, deriv_set, 1, needs, &
                               weight, lsd, na, nr, exc, vxc_LB_s, vxg, vtau)
 
-            vxc_LB_s = vxc_LB_s+alpha*vxc_tmp_s
+            vxc_LB_s = vxc_LB_s + alpha*vxc_tmp_s
             DO ispin = 1, nspins
                dummy => vxc_tmp_s(:, :, ispin:ispin)
                CALL add_lb_pot(dummy, rho_set_s, lsd, ispin)
-               vxc_LB_s(:, :, ispin) = vxc_LB_s(:, :, ispin)-weight(:, :)*vxc_tmp_s(:, :, ispin)
+               vxc_LB_s(:, :, ispin) = vxc_LB_s(:, :, ispin) - weight(:, :)*vxc_tmp_s(:, :, ispin)
             END DO
             NULLIFY (dummy)
 
@@ -774,11 +774,11 @@ CONTAINS
 
             DO ispin = 1, nspins
 
-               DO orb = 1, homo(ispin)-1
+               DO orb = 1, homo(ispin) - 1
 
                   ALLOCATE (coeff_col(nrow(ispin), 1))
 
-                  efac = K_rho*SQRT(mo_eigenvalues(ispin)%array(homo(ispin))- &
+                  efac = K_rho*SQRT(mo_eigenvalues(ispin)%array(homo(ispin)) - &
                                     mo_eigenvalues(ispin)%array(orb))
                   IF (.NOT. lsd) efac = 2.0_dp*efac
 
@@ -820,15 +820,15 @@ CONTAINS
 
                   IF (lsd) THEN
                      IF (ispin == 1) THEN
-                        vxc_tmp_h(:, :, 1) = vxc_tmp_h(:, :, 1)+efac*orb_rho_set_h%rhoa(:, :, 1)
-                        vxc_tmp_s(:, :, 1) = vxc_tmp_s(:, :, 1)+efac*orb_rho_set_s%rhoa(:, :, 1)
+                        vxc_tmp_h(:, :, 1) = vxc_tmp_h(:, :, 1) + efac*orb_rho_set_h%rhoa(:, :, 1)
+                        vxc_tmp_s(:, :, 1) = vxc_tmp_s(:, :, 1) + efac*orb_rho_set_s%rhoa(:, :, 1)
                      ELSE
-                        vxc_tmp_h(:, :, 2) = vxc_tmp_h(:, :, 2)+efac*orb_rho_set_h%rhob(:, :, 1)
-                        vxc_tmp_s(:, :, 2) = vxc_tmp_s(:, :, 2)+efac*orb_rho_set_s%rhob(:, :, 1)
+                        vxc_tmp_h(:, :, 2) = vxc_tmp_h(:, :, 2) + efac*orb_rho_set_h%rhob(:, :, 1)
+                        vxc_tmp_s(:, :, 2) = vxc_tmp_s(:, :, 2) + efac*orb_rho_set_s%rhob(:, :, 1)
                      END IF
                   ELSE
-                     vxc_tmp_h(:, :, 1) = vxc_tmp_h(:, :, 1)+efac*orb_rho_set_h%rho(:, :, 1)
-                     vxc_tmp_s(:, :, 1) = vxc_tmp_s(:, :, 1)+efac*orb_rho_set_s%rho(:, :, 1)
+                     vxc_tmp_h(:, :, 1) = vxc_tmp_h(:, :, 1) + efac*orb_rho_set_h%rho(:, :, 1)
+                     vxc_tmp_s(:, :, 1) = vxc_tmp_s(:, :, 1) + efac*orb_rho_set_s%rho(:, :, 1)
                   END IF
 
                END DO ! orb
@@ -839,16 +839,16 @@ CONTAINS
                DO ir = 1, nr
                   DO ia = 1, na
                      IF (rho_set_h%rhoa(ia, ir, 1) > rho_set_h%rho_cutoff) &
-                        vxc_GLLB_h(ia, ir, 1) = vxc_GLLB_h(ia, ir, 1)+ &
+                        vxc_GLLB_h(ia, ir, 1) = vxc_GLLB_h(ia, ir, 1) + &
                                                 weight(ia, ir)*vxc_tmp_h(ia, ir, 1)/rho_set_h%rhoa(ia, ir, 1)
                      IF (rho_set_h%rhob(ia, ir, 1) > rho_set_h%rho_cutoff) &
-                        vxc_GLLB_h(ia, ir, 2) = vxc_GLLB_h(ia, ir, 2)+ &
+                        vxc_GLLB_h(ia, ir, 2) = vxc_GLLB_h(ia, ir, 2) + &
                                                 weight(ia, ir)*vxc_tmp_h(ia, ir, 2)/rho_set_h%rhob(ia, ir, 1)
                      IF (rho_set_s%rhoa(ia, ir, 1) > rho_set_s%rho_cutoff) &
-                        vxc_GLLB_s(ia, ir, 1) = vxc_GLLB_s(ia, ir, 1)+ &
+                        vxc_GLLB_s(ia, ir, 1) = vxc_GLLB_s(ia, ir, 1) + &
                                                 weight(ia, ir)*vxc_tmp_s(ia, ir, 1)/rho_set_s%rhoa(ia, ir, 1)
                      IF (rho_set_s%rhob(ia, ir, 1) > rho_set_s%rho_cutoff) &
-                        vxc_GLLB_s(ia, ir, 2) = vxc_GLLB_s(ia, ir, 2)+ &
+                        vxc_GLLB_s(ia, ir, 2) = vxc_GLLB_s(ia, ir, 2) + &
                                                 weight(ia, ir)*vxc_tmp_s(ia, ir, 2)/rho_set_s%rhob(ia, ir, 1)
                   END DO
                END DO
@@ -856,10 +856,10 @@ CONTAINS
                DO ir = 1, nr
                   DO ia = 1, na
                      IF (rho_set_h%rho(ia, ir, 1) > rho_set_h%rho_cutoff) &
-                        vxc_GLLB_h(ia, ir, 1) = vxc_GLLB_h(ia, ir, 1)+ &
+                        vxc_GLLB_h(ia, ir, 1) = vxc_GLLB_h(ia, ir, 1) + &
                                                 weight(ia, ir)*vxc_tmp_h(ia, ir, 1)/rho_set_h%rho(ia, ir, 1)
                      IF (rho_set_s%rho(ia, ir, 1) > rho_set_s%rho_cutoff) &
-                        vxc_GLLB_s(ia, ir, 1) = vxc_GLLB_s(ia, ir, 1)+ &
+                        vxc_GLLB_s(ia, ir, 1) = vxc_GLLB_s(ia, ir, 1) + &
                                                 weight(ia, ir)*vxc_tmp_s(ia, ir, 1)/rho_set_s%rho(ia, ir, 1)
                   END DO
                END DO
@@ -873,17 +873,17 @@ CONTAINS
 
                   ALLOCATE (coeff_col(nrow(ispin), 1))
 
-                  we_LB = EXP(-2.0_dp*(mo_eigenvalues(ispin)%array(homo(ispin))- &
+                  we_LB = EXP(-2.0_dp*(mo_eigenvalues(ispin)%array(homo(ispin)) - &
                                        mo_eigenvalues(ispin)%array(orb))**2)
-                  we_GLLB = 1.0_dp-we_LB
+                  we_GLLB = 1.0_dp - we_LB
                   IF (.NOT. lsd) THEN
                      we_LB = 2.0_dp*we_LB
                      we_GLLB = 2.0_dp*we_GLLB
                   END IF
 
-                  vxc_tmp_h(:, :, ispin) = we_LB*vxc_LB_h(:, :, ispin)+ &
+                  vxc_tmp_h(:, :, ispin) = we_LB*vxc_LB_h(:, :, ispin) + &
                                            we_GLLB*vxc_GLLB_h(:, :, ispin)
-                  vxc_tmp_s(:, :, ispin) = we_LB*vxc_LB_s(:, :, ispin)+ &
+                  vxc_tmp_s(:, :, ispin) = we_LB*vxc_LB_s(:, :, ispin) + &
                                            we_GLLB*vxc_GLLB_s(:, :, ispin)
 
                   CALL cp_fm_set_all(single_mo_coeff(ispin)%matrix, 0.0_dp)
@@ -924,15 +924,15 @@ CONTAINS
 
                   IF (lsd) THEN
                      IF (ispin == 1) THEN
-                        vxc_SAOP_h(:, :, 1) = vxc_SAOP_h(:, :, 1)+vxc_tmp_h(:, :, 1)*orb_rho_set_h%rhoa(:, :, 1)
-                        vxc_SAOP_s(:, :, 1) = vxc_SAOP_s(:, :, 1)+vxc_tmp_s(:, :, 1)*orb_rho_set_s%rhoa(:, :, 1)
+                        vxc_SAOP_h(:, :, 1) = vxc_SAOP_h(:, :, 1) + vxc_tmp_h(:, :, 1)*orb_rho_set_h%rhoa(:, :, 1)
+                        vxc_SAOP_s(:, :, 1) = vxc_SAOP_s(:, :, 1) + vxc_tmp_s(:, :, 1)*orb_rho_set_s%rhoa(:, :, 1)
                      ELSE
-                        vxc_SAOP_h(:, :, 2) = vxc_SAOP_h(:, :, 2)+vxc_tmp_h(:, :, 2)*orb_rho_set_h%rhob(:, :, 1)
-                        vxc_SAOP_s(:, :, 2) = vxc_SAOP_s(:, :, 2)+vxc_tmp_s(:, :, 2)*orb_rho_set_s%rhob(:, :, 1)
+                        vxc_SAOP_h(:, :, 2) = vxc_SAOP_h(:, :, 2) + vxc_tmp_h(:, :, 2)*orb_rho_set_h%rhob(:, :, 1)
+                        vxc_SAOP_s(:, :, 2) = vxc_SAOP_s(:, :, 2) + vxc_tmp_s(:, :, 2)*orb_rho_set_s%rhob(:, :, 1)
                      END IF
                   ELSE
-                     vxc_SAOP_h(:, :, 1) = vxc_SAOP_h(:, :, 1)+vxc_tmp_h(:, :, 1)*orb_rho_set_h%rho(:, :, 1)
-                     vxc_SAOP_s(:, :, 1) = vxc_SAOP_s(:, :, 1)+vxc_tmp_s(:, :, 1)*orb_rho_set_s%rho(:, :, 1)
+                     vxc_SAOP_h(:, :, 1) = vxc_SAOP_h(:, :, 1) + vxc_tmp_h(:, :, 1)*orb_rho_set_h%rho(:, :, 1)
+                     vxc_SAOP_s(:, :, 1) = vxc_SAOP_s(:, :, 1) + vxc_tmp_s(:, :, 1)*orb_rho_set_s%rho(:, :, 1)
                   END IF
 
                END DO ! orb
@@ -1065,7 +1065,7 @@ CONTAINS
                      n_13 = n**ob3
                      x = (rho_set%norm_drho(i, j, k)/2.0_dp)/(n*n_13)
                      x2 = x*x
-                     pot(i, j, k) = beta*x2*n_13/(1.0_dp+3.0_dp*beta*x*LOG(x+SQRT(x2+1.0_dp)))
+                     pot(i, j, k) = beta*x2*n_13/(1.0_dp + 3.0_dp*beta*x*LOG(x + SQRT(x2 + 1.0_dp)))
                   END IF
                ELSE
                   IF (spin == 1) THEN
@@ -1073,14 +1073,14 @@ CONTAINS
                         n_13 = rho_set%rhoa_1_3(i, j, k)
                         x = rho_set%norm_drhoa(i, j, k)/(rho_set%rhoa(i, j, k)*n_13)
                         x2 = x*x
-                        pot(i, j, k) = beta*x2*n_13/(1.0_dp+3.0_dp*beta*x*LOG(SQRT(x2+1.0_dp)+x))
+                        pot(i, j, k) = beta*x2*n_13/(1.0_dp + 3.0_dp*beta*x*LOG(SQRT(x2 + 1.0_dp) + x))
                      END IF
                   ELSE IF (spin == 2) THEN
                      IF (rho_set%rhob(i, j, k) > rho_set%rho_cutoff) THEN
                         n_13 = rho_set%rhob_1_3(i, j, k)
                         x = rho_set%norm_drhob(i, j, k)/(rho_set%rhob(i, j, k)*n_13)
                         x2 = x*x
-                        pot(i, j, k) = beta*x2*n_13/(1.0_dp+3.0_dp*beta*x*LOG(SQRT(x2+1.0_dp)+x))
+                        pot(i, j, k) = beta*x2*n_13/(1.0_dp + 3.0_dp*beta*x*LOG(SQRT(x2 + 1.0_dp) + x))
                      END IF
                   END IF
                END IF
@@ -1122,12 +1122,12 @@ CONTAINS
                   pot(i, j, k) = &
                      2.0_dp* &
                      calc_ecpbe_r(rho_set%rho(i, j, k), rho_set%norm_drho(i, j, k), &
-                                  e_unif, rho_set%rho_cutoff, rho_set%drho_cutoff)+ &
+                                  e_unif, rho_set%rho_cutoff, rho_set%drho_cutoff) + &
                      2.0_dp* &
                      calc_expbe_r(rho_set%rho(i, j, k), rho_set%norm_drho(i, j, k), &
                                   rho_set%rho_cutoff, rho_set%drho_cutoff)
                ELSE
-                  rho = rho_set%rhoa(i, j, k)+rho_set%rhob(i, j, k)
+                  rho = rho_set%rhoa(i, j, k) + rho_set%rhob(i, j, k)
                   IF (rho > rho_set%rho_cutoff) THEN
                      e_unif = e_uniform(i, j, k)/rho
                   ELSE
@@ -1137,7 +1137,7 @@ CONTAINS
                      2.0_dp* &
                      calc_ecpbe_u(rho_set%rhoa(i, j, k), rho_set%rhob(i, j, k), rho_set%norm_drho(i, j, k), &
                                   e_unif, &
-                                  rho_set%rho_cutoff, rho_set%drho_cutoff)+ &
+                                  rho_set%rho_cutoff, rho_set%drho_cutoff) + &
                      2.0_dp* &
                      calc_expbe_u(rho_set%rhoa(i, j, k), rho_set%rhob(i, j, k), rho_set%norm_drho(i, j, k), &
                                   rho_set%rho_cutoff, rho_set%drho_cutoff)
@@ -1168,23 +1168,23 @@ CONTAINS
       REAL(kind=dp)                                      :: A, At2, H, kf, kl, ks, phi, phi3, r, t2, &
                                                             zeta
 
-      r = ra+rb
+      r = ra + rb
       H = 0.0_dp
       IF (r > rc .AND. ngr > ngrc) THEN
-         zeta = (ra-rb)/r
+         zeta = (ra - rb)/r
          IF (zeta > 1.0_dp) zeta = 1.0_dp ! machine precision problem
          IF (zeta < -1.0_dp) zeta = -1.0_dp ! machine precision problem
-         phi = ((1.0_dp+zeta)**tb3+(1.0_dp-zeta)**tb3)/2.0_dp
+         phi = ((1.0_dp + zeta)**tb3 + (1.0_dp - zeta)**tb3)/2.0_dp
          phi3 = phi*phi*phi
          kf = (3.0_dp*r*pi*pi)**ob3
          ks = SQRT(4.0_dp*kf/pi)
          t2 = (ngr/(2.0_dp*phi*ks*r))**2
-         A = beta_ec/gamma_saop/(EXP(-ec_unif/(gamma_saop*phi3))-1.0_dp)
+         A = beta_ec/gamma_saop/(EXP(-ec_unif/(gamma_saop*phi3)) - 1.0_dp)
          At2 = A*t2
-         kl = (1.0_dp+At2)/(1.0_dp+At2+At2*At2)
-         H = gamma_saop*LOG(1.0_dp+beta_ec/gamma_saop*t2*kl)
+         kl = (1.0_dp + At2)/(1.0_dp + At2 + At2*At2)
+         H = gamma_saop*LOG(1.0_dp + beta_ec/gamma_saop*t2*kl)
       END IF
-      res = ec_unif+H
+      res = ec_unif + H
 
    END FUNCTION calc_ecpbe_u
 
@@ -1209,12 +1209,12 @@ CONTAINS
          kf = (3.0_dp*r*pi*pi)**(1.0_dp/3.0_dp)
          ks = SQRT(4.0_dp*kf/pi)
          t2 = (ngr/(2.0_dp*ks*r))**2
-         A = beta_ec/gamma_saop/(EXP(-ec_unif/gamma_saop)-1.0_dp)
+         A = beta_ec/gamma_saop/(EXP(-ec_unif/gamma_saop) - 1.0_dp)
          At2 = A*t2
-         kl = (1.0_dp+At2)/(1.0_dp+At2+At2*At2)
-         H = gamma_saop*LOG(1.0_dp+beta_ec/gamma_saop*t2*kl)
+         kl = (1.0_dp + At2)/(1.0_dp + At2 + At2*At2)
+         H = gamma_saop*LOG(1.0_dp + beta_ec/gamma_saop*t2*kl)
       END IF
-      res = ec_unif+H
+      res = ec_unif + H
 
    END FUNCTION calc_ecpbe_r
 
@@ -1234,7 +1234,7 @@ CONTAINS
 
       REAL(kind=dp)                                      :: r
 
-      r = ra+rb
+      r = ra + rb
       res = calc_expbe_r(r, ngr, rc, ngrc)
 
    END FUNCTION calc_expbe_u
@@ -1260,7 +1260,7 @@ CONTAINS
          fx = 1.0_dp
          IF (ngr > ngrc) THEN
             s = ngr/(2.0_dp*kf*r)
-            fx = fx+kappa-kappa/(1.0_dp+mu*s*s/kappa)
+            fx = fx + kappa - kappa/(1.0_dp + mu*s*s/kappa)
          END IF
          res = ex_unif*fx
       ELSE

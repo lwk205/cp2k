@@ -7,8 +7,8 @@
 !> \brief Collection of routines to handle the iteration info
 ! **************************************************************************************************
 MODULE cp_iter_types
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -94,7 +94,7 @@ CONTAINS
       CHARACTER(len=*), INTENT(in)                       :: project_name
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_iteration_info_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: stat
 
@@ -102,7 +102,7 @@ CONTAINS
       IF (stat /= 0) &
          CPABORT(routineP//" could not allocate iteration_info")
 
-      last_it_info_id = last_it_info_id+1
+      last_it_info_id = last_it_info_id + 1
       iteration_info%id_nr = last_it_info_id
       iteration_info%ref_count = 1
       iteration_info%print_level = 2
@@ -138,7 +138,7 @@ CONTAINS
       TYPE(cp_iteration_info_type), POINTER              :: iteration_info
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_iteration_info_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (.NOT. ASSOCIATED(iteration_info)) THEN
          CPABORT(routineP//" iteration_info not associated")
@@ -146,7 +146,7 @@ CONTAINS
       IF (iteration_info%ref_count <= 0) THEN
          CPABORT(routineP//" iteration_info%ref_counf<=0")
       END IF
-      iteration_info%ref_count = iteration_info%ref_count+1
+      iteration_info%ref_count = iteration_info%ref_count + 1
    END SUBROUTINE cp_iteration_info_retain
 
 ! **************************************************************************************************
@@ -158,13 +158,13 @@ CONTAINS
       TYPE(cp_iteration_info_type), POINTER              :: iteration_info
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_iteration_info_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(iteration_info)) THEN
          IF (iteration_info%ref_count <= 0) THEN
             CPABORT(routineP//" iteration_info%ref_counf<=0")
          END IF
-         iteration_info%ref_count = iteration_info%ref_count-1
+         iteration_info%ref_count = iteration_info%ref_count - 1
          IF (iteration_info%ref_count == 0) THEN
             IF (ASSOCIATED(iteration_info%iteration)) THEN
                DEALLOCATE (iteration_info%iteration)
@@ -190,7 +190,7 @@ CONTAINS
       TYPE(cp_iteration_info_type), POINTER              :: iteration_info_in, iteration_info_out
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_iteration_info_copy_iter', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, stat
 

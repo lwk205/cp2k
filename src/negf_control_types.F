@@ -8,24 +8,24 @@
 ! **************************************************************************************************
 
 MODULE negf_control_types
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE input_constants,                 ONLY: negf_run
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mathconstants,                   ONLY: pi
-   USE molecule_kind_types,             ONLY: get_molecule_kind,&
-                                              molecule_kind_type
-   USE molecule_types,                  ONLY: get_molecule,&
-                                              molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE physcon,                         ONLY: kelvin
-   USE string_utilities,                ONLY: integer_to_string
-   USE util,                            ONLY: sort
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE input_constants, ONLY: negf_run
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mathconstants, ONLY: pi
+   USE molecule_kind_types, ONLY: get_molecule_kind, &
+                                  molecule_kind_type
+   USE molecule_types, ONLY: get_molecule, &
+                             molecule_type
+   USE particle_types, ONLY: particle_type
+   USE physcon, ONLY: kelvin
+   USE string_utilities, ONLY: integer_to_string
+   USE util, ONLY: sort
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -126,7 +126,7 @@ CONTAINS
       TYPE(negf_control_type), POINTER                   :: negf_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_control_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -148,7 +148,7 @@ CONTAINS
       TYPE(negf_control_type), POINTER                   :: negf_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'negf_control_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -188,10 +188,10 @@ CONTAINS
       TYPE(cp_subsys_type), POINTER                      :: subsys
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_negf_control', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length) :: contact_id_str, eta_current_str, eta_max_str, &
-         npoles_current_str, npoles_min_str, temp_current_str, temp_min_str
+                                              npoles_current_str, npoles_min_str, temp_current_str, temp_min_str
       INTEGER                                            :: delta_npoles_min, handle, i_rep, n_rep, &
                                                             natoms_current, natoms_total, run_type
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: inds
@@ -294,16 +294,16 @@ CONTAINS
       END IF
 
       IF (n_rep > 0) THEN
-         delta_npoles_min = NINT(0.5_dp*(negf_control%eta/(pi*MAXVAL(negf_control%contacts(:)%temperature))+1.0_dp))
+         delta_npoles_min = NINT(0.5_dp*(negf_control%eta/(pi*MAXVAL(negf_control%contacts(:)%temperature)) + 1.0_dp))
       ELSE
          delta_npoles_min = 1
       END IF
 
       IF (negf_control%delta_npoles < delta_npoles_min) THEN
          IF (n_rep > 0) THEN
-            eta_max = REAL(2*negf_control%delta_npoles-1, kind=dp)*pi*MAXVAL(negf_control%contacts(:)%temperature)
+            eta_max = REAL(2*negf_control%delta_npoles - 1, kind=dp)*pi*MAXVAL(negf_control%contacts(:)%temperature)
             temp_current = MAXVAL(negf_control%contacts(:)%temperature)*kelvin
-            temp_min = negf_control%eta/(pi*REAL(2*negf_control%delta_npoles-1, kind=dp))*kelvin
+            temp_min = negf_control%eta/(pi*REAL(2*negf_control%delta_npoles - 1, kind=dp))*kelvin
 
             WRITE (eta_current_str, '(ES11.4E2)') negf_control%eta
             WRITE (eta_max_str, '(ES11.4E2)') eta_max
@@ -338,7 +338,7 @@ CONTAINS
       DO i_rep = 1, n_rep
          IF (ALLOCATED(negf_control%contacts(i_rep)%atomlist_screening)) THEN
             IF (ALLOCATED(negf_control%contacts(i_rep)%atomlist_screening)) &
-               natoms_total = natoms_total+SIZE(negf_control%contacts(i_rep)%atomlist_screening)
+               natoms_total = natoms_total + SIZE(negf_control%contacts(i_rep)%atomlist_screening)
          END IF
       END DO
 
@@ -355,10 +355,10 @@ CONTAINS
             IF (ALLOCATED(negf_control%contacts(i_rep)%atomlist_screening)) THEN
                natoms_current = SIZE(negf_control%contacts(i_rep)%atomlist_screening)
 
-               negf_control%atomlist_S_screening(natoms_total+1:natoms_total+natoms_current) = &
+               negf_control%atomlist_S_screening(natoms_total + 1:natoms_total + natoms_current) = &
                   negf_control%contacts(i_rep)%atomlist_screening(1:natoms_current)
 
-               natoms_total = natoms_total+natoms_current
+               natoms_total = natoms_total + natoms_current
             END IF
          END DO
 
@@ -368,9 +368,9 @@ CONTAINS
          DEALLOCATE (inds)
 
          natoms_current = 1
-         DO i_rep = natoms_current+1, natoms_total
+         DO i_rep = natoms_current + 1, natoms_total
             IF (negf_control%atomlist_S_screening(i_rep) /= negf_control%atomlist_S_screening(natoms_current)) THEN
-               natoms_current = natoms_current+1
+               natoms_current = natoms_current + 1
                negf_control%atomlist_S_screening(natoms_current) = negf_control%atomlist_S_screening(i_rep)
             END IF
          END DO
@@ -410,13 +410,13 @@ CONTAINS
       LOGICAL                                            :: is_explicit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_negf_atomlist', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: index_str, natoms_str
       CHARACTER(len=default_string_length), &
          DIMENSION(:), POINTER                           :: cptr
       INTEGER :: first_atom, handle, iatom, ikind, imol, iname, irep, last_atom, natoms_current, &
-         natoms_max, natoms_total, nkinds, nmols, nnames, nrep_list, nrep_molname
+                 natoms_max, natoms_total, nkinds, nmols, nnames, nrep_list, nrep_molname
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: inds
       INTEGER, DIMENSION(:), POINTER                     :: iptr
       LOGICAL                                            :: is_list, is_molname
@@ -459,7 +459,7 @@ CONTAINS
                   END IF
                END DO
 
-               natoms_total = natoms_total+natoms_current
+               natoms_total = natoms_total + natoms_current
             END DO
          END IF
 
@@ -480,8 +480,8 @@ CONTAINS
                      DO imol = 1, nmols
                         molecule => molecule_set(iptr(imol))
                         CALL get_molecule(molecule, first_atom=first_atom, last_atom=last_atom)
-                        natoms_current = last_atom-first_atom+1
-                        natoms_total = natoms_total+natoms_current
+                        natoms_current = last_atom - first_atom + 1
+                        natoms_total = natoms_total + natoms_current
                      END DO
                   ELSE
                      CALL cp_abort(__LOCATION__, &
@@ -503,8 +503,8 @@ CONTAINS
                   CALL section_vals_val_get(subsection, "LIST", i_rep_val=irep, i_vals=iptr)
 
                   natoms_current = SIZE(iptr)
-                  atomlist(natoms_total+1:natoms_total+natoms_current) = iptr(1:natoms_current)
-                  natoms_total = natoms_total+natoms_current
+                  atomlist(natoms_total + 1:natoms_total + natoms_current) = iptr(1:natoms_current)
+                  natoms_total = natoms_total + natoms_current
                END DO
             END IF
 
@@ -527,7 +527,7 @@ CONTAINS
                            CALL get_molecule(molecule, first_atom=first_atom, last_atom=last_atom)
 
                            DO natoms_current = first_atom, last_atom
-                              natoms_total = natoms_total+1
+                              natoms_total = natoms_total + 1
                               atomlist(natoms_total) = natoms_current
                            END DO
                         END DO
@@ -542,9 +542,9 @@ CONTAINS
             DEALLOCATE (inds)
 
             natoms_current = 1
-            DO iatom = natoms_current+1, natoms_total
+            DO iatom = natoms_current + 1, natoms_total
                IF (atomlist(iatom) /= atomlist(natoms_current)) THEN
-                  natoms_current = natoms_current+1
+                  natoms_current = natoms_current + 1
                   atomlist(natoms_current) = atomlist(iatom)
                END IF
             END DO

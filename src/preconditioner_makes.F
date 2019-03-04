@@ -11,44 +11,44 @@
 !> \author Joost VandeVondele (09.2002)
 ! **************************************************************************************************
 MODULE preconditioner_makes
-   USE arnoldi_api,                     ONLY: arnoldi_data_type,&
-                                              arnoldi_ev,&
-                                              deallocate_arnoldi_data,&
-                                              get_selected_ritz_val,&
-                                              get_selected_ritz_vector,&
-                                              set_arnoldi_initial_vector,&
-                                              setup_arnoldi_data
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_m_by_n_from_template,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              cp_fm_to_dbcsr_row_template
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale,&
-                                              cp_fm_triangular_invert,&
-                                              cp_fm_triangular_multiply,&
-                                              cp_fm_upper_to_full
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose,&
-                                              cp_fm_cholesky_reduce,&
-                                              cp_fm_cholesky_restore
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_diag,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_get_info, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_symmetric
-   USE input_constants,                 ONLY: &
-        cholesky_inverse, cholesky_reduce, ot_precond_full_all, ot_precond_full_kinetic, &
-        ot_precond_full_single, ot_precond_full_single_inverse, ot_precond_s_inverse, &
-        ot_precond_solver_default, ot_precond_solver_inv_chol
-   USE kinds,                           ONLY: dp
-   USE preconditioner_types,            ONLY: preconditioner_type
+   USE arnoldi_api, ONLY: arnoldi_data_type, &
+                          arnoldi_ev, &
+                          deallocate_arnoldi_data, &
+                          get_selected_ritz_val, &
+                          get_selected_ritz_vector, &
+                          set_arnoldi_initial_vector, &
+                          setup_arnoldi_data
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_m_by_n_from_template, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  cp_fm_to_dbcsr_row_template
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale, &
+                                 cp_fm_triangular_invert, &
+                                 cp_fm_triangular_multiply, &
+                                 cp_fm_upper_to_full
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose, &
+                             cp_fm_cholesky_reduce, &
+                             cp_fm_cholesky_restore
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_diag, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_add_on_diag, dbcsr_copy, dbcsr_create, dbcsr_get_info, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_release, dbcsr_type, dbcsr_type_symmetric
+   USE input_constants, ONLY: &
+      cholesky_inverse, cholesky_reduce, ot_precond_full_all, ot_precond_full_kinetic, &
+      ot_precond_full_single, ot_precond_full_single_inverse, ot_precond_s_inverse, &
+      ot_precond_solver_default, ot_precond_solver_inv_chol
+   USE kinds, ONLY: dp
+   USE preconditioner_types, ONLY: preconditioner_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -86,7 +86,7 @@ CONTAINS
       INTEGER                                            :: my_solver_type
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_preconditioner_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: precon_type
 
@@ -146,7 +146,7 @@ CONTAINS
       TYPE(dbcsr_type), POINTER                          :: matrix_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_s_inverse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -178,7 +178,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy_gap
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_kinetic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       REAL(KIND=dp)                                      :: shift
@@ -219,7 +219,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy_homo, energy_gap
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_single', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, n
       REAL(KIND=dp), DIMENSION(:), POINTER               :: evals
@@ -271,13 +271,13 @@ CONTAINS
          CALL cp_fm_triangular_multiply(fm_s, fm, side="L", transpose_tr=.FALSE., &
                                         invert_tr=.FALSE., uplo_tr="U", n_rows=n, n_cols=n, alpha=1.0_dp)
          DO i = 1, n
-            evals(i) = 1.0_dp/MAX(evals(i)-energy_homo, energy_gap)
+            evals(i) = 1.0_dp/MAX(evals(i) - energy_homo, energy_gap)
          ENDDO
          CALL cp_fm_to_fm(fm, fm_h)
       CASE (cholesky_reduce)
          CALL cp_fm_cholesky_restore(fm, n, fm_s, fm_h, "SOLVE")
          DO i = 1, n
-            evals(i) = 1.0_dp/MAX(evals(i)-energy_homo, energy_gap)
+            evals(i) = 1.0_dp/MAX(evals(i) - energy_homo, energy_gap)
          ENDDO
          CALL cp_fm_to_fm(fm_h, fm)
       END SELECT
@@ -310,7 +310,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy_homo, energy_gap
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_single_ortho', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, n
       REAL(KIND=dp), DIMENSION(:), POINTER               :: evals
@@ -338,7 +338,7 @@ CONTAINS
 
       CALL choose_eigv_solver(fm_h, fm, evals)
       DO i = 1, n
-         evals(i) = 1.0_dp/MAX(evals(i)-energy_homo, energy_gap)
+         evals(i) = 1.0_dp/MAX(evals(i) - energy_homo, energy_gap)
       ENDDO
       CALL cp_fm_to_fm(fm, fm_h)
       CALL cp_fm_column_scale(fm, evals)
@@ -448,7 +448,7 @@ CONTAINS
       CALL cp_gemm('T', 'N', k, k, n, 1.0_dp, matrix_shc0, matrix_shc0, 0.0_dp, matrix_s1)
       ALLOCATE (diag(k))
       CALL cp_fm_get_diag(matrix_s1, diag)
-      error_estimate = MAXVAL(SQRT(ABS(diag-c0_evals**2)))
+      error_estimate = MAXVAL(SQRT(ABS(diag - c0_evals**2)))
       DEALLOCATE (diag)
       CALL cp_fm_release(matrix_s1)
       CALL cp_fm_release(matrix_shc0)
@@ -473,8 +473,8 @@ CONTAINS
       CALL cp_fm_release(matrix_left)
 
       ALLOCATE (shifted_evals(k))
-      lambda = lambda_base+error_estimate
-      shifted_evals = c0_evals-lambda
+      lambda = lambda_base + error_estimate
+      shifted_evals = c0_evals - lambda
       CALL cp_fm_to_fm(matrix_sc0, matrix_hc0)
       CALL cp_fm_column_scale(matrix_hc0, shifted_evals)
       CALL cp_gemm('N', 'T', n, n, k, 1.0_dp, matrix_hc0, matrix_sc0, 1.0_dp, matrix_tmp)
@@ -511,7 +511,7 @@ CONTAINS
          ALLOCATE (norms(k))
          CALL cp_gemm('T', 'N', k, k, n, 1.0_dp, matrix_sc0, matrix_tmp, 0.0_dp, matrix_s1)
          CALL choose_eigv_solver(matrix_s1, matrix_s2, norms)
-         WRITE (*, *) "matrix norm deviation (should be close to zero): ", MAXVAL(ABS(ABS(norms)-1.0_dp))
+         WRITE (*, *) "matrix norm deviation (should be close to zero): ", MAXVAL(ABS(ABS(norms) - 1.0_dp))
          DEALLOCATE (norms)
          CALL cp_fm_release(matrix_s1)
          CALL cp_fm_release(matrix_s2)
@@ -549,7 +549,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy_gap
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_all_ortho', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: fudge_factor = 0.25_dp, &
                                                             lambda_base = 10.0_dp
 
@@ -596,7 +596,7 @@ CONTAINS
       CALL cp_gemm('T', 'N', k, k, n, 1.0_dp, matrix_hc0, matrix_hc0, 0.0_dp, matrix_s1)
       ALLOCATE (diag(k))
       CALL cp_fm_get_diag(matrix_s1, diag)
-      error_estimate = MAXVAL(SQRT(ABS(diag-c0_evals**2)))
+      error_estimate = MAXVAL(SQRT(ABS(diag - c0_evals**2)))
       DEALLOCATE (diag)
       CALL cp_fm_release(matrix_s1)
       ! we'll only use the energy gap, if our estimate of the error on the eigenvalues
@@ -621,8 +621,8 @@ CONTAINS
       CALL cp_fm_release(matrix_left)
 
       ALLOCATE (shifted_evals(k))
-      lambda = lambda_base+error_estimate
-      shifted_evals = c0_evals-lambda
+      lambda = lambda_base + error_estimate
+      shifted_evals = c0_evals - lambda
       CALL cp_fm_to_fm(matrix_sc0, matrix_hc0)
       CALL cp_fm_column_scale(matrix_hc0, shifted_evals)
       CALL cp_gemm('N', 'T', n, n, k, 1.0_dp, matrix_hc0, matrix_sc0, 1.0_dp, matrix_tmp)
@@ -643,7 +643,7 @@ CONTAINS
          CALL cp_gemm('T', 'N', k, k, n, 1.0_dp, matrix_sc0, matrix_tmp, 0.0_dp, matrix_s1)
          CALL choose_eigv_solver(matrix_s1, matrix_s2, norms)
 
-         WRITE (*, *) "matrix norm deviation (should be close to zero): ", MAXVAL(ABS(ABS(norms)-1.0_dp))
+         WRITE (*, *) "matrix norm deviation (should be close to zero): ", MAXVAL(ABS(ABS(norms) - 1.0_dp))
          DEALLOCATE (norms)
          CALL cp_fm_release(matrix_s1)
          CALL cp_fm_release(matrix_s2)
@@ -689,7 +689,7 @@ CONTAINS
       TYPE(dbcsr_type), OPTIONAL, POINTER                :: matrix_s
 
       CHARACTER(len=*), PARAMETER :: routineN = 'make_full_single_inverse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, k, n
       REAL(KIND=dp)                                      :: max_ev, min_ev, pre_shift
@@ -781,9 +781,9 @@ CONTAINS
 !-------------------------------------compute eigenvalues of H ----------------------------------------------
       ! Shift the Lumo to the 1.5*the computed energy_gap or the external energy gap value
       ! The factor 1.5 is determined by trying. If the LUMO is positive, enough, just leave it alone
-      pre_shift = MAX(1.5_dp*(min_ev-max_ev), energy_gap)
+      pre_shift = MAX(1.5_dp*(min_ev - max_ev), energy_gap)
       IF (min_ev .LT. pre_shift) THEN
-         pre_shift = pre_shift-min_ev
+         pre_shift = pre_shift - min_ev
       ELSE
          pre_shift = 0.0_dp
       END IF

@@ -9,7 +9,7 @@
 ! **************************************************************************************************
 MODULE semi_empirical_mpole_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -77,7 +77,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ndim
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_mpole_p_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -100,7 +100,7 @@ CONTAINS
          POINTER                                         :: mpole
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_mpole_p_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -122,7 +122,7 @@ CONTAINS
       TYPE(semi_empirical_mpole_type), POINTER           :: mpole
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_mpole_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(mpole))
       ALLOCATE (mpole)
@@ -147,7 +147,7 @@ CONTAINS
       TYPE(semi_empirical_mpole_type), POINTER           :: mpole
 
       CHARACTER(len=*), PARAMETER :: routineN = 'semi_empirical_mpole_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(mpole)) THEN
          DEALLOCATE (mpole)
@@ -164,7 +164,7 @@ CONTAINS
       TYPE(nddo_mpole_type), POINTER                     :: nddo_mpole
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nddo_mpole_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(nddo_mpole))
       ALLOCATE (nddo_mpole)
@@ -185,7 +185,7 @@ CONTAINS
       TYPE(nddo_mpole_type), POINTER                     :: nddo_mpole
 
       CHARACTER(len=*), PARAMETER :: routineN = 'nddo_mpole_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(nddo_mpole)) THEN
          IF (ASSOCIATED(nddo_mpole%charge)) THEN

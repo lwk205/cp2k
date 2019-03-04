@@ -8,53 +8,53 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE cp_fm_elpa
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_upper_to_full
-   USE cp_fm_diag_utils,                ONLY: cp_fm_redistribute_start,&
-                                              cp_fm_redistribute_end
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_get
-   USE cp_fm_types,                     ONLY: cp_fm_type, &
-                                              cp_fm_to_fm, &
-                                              cp_fm_release, &
-                                              cp_fm_create
-   USE cp_log_handling,                 ONLY: cp_get_default_logger, &
-                                              cp_logger_get_default_io_unit, &
-                                              cp_logger_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_comm_free,&
-                                              mp_comm_split_direct, &
-                                              mp_bcast
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_fm_basic_linalg, ONLY: cp_fm_upper_to_full
+   USE cp_fm_diag_utils, ONLY: cp_fm_redistribute_start, &
+                               cp_fm_redistribute_end
+   USE cp_fm_struct, ONLY: cp_fm_struct_get
+   USE cp_fm_types, ONLY: cp_fm_type, &
+                          cp_fm_to_fm, &
+                          cp_fm_release, &
+                          cp_fm_create
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_comm_free, &
+                              mp_comm_split_direct, &
+                              mp_bcast
 
 #include "../base/base_uses.f90"
 
 #if defined (__ELPA)
 # if (__ELPA < 201611)
 #  include "elpa_kernel_constants.h"
-   USE elpa2,                           ONLY: solve_evp_real_2stage
+   USE elpa2, ONLY: solve_evp_real_2stage
 # elif (__ELPA < 201705)
 #  include "elpa_kernel_constants.h"
-   USE elpa2,                           ONLY: elpa_solve_evp_real_2stage_double
+   USE elpa2, ONLY: elpa_solve_evp_real_2stage_double
 # else
-   USE elpa_constants,                  ONLY: ELPA_2STAGE_REAL_GENERIC,&
-                                              ELPA_2STAGE_REAL_GENERIC_SIMPLE,&
-                                              ELPA_2STAGE_REAL_BGP,&
-                                              ELPA_2STAGE_REAL_BGQ,&
-                                              ELPA_2STAGE_REAL_SSE_ASSEMBLY,&
-                                              ELPA_2STAGE_REAL_SSE_BLOCK2,&
-                                              ELPA_2STAGE_REAL_SSE_BLOCK4,&
-                                              ELPA_2STAGE_REAL_SSE_BLOCK6,&
-                                              ELPA_2STAGE_REAL_AVX_BLOCK2,&
-                                              ELPA_2STAGE_REAL_AVX_BLOCK4,&
-                                              ELPA_2STAGE_REAL_AVX_BLOCK6,&
-                                              ELPA_2STAGE_REAL_AVX2_BLOCK2,&
-                                              ELPA_2STAGE_REAL_AVX2_BLOCK4,&
-                                              ELPA_2STAGE_REAL_AVX2_BLOCK6,&
-                                              ELPA_2STAGE_REAL_AVX512_BLOCK2,&
-                                              ELPA_2STAGE_REAL_AVX512_BLOCK4,&
-                                              ELPA_2STAGE_REAL_AVX512_BLOCK6,&
-                                              ELPA_2STAGE_REAL_GPU
-   USE elpa2,                           ONLY: elpa_solve_evp_real_2stage_double
+   USE elpa_constants, ONLY: ELPA_2STAGE_REAL_GENERIC, &
+                             ELPA_2STAGE_REAL_GENERIC_SIMPLE, &
+                             ELPA_2STAGE_REAL_BGP, &
+                             ELPA_2STAGE_REAL_BGQ, &
+                             ELPA_2STAGE_REAL_SSE_ASSEMBLY, &
+                             ELPA_2STAGE_REAL_SSE_BLOCK2, &
+                             ELPA_2STAGE_REAL_SSE_BLOCK4, &
+                             ELPA_2STAGE_REAL_SSE_BLOCK6, &
+                             ELPA_2STAGE_REAL_AVX_BLOCK2, &
+                             ELPA_2STAGE_REAL_AVX_BLOCK4, &
+                             ELPA_2STAGE_REAL_AVX_BLOCK6, &
+                             ELPA_2STAGE_REAL_AVX2_BLOCK2, &
+                             ELPA_2STAGE_REAL_AVX2_BLOCK4, &
+                             ELPA_2STAGE_REAL_AVX2_BLOCK6, &
+                             ELPA_2STAGE_REAL_AVX512_BLOCK2, &
+                             ELPA_2STAGE_REAL_AVX512_BLOCK4, &
+                             ELPA_2STAGE_REAL_AVX512_BLOCK6, &
+                             ELPA_2STAGE_REAL_GPU
+   USE elpa2, ONLY: elpa_solve_evp_real_2stage_double
 # endif
 #endif
 
@@ -97,15 +97,15 @@ CONTAINS
    FUNCTION get_elpa_kernel_names() RESULT(names)
       CHARACTER(len=default_string_length), DIMENSION(19) :: names
 
-      names( 1) = "AUTO"
-      names( 2) = "GENERIC"
-      names( 3) = "GENERIC_SIMPLE"
-      names( 4) = "BGP"
-      names( 5) = "BGQ"
-      names( 6) = "SSE"
-      names( 7) = "SSE_BLOCK2"
-      names( 8) = "SSE_BLOCK4"
-      names( 9) = "SSE_BLOCK6"
+      names(1) = "AUTO"
+      names(2) = "GENERIC"
+      names(3) = "GENERIC_SIMPLE"
+      names(4) = "BGP"
+      names(5) = "BGQ"
+      names(6) = "SSE"
+      names(7) = "SSE_BLOCK2"
+      names(8) = "SSE_BLOCK4"
+      names(9) = "SSE_BLOCK6"
       names(10) = "AVX_BLOCK2"
       names(11) = "AVX_BLOCK4"
       names(12) = "AVX_BLOCK6"
@@ -126,15 +126,15 @@ CONTAINS
    FUNCTION get_elpa_kernel_descriptions() RESULT(descriptions)
       CHARACTER(len=default_string_length), DIMENSION(19) :: descriptions
 
-      descriptions( 1) = "Automatically selected kernel"
-      descriptions( 2) = "Generic kernel"
-      descriptions( 3) = "Simplified generic kernel"
-      descriptions( 4) = "Kernel optimized for IBM BGP"
-      descriptions( 5) = "Kernel optimized for IBM BGQ"
-      descriptions( 6) = "Kernel optimized for x86_64/SSE"
-      descriptions( 7) = "Kernel optimized for x86_64/SSE (block=2)"
-      descriptions( 8) = "Kernel optimized for x86_64/SSE (block=4)"
-      descriptions( 9) = "Kernel optimized for x86_64/SSE (block=6)"
+      descriptions(1) = "Automatically selected kernel"
+      descriptions(2) = "Generic kernel"
+      descriptions(3) = "Simplified generic kernel"
+      descriptions(4) = "Kernel optimized for IBM BGP"
+      descriptions(5) = "Kernel optimized for IBM BGQ"
+      descriptions(6) = "Kernel optimized for x86_64/SSE"
+      descriptions(7) = "Kernel optimized for x86_64/SSE (block=2)"
+      descriptions(8) = "Kernel optimized for x86_64/SSE (block=4)"
+      descriptions(9) = "Kernel optimized for x86_64/SSE (block=6)"
       descriptions(10) = "Kernel optimized for Intel AVX (block=2)"
       descriptions(11) = "Kernel optimized for Intel AVX (block=4)"
       descriptions(12) = "Kernel optimized for Intel AVX (block=6)"
@@ -170,53 +170,53 @@ $: "   CPABORT('ELPA is not available')"
 $: "#endif"
 #:enddef
 
-      SELECT CASE(kernel)
-        CASE(1)
-          elpa_kernel = -1 ! auto
-        CASE(2)
+      SELECT CASE (kernel)
+      CASE (1)
+         elpa_kernel = -1 ! auto
+      CASE (2)
 @:        pick_macro(GENERIC)
-        CASE(3)
+      CASE (3)
 @:        pick_macro(GENERIC_SIMPLE)
-        CASE(4)
+      CASE (4)
 @:        pick_macro(BGP)
-        CASE(5)
+      CASE (5)
 @:        pick_macro(BGQ)
-        CASE(6)
+      CASE (6)
 #if (__ELPA < 201705)
 @:        pick_macro(SSE)
 #else
 @:        pick_macro(SSE_ASSEMBLY)
 #endif
-        CASE(7)
+      CASE (7)
 @:        pick_macro(SSE_BLOCK2)
-        CASE(8)
+      CASE (8)
 @:        pick_macro(SSE_BLOCK4)
-        CASE(9)
+      CASE (9)
 @:        pick_macro(SSE_BLOCK6)
-        CASE(10)
+      CASE (10)
 @:        pick_macro(AVX_BLOCK2)
-        CASE(11)
+      CASE (11)
 @:        pick_macro(AVX_BLOCK4)
-        CASE(12)
+      CASE (12)
 @:        pick_macro(AVX_BLOCK6)
-        CASE(13)
+      CASE (13)
 @:        pick_macro(AVX2_BLOCK2)
-        CASE(14)
+      CASE (14)
 @:        pick_macro(AVX2_BLOCK4)
-        CASE(15)
+      CASE (15)
 @:        pick_macro(AVX2_BLOCK6)
-        CASE(16)
+      CASE (16)
 @:        pick_macro(AVX512_BLOCK2)
-        CASE(17)
+      CASE (17)
 @:        pick_macro(AVX512_BLOCK4)
-        CASE(18)
+      CASE (18)
 @:        pick_macro(AVX512_BLOCK6)
-        CASE(19)
+      CASE (19)
 @:        pick_macro(GPU)
-          elpa_use_gpu = .TRUE.
-        CASE DEFAULT
-          CPABORT("Invalid ELPA kernel selected")
-     END SELECT
+         elpa_use_gpu = .TRUE.
+      CASE DEFAULT
+         CPABORT("Invalid ELPA kernel selected")
+      END SELECT
 
    END SUBROUTINE set_elpa_kernel
 
@@ -245,7 +245,7 @@ $: "#endif"
       elpa_qr = use_qr
       elpa_qr_unsafe = use_qr_unsafe
 #else
-   Error: Unknown ELPA version, please specify library release date via __ELPA=YYYYMM
+      Error:Unknown ELPA version, please specify library release date via __ELPA = YYYYMM
 #endif
 #else
       MARK_USED(use_qr)
@@ -353,8 +353,8 @@ $: "#endif"
 
       CALL timeset(routineN, handle)
 #if defined(__ELPA)
-      NULLIFY(logger)
-      NULLIFY(m_noqr, v_noqr, eval_noqr)
+      NULLIFY (logger)
+      NULLIFY (m_noqr, v_noqr, eval_noqr)
       th = 1.0E-14_dp
       check_eigenvalues = .FALSE.
       logger => cp_get_default_logger()
@@ -394,15 +394,15 @@ $: "#endif"
       use_qr = .FALSE.
 #elif (__ELPA==201502) || (__ELPA==201505) || (__ELPA==201511)
       ! Matrix order must be an integer multiple of the block size
-      use_qr = elpa_qr .AND. MOD(n, nblk).EQ.0
+      use_qr = elpa_qr .AND. MOD(n, nblk) .EQ. 0
 #elif (__ELPA==201605) || (__ELPA==201611) || (__ELPA==201705) || (__ELPA==201711)
       ! Matrix order must be even
-      use_qr = elpa_qr .AND. MOD(n, 2).EQ.0
+      use_qr = elpa_qr .AND. MOD(n, 2) .EQ. 0
       ! Matrix order and block size must be greater than or equal to 64
       IF (.NOT. elpa_qr_unsafe) &
-         use_qr = use_qr .AND. n.GE. 64 .AND. nblk .GE. 64
+         use_qr = use_qr .AND. n .GE. 64 .AND. nblk .GE. 64
 #else
-   Error: Unknown ELPA version, please specify library release date via __ELPA=YYYYMM
+      Error:Unknown ELPA version, please specify library release date via __ELPA = YYYYMM
 #endif
       ! Check if eigenvalues computed with ELPA_QR_UNSAFE should be verified
       IF (use_qr .AND. elpa_qr_unsafe .AND. elpa_should_print) &
@@ -410,7 +410,7 @@ $: "#endif"
       CALL mp_bcast(check_eigenvalues, matrix%matrix_struct%para_env%source, matrix%matrix_struct%para_env%group)
       IF (check_eigenvalues) THEN
          ! Allocate and initialize needed temporaries to compute eigenvalues without ELPA QR
-         ALLOCATE(eval_noqr(n))
+         ALLOCATE (eval_noqr(n))
          CALL cp_fm_create(matrix=matrix_noqr, matrix_struct=matrix%matrix_struct)
          CALL cp_fm_to_fm(matrix, matrix_noqr)
          m_noqr => matrix_noqr%local_data
@@ -421,35 +421,35 @@ $: "#endif"
 
       ! Print some information
       IF (io_unit > 0 .AND. elpa_should_print) THEN
-         WRITE(io_unit, '(/,A)') "ELPA| Matrix diagonalization information"
+         WRITE (io_unit, '(/,A)') "ELPA| Matrix diagonalization information"
          kernels = get_elpa_kernel_names()
          IF (elpa_kernel == -1) THEN
             kernel = TRIM(kernels(1))
             kernel = ADJUSTR(kernel)
          ELSE
-            kernel = TRIM(kernels(elpa_kernel+1))
+            kernel = TRIM(kernels(elpa_kernel + 1))
             kernel = ADJUSTR(kernel)
          END IF
-         WRITE(io_unit, '(A,I14)') "ELPA| Matrix order             : ", n
-         WRITE(io_unit, '(A,I14)') "ELPA| Matrix block size        : ", nblk
-         WRITE(io_unit, '(A,A14)') "ELPA| Kernel                   : ", kernel
-         WRITE(io_unit, '(A,L14)') "ELPA| QR step requested        : ", elpa_qr
+         WRITE (io_unit, '(A,I14)') "ELPA| Matrix order             : ", n
+         WRITE (io_unit, '(A,I14)') "ELPA| Matrix block size        : ", nblk
+         WRITE (io_unit, '(A,A14)') "ELPA| Kernel                   : ", kernel
+         WRITE (io_unit, '(A,L14)') "ELPA| QR step requested        : ", elpa_qr
          IF (elpa_qr) THEN
-            WRITE(io_unit, '(A,L14)') "ELPA| Use potentially unsafe QR: ", elpa_qr_unsafe
-            WRITE(io_unit, '(A,L14)') "ELPA| Matrix is suitable for QR: ", use_qr
+            WRITE (io_unit, '(A,L14)') "ELPA| Use potentially unsafe QR: ", elpa_qr_unsafe
+            WRITE (io_unit, '(A,L14)') "ELPA| Matrix is suitable for QR: ", use_qr
             IF (.NOT. use_qr) THEN
 #if (__ELPA==201502) || (__ELPA==201505) || (__ELPA==201511)
-               WRITE(io_unit, '(A)') "ELPA| Matrix order is NOT divisible by block size"
+               WRITE (io_unit, '(A)') "ELPA| Matrix order is NOT divisible by block size"
 #elif (__ELPA==201605) || (__ELPA==201611) || (__ELPA==201705) || (__ELPA==201711)
-               IF (MOD(n, 2).NE.0 ) &
-                  WRITE(io_unit, '(A)') "ELPA| Matrix order is NOT even"
+               IF (MOD(n, 2) .NE. 0) &
+                  WRITE (io_unit, '(A)') "ELPA| Matrix order is NOT even"
                IF (nblk .LT. 64 .AND. .NOT. elpa_qr_unsafe) &
-                  WRITE(io_unit, '(A)') "ELPA| Matrix block size is NOT 64 or greater"
+                  WRITE (io_unit, '(A)') "ELPA| Matrix block size is NOT 64 or greater"
 #endif
             ELSE
 #if (__ELPA==201605) || (__ELPA==201611) || (__ELPA==201705) || (__ELPA==201711)
                IF (nblk .LT. 64 .AND. elpa_qr_unsafe) &
-                  WRITE(io_unit, '(A,L14)') "ELPA| Matrix block size check was bypassed"
+                  WRITE (io_unit, '(A,L14)') "ELPA| Matrix block size check was bypassed"
 #endif
             END IF
          END IF
@@ -460,7 +460,6 @@ $: "#endif"
 
       ! the full eigenvalues vector is needed
       ALLOCATE (eval(n))
-
 
       ! Make actual call to ELPA to calculate eigenvalues/eigenvectors
 
@@ -533,7 +532,7 @@ $: "#endif"
 
 !---------------------------------------------------------------------------------------------------
 #else
-   Error: Unknown ELPA version, please specify library release date via __ELPA=YYYYMM
+      Error:Unknown ELPA version, please specify library release date via __ELPA = YYYYMM
 #endif
 !---------------------------------------------------------------------------------------------------
 
@@ -546,12 +545,12 @@ $: "#endif"
          IF (.NOT. success_noqr) &
             CPABORT("ELPA failed to diagonalize a matrix")
          DO i = 1, neig
-            IF (ABS(eval(i)-eval_noqr(i)).GT.th) &
+            IF (ABS(eval(i) - eval_noqr(i)) .GT. th) &
                CALL cp_abort(__LOCATION__, &
                              "Eigenvalues from ELPA_QR are wrong. Disable ELPA_QR_UNSAFE.")
          END DO
-         DEALLOCATE(eval_noqr)
-         NULLIFY(m_noqr, eval_noqr)
+         DEALLOCATE (eval_noqr)
+         NULLIFY (m_noqr, eval_noqr)
          CALL cp_fm_release(matrix_noqr)
          CALL cp_fm_release(eigenvectors_noqr)
       END IF

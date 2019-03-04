@@ -11,86 +11,86 @@
 !> \author Rustam Z Khaliullin
 ! **************************************************************************************************
 MODULE almo_scf
-   USE almo_scf_methods,                ONLY: almo_scf_p_blk_to_t_blk,&
-                                              almo_scf_t_rescaling,&
-                                              almo_scf_t_to_proj,&
-                                              distribute_domains,&
-                                              orthogonalize_mos
-   USE almo_scf_optimizer,              ONLY: almo_scf_block_diagonal,&
-                                              almo_scf_xalmo_eigensolver,&
-                                              almo_scf_xalmo_pcg
-   USE almo_scf_qs,                     ONLY: almo_dm_to_almo_ks,&
-                                              almo_scf_construct_quencher,&
-                                              calculate_w_matrix_almo,&
-                                              construct_qs_mos,&
-                                              init_almo_ks_matrix_via_qs,&
-                                              matrix_almo_create,&
-                                              matrix_qs_to_almo
-   USE almo_scf_types,                  ONLY: almo_mat_dim_aobasis,&
-                                              almo_mat_dim_occ,&
-                                              almo_mat_dim_virt,&
-                                              almo_mat_dim_virt_disc,&
-                                              almo_mat_dim_virt_full,&
-                                              almo_scf_env_type,&
-                                              optimizer_options_type,&
-                                              print_optimizer_options
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE bibliography,                    ONLY: Khaliullin2013,&
-                                              Kolafa2004,&
-                                              Scheiber2018,&
-                                              Staub2019,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_retain
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm
-   USE cp_fm_types,                     ONLY: cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add_on_diag, dbcsr_binary_read, dbcsr_checksum, dbcsr_copy, dbcsr_create, &
-        dbcsr_distribution_get, dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, &
-        dbcsr_get_info, dbcsr_get_stored_coordinates, dbcsr_multiply, dbcsr_nblkcols_total, &
-        dbcsr_nblkrows_total, dbcsr_p_type, dbcsr_release, dbcsr_reserve_block2d, dbcsr_scale, &
-        dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric, dbcsr_work_create
-   USE domain_submatrix_methods,        ONLY: init_submatrices,&
-                                              release_submatrices
-   USE input_constants,                 ONLY: &
-        almo_deloc_none, almo_deloc_scf, almo_deloc_x, almo_deloc_x_then_scf, &
-        almo_deloc_xalmo_1diag, almo_deloc_xalmo_scf, almo_deloc_xalmo_x, almo_deloc_xk, &
-        almo_domain_layout_molecular, almo_mat_distr_atomic, almo_mat_distr_molecular, &
-        almo_scf_diag, almo_scf_dm_sign, almo_scf_pcg, almo_scf_skip, atomic_guess, &
-        molecular_guess, optimizer_diis, optimizer_lin_eq_pcg, optimizer_pcg, restart_guess, &
-        smear_fermi_dirac, virt_full, virt_number, virt_occ_size, xalmo_case_block_diag, &
-        xalmo_case_fully_deloc, xalmo_case_normal, xalmo_trial_r0_out
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE iterate_matrix,                  ONLY: invert_Hotelling,&
-                                              matrix_sqrt_Newton_Schulz
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE mathlib,                         ONLY: binomial
-   USE molecule_types,                  ONLY: get_molecule_set_info,&
-                                              molecule_type
-   USE mscfg_types,                     ONLY: get_matrix_from_submatrices,&
-                                              molecular_scf_guess_env_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_initial_guess,                ONLY: calculate_atomic_block_dm,&
-                                              calculate_mopac_dm
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_post_scf,                 ONLY: qs_scf_compute_properties
-   USE qs_scf_types,                    ONLY: qs_scf_env_type,&
-                                              scf_env_release
+   USE almo_scf_methods, ONLY: almo_scf_p_blk_to_t_blk, &
+                               almo_scf_t_rescaling, &
+                               almo_scf_t_to_proj, &
+                               distribute_domains, &
+                               orthogonalize_mos
+   USE almo_scf_optimizer, ONLY: almo_scf_block_diagonal, &
+                                 almo_scf_xalmo_eigensolver, &
+                                 almo_scf_xalmo_pcg
+   USE almo_scf_qs, ONLY: almo_dm_to_almo_ks, &
+                          almo_scf_construct_quencher, &
+                          calculate_w_matrix_almo, &
+                          construct_qs_mos, &
+                          init_almo_ks_matrix_via_qs, &
+                          matrix_almo_create, &
+                          matrix_qs_to_almo
+   USE almo_scf_types, ONLY: almo_mat_dim_aobasis, &
+                             almo_mat_dim_occ, &
+                             almo_mat_dim_virt, &
+                             almo_mat_dim_virt_disc, &
+                             almo_mat_dim_virt_full, &
+                             almo_scf_env_type, &
+                             optimizer_options_type, &
+                             print_optimizer_options
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE bibliography, ONLY: Khaliullin2013, &
+                           Kolafa2004, &
+                           Scheiber2018, &
+                           Staub2019, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_retain
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm
+   USE cp_fm_types, ONLY: cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add_on_diag, dbcsr_binary_read, dbcsr_checksum, dbcsr_copy, dbcsr_create, &
+      dbcsr_distribution_get, dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, &
+      dbcsr_get_info, dbcsr_get_stored_coordinates, dbcsr_multiply, dbcsr_nblkcols_total, &
+      dbcsr_nblkrows_total, dbcsr_p_type, dbcsr_release, dbcsr_reserve_block2d, dbcsr_scale, &
+      dbcsr_set, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric, dbcsr_work_create
+   USE domain_submatrix_methods, ONLY: init_submatrices, &
+                                       release_submatrices
+   USE input_constants, ONLY: &
+      almo_deloc_none, almo_deloc_scf, almo_deloc_x, almo_deloc_x_then_scf, &
+      almo_deloc_xalmo_1diag, almo_deloc_xalmo_scf, almo_deloc_xalmo_x, almo_deloc_xk, &
+      almo_domain_layout_molecular, almo_mat_distr_atomic, almo_mat_distr_molecular, &
+      almo_scf_diag, almo_scf_dm_sign, almo_scf_pcg, almo_scf_skip, atomic_guess, &
+      molecular_guess, optimizer_diis, optimizer_lin_eq_pcg, optimizer_pcg, restart_guess, &
+      smear_fermi_dirac, virt_full, virt_number, virt_occ_size, xalmo_case_block_diag, &
+      xalmo_case_fully_deloc, xalmo_case_normal, xalmo_trial_r0_out
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE iterate_matrix, ONLY: invert_Hotelling, &
+                             matrix_sqrt_Newton_Schulz
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE mathlib, ONLY: binomial
+   USE molecule_types, ONLY: get_molecule_set_info, &
+                             molecule_type
+   USE mscfg_types, ONLY: get_matrix_from_submatrices, &
+                          molecular_scf_guess_env_type
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_initial_guess, ONLY: calculate_atomic_block_dm, &
+                               calculate_mopac_dm
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_post_scf, ONLY: qs_scf_compute_properties
+   USE qs_scf_types, ONLY: qs_scf_env_type, &
+                           scf_env_release
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -286,8 +286,8 @@ CONTAINS
          DO idomain = 1, ndomains
             nelec = almo_scf_env%nocc_of_domain(idomain, 1)
             multip = almo_scf_env%multiplicity_of_domain(idomain)
-            nelec_a = (nelec+multip-1)/2
-            nelec_b = nelec-nelec_a
+            nelec_a = (nelec + multip - 1)/2
+            nelec_b = nelec - nelec_a
             almo_scf_env%nocc_of_domain(idomain, 1) = nelec_a
             IF (nelec_a .NE. nelec_b) THEN
                IF (nspins .EQ. 1) THEN
@@ -306,14 +306,14 @@ CONTAINS
                !! Add a number of added_mos equal to the number of atoms in domain
                !! (since fragments were computed this way with smearing)
                almo_scf_env%nocc_of_domain(idomain, :) = almo_scf_env%nocc_of_domain(idomain, :) &
-                                                         +(almo_scf_env%last_atom_of_domain(idomain) &
-                                                           -almo_scf_env%first_atom_of_domain(idomain)+1)
+                                                         + (almo_scf_env%last_atom_of_domain(idomain) &
+                                                            - almo_scf_env%first_atom_of_domain(idomain) + 1)
             END IF
          ENDDO
          DO ispin = 1, nspins
             ! take care of the full virtual subspace
             almo_scf_env%nvirt_full_of_domain(:, ispin) = &
-               almo_scf_env%nbasis_of_domain(:)- &
+               almo_scf_env%nbasis_of_domain(:) - &
                almo_scf_env%nocc_of_domain(:, ispin)
             ! and the truncated virtual subspace
             SELECT CASE (almo_scf_env%deloc_truncate_virt)
@@ -327,7 +327,7 @@ CONTAINS
                      MIN(almo_scf_env%deloc_virt_per_domain, &
                          almo_scf_env%nvirt_full_of_domain(idomain, ispin))
                   almo_scf_env%nvirt_disc_of_domain(idomain, ispin) = &
-                     almo_scf_env%nvirt_full_of_domain(idomain, ispin)- &
+                     almo_scf_env%nvirt_full_of_domain(idomain, ispin) - &
                      almo_scf_env%nvirt_of_domain(idomain, ispin)
                ENDDO
             CASE (virt_occ_size)
@@ -336,7 +336,7 @@ CONTAINS
                      MIN(almo_scf_env%nocc_of_domain(idomain, ispin), &
                          almo_scf_env%nvirt_full_of_domain(idomain, ispin))
                   almo_scf_env%nvirt_disc_of_domain(idomain, ispin) = &
-                     almo_scf_env%nvirt_full_of_domain(idomain, ispin)- &
+                     almo_scf_env%nvirt_full_of_domain(idomain, ispin) - &
                      almo_scf_env%nvirt_of_domain(idomain, ispin)
                ENDDO
             CASE DEFAULT
@@ -352,7 +352,7 @@ CONTAINS
       DO idomain = 1, ndomains
          DO iao = 1, almo_scf_env%nbasis_of_domain(idomain)
             almo_scf_env%domain_index_of_ao(ao) = idomain
-            ao = ao+1
+            ao = ao + 1
          ENDDO
       ENDDO
 
@@ -402,7 +402,7 @@ CONTAINS
             CPABORT("Forces for perturbative methods are NYI. Change DELOCALIZE_METHOD")
          ENDIF
          ! switch to ASPC after a certain number of exact steps is done
-         IF (almo_scf_env%almo_history%istore .GT. (almo_scf_env%almo_history%nstore+1)) THEN
+         IF (almo_scf_env%almo_history%istore .GT. (almo_scf_env%almo_history%nstore + 1)) THEN
             IF (almo_scf_env%opt_block_diag_pcg%eps_error_early .GT. 0.0_dp) THEN
                almo_scf_env%opt_block_diag_pcg%eps_error = almo_scf_env%opt_block_diag_pcg%eps_error_early
                almo_scf_env%opt_block_diag_pcg%early_stopping_on = .TRUE.
@@ -427,7 +427,7 @@ CONTAINS
             almo_scf_env%opt_block_diag_diis%early_stopping_on = .FALSE.
             almo_scf_env%opt_block_diag_pcg%early_stopping_on = .FALSE.
          ENDIF
-         IF (almo_scf_env%xalmo_history%istore .GT. (almo_scf_env%xalmo_history%nstore+1)) THEN
+         IF (almo_scf_env%xalmo_history%istore .GT. (almo_scf_env%xalmo_history%nstore + 1)) THEN
             IF (almo_scf_env%opt_xalmo_pcg%eps_error_early .GT. 0.0_dp) THEN
                almo_scf_env%opt_xalmo_pcg%eps_error = almo_scf_env%opt_xalmo_pcg%eps_error_early
                almo_scf_env%opt_xalmo_pcg%early_stopping_on = .TRUE.
@@ -505,7 +505,7 @@ CONTAINS
       TYPE(almo_scf_env_type)                            :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_initial_guess', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name, project_name
       INTEGER                                            :: handle, iaspc, ispin, istore, naspc, &
@@ -639,9 +639,9 @@ CONTAINS
 
             ! extrapolation
             DO iaspc = 1, naspc
-               istore = MOD(almo_scf_env%almo_history%istore-iaspc, almo_scf_env%almo_history%nstore)+1
-               alpha = (-1.0_dp)**(iaspc+1)*REAL(iaspc, KIND=dp)* &
-                       binomial(2*naspc, naspc-iaspc)/binomial(2*naspc-2, naspc-1)
+               istore = MOD(almo_scf_env%almo_history%istore - iaspc, almo_scf_env%almo_history%nstore) + 1
+               alpha = (-1.0_dp)**(iaspc + 1)*REAL(iaspc, KIND=dp)* &
+                       binomial(2*naspc, naspc - iaspc)/binomial(2*naspc - 2, naspc - 1)
                IF (unit_nr > 0) THEN
                   WRITE (unit_nr, FMT="(T3,A2,I0,A4,F10.6)") &
                      "B(", iaspc, ") = ", alpha
@@ -756,7 +756,7 @@ CONTAINS
       TYPE(almo_scf_env_type)                            :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_store_extrapolation_data', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, istore, unit_nr
       LOGICAL :: delocalization_uses_extrapolation
@@ -776,11 +776,11 @@ CONTAINS
 
       IF (almo_scf_env%almo_history%nstore > 0) THEN
 
-         almo_scf_env%almo_history%istore = almo_scf_env%almo_history%istore+1
+         almo_scf_env%almo_history%istore = almo_scf_env%almo_history%istore + 1
 
          DO ispin = 1, SIZE(almo_scf_env%matrix_t_blk)
 
-            istore = MOD(almo_scf_env%almo_history%istore-1, almo_scf_env%almo_history%nstore)+1
+            istore = MOD(almo_scf_env%almo_history%istore - 1, almo_scf_env%almo_history%nstore) + 1
 
             IF (almo_scf_env%almo_history%istore == 1) THEN
                CALL dbcsr_create(almo_scf_env%almo_history%matrix_t(ispin), &
@@ -830,11 +830,11 @@ CONTAINS
       IF (almo_scf_env%xalmo_history%nstore > 0 .AND. &
           delocalization_uses_extrapolation) THEN
 
-         almo_scf_env%xalmo_history%istore = almo_scf_env%xalmo_history%istore+1
+         almo_scf_env%xalmo_history%istore = almo_scf_env%xalmo_history%istore + 1
 
          DO ispin = 1, SIZE(almo_scf_env%matrix_t)
 
-            istore = MOD(almo_scf_env%xalmo_history%istore-1, almo_scf_env%xalmo_history%nstore)+1
+            istore = MOD(almo_scf_env%xalmo_history%istore - 1, almo_scf_env%xalmo_history%nstore) + 1
 
             IF (almo_scf_env%xalmo_history%istore == 1) THEN
                CALL dbcsr_create(almo_scf_env%xalmo_history%matrix_t(ispin), &
@@ -905,7 +905,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_print_job_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=13)                                  :: neig_string
       CHARACTER(len=33)                                  :: deloc_method_string
@@ -1073,16 +1073,16 @@ CONTAINS
             IF (idomain .EQ. 1) THEN
                index1_prev = 1
             ELSE
-               index1_prev = almo_scf_env%domain_map(1)%index1(idomain-1)
+               index1_prev = almo_scf_env%domain_map(1)%index1(idomain - 1)
             ENDIF
 
             SELECT CASE (almo_scf_env%deloc_method)
             CASE (almo_deloc_none)
                nneighbors(idomain) = 0
             CASE (almo_deloc_x, almo_deloc_scf, almo_deloc_x_then_scf)
-               nneighbors(idomain) = almo_scf_env%ndomains-1 ! minus self
+               nneighbors(idomain) = almo_scf_env%ndomains - 1 ! minus self
             CASE (almo_deloc_xalmo_1diag, almo_deloc_xalmo_x, almo_deloc_xalmo_scf)
-               nneighbors(idomain) = almo_scf_env%domain_map(1)%index1(idomain)-index1_prev-1 ! minus self
+               nneighbors(idomain) = almo_scf_env%domain_map(1)%index1(idomain) - index1_prev - 1 ! minus self
             CASE DEFAULT
                nneighbors(idomain) = -1
             END SELECT
@@ -1143,13 +1143,13 @@ CONTAINS
                   IF (idomain .EQ. 1) THEN
                      index1_prev = 1
                   ELSE
-                     index1_prev = almo_scf_env%domain_map(1)%index1(idomain-1)
+                     index1_prev = almo_scf_env%domain_map(1)%index1(idomain - 1)
                   ENDIF
 
                   WRITE (unit_nr, '(T2,I10,":")') idomain
                   WRITE (unit_nr, '(T12,11I6)') &
                      almo_scf_env%domain_map(1)%pairs &
-                     (index1_prev:almo_scf_env%domain_map(1)%index1(idomain)-1, 1) ! includes self
+                     (index1_prev:almo_scf_env%domain_map(1)%index1(idomain) - 1, 1) ! includes self
 
                ENDDO ! cycle over domains
 
@@ -1187,7 +1187,7 @@ CONTAINS
       TYPE(almo_scf_env_type), INTENT(INOUT)             :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_init_ao_overlap', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -1345,7 +1345,7 @@ CONTAINS
       TYPE(almo_scf_env_type)                            :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_delocalization', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: col, handle, hold, iblock_col, &
                                                             iblock_row, ispin, mynode, &
@@ -1707,7 +1707,7 @@ CONTAINS
       TYPE(dbcsr_type), INTENT(IN)                       :: matrix_s0
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_env_create_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
 
@@ -2166,7 +2166,7 @@ CONTAINS
       TYPE(almo_scf_env_type)                            :: almo_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_scf_clean_up', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, unit_nr
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -2364,7 +2364,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'almo_post_scf_compute_properties', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
       TYPE(section_vals_type), POINTER                   :: dft_section, input

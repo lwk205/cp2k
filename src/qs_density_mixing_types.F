@@ -10,32 +10,32 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE qs_density_mixing_types
-   USE ao_util,                         ONLY: exp_radius
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE dbcsr_api,                       ONLY: dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: broy_mix,&
-                                              broy_mix_new,&
-                                              direct_p_mix,&
-                                              gaussian,&
-                                              kerker_mix,&
-                                              multisec_mix,&
-                                              no_mix,&
-                                              pulay_mix
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_create,&
-                                              section_type,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE input_val_types,                 ONLY: real_t
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE qs_rho_atom_types,               ONLY: rho_atom_coeff
-   USE string_utilities,                ONLY: s2a
+   USE ao_util, ONLY: exp_radius
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE dbcsr_api, ONLY: dbcsr_deallocate_matrix, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE input_constants, ONLY: broy_mix, &
+                              broy_mix_new, &
+                              direct_p_mix, &
+                              gaussian, &
+                              kerker_mix, &
+                              multisec_mix, &
+                              no_mix, &
+                              pulay_mix
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_create, &
+                                  section_type, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE input_val_types, ONLY: real_t
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE qs_rho_atom_types, ONLY: rho_atom_coeff
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -105,7 +105,7 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: ecut
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixing_storage_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(dp)                                           :: alpha, eps, gcut
 
@@ -211,13 +211,13 @@ CONTAINS
       TYPE(mixing_storage_type), POINTER                 :: mixing_store
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mixing_storage_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, k
 
       IF (ASSOCIATED(mixing_store)) THEN
          CPASSERT(mixing_store%ref_count > 0)
-         mixing_store%ref_count = mixing_store%ref_count-1
+         mixing_store%ref_count = mixing_store%ref_count - 1
          IF (mixing_store%ref_count == 0) THEN
 
             IF (ASSOCIATED(mixing_store%kerker_factor)) THEN
@@ -457,7 +457,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: ls_scf
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_mixing_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: section_name
       INTEGER                                            :: default_mix

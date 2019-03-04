@@ -11,24 +11,24 @@
 !> \author Florina Schiffmann
 ! **************************************************************************************************
 MODULE rt_hfx_utils
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_p_type,&
-                                              dbcsr_set,&
-                                              dbcsr_type_antisymmetric
-   USE kinds,                           ONLY: dp
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_ks_types,                     ONLY: qs_ks_env_type,&
-                                              set_ks_env
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_set,&
-                                              qs_rho_type
-   USE rt_propagation_types,            ONLY: rt_prop_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_p_type, &
+                        dbcsr_set, &
+                        dbcsr_type_antisymmetric
+   USE kinds, ONLY: dp
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_ks_types, ONLY: qs_ks_env_type, &
+                          set_ks_env
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_set, &
+                           qs_rho_type
+   USE rt_propagation_types, ONLY: rt_prop_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -49,7 +49,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rtp_hfx_rebuild', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks_aux_im, matrix_ks_im, &
                                                             matrix_s, matrix_s_aux, rho_ao_im, &
@@ -112,7 +112,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: nspins
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'rebuild_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

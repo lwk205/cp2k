@@ -9,36 +9,36 @@
 ! **************************************************************************************************
 MODULE gle_system_dynamics
 
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE extended_system_types,           ONLY: map_info_type
-   USE gle_system_types,                ONLY: gle_thermo_create,&
-                                              gle_type
-   USE input_constants,                 ONLY: &
-        do_thermo_communication, do_thermo_no_communication, isokin_ensemble, langevin_ensemble, &
-        npe_f_ensemble, npe_i_ensemble, nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, &
-        npt_f_ensemble, npt_i_ensemble, nve_ensemble, nvt_ensemble, reftraj_ensemble
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_remove_values,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: global_constraint_type,&
-                                              molecule_type
-   USE parallel_rng_types,              ONLY: next_random_number,&
-                                              read_rng_stream,&
-                                              rng_record_length,&
-                                              rng_stream_type
-   USE particle_types,                  ONLY: particle_type
-   USE simpar_types,                    ONLY: simpar_type
-   USE thermostat_mapping,              ONLY: thermostat_mapping_region
-   USE thermostat_types,                ONLY: thermostat_info_type
-   USE thermostat_utils,                ONLY: ke_region_particles,&
-                                              momentum_region_particles,&
-                                              vel_rescale_particles
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE extended_system_types, ONLY: map_info_type
+   USE gle_system_types, ONLY: gle_thermo_create, &
+                               gle_type
+   USE input_constants, ONLY: &
+      do_thermo_communication, do_thermo_no_communication, isokin_ensemble, langevin_ensemble, &
+      npe_f_ensemble, npe_i_ensemble, nph_uniaxial_damped_ensemble, nph_uniaxial_ensemble, &
+      npt_f_ensemble, npt_i_ensemble, nve_ensemble, nvt_ensemble, reftraj_ensemble
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_remove_values, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: global_constraint_type, &
+                             molecule_type
+   USE parallel_rng_types, ONLY: next_random_number, &
+                                 read_rng_stream, &
+                                 rng_record_length, &
+                                 rng_stream_type
+   USE particle_types, ONLY: particle_type
+   USE simpar_types, ONLY: simpar_type
+   USE thermostat_mapping, ONLY: thermostat_mapping_region
+   USE thermostat_types, ONLY: thermostat_info_type
+   USE thermostat_utils, ONLY: ke_region_particles, &
+                               momentum_region_particles, &
+                               vel_rescale_particles
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -159,8 +159,8 @@ CONTAINS
                                local_molecules, molecule_set, group, vel)
       DO ideg = 1, gle%loc_num_gle
          imap = gle%map_info%map_index(ideg)
-         gle%nvt(ideg)%thermostat_energy = gle%nvt(ideg)%thermostat_energy+ &
-                                           0.5_dp*(gle%nvt(ideg)%kin_energy-map_info%s_kin(imap))
+         gle%nvt(ideg)%thermostat_energy = gle%nvt(ideg)%thermostat_energy + &
+                                           0.5_dp*(gle%nvt(ideg)%kin_energy - map_info%s_kin(imap))
       END DO
 
       DEALLOCATE (e_tmp, s_tmp, h_tmp)
@@ -198,7 +198,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: save_mem
 
       CHARACTER(len=*), PARAMETER :: routineN = 'initialize_gle_part', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: restart
       REAL(dp)                                           :: Mtmp(gle%ndim, gle%ndim)
@@ -217,7 +217,7 @@ CONTAINS
       ! deterministic part of the propagator
       CALL gle_matrix_exp((-simpar%dt*0.5_dp)*gle%a_mat, gle%ndim, 15, 15, gle%gle_t)
       ! stochastic part
-      Mtmp = gle%c_mat-MATMUL(gle%gle_t, MATMUL(gle%c_mat, TRANSPOSE(gle%gle_t)))
+      Mtmp = gle%c_mat - MATMUL(gle%gle_t, MATMUL(gle%c_mat, TRANSPOSE(gle%gle_t)))
       CALL gle_cholesky_stab(Mtmp, gle%gle_s, gle%ndim)
 
    END SUBROUTINE initialize_gle_part
@@ -240,25 +240,25 @@ CONTAINS
       REAL(dp), INTENT(out)                              :: EM(n, n)
 
       INTEGER                                            :: i, p
-      REAL(dp)                                           :: SM(n, n), tc(j+1)
+      REAL(dp)                                           :: SM(n, n), tc(j + 1)
 
       tc(1) = 1._dp
       DO i = 1, j
-         tc(i+1) = tc(i)/REAL(i, KIND=dp)
+         tc(i + 1) = tc(i)/REAL(i, KIND=dp)
       ENDDO
 
       !scale
       SM = M*(1._dp/2._dp**k)
       EM = 0._dp
       DO i = 1, n
-         EM(i, i) = tc(j+1)
+         EM(i, i) = tc(j + 1)
       ENDDO
 
       !taylor exp of scaled matrix
       DO p = j, 1, -1
          EM = MATMUL(SM, EM)
          DO i = 1, n
-            EM(i, i) = EM(i, i)+tc(p)
+            EM(i, i) = EM(i, i) + tc(p)
          ENDDO
       ENDDO
 
@@ -293,21 +293,21 @@ CONTAINS
       DO i = 1, n
          L(i, i) = 1.0_dp
          D(i) = SST(i, i)
-         DO j = 1, i-1
+         DO j = 1, i - 1
             L(i, j) = SST(i, j); 
-            DO k = 1, j-1
-               L(i, j) = L(i, j)-L(i, k)*L(j, k)*D(k)
+            DO k = 1, j - 1
+               L(i, j) = L(i, j) - L(i, k)*L(j, k)*D(k)
             ENDDO
             IF (ABS(D(j)) > EPSILON(1.0_dp)) L(i, j) = L(i, j)/D(j)
          ENDDO
-         DO k = 1, i-1
-            D(i) = D(i)-L(i, k)*L(i, k)*D(k)
+         DO k = 1, i - 1
+            D(i) = D(i) - L(i, k)*L(i, k)*D(k)
          END DO
       ENDDO
       DO i = 1, n
          DO j = 1, i
             IF ((ABS(D(j)) > EPSILON(1.0_dp)) .AND. (D(j) > 0.0_dp)) THEN
-               S(i, j) = S(i, j)+L(i, j)*SQRT(D(j))
+               S(i, j) = S(i, j) + L(i, j)*SQRT(D(j))
             END IF
          ENDDO
       ENDDO
@@ -339,7 +339,7 @@ CONTAINS
       TYPE(global_constraint_type), POINTER              :: gci
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'gle_to_particle_mapping', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, imap, j, mal_size, natoms_local, &
                                                             nkind, number, region, &
@@ -384,7 +384,7 @@ CONTAINS
          map_info%s_kin = 0.0_dp
          DO i = 1, 3
             DO j = 1, natoms_local
-               map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point+1
+               map_info%p_kin(i, j)%point = map_info%p_kin(i, j)%point + 1
             END DO
          END DO
 
@@ -394,7 +394,7 @@ CONTAINS
 
          ! We know the total number of system thermostats.
          IF ((sum_of_thermostats == 1) .AND. (map_info%dis_type /= do_thermo_no_communication)) THEN
-            fac = map_info%s_kin(1)-deg_of_freedom(1)-simpar%nfree_rot_transl
+            fac = map_info%s_kin(1) - deg_of_freedom(1) - simpar%nfree_rot_transl
             IF (fac == 0.0_dp) THEN
                CPABORT("Zero degrees of freedom. Nothing to thermalize!")
             END IF
@@ -403,7 +403,7 @@ CONTAINS
          ELSE
             DO i = 1, gle%loc_num_gle
                imap = map_info%map_index(i)
-               fac = (map_info%s_kin(imap)-deg_of_freedom(i))
+               fac = (map_info%s_kin(imap) - deg_of_freedom(i))
                gle%nvt(i)%nkt = simpar%temp_ext*fac
                gle%nvt(i)%degrees_of_freedom = FLOOR(fac)
             END DO
@@ -453,9 +453,9 @@ CONTAINS
          CALL section_vals_val_get(gle_section, "S%_DEFAULT_KEYWORD_", r_vals=buffer)
          DO i = 1, SIZE(gle%nvt, 1)
             ind = map_info%index(i)
-            ind = (ind-1)*(gle%ndim)
+            ind = (ind - 1)*(gle%ndim)
             DO j = 1, SIZE(gle%nvt(i)%s, 1)
-               ind = ind+1
+               ind = ind + 1
                gle%nvt(i)%s(j) = buffer(ind)
             END DO
          END DO
@@ -524,7 +524,7 @@ CONTAINS
       TYPE(gle_type), POINTER                            :: gle
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_gle_variables', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
       REAL(dp)                                           :: rr(gle%ndim), cc(gle%ndim, gle%ndim)

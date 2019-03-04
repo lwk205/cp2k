@@ -9,7 +9,7 @@
 ! **************************************************************************************************
 MODULE virial_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -79,25 +79,25 @@ CONTAINS
       INTEGER                                            :: i, j
 
       DO i = 1, 3
-         DO j = 1, i-1
+         DO j = 1, i - 1
             ! Symmetrize total
-            virial%pv_total(j, i) = (virial%pv_total(i, j)+virial%pv_total(j, i))*0.5_dp
+            virial%pv_total(j, i) = (virial%pv_total(i, j) + virial%pv_total(j, i))*0.5_dp
             virial%pv_total(i, j) = virial%pv_total(j, i)
             ! Symmetrize Kinetic
-            virial%pv_kinetic(j, i) = (virial%pv_kinetic(i, j)+virial%pv_kinetic(j, i))*0.5_dp
+            virial%pv_kinetic(j, i) = (virial%pv_kinetic(i, j) + virial%pv_kinetic(j, i))*0.5_dp
             virial%pv_kinetic(i, j) = virial%pv_kinetic(j, i)
             ! Symmetrize Virial
-            virial%pv_virial(j, i) = (virial%pv_virial(i, j)+virial%pv_virial(j, i))*0.5_dp
+            virial%pv_virial(j, i) = (virial%pv_virial(i, j) + virial%pv_virial(j, i))*0.5_dp
             virial%pv_virial(i, j) = virial%pv_virial(j, i)
             ! Symmetrize XC
-            virial%pv_xc(j, i) = (virial%pv_xc(i, j)+virial%pv_xc(j, i))*0.5_dp
+            virial%pv_xc(j, i) = (virial%pv_xc(i, j) + virial%pv_xc(j, i))*0.5_dp
             virial%pv_xc(i, j) = virial%pv_xc(j, i)
             ! Symmetrize HFX
-            virial%pv_fock_4c(j, i) = (virial%pv_fock_4c(i, j)+virial%pv_fock_4c(j, i))*0.5_dp
+            virial%pv_fock_4c(j, i) = (virial%pv_fock_4c(i, j) + virial%pv_fock_4c(j, i))*0.5_dp
             virial%pv_fock_4c(i, j) = virial%pv_fock_4c(j, i)
 
             ! Symmetrize constraints
-            virial%pv_constraint(j, i) = (virial%pv_constraint(i, j)+virial%pv_constraint(j, i))*0.5_dp
+            virial%pv_constraint(j, i) = (virial%pv_constraint(i, j) + virial%pv_constraint(j, i))*0.5_dp
             virial%pv_constraint(i, j) = virial%pv_constraint(j, i)
          END DO
       END DO
@@ -186,7 +186,7 @@ CONTAINS
       ALLOCATE (virial)
 
       CALL zero_virial(virial)
-      last_virial_id_nr = last_virial_id_nr+1
+      last_virial_id_nr = last_virial_id_nr + 1
       virial%id_nr = last_virial_id_nr
       virial%ref_count = 1
    END SUBROUTINE virial_create
@@ -207,7 +207,7 @@ CONTAINS
 
       IF (ASSOCIATED(virial)) THEN
          CPASSERT(virial%ref_count > 0)
-         virial%ref_count = virial%ref_count-1
+         virial%ref_count = virial%ref_count - 1
          IF (virial%ref_count .EQ. 0) THEN
             DEALLOCATE (virial)
          ENDIF

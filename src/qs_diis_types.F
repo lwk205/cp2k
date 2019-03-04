@@ -10,11 +10,11 @@
 !> \author Matthias Krack
 ! **************************************************************************************************
 MODULE qs_diis_types
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release
-   USE dbcsr_api,                       ONLY: dbcsr_p_type,&
-                                              dbcsr_release
-   USE kinds,                           ONLY: dp
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release
+   USE dbcsr_api, ONLY: dbcsr_p_type, &
+                        dbcsr_release
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -83,11 +83,11 @@ CONTAINS
       TYPE(qs_diis_buffer_type), POINTER                 :: diis_buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_diis_b_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(diis_buffer))
       CPASSERT(diis_buffer%ref_count > 0)
-      diis_buffer%ref_count = diis_buffer%ref_count+1
+      diis_buffer%ref_count = diis_buffer%ref_count + 1
    END SUBROUTINE qs_diis_b_retain
 
 ! **************************************************************************************************
@@ -101,13 +101,13 @@ CONTAINS
       TYPE(qs_diis_buffer_type), POINTER                 :: diis_buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_diis_b_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 
       IF (ASSOCIATED(diis_buffer)) THEN
          CPASSERT(diis_buffer%ref_count > 0)
-         diis_buffer%ref_count = diis_buffer%ref_count-1
+         diis_buffer%ref_count = diis_buffer%ref_count - 1
          IF (diis_buffer%ref_count < 1) THEN
             IF (ASSOCIATED(diis_buffer%b_matrix)) THEN
                DEALLOCATE (diis_buffer%b_matrix)
@@ -145,7 +145,7 @@ CONTAINS
       TYPE(qs_diis_buffer_type_sparse), POINTER          :: diis_buffer
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_diis_b_release_sparse', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j
 

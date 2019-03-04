@@ -11,9 +11,9 @@
 ! **************************************************************************************************
 
 MODULE eri_mme_gaussian
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: gamma1
-   USE minimax_exp,                     ONLY: get_exp_minimax_coeff
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: gamma1
+   USE minimax_exp, ONLY: get_exp_minimax_coeff
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -49,12 +49,12 @@ CONTAINS
 
       INTEGER                                            :: k, l
 
-      ALLOCATE (h_to_c(-1:l_max+1, 0:l_max))
+      ALLOCATE (h_to_c(-1:l_max + 1, 0:l_max))
       h_to_c(:, :) = 0.0_dp
       h_to_c(0, 0) = 1.0_dp
-      DO l = 0, l_max-1
-         DO k = 0, l+1
-            h_to_c(k, l+1) = -(k+1)*h_to_c(k+1, l)+2.0_dp*zet*h_to_c(k-1, l)
+      DO l = 0, l_max - 1
+         DO k = 0, l + 1
+            h_to_c(k, l + 1) = -(k + 1)*h_to_c(k + 1, l) + 2.0_dp*zet*h_to_c(k - 1, l)
          ENDDO
       ENDDO
 
@@ -71,7 +71,7 @@ CONTAINS
       INTEGER, DIMENSION(3), INTENT(IN)                  :: l
       REAL(KIND=dp)                                      :: norm
 
-      norm = 1.0_dp/SQRT((2.0_dp*zet)**(SUM(l)-1.5_dp)*(gamma1(l(1))*gamma1(l(2))*gamma1(l(3))))
+      norm = 1.0_dp/SQRT((2.0_dp*zet)**(SUM(l) - 1.5_dp)*(gamma1(l(1))*gamma1(l(2))*gamma1(l(3))))
 
    END FUNCTION hermite_gauss_norm
 
@@ -91,7 +91,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT), OPTIONAL               :: err_minimax
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_minimax_coeff_v_gspace', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: dG, G_max, minimax_Rc
 
@@ -134,32 +134,32 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: l, m
       REAL(KIND=dp), INTENT(IN)                          :: a, b, R1, R2
       INTEGER, INTENT(IN)                                :: H_or_C_product
-      REAL(KIND=dp), DIMENSION(-1:l+m+1, -1:l, -1:m), &
+      REAL(KIND=dp), DIMENSION(-1:l + m + 1, -1:l, -1:m), &
          INTENT(OUT)                                     :: E
 
       INTEGER                                            :: ll, mm, t
       REAL(KIND=dp)                                      :: c1, c2, c3
 
       E(:, :, :) = 0.0_dp
-      E(0, 0, 0) = EXP(-a*b/(a+b)*(R1-R2)**2) ! cost: exp_w flops
+      E(0, 0, 0) = EXP(-a*b/(a + b)*(R1 - R2)**2) ! cost: exp_w flops
 
-      c1 = 0.5_dp/(a+b)
-      c2 = (b/(a+b))*(R2-R1)
-      c3 = (a/(a+b))*(R1-R2)
+      c1 = 0.5_dp/(a + b)
+      c2 = (b/(a + b))*(R2 - R1)
+      c3 = (a/(a + b))*(R1 - R2)
 
       IF (H_or_C_product .EQ. 1) THEN ! Cartesian overlap dist
          DO mm = 0, m
             DO ll = 0, l
-               DO t = 0, ll+mm+1
+               DO t = 0, ll + mm + 1
                   IF (ll .LT. l) THEN
-                     E(t, ll+1, mm) = c1*E(t-1, ll, mm)+ & ! cost: 8 flops
-                                      c2*E(t, ll, mm)+ &
-                                      (t+1)*E(t+1, ll, mm)
+                     E(t, ll + 1, mm) = c1*E(t - 1, ll, mm) + & ! cost: 8 flops
+                                        c2*E(t, ll, mm) + &
+                                        (t + 1)*E(t + 1, ll, mm)
                   ENDIF
                   IF (mm .LT. m) THEN
-                     E(t, ll, mm+1) = c1*E(t-1, ll, mm)+ & ! cost: 8 flops
-                                      c3*E(t, ll, mm)+ &
-                                      (t+1)*E(t+1, ll, mm)
+                     E(t, ll, mm + 1) = c1*E(t - 1, ll, mm) + & ! cost: 8 flops
+                                        c3*E(t, ll, mm) + &
+                                        (t + 1)*E(t + 1, ll, mm)
                   ENDIF
                ENDDO
             ENDDO
@@ -167,18 +167,18 @@ CONTAINS
       ELSE ! Hermite overlap dist
          DO mm = 0, m
             DO ll = 0, l
-               DO t = 0, ll+mm+1
+               DO t = 0, ll + mm + 1
                   IF (ll .LT. l) THEN
-                     E(t, ll+1, mm) = a*(2*c1*E(t-1, ll, mm)+ & ! cost: 16 flops
-                                         2*c2*E(t, ll, mm)+ &
-                                         2*(t+1)*E(t+1, ll, mm)- &
-                                         2*ll*E(t, ll-1, mm))
+                     E(t, ll + 1, mm) = a*(2*c1*E(t - 1, ll, mm) + & ! cost: 16 flops
+                                           2*c2*E(t, ll, mm) + &
+                                           2*(t + 1)*E(t + 1, ll, mm) - &
+                                           2*ll*E(t, ll - 1, mm))
                   ENDIF
                   IF (mm .LT. m) THEN
-                     E(t, ll, mm+1) = b*(2*c1*E(t-1, ll, mm)+ & ! cost: 16 flops
-                                         2*c3*E(t, ll, mm)+ &
-                                         2*(t+1)*E(t+1, ll, mm)- &
-                                         2*mm*E(t, ll, mm-1))
+                     E(t, ll, mm + 1) = b*(2*c1*E(t - 1, ll, mm) + & ! cost: 16 flops
+                                           2*c3*E(t, ll, mm) + &
+                                           2*(t + 1)*E(t + 1, ll, mm) - &
+                                           2*mm*E(t, ll, mm - 1))
 
                   ENDIF
                ENDDO

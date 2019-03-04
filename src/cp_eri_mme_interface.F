@@ -8,43 +8,43 @@
 ! **************************************************************************************************
 
 MODULE cp_eri_mme_interface
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE cell_types,                      ONLY: cell_create,&
-                                              cell_release,&
-                                              cell_type,&
-                                              init_cell,&
-                                              pbc
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_section_create,&
-                                              cp_print_key_unit_nr,&
-                                              medium_print_level
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE eri_mme_test,                    ONLY: eri_mme_2c_perf_acc_test,&
-                                              eri_mme_3c_perf_acc_test
-   USE eri_mme_types,                   ONLY: eri_mme_init,&
-                                              eri_mme_param,&
-                                              eri_mme_release,&
-                                              eri_mme_set_params
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_add_subsection,&
-                                              section_create,&
-                                              section_release,&
-                                              section_type,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE input_val_types,                 ONLY: real_t
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_sum
-   USE orbital_pointers,                ONLY: init_orbital_pointers
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE cell_types, ONLY: cell_create, &
+                         cell_release, &
+                         cell_type, &
+                         init_cell, &
+                         pbc
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_section_create, &
+                                 cp_print_key_unit_nr, &
+                                 medium_print_level
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE eri_mme_test, ONLY: eri_mme_2c_perf_acc_test, &
+                           eri_mme_3c_perf_acc_test
+   USE eri_mme_types, ONLY: eri_mme_init, &
+                            eri_mme_param, &
+                            eri_mme_release, &
+                            eri_mme_set_params
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_add_subsection, &
+                                  section_create, &
+                                  section_release, &
+                                  section_type, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE input_val_types, ONLY: real_t
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE message_passing, ONLY: mp_sum
+   USE orbital_pointers, ONLY: init_orbital_pointers
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -96,7 +96,7 @@ CONTAINS
       INTEGER, INTENT(IN), OPTIONAL                      :: default_n_minimax
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_eri_mme_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: my_default_n_minimax
       TYPE(keyword_type), POINTER                        :: keyword
@@ -239,7 +239,7 @@ CONTAINS
       TYPE(cp_eri_mme_param), INTENT(INOUT)              :: param
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_eri_mme_init_read_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: debug_nsum, n_minimax, unit_nr
       LOGICAL                                            :: debug, do_calib_cutoff, print_calib
@@ -294,12 +294,12 @@ CONTAINS
       TYPE(cp_eri_mme_param), INTENT(INOUT)              :: param
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'cp_eri_mme_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: count_2c, count_3c, unit_nr
 
-      count_2c = param%G_count_2c+param%R_count_2c
-      count_3c = param%GG_count_3c+param%GR_count_3c+param%RR_count_3c
+      count_2c = param%G_count_2c + param%R_count_2c
+      count_3c = param%GG_count_3c + param%GR_count_3c + param%RR_count_3c
 
       unit_nr = param%par%unit_nr
 
@@ -348,7 +348,7 @@ CONTAINS
       TYPE(cp_para_env_type), INTENT(IN), POINTER        :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'eri_mme_set_params_from_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, l_max
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: l_err_cutoff
@@ -396,9 +396,9 @@ CONTAINS
             param%par%do_calib_cutoff = .TRUE.
          ELSE
             ! only calibrate cutoff if parameters (cell, basis coefficients) have changed
-            IF (ALL(ABS(param%hmat-hmat) < eps_changed) .AND. &
-                ABS(param%zet_err_minimax-zet_err_minimax) < eps_changed .AND. &
-                ALL(ABS(param%zet_err_cutoff-zet_err_cutoff) < eps_changed) .AND. &
+            IF (ALL(ABS(param%hmat - hmat) < eps_changed) .AND. &
+                ABS(param%zet_err_minimax - zet_err_minimax) < eps_changed .AND. &
+                ALL(ABS(param%zet_err_cutoff - zet_err_cutoff) < eps_changed) .AND. &
                 ALL(param%l_err_cutoff == l_err_cutoff) .AND. &
                 param%l_max == l_max) THEN
                param%par%do_calib_cutoff = .FALSE.
@@ -448,7 +448,7 @@ CONTAINS
       INTEGER, ALLOCATABLE, DIMENSION(:), INTENT(OUT)    :: l_c
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'error_est_pgf_params_from_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: basis_type
       INTEGER                                            :: handle, i, ibasis, ikind, iset, j, l_m, &
@@ -506,7 +506,7 @@ CONTAINS
                              basis_type=basis_type)
             DO i = LBOUND(basis_set%l, 1), UBOUND(basis_set%l, 1)
                DO j = LBOUND(basis_set%l, 2), UBOUND(basis_set%l, 2)
-                  IF (ABS(zet_m-basis_set%zet(i, j)) .LE. (zet_m*1.0E-12_dp) .AND. (basis_set%l(i, j) .GT. l_zet)) THEN
+                  IF (ABS(zet_m - basis_set%zet(i, j)) .LE. (zet_m*1.0E-12_dp) .AND. (basis_set%l(i, j) .GT. l_zet)) THEN
                      l_zet = basis_set%l(i, j)
                   ENDIF
                   IF ((basis_set%l(i, j) .EQ. l_m) .AND. (basis_set%zet(i, j) .GT. zet_l)) THEN
@@ -526,7 +526,7 @@ CONTAINS
 
       ! l + 1 because we may calculate forces
       ! this is probably a safe choice also for the case that forces are not needed
-      l_c(:) = [l_zet+1, l_m+1]
+      l_c(:) = [l_zet + 1, l_m + 1]
 
       CALL timestop(handle)
    END SUBROUTINE error_est_pgf_params_from_basis
@@ -553,7 +553,7 @@ CONTAINS
             WRITE (unit_nr, '(T2, A)') "ERI_MME| Estimated absolute error for normalized Hermite-Gaussian basis"
             WRITE (unit_nr, '(T2, A, T72, ES9.2)') "ERI_MME|   Minimax error:", param%par%err_mm
             WRITE (unit_nr, '(T2, A, T72, ES9.2)') "ERI_MME|   Cutoff error:", param%par%err_c
-            WRITE (unit_nr, '(T2, A, T72, ES9.2)') "ERI_MME|   Total error (minimax + cutoff):", param%par%err_mm+param%par%err_c
+            WRITE (unit_nr, '(T2, A, T72, ES9.2)') "ERI_MME|   Total error (minimax + cutoff):", param%par%err_mm + param%par%err_c
             IF (param%par%print_calib) &
                WRITE (unit_nr, '(T2, A, T68, F13.10)') "ERI_MME|   Minimax scaling constant in AM-GM estimate:", param%par%C_mm
          ENDIF
@@ -570,7 +570,7 @@ CONTAINS
       TYPE(section_type), INTENT(INOUT), POINTER         :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_eri_mme_test_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
       TYPE(section_type), POINTER                        :: subsection
@@ -689,27 +689,27 @@ CONTAINS
 
       IF (PRESENT(G_count_2c)) THEN
          CALL mp_sum(G_count_2c, para_env%group)
-         param%G_count_2c = param%G_count_2c+G_count_2c
+         param%G_count_2c = param%G_count_2c + G_count_2c
       ENDIF
 
       IF (PRESENT(R_count_2c)) THEN
          CALL mp_sum(R_count_2c, para_env%group)
-         param%R_count_2c = param%R_count_2c+R_count_2c
+         param%R_count_2c = param%R_count_2c + R_count_2c
       ENDIF
 
       IF (PRESENT(GG_count_3c)) THEN
          CALL mp_sum(GG_count_3c, para_env%group)
-         param%GG_count_3c = param%GG_count_3c+GG_count_3c
+         param%GG_count_3c = param%GG_count_3c + GG_count_3c
       ENDIF
 
       IF (PRESENT(GR_count_3c)) THEN
          CALL mp_sum(GR_count_3c, para_env%group)
-         param%GR_count_3c = param%GR_count_3c+GR_count_3c
+         param%GR_count_3c = param%GR_count_3c + GR_count_3c
       ENDIF
 
       IF (PRESENT(RR_count_3c)) THEN
          CALL mp_sum(RR_count_3c, para_env%group)
-         param%RR_count_3c = param%RR_count_3c+RR_count_3c
+         param%RR_count_3c = param%RR_count_3c + RR_count_3c
       ENDIF
 
    END SUBROUTINE cp_eri_mme_update_local_counts
@@ -726,7 +726,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: eri_mme_test_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_eri_mme_perf_acc_test', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: count_r, G_count, GG_count, GR_count, i, &
                                                             ix, iy, iz, l_max, min_nR, nR, nR_xyz, &
@@ -767,9 +767,9 @@ CONTAINS
 
       zet(1) = zetmin
       IF (nzet .GT. 1) THEN
-         zet_fac = (zetmax/zetmin)**(1.0_dp/(nzet-1))
-         DO i = 1, nzet-1
-            zet(i+1) = zet(i)*zet_fac
+         zet_fac = (zetmax/zetmin)**(1.0_dp/(nzet - 1))
+         DO i = 1, nzet - 1
+            zet(i + 1) = zet(i)*zet_fac
          ENDDO
       ENDIF
 
@@ -782,7 +782,7 @@ CONTAINS
       CALL init_cell(box)
 
       ! Create range of rab (atomic distances) to be tested
-      nR_xyz = CEILING(REAL(min_nR, KIND=dp)**(1.0_dp/3.0_dp)-1.0E-06)
+      nR_xyz = CEILING(REAL(min_nR, KIND=dp)**(1.0_dp/3.0_dp) - 1.0E-06)
       nR = nR_xyz**3
 
       ALLOCATE (rabc(3, nR))
@@ -790,11 +790,11 @@ CONTAINS
       DO ix = 1, nR_xyz
       DO iy = 1, nR_xyz
       DO iz = 1, nR_xyz
-         count_r = count_r+1
+         count_r = count_r + 1
          ! adding 10% of cell size to positions to avoid atoms exactly at boundary or center of a cell
          rabc(:, count_r) = pbc([ix*ABS(cell_par(1)), &
                                  iy*ABS(cell_par(2)), &
-                                 iz*ABS(cell_par(3))]/nR_xyz+ &
+                                 iz*ABS(cell_par(3))]/nR_xyz + &
                                 0.1_dp*ABS(cell_par(:)), box)
       ENDDO
       ENDDO

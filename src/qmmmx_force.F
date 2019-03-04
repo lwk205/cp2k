@@ -10,32 +10,32 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE qmmmx_force
-   USE cell_types,                      ONLY: cell_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_type
-   USE fist_environment_types,          ONLY: fist_env_get
-   USE input_constants,                 ONLY: do_fm_mom_conserv_QM,&
-                                              do_fm_mom_conserv_buffer,&
-                                              do_fm_mom_conserv_core,&
-                                              do_fm_mom_conserv_equal_a,&
-                                              do_fm_mom_conserv_equal_f,&
-                                              do_fm_mom_conserv_none
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE particle_types,                  ONLY: particle_type
-   USE qmmm_force,                      ONLY: qmmm_calc_energy_force
-   USE qmmm_types,                      ONLY: qmmm_env_get,&
-                                              qmmm_env_type
-   USE qmmm_types_low,                  ONLY: force_mixing_label_QM_core,&
-                                              force_mixing_label_QM_dynamics,&
-                                              force_mixing_label_buffer
-   USE qmmm_util,                       ONLY: apply_qmmm_unwrap,&
-                                              apply_qmmm_wrap
-   USE qmmmx_types,                     ONLY: qmmmx_env_type
-   USE qmmmx_util,                      ONLY: apply_qmmmx_translate
-   USE qs_environment_types,            ONLY: get_qs_env
+   USE cell_types, ONLY: cell_type
+   USE cp_subsys_types, ONLY: cp_subsys_type
+   USE fist_environment_types, ONLY: fist_env_get
+   USE input_constants, ONLY: do_fm_mom_conserv_QM, &
+                              do_fm_mom_conserv_buffer, &
+                              do_fm_mom_conserv_core, &
+                              do_fm_mom_conserv_equal_a, &
+                              do_fm_mom_conserv_equal_f, &
+                              do_fm_mom_conserv_none
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE particle_types, ONLY: particle_type
+   USE qmmm_force, ONLY: qmmm_calc_energy_force
+   USE qmmm_types, ONLY: qmmm_env_get, &
+                         qmmm_env_type
+   USE qmmm_types_low, ONLY: force_mixing_label_QM_core, &
+                             force_mixing_label_QM_dynamics, &
+                             force_mixing_label_buffer
+   USE qmmm_util, ONLY: apply_qmmm_unwrap, &
+                        apply_qmmm_wrap
+   USE qmmmx_types, ONLY: qmmmx_env_type
+   USE qmmmx_util, ONLY: apply_qmmmx_translate
+   USE qs_environment_types, ONLY: get_qs_env
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -66,7 +66,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL :: require_consistent_energy_force
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmmx_calc_energy_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ip, mom_conserv_min_label, &
                                                             mom_conserv_n, mom_conserv_region, &
@@ -129,26 +129,26 @@ CONTAINS
 
          total_f = 0.0_dp
          DO ip = 1, SIZE(particles_qmmm_core)
-            total_f(1:3) = total_f(1:3)+particles_qmmm_core(ip)%f(1:3)
+            total_f(1:3) = total_f(1:3) + particles_qmmm_core(ip)%f(1:3)
          END DO
          IF (mom_conserv_type == do_fm_mom_conserv_equal_f) THEN
             mom_conserv_n = COUNT(cur_labels >= mom_conserv_min_label)
             delta_f = total_f/mom_conserv_n
             DO ip = 1, SIZE(cur_indices)
                IF (cur_labels(ip) >= mom_conserv_min_label) THEN
-                  particles_qmmm_core(cur_indices(ip))%f = particles_qmmm_core(cur_indices(ip))%f-delta_f
+                  particles_qmmm_core(cur_indices(ip))%f = particles_qmmm_core(cur_indices(ip))%f - delta_f
                ENDIF
             END DO
          ELSE IF (mom_conserv_type == do_fm_mom_conserv_equal_a) THEN
             mom_conserv_mass = 0.0_dp
             DO ip = 1, SIZE(cur_indices)
                IF (cur_labels(ip) >= mom_conserv_min_label) &
-                  mom_conserv_mass = mom_conserv_mass+particles_qmmm_core(cur_indices(ip))%atomic_kind%mass
+                  mom_conserv_mass = mom_conserv_mass + particles_qmmm_core(cur_indices(ip))%atomic_kind%mass
             END DO
             delta_a = total_f/mom_conserv_mass
             DO ip = 1, SIZE(cur_indices)
                IF (cur_labels(ip) >= mom_conserv_min_label) THEN
-                  particles_qmmm_core(cur_indices(ip))%f = particles_qmmm_core(cur_indices(ip))%f- &
+                  particles_qmmm_core(cur_indices(ip))%f = particles_qmmm_core(cur_indices(ip))%f - &
                                                            particles_qmmm_core(cur_indices(ip))%atomic_kind%mass*delta_a
                ENDIF
             END DO
@@ -177,7 +177,7 @@ CONTAINS
       CHARACTER(*)                                       :: label
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmmx_calc_energy_force_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(default_string_length)                   :: new_restart_fn, new_restart_hist_fn, &
                                                             old_restart_fn, old_restart_hist_fn

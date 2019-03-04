@@ -10,14 +10,14 @@
 !> \author Rustam Z Khaliullin
 ! **************************************************************************************************
 MODULE ct_types
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_copy,&
-                                              dbcsr_release,&
-                                              dbcsr_type
-   USE input_constants,                 ONLY: cg_polak_ribiere,&
-                                              tensor_orthogonal
-   USE kinds,                           ONLY: dp
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_copy, &
+                        dbcsr_release, &
+                        dbcsr_type
+   USE input_constants, ONLY: cg_polak_ribiere, &
+                              tensor_orthogonal
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -135,7 +135,7 @@ CONTAINS
       TYPE(ct_step_env_type)                             :: env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ct_step_env_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       env%use_occ_orbs = .TRUE.
       env%use_virt_orbs = .FALSE.
@@ -225,7 +225,7 @@ CONTAINS
       REAL(KIND=dp), OPTIONAL                            :: eps_convergence, eps_filter
       INTEGER, OPTIONAL                                  :: max_iter
       TYPE(dbcsr_type), OPTIONAL, POINTER :: p_index_up, p_index_down, q_index_up, q_index_down, &
-         matrix_ks, matrix_p, matrix_qp_template, matrix_pq_template, matrix_t, matrix_v
+                                             matrix_ks, matrix_p, matrix_qp_template, matrix_pq_template, matrix_t, matrix_v
       TYPE(dbcsr_type), OPTIONAL                         :: copy_matrix_x
       REAL(KIND=dp), OPTIONAL                            :: energy_correction
       LOGICAL, OPTIONAL                                  :: calculate_energy_corr, converged, &
@@ -233,7 +233,7 @@ CONTAINS
                                                             pp_preconditioner_full
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ct_step_env_get', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !INTEGER      , OPTIONAL                     :: nspins
 !SPIN!!!    TYPE(dbcsr_type), DIMENSION(:), POINTER, OPTIONAL  :: p_index_up
@@ -349,15 +349,15 @@ CONTAINS
       REAL(KIND=dp), OPTIONAL                            :: eps_convergence, eps_filter
       INTEGER, OPTIONAL                                  :: max_iter
       TYPE(dbcsr_type), OPTIONAL, TARGET :: p_index_up, p_index_down, q_index_up, q_index_down, &
-         matrix_ks, matrix_p, matrix_qp_template, matrix_pq_template, matrix_t, matrix_v, &
-         matrix_x_guess
+                                            matrix_ks, matrix_p, matrix_qp_template, matrix_pq_template, matrix_t, matrix_v, &
+                                            matrix_x_guess
       LOGICAL, OPTIONAL                                  :: calculate_energy_corr
       INTEGER, OPTIONAL                                  :: conjugator
       LOGICAL, OPTIONAL                                  :: qq_preconditioner_full, &
                                                             pp_preconditioner_full
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ct_step_env_set', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !INTEGER      , OPTIONAL                     :: nspins
 !SPIN!!!    TYPE(dbcsr_type), TARGET, DIMENSION(:), OPTIONAL  :: p_index_up
@@ -423,7 +423,7 @@ CONTAINS
       TYPE(ct_step_env_type)                             :: env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ct_step_env_clean', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
 !INTEGER                                     :: ispin
 

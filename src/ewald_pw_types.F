@@ -8,45 +8,45 @@
 !> \author CJM
 ! **************************************************************************************************
 MODULE ewald_pw_types
-   USE ao_util,                         ONLY: exp_radius
-   USE cell_types,                      ONLY: cell_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_init,          ONLY: init_input_type
-   USE dg_types,                        ONLY: dg_create,&
-                                              dg_release,&
-                                              dg_retain,&
-                                              dg_type
-   USE dgs,                             ONLY: dg_pme_grid_setup
-   USE ewald_environment_types,         ONLY: ewald_env_get,&
-                                              ewald_environment_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE message_passing,                 ONLY: mp_comm_self
-   USE pw_grid_types,                   ONLY: HALFSPACE,&
-                                              pw_grid_type
-   USE pw_grids,                        ONLY: pw_grid_create,&
-                                              pw_grid_release,&
-                                              pw_grid_setup
-   USE pw_poisson_methods,              ONLY: pw_poisson_set
-   USE pw_poisson_read_input,           ONLY: pw_poisson_read_parameters
-   USE pw_poisson_types,                ONLY: &
-        do_ewald_ewald, do_ewald_none, do_ewald_pme, do_ewald_spme, pw_poisson_create, &
-        pw_poisson_parameter_type, pw_poisson_release, pw_poisson_retain, pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create,&
-                                              pw_pool_p_type,&
-                                              pw_pool_release,&
-                                              pw_pool_retain,&
-                                              pw_pool_type
-   USE realspace_grid_types,            ONLY: &
-        realspace_grid_desc_type, realspace_grid_input_type, realspace_grid_type, rs_grid_create, &
-        rs_grid_create_descriptor, rs_grid_print, rs_grid_release, rs_grid_release_descriptor, &
-        rs_grid_retain_descriptor
+   USE ao_util, ONLY: exp_radius
+   USE cell_types, ONLY: cell_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_init, ONLY: init_input_type
+   USE dg_types, ONLY: dg_create, &
+                       dg_release, &
+                       dg_retain, &
+                       dg_type
+   USE dgs, ONLY: dg_pme_grid_setup
+   USE ewald_environment_types, ONLY: ewald_env_get, &
+                                      ewald_environment_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE message_passing, ONLY: mp_comm_self
+   USE pw_grid_types, ONLY: HALFSPACE, &
+                            pw_grid_type
+   USE pw_grids, ONLY: pw_grid_create, &
+                       pw_grid_release, &
+                       pw_grid_setup
+   USE pw_poisson_methods, ONLY: pw_poisson_set
+   USE pw_poisson_read_input, ONLY: pw_poisson_read_parameters
+   USE pw_poisson_types, ONLY: &
+      do_ewald_ewald, do_ewald_none, do_ewald_pme, do_ewald_spme, pw_poisson_create, &
+      pw_poisson_parameter_type, pw_poisson_release, pw_poisson_retain, pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create, &
+                            pw_pool_p_type, &
+                            pw_pool_release, &
+                            pw_pool_retain, &
+                            pw_pool_type
+   USE realspace_grid_types, ONLY: &
+      realspace_grid_desc_type, realspace_grid_input_type, realspace_grid_type, rs_grid_create, &
+      rs_grid_create_descriptor, rs_grid_print, rs_grid_release, rs_grid_release_descriptor, &
+      rs_grid_retain_descriptor
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -79,11 +79,11 @@ CONTAINS
       TYPE(ewald_pw_type), POINTER                       :: ewald_pw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ewald_pw_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(ewald_pw))
       CPASSERT(ewald_pw%ref_count > 0)
-      ewald_pw%ref_count = ewald_pw%ref_count+1
+      ewald_pw%ref_count = ewald_pw%ref_count + 1
    END SUBROUTINE ewald_pw_retain
 
 ! **************************************************************************************************
@@ -101,7 +101,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: print_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ewald_pw_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dg_type), POINTER                             :: dg
 
@@ -114,7 +114,7 @@ CONTAINS
       CALL dg_create(dg)
       ewald_pw%dg => dg
       ewald_pw%ref_count = 1
-      last_ewald_pw_id_nr = last_ewald_pw_id_nr+1
+      last_ewald_pw_id_nr = last_ewald_pw_id_nr + 1
       ewald_pw%id_nr = last_ewald_pw_id_nr
       CALL ewald_pw_init(ewald_pw, ewald_env, cell, cell_ref, print_section)
    END SUBROUTINE ewald_pw_create
@@ -129,14 +129,14 @@ CONTAINS
       TYPE(ewald_pw_type), POINTER                       :: ewald_pw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ewald_pw_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
       CALL timeset(routineN, handle)
       IF (ASSOCIATED(ewald_pw)) THEN
          CPASSERT(ewald_pw%ref_count > 0)
-         ewald_pw%ref_count = ewald_pw%ref_count-1
+         ewald_pw%ref_count = ewald_pw%ref_count - 1
          IF (ewald_pw%ref_count < 1) THEN
             CALL pw_pool_release(ewald_pw%pw_small_pool)
             CALL pw_pool_release(ewald_pw%pw_big_pool)

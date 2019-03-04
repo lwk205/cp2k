@@ -12,11 +12,11 @@
 ! **************************************************************************************************
 MODULE dirichlet_bc_types
 
-   USE kinds,                           ONLY: dp
-   USE pw_pool_types,                   ONLY: pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: pw_release,&
-                                              pw_type
+   USE kinds, ONLY: dp
+   USE pw_pool_types, ONLY: pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: pw_release, &
+                       pw_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -197,7 +197,7 @@ CONTAINS
       TYPE(pw_pool_type), INTENT(IN), OPTIONAL, POINTER  :: pw_pool
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dbc_tile_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, k, n_tiles
 
@@ -234,7 +234,7 @@ CONTAINS
       TYPE(dirichlet_bc_parameters), INTENT(INOUT)       :: dbc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'dbc_parameters_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(dbc_params%aa_planar_nprtn)) DEALLOCATE (dbc_params%aa_planar_nprtn)
       IF (ASSOCIATED(dbc_params%aa_planar_pplane)) DEALLOCATE (dbc_params%aa_planar_pplane)

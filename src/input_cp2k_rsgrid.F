@@ -10,17 +10,17 @@
 ! **************************************************************************************************
 MODULE input_cp2k_rsgrid
 
-   USE input_keyword_types,             ONLY: keyword_create,&
-                                              keyword_release,&
-                                              keyword_type
-   USE input_section_types,             ONLY: section_add_keyword,&
-                                              section_create,&
-                                              section_type
-   USE kinds,                           ONLY: dp
-   USE realspace_grid_types,            ONLY: rsgrid_automatic,&
-                                              rsgrid_distributed,&
-                                              rsgrid_replicated
-   USE string_utilities,                ONLY: s2a
+   USE input_keyword_types, ONLY: keyword_create, &
+                                  keyword_release, &
+                                  keyword_type
+   USE input_section_types, ONLY: section_add_keyword, &
+                                  section_create, &
+                                  section_type
+   USE kinds, ONLY: dp
+   USE realspace_grid_types, ONLY: rsgrid_automatic, &
+                                   rsgrid_distributed, &
+                                   rsgrid_replicated
+   USE string_utilities, ONLY: s2a
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -42,7 +42,7 @@ CONTAINS
       TYPE(section_type), POINTER                        :: section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_rsgrid_section', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(keyword_type), POINTER                        :: keyword
 

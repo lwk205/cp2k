@@ -7,35 +7,35 @@
 !> \brief Set of routines to apply restraints to the KS hamiltonian
 ! **************************************************************************************************
 MODULE qs_ks_apply_restraints
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_constants,                 ONLY: cdft_charge_constraint,&
-                                              outer_scf_becke_constraint,&
-                                              outer_scf_hirshfeld_constraint
-   USE kinds,                           ONLY: dp
-   USE mulliken,                        ONLY: mulliken_restraint
-   USE pw_methods,                      ONLY: pw_scale
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE
-   USE qs_cdft_methods,                 ONLY: becke_constraint,&
-                                              hirshfeld_constraint
-   USE qs_cdft_types,                   ONLY: cdft_control_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE s_square_methods,                ONLY: s2_restraint
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_constants, ONLY: cdft_charge_constraint, &
+                              outer_scf_becke_constraint, &
+                              outer_scf_hirshfeld_constraint
+   USE kinds, ONLY: dp
+   USE mulliken, ONLY: mulliken_restraint
+   USE pw_methods, ONLY: pw_scale
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE
+   USE qs_cdft_methods, ONLY: becke_constraint, &
+                              hirshfeld_constraint
+   USE qs_cdft_types, ONLY: cdft_control_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE s_square_methods, ONLY: s2_restraint
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -64,7 +64,7 @@ CONTAINS
       TYPE(cdft_control_type), POINTER                   :: cdft_control
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_ks_cdft_constraint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, igroup, natom
       LOGICAL                                            :: do_kpoints
@@ -151,7 +151,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: mulliken_order_p
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_ks_mulliken_restraint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: ksmat, rho_ao
 
@@ -198,7 +198,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_ks_s2_restraint', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: fm_mo_derivs

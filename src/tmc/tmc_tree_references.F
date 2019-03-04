@@ -18,12 +18,12 @@
 ! **************************************************************************************************
 
 MODULE tmc_tree_references
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE tmc_cancelation,                 ONLY: add_to_canceling_list
-   USE tmc_tree_types,                  ONLY: global_tree_type,&
-                                              gt_elem_list_type,&
-                                              tree_type
-   USE tmc_types,                       ONLY: tmc_env_type
+   USE cp_log_handling, ONLY: cp_to_string
+   USE tmc_cancelation, ONLY: add_to_canceling_list
+   USE tmc_tree_types, ONLY: global_tree_type, &
+                             gt_elem_list_type, &
+                             tree_type
+   USE tmc_types, ONLY: tmc_env_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -47,7 +47,7 @@ CONTAINS
       TYPE(global_tree_type), POINTER                    :: gt_elem
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'add_to_references', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(gt_elem_list_type), POINTER                   :: tmp_pt_list_elem
@@ -75,12 +75,12 @@ CONTAINS
          ! add reference to swapped elem
          ALLOCATE (tmp_pt_list_elem)
          tmp_pt_list_elem%gt_elem => gt_elem
-         IF (ASSOCIATED(gt_elem%conf(gt_elem%mv_conf+1)%elem%gt_nodes_references)) THEN
-            tmp_pt_list_elem%next => gt_elem%conf(gt_elem%mv_conf+1)%elem%gt_nodes_references
+         IF (ASSOCIATED(gt_elem%conf(gt_elem%mv_conf + 1)%elem%gt_nodes_references)) THEN
+            tmp_pt_list_elem%next => gt_elem%conf(gt_elem%mv_conf + 1)%elem%gt_nodes_references
          ELSE
             tmp_pt_list_elem%next => NULL()
          END IF
-         gt_elem%conf(gt_elem%mv_conf+1)%elem%gt_nodes_references => tmp_pt_list_elem
+         gt_elem%conf(gt_elem%mv_conf + 1)%elem%gt_nodes_references => tmp_pt_list_elem
       END IF
       ! end the timing
       CALL timestop(handle)
@@ -98,7 +98,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_gt_references', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -114,7 +114,7 @@ CONTAINS
       ! in case of parallel tempering also the reference in the second swaped configuration has to be removed
       IF (gt_ptr%swaped) THEN
          CALL search_and_remove_reference_in_list(gt_ptr=gt_ptr, &
-                                                  elem=gt_ptr%conf(gt_ptr%mv_conf+1)%elem, tmc_env=tmc_env)
+                                                  elem=gt_ptr%conf(gt_ptr%mv_conf + 1)%elem, tmc_env=tmc_env)
       END IF
       ! end the timing
       CALL timestop(handle)
@@ -130,7 +130,7 @@ CONTAINS
       TYPE(tree_type), POINTER                           :: ptr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'remove_subtree_element_of_all_references', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=2000)                                :: list_of_nr
       INTEGER                                            :: handle, i
@@ -156,8 +156,8 @@ CONTAINS
             IF (ASSOCIATED(ptr, tmp_gt_list_ptr%gt_elem%conf(tmp_gt_list_ptr%gt_elem%mv_conf)%elem)) THEN
                tmp_gt_list_ptr%gt_elem%conf(tmp_gt_list_ptr%gt_elem%mv_conf)%elem => NULL()
                ! in case of swapping the second configuration could be the related one
-            ELSE IF (ASSOCIATED(ptr, tmp_gt_list_ptr%gt_elem%conf(tmp_gt_list_ptr%gt_elem%mv_conf+1)%elem)) THEN
-               tmp_gt_list_ptr%gt_elem%conf(tmp_gt_list_ptr%gt_elem%mv_conf+1)%elem => NULL()
+            ELSE IF (ASSOCIATED(ptr, tmp_gt_list_ptr%gt_elem%conf(tmp_gt_list_ptr%gt_elem%mv_conf + 1)%elem)) THEN
+               tmp_gt_list_ptr%gt_elem%conf(tmp_gt_list_ptr%gt_elem%mv_conf + 1)%elem => NULL()
             ELSE
                list_of_nr = ""
                DO i = 1, SIZE(tmp_gt_list_ptr%gt_elem%conf)
@@ -205,7 +205,7 @@ CONTAINS
       TYPE(tmc_env_type), POINTER                        :: tmc_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'search_and_remove_reference_in_list', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(gt_elem_list_type), POINTER                   :: tmp_gt_list_last_ptr, tmp_gt_list_ptr

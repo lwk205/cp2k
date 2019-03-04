@@ -10,35 +10,35 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE qs_scf_types
-   USE cp_dbcsr_operations,             ONLY: dbcsr_deallocate_matrix_set
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_fm_vect,                      ONLY: cp_fm_vect_dealloc
-   USE dbcsr_api,                       ONLY: dbcsr_deallocate_matrix,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE outer_scf_control_types,         ONLY: qs_outer_scf_type
-   USE preconditioner_types,            ONLY: destroy_preconditioner,&
-                                              preconditioner_p_type
-   USE qs_block_davidson_types,         ONLY: block_davidson_release,&
-                                              davidson_type
-   USE qs_density_mixing_types,         ONLY: direct_mixing_nr,&
-                                              mixing_storage_create,&
-                                              mixing_storage_release,&
-                                              mixing_storage_type
-   USE qs_diis_types,                   ONLY: qs_diis_b_release,&
-                                              qs_diis_buffer_type
-   USE qs_fb_env_types,                 ONLY: fb_env_has_data,&
-                                              fb_env_nullify,&
-                                              fb_env_obj,&
-                                              fb_env_release
-   USE qs_ot_types,                     ONLY: qs_ot_destroy,&
-                                              qs_ot_type
+   USE cp_dbcsr_operations, ONLY: dbcsr_deallocate_matrix_set
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_fm_vect, ONLY: cp_fm_vect_dealloc
+   USE dbcsr_api, ONLY: dbcsr_deallocate_matrix, &
+                        dbcsr_p_type, &
+                        dbcsr_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE outer_scf_control_types, ONLY: qs_outer_scf_type
+   USE preconditioner_types, ONLY: destroy_preconditioner, &
+                                   preconditioner_p_type
+   USE qs_block_davidson_types, ONLY: block_davidson_release, &
+                                      davidson_type
+   USE qs_density_mixing_types, ONLY: direct_mixing_nr, &
+                                      mixing_storage_create, &
+                                      mixing_storage_release, &
+                                      mixing_storage_type
+   USE qs_diis_types, ONLY: qs_diis_b_release, &
+                            qs_diis_buffer_type
+   USE qs_fb_env_types, ONLY: fb_env_has_data, &
+                              fb_env_nullify, &
+                              fb_env_obj, &
+                              fb_env_release
+   USE qs_ot_types, ONLY: qs_ot_destroy, &
+                          qs_ot_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -142,7 +142,7 @@ CONTAINS
       ALLOCATE (scf_env)
       scf_env%ref_count = 1
       scf_env%print_count = 0
-      last_scf_env_id = last_scf_env_id+1
+      last_scf_env_id = last_scf_env_id + 1
       scf_env%id_nr = last_scf_env_id
       scf_env%print_count = 0
       scf_env%iter_count = 0
@@ -213,7 +213,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(scf_env))
       CPASSERT(scf_env%ref_count > 0)
-      scf_env%ref_count = scf_env%ref_count+1
+      scf_env%ref_count = scf_env%ref_count + 1
 
       CALL timestop(handle)
 
@@ -230,7 +230,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_env_did_change', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -268,7 +268,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
@@ -276,7 +276,7 @@ CONTAINS
 
       IF (ASSOCIATED(scf_env)) THEN
          CPASSERT(scf_env%ref_count > 0)
-         scf_env%ref_count = scf_env%ref_count-1
+         scf_env%ref_count = scf_env%ref_count - 1
          IF (scf_env%ref_count < 1) THEN
             CALL cp_fm_vect_dealloc(scf_env%scf_work1)
             CALL cp_fm_release(scf_env%scf_work2)
@@ -401,7 +401,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: scf_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'krylov_space_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(krylov_space))
       ALLOCATE (krylov_space)
@@ -442,7 +442,7 @@ CONTAINS
       TYPE(krylov_space_type), POINTER                   :: krylov_space
 
       CHARACTER(len=*), PARAMETER :: routineN = 'krylov_space_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -504,7 +504,7 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: ecut
 
       CHARACTER(len=*), PARAMETER :: routineN = 'diag_subspace_env_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: do_mixing
       TYPE(section_vals_type), POINTER                   :: mixing_section
@@ -554,7 +554,7 @@ CONTAINS
       TYPE(subspace_env_type), POINTER                   :: subspace_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'diag_subspace_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

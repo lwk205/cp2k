@@ -26,24 +26,24 @@
 
 MODULE xc_xbr_pbe_lda_hole_t_c_lr
 
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: pi
-   USE xc_derivative_set_types,         ONLY: xc_derivative_set_type,&
-                                              xc_dset_get_derivative
-   USE xc_derivative_types,             ONLY: xc_derivative_get,&
-                                              xc_derivative_type
-   USE xc_rho_cflags_types,             ONLY: xc_rho_cflags_type
-   USE xc_rho_set_types,                ONLY: xc_rho_set_get,&
-                                              xc_rho_set_type
-   USE xc_xbecke_roussel,               ONLY: x_br_lsd_y_gt_0,&
-                                              x_br_lsd_y_gt_0_cutoff,&
-                                              x_br_lsd_y_lte_0,&
-                                              x_br_lsd_y_lte_0_cutoff
-   USE xc_xlda_hole_t_c_lr,             ONLY: xlda_hole_t_c_lr_lda_calc_0
-   USE xc_xpbe_hole_t_c_lr,             ONLY: xpbe_hole_t_c_lr_lda_calc_1,&
-                                              xpbe_hole_t_c_lr_lda_calc_2
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: pi
+   USE xc_derivative_set_types, ONLY: xc_derivative_set_type, &
+                                      xc_dset_get_derivative
+   USE xc_derivative_types, ONLY: xc_derivative_get, &
+                                  xc_derivative_type
+   USE xc_rho_cflags_types, ONLY: xc_rho_cflags_type
+   USE xc_rho_set_types, ONLY: xc_rho_set_get, &
+                               xc_rho_set_type
+   USE xc_xbecke_roussel, ONLY: x_br_lsd_y_gt_0, &
+                                x_br_lsd_y_gt_0_cutoff, &
+                                x_br_lsd_y_lte_0, &
+                                x_br_lsd_y_lte_0_cutoff
+   USE xc_xlda_hole_t_c_lr, ONLY: xlda_hole_t_c_lr_lda_calc_0
+   USE xc_xpbe_hole_t_c_lr, ONLY: xpbe_hole_t_c_lr_lda_calc_1, &
+                                  xpbe_hole_t_c_lr_lda_calc_2
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -111,7 +111,7 @@ CONTAINS
       INTEGER, INTENT(out), OPTIONAL                     :: max_deriv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xbr_pbe_lda_hole_tc_lr_lda_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(reference)) THEN
          reference = "{LDA version}"
@@ -146,7 +146,7 @@ CONTAINS
       INTEGER, INTENT(out), OPTIONAL                     :: max_deriv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xbr_pbe_lda_hole_tc_lr_lsd_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(reference)) THEN
          reference = "{LDA version}"
@@ -183,7 +183,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: params
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xbr_pbe_lda_hole_tc_lr_lda_eval', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, npoints
       INTEGER, DIMENSION(:, :), POINTER                  :: bo
@@ -205,7 +205,7 @@ CONTAINS
       CALL xc_rho_set_get(rho_set, rho=rho, norm_drho=norm_drho, &
                           tau=tau, laplace_rho=laplace_rho, local_bounds=bo, &
                           rho_cutoff=epsilon_rho)
-      npoints = (bo(2, 1)-bo(1, 1)+1)*(bo(2, 2)-bo(1, 2)+1)*(bo(2, 3)-bo(1, 3)+1)
+      npoints = (bo(2, 1) - bo(1, 1) + 1)*(bo(2, 2) - bo(1, 2) + 1)*(bo(2, 3) - bo(1, 3) + 1)
 
       dummy => rho
 
@@ -294,13 +294,13 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: epsilon_rho, sx, R, gamma
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xbr_pbe_lda_hole_tc_lr_lda_calc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ip
       REAL(dp) :: dFermi_dlaplace_rho, dFermi_dndrho, dFermi_drho, dFermi_dtau, e_0_br, e_0_lda, &
-         e_0_pbe, e_laplace_rho_br, e_ndrho_br, e_ndrho_pbe, e_rho_br, e_rho_lda, e_rho_pbe, &
-         e_tau_br, Fermi, Fx, my_laplace_rho, my_ndrho, my_rho, my_tau, ss, ss2, sscale, t1, t15, &
-         t16, t2, t3, t4, t5, t6, t7, t8, t9, yval
+                  e_0_pbe, e_laplace_rho_br, e_ndrho_br, e_ndrho_pbe, e_rho_br, e_rho_lda, e_rho_pbe, &
+                  e_tau_br, Fermi, Fx, my_laplace_rho, my_ndrho, my_rho, my_tau, ss, ss2, sscale, t1, t15, &
+                  t16, t2, t3, t4, t5, t6, t7, t8, t9, yval
 
 !$OMP     DO
 
@@ -319,7 +319,7 @@ CONTAINS
             t5 = t4*my_rho
             t8 = my_ndrho**2
             t9 = 0.1e1_dp/my_rho
-            t15 = my_laplace_rho/0.6e1_dp-gamma*(2.0_dp*my_tau-t8*t9/0.4e1_dp)/0.3e1_dp
+            t15 = my_laplace_rho/0.6e1_dp - gamma*(2.0_dp*my_tau - t8*t9/0.4e1_dp)/0.3e1_dp
             t16 = 0.1e1_dp/t15
             yval = 0.2e1_dp/0.3e1_dp*t2*t5*t16
 
@@ -376,7 +376,7 @@ CONTAINS
             ss = 0.3466806371753173524216762e0_dp*t6*t8
             IF (ss > scutoff) THEN
                ss2 = ss*ss
-               sscale = (smax*ss2-sconst)/(ss2*ss)
+               sscale = (smax*ss2 - sconst)/(ss2*ss)
             END IF
             e_0_pbe = 0.0_dp
             e_rho_pbe = 0.0_dp
@@ -400,28 +400,28 @@ CONTAINS
 
             Fx = e_0_br/e_0_lda
 
-            Fermi = alpha/(EXP((Fx-mu)/N)+1.0_dp)
+            Fermi = alpha/(EXP((Fx - mu)/N) + 1.0_dp)
 
-            dFermi_drho = -Fermi**2/alpha/N*(e_rho_br/e_0_lda-e_0_br*e_rho_lda/e_0_lda**2)*EXP((Fx-mu)/N)
-            dFermi_dndrho = -Fermi**2/alpha/N*(e_ndrho_br/e_0_lda)*EXP((Fx-mu)/N)
-            dFermi_dtau = -Fermi**2/alpha/N*(e_tau_br/e_0_lda)*EXP((Fx-mu)/N)
-            dFermi_dlaplace_rho = -Fermi**2/alpha/N*(e_laplace_rho_br/e_0_lda)*EXP((Fx-mu)/N)
+            dFermi_drho = -Fermi**2/alpha/N*(e_rho_br/e_0_lda - e_0_br*e_rho_lda/e_0_lda**2)*EXP((Fx - mu)/N)
+            dFermi_dndrho = -Fermi**2/alpha/N*(e_ndrho_br/e_0_lda)*EXP((Fx - mu)/N)
+            dFermi_dtau = -Fermi**2/alpha/N*(e_tau_br/e_0_lda)*EXP((Fx - mu)/N)
+            dFermi_dlaplace_rho = -Fermi**2/alpha/N*(e_laplace_rho_br/e_0_lda)*EXP((Fx - mu)/N)
 
-            e_0(ip) = e_0(ip)+(Fermi*e_0_pbe+(1.0_dp-Fermi)*e_0_br)*sx
+            e_0(ip) = e_0(ip) + (Fermi*e_0_pbe + (1.0_dp - Fermi)*e_0_br)*sx
 
             IF (grad_deriv >= 1 .OR. grad_deriv == -1) THEN
 
-               e_rho(ip) = e_rho(ip)+(Fermi*e_rho_pbe+dFermi_drho*e_0_pbe+ &
-                                      (1.0_dp-Fermi)*e_rho_br-dFermi_drho*e_0_br)*sx
+               e_rho(ip) = e_rho(ip) + (Fermi*e_rho_pbe + dFermi_drho*e_0_pbe + &
+                                        (1.0_dp - Fermi)*e_rho_br - dFermi_drho*e_0_br)*sx
 
-               e_ndrho(ip) = e_ndrho(ip)+(Fermi*e_ndrho_pbe+dFermi_dndrho*e_0_pbe+ &
-                                          (1.0_dp-Fermi)*e_ndrho_br-dFermi_dndrho*e_0_br)*sx
+               e_ndrho(ip) = e_ndrho(ip) + (Fermi*e_ndrho_pbe + dFermi_dndrho*e_0_pbe + &
+                                            (1.0_dp - Fermi)*e_ndrho_br - dFermi_dndrho*e_0_br)*sx
 
-               e_tau(ip) = e_tau(ip)+(dFermi_dtau*e_0_pbe+ &
-                                      (1.0_dp-Fermi)*e_tau_br-dFermi_dtau*e_0_br)*sx
+               e_tau(ip) = e_tau(ip) + (dFermi_dtau*e_0_pbe + &
+                                        (1.0_dp - Fermi)*e_tau_br - dFermi_dtau*e_0_br)*sx
 
-               e_laplace_rho(ip) = e_laplace_rho(ip)+(dFermi_dlaplace_rho*e_0_pbe+ &
-                                                      (1.0_dp-Fermi)*e_laplace_rho_br-dFermi_dlaplace_rho*e_0_br)*sx
+               e_laplace_rho(ip) = e_laplace_rho(ip) + (dFermi_dlaplace_rho*e_0_pbe + &
+                                                        (1.0_dp - Fermi)*e_laplace_rho_br - dFermi_dlaplace_rho*e_0_br)*sx
             END IF
 
          END IF
@@ -449,15 +449,15 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: params
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xbr_pbe_lda_hole_tc_lr_lsd_eval', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, npoints
       INTEGER, DIMENSION(:, :), POINTER                  :: bo
       REAL(dp)                                           :: gamma, R, sx
       REAL(kind=dp)                                      :: epsilon_rho
       REAL(kind=dp), DIMENSION(:, :, :), POINTER :: dummy, e_0, e_laplace_rhoa, e_laplace_rhob, &
-         e_ndrhoa, e_ndrhob, e_rhoa, e_rhob, e_tau_a, e_tau_b, laplace_rhoa, laplace_rhob, &
-         norm_drhoa, norm_drhob, rhoa, rhob, tau_a, tau_b
+                                                 e_ndrhoa, e_ndrhob, e_rhoa, e_rhob, e_tau_a, e_tau_b, laplace_rhoa, laplace_rhob, &
+                                                    norm_drhoa, norm_drhob, rhoa, rhob, tau_a, tau_b
       TYPE(xc_derivative_type), POINTER                  :: deriv
 
       CALL timeset(routineN, handle)
@@ -472,7 +472,7 @@ CONTAINS
                           norm_drhob=norm_drhob, tau_a=tau_a, tau_b=tau_b, laplace_rhoa=laplace_rhoa, &
                           laplace_rhob=laplace_rhob, local_bounds=bo, &
                           rho_cutoff=epsilon_rho)
-      npoints = (bo(2, 1)-bo(1, 1)+1)*(bo(2, 2)-bo(1, 2)+1)*(bo(2, 3)-bo(1, 3)+1)
+      npoints = (bo(2, 1) - bo(1, 1) + 1)*(bo(2, 2) - bo(1, 2) + 1)*(bo(2, 3) - bo(1, 3) + 1)
 
       dummy => rhoa
 
@@ -588,13 +588,13 @@ CONTAINS
       REAL(kind=dp), INTENT(in)                          :: epsilon_rho, sx, R, gamma
 
       CHARACTER(len=*), PARAMETER :: routineN = 'xbr_pbe_lda_hole_tc_lr_lsd_calc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ip
       REAL(dp) :: dFermi_dlaplace_rho, dFermi_dndrho, dFermi_drho, dFermi_dtau, e_0_br, e_0_lda, &
-         e_0_pbe, e_laplace_rho_br, e_ndrho_br, e_ndrho_pbe, e_rho_br, e_rho_lda, e_rho_pbe, &
-         e_tau_br, Fermi, Fx, my_laplace_rho, my_ndrho, my_rho, my_tau, ss, ss2, sscale, t1, t15, &
-         t16, t2, t3, t4, t5, t6, t7, t8, t9, yval
+                  e_0_pbe, e_laplace_rho_br, e_ndrho_br, e_ndrho_pbe, e_rho_br, e_rho_lda, e_rho_pbe, &
+                  e_tau_br, Fermi, Fx, my_laplace_rho, my_ndrho, my_rho, my_tau, ss, ss2, sscale, t1, t15, &
+                  t16, t2, t3, t4, t5, t6, t7, t8, t9, yval
 
 !$OMP     DO
 
@@ -612,7 +612,7 @@ CONTAINS
             t5 = t4*my_rho
             t8 = my_ndrho**2
             t9 = 0.1e1_dp/my_rho
-            t15 = my_laplace_rho/0.6e1_dp-gamma*(2.0_dp*my_tau-t8*t9/0.4e1_dp)/0.3e1_dp
+            t15 = my_laplace_rho/0.6e1_dp - gamma*(2.0_dp*my_tau - t8*t9/0.4e1_dp)/0.3e1_dp
             t16 = 0.1e1_dp/t15
             yval = 0.2e1_dp/0.3e1_dp*t2*t5*t16
 
@@ -661,7 +661,7 @@ CONTAINS
             ss = 0.3466806371753173524216762e0_dp*t6*t8
             IF (ss > scutoff) THEN
                ss2 = ss*ss
-               sscale = (smax*ss2-sconst)/(ss2*ss)
+               sscale = (smax*ss2 - sconst)/(ss2*ss)
             END IF
             e_0_pbe = 0.0_dp
             e_rho_pbe = 0.0_dp
@@ -688,28 +688,28 @@ CONTAINS
 
             Fx = e_0_br/e_0_lda
 
-            Fermi = alpha/(EXP((Fx-mu)/N)+1.0_dp)
+            Fermi = alpha/(EXP((Fx - mu)/N) + 1.0_dp)
 
-            dFermi_drho = -Fermi**2/alpha/N*(e_rho_br/e_0_lda-e_0_br*e_rho_lda/e_0_lda**2)*EXP((Fx-mu)/N)
-            dFermi_dndrho = -Fermi**2/alpha/N*(e_ndrho_br/e_0_lda)*EXP((Fx-mu)/N)
-            dFermi_dtau = -Fermi**2/alpha/N*(e_tau_br/e_0_lda)*EXP((Fx-mu)/N)
-            dFermi_dlaplace_rho = -Fermi**2/alpha/N*(e_laplace_rho_br/e_0_lda)*EXP((Fx-mu)/N)
+            dFermi_drho = -Fermi**2/alpha/N*(e_rho_br/e_0_lda - e_0_br*e_rho_lda/e_0_lda**2)*EXP((Fx - mu)/N)
+            dFermi_dndrho = -Fermi**2/alpha/N*(e_ndrho_br/e_0_lda)*EXP((Fx - mu)/N)
+            dFermi_dtau = -Fermi**2/alpha/N*(e_tau_br/e_0_lda)*EXP((Fx - mu)/N)
+            dFermi_dlaplace_rho = -Fermi**2/alpha/N*(e_laplace_rho_br/e_0_lda)*EXP((Fx - mu)/N)
 
-            e_0(ip) = e_0(ip)+(Fermi*e_0_pbe+(1.0_dp-Fermi)*e_0_br)*sx
+            e_0(ip) = e_0(ip) + (Fermi*e_0_pbe + (1.0_dp - Fermi)*e_0_br)*sx
 
             IF (grad_deriv >= 1 .OR. grad_deriv == -1) THEN
 
-               e_rho(ip) = e_rho(ip)+(Fermi*e_rho_pbe+dFermi_drho*e_0_pbe+ &
-                                      (1.0_dp-Fermi)*e_rho_br-dFermi_drho*e_0_br)*sx
+               e_rho(ip) = e_rho(ip) + (Fermi*e_rho_pbe + dFermi_drho*e_0_pbe + &
+                                        (1.0_dp - Fermi)*e_rho_br - dFermi_drho*e_0_br)*sx
 
-               e_ndrho(ip) = e_ndrho(ip)+(Fermi*e_ndrho_pbe+dFermi_dndrho*e_0_pbe+ &
-                                          (1.0_dp-Fermi)*e_ndrho_br-dFermi_dndrho*e_0_br)*sx
+               e_ndrho(ip) = e_ndrho(ip) + (Fermi*e_ndrho_pbe + dFermi_dndrho*e_0_pbe + &
+                                            (1.0_dp - Fermi)*e_ndrho_br - dFermi_dndrho*e_0_br)*sx
 
-               e_tau(ip) = e_tau(ip)+(dFermi_dtau*e_0_pbe+ &
-                                      (1.0_dp-Fermi)*e_tau_br-dFermi_dtau*e_0_br)*sx
+               e_tau(ip) = e_tau(ip) + (dFermi_dtau*e_0_pbe + &
+                                        (1.0_dp - Fermi)*e_tau_br - dFermi_dtau*e_0_br)*sx
 
-               e_laplace_rho(ip) = e_laplace_rho(ip)+(dFermi_dlaplace_rho*e_0_pbe+ &
-                                                      (1.0_dp-Fermi)*e_laplace_rho_br-dFermi_dlaplace_rho*e_0_br)*sx
+               e_laplace_rho(ip) = e_laplace_rho(ip) + (dFermi_dlaplace_rho*e_0_pbe + &
+                                                        (1.0_dp - Fermi)*e_laplace_rho_br - dFermi_dlaplace_rho*e_0_br)*sx
             END IF
 
          END IF

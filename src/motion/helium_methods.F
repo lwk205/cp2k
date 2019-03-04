@@ -10,71 +10,71 @@
 ! **************************************************************************************************
 MODULE helium_methods
 
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE bibliography,                    ONLY: Walewski2014,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_printkey_is_on
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE f77_interface,                   ONLY: f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE force_env_types,                 ONLY: force_env_get
-   USE helium_common,                   ONLY: helium_com,&
-                                              helium_pbc
-   USE helium_io,                       ONLY: helium_read_xyz,&
-                                              helium_write_line,&
-                                              helium_write_setup
-   USE helium_sampling,                 ONLY: helium_sample
-   USE helium_types,                    ONLY: &
-        he_mass, helium_solvent_p_type, helium_solvent_type, rho_atom_number, &
-        rho_moment_of_inertia, rho_num, rho_projected_area, rho_winding_cycle, rho_winding_number
-   USE input_constants,                 ONLY: helium_cell_shape_cube,&
-                                              helium_cell_shape_octahedron,&
-                                              helium_solute_intpot_none
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get,&
-                                              section_vals_val_set
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp,&
-                                              max_line_length
-   USE mathconstants,                   ONLY: pi,&
-                                              twopi
-   USE message_passing,                 ONLY: mp_allgather,&
-                                              mp_bcast,&
-                                              mp_comm_free,&
-                                              mp_comm_split_direct
-   USE parallel_rng_types,              ONLY: GAUSSIAN,&
-                                              UNIFORM,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_random_number,&
-                                              rng_stream_p_type,&
-                                              rng_stream_type,&
-                                              set_rng_stream
-   USE particle_list_types,             ONLY: particle_list_type
-   USE physcon,                         ONLY: a_mass,&
-                                              angstrom,&
-                                              boltzmann,&
-                                              h_bar,&
-                                              kelvin,&
-                                              massunit
-   USE pint_public,                     ONLY: pint_com_pos
-   USE pint_types,                      ONLY: pint_env_type
-   USE splines_methods,                 ONLY: init_spline,&
-                                              init_splinexy
-   USE splines_types,                   ONLY: spline_data_create,&
-                                              spline_data_release,&
-                                              spline_data_retain
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE bibliography, ONLY: Walewski2014, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type, &
+                         get_cell
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_printkey_is_on
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE f77_interface, ONLY: f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE force_env_types, ONLY: force_env_get
+   USE helium_common, ONLY: helium_com, &
+                            helium_pbc
+   USE helium_io, ONLY: helium_read_xyz, &
+                        helium_write_line, &
+                        helium_write_setup
+   USE helium_sampling, ONLY: helium_sample
+   USE helium_types, ONLY: &
+      he_mass, helium_solvent_p_type, helium_solvent_type, rho_atom_number, &
+      rho_moment_of_inertia, rho_num, rho_projected_area, rho_winding_cycle, rho_winding_number
+   USE input_constants, ONLY: helium_cell_shape_cube, &
+                              helium_cell_shape_octahedron, &
+                              helium_solute_intpot_none
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get, &
+                                  section_vals_val_set
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp, &
+                    max_line_length
+   USE mathconstants, ONLY: pi, &
+                            twopi
+   USE message_passing, ONLY: mp_allgather, &
+                              mp_bcast, &
+                              mp_comm_free, &
+                              mp_comm_split_direct
+   USE parallel_rng_types, ONLY: GAUSSIAN, &
+                                 UNIFORM, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_random_number, &
+                                 rng_stream_p_type, &
+                                 rng_stream_type, &
+                                 set_rng_stream
+   USE particle_list_types, ONLY: particle_list_type
+   USE physcon, ONLY: a_mass, &
+                      angstrom, &
+                      boltzmann, &
+                      h_bar, &
+                      kelvin, &
+                      massunit
+   USE pint_public, ONLY: pint_com_pos
+   USE pint_types, ONLY: pint_env_type
+   USE splines_methods, ONLY: init_spline, &
+                              init_splinexy
+   USE splines_types, ONLY: spline_data_create, &
+                            spline_data_release, &
+                            spline_data_retain
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -149,7 +149,7 @@ CONTAINS
       END IF
       ! calculate number of tasks for each processor
       mepos = num_env/logger%para_env%num_pe &
-              +MIN(MOD(num_env, logger%para_env%num_pe)/(logger%para_env%mepos+1), 1)
+              + MIN(MOD(num_env, logger%para_env%num_pe)/(logger%para_env%mepos + 1), 1)
       ! gather result
       NULLIFY (env_all)
       ALLOCATE (env_all(logger%para_env%num_pe))
@@ -212,7 +212,7 @@ CONTAINS
                      )
 
             helium_env(k)%helium%ref_count = 1
-            last_helium_id = last_helium_id+1
+            last_helium_id = last_helium_id + 1
             helium_env(k)%helium%id_nr = last_helium_id
             helium_env(k)%helium%accepts = 0
             helium_env(k)%helium%relrot = 0
@@ -253,13 +253,13 @@ CONTAINS
                                          i_val=itmp)
                helium_env(k)%helium%last_step = itmp
                helium_env(k)%helium%num_steps = helium_env(k)%helium%last_step &
-                                                -helium_env(k)%helium%first_step
+                                                - helium_env(k)%helium%first_step
             ELSE
                CALL section_vals_val_get(input, "MOTION%PINT%NUM_STEPS", &
                                          i_val=itmp)
                helium_env(k)%helium%num_steps = itmp
                helium_env(k)%helium%last_step = helium_env(k)%helium%first_step &
-                                                +helium_env(k)%helium%num_steps
+                                                + helium_env(k)%helium%num_steps
             END IF
 
             ! boundary conditions
@@ -296,8 +296,8 @@ CONTAINS
                CALL section_vals_val_get(helium_section, "CELL_SIZE", &
                                          r_val=helium_env(k)%helium%cell_size)
                ! only more work if not all three values are consistent:
-               IF (ABS(helium_env(k)%helium%cell_size-rtmp) .GT. 100.0_dp*EPSILON(0.0_dp)* &
-                   (ABS(helium_env(k)%helium%cell_size)+rtmp)) THEN
+               IF (ABS(helium_env(k)%helium%cell_size - rtmp) .GT. 100.0_dp*EPSILON(0.0_dp)* &
+                   (ABS(helium_env(k)%helium%cell_size) + rtmp)) THEN
                   IF (expl_dens .AND. expl_nats) THEN
                      msg_str = "DENSITY, NATOMS and CELL_SIZE options "// &
                                "contradict each other"
@@ -319,8 +319,8 @@ CONTAINS
                      ! (should be a small correction)
                      rtmp = (cgeof*helium_env(k)%helium%atoms/helium_env(k)%helium%density &
                              )**(1.0_dp/3.0_dp)
-                     IF (ABS(helium_env(k)%helium%cell_size-rtmp) .GT. 100.0_dp*EPSILON(0.0_dp) &
-                         *(ABS(helium_env(k)%helium%cell_size)+rtmp)) THEN
+                     IF (ABS(helium_env(k)%helium%cell_size - rtmp) .GT. 100.0_dp*EPSILON(0.0_dp) &
+                         *(ABS(helium_env(k)%helium%cell_size) + rtmp)) THEN
                         msg_str = "Adjusting actual cell size "// &
                                   "to maintain correct density."
                         CPWARN(msg_str)
@@ -334,7 +334,7 @@ CONTAINS
             ! correctly defined.
 
             ! set the M matrix for winding number calculations
-            SELECT CASE (helium_env (k)%helium%cell_shape)
+            SELECT CASE (helium_env(k)%helium%cell_shape)
 
             CASE (helium_cell_shape_octahedron)
                helium_env(k)%helium%cell_m(1, 1) = helium_env(k)%helium%cell_size
@@ -390,7 +390,7 @@ CONTAINS
                                       i_val=helium_env(k)%helium%maxcycle)
             i = helium_env(k)%helium%maxcycle
             CPASSERT(i >= 0)
-            i = helium_env(k)%helium%atoms-helium_env(k)%helium%maxcycle
+            i = helium_env(k)%helium%atoms - helium_env(k)%helium%maxcycle
             CPASSERT(i >= 0)
 
             ! set m-distribution parameters
@@ -415,12 +415,12 @@ CONTAINS
             ! precheck bisection value (not all invalids are filtered out here yet)
             i = helium_env(k)%helium%bisection
             CPASSERT(i > 1)
-            i = helium_env(k)%helium%beads-helium_env(k)%helium%bisection
+            i = helium_env(k)%helium%beads - helium_env(k)%helium%bisection
             CPASSERT(i > 0)
             !
             itmp = helium_env(k)%helium%bisection
             rtmp = 2.0_dp**(ANINT(LOG(REAL(itmp, dp))/LOG(2.0_dp)))
-            tcheck = ABS(REAL(itmp, KIND=dp)-rtmp)
+            tcheck = ABS(REAL(itmp, KIND=dp) - rtmp)
             IF (tcheck > 100.0_dp*EPSILON(0.0_dp)) THEN
                msg_str = "BISECTION should be integer power of 2."
                CPABORT(msg_str)
@@ -525,7 +525,7 @@ CONTAINS
                        helium_env(1)%comm)
          CALL mp_bcast(dx, logger%para_env%source, &
                        helium_env(1)%comm)
-         isize = (pdx+1)*(pdx+2)
+         isize = (pdx + 1)*(pdx + 2)
          ALLOCATE (pot_transfer(nlines, isize))
          IF (logger%para_env%ionode) THEN
             DO i = 1, nlines
@@ -551,7 +551,7 @@ CONTAINS
             helium_env(k)%helium%wpref = (((1e-20/h_bar)*mHe)/h_bar)*boltzmann*T
             helium_env(k)%helium%apref = (((4e-20/h_bar)*mHe)/h_bar)*boltzmann*T
 
-            isize = helium_env(k)%helium%pdx+1
+            isize = helium_env(k)%helium%pdx + 1
             ALLOCATE (helium_env(k)%helium%uij(isize, isize))
             ALLOCATE (helium_env(k)%helium%eij(isize, isize))
             DO i = 1, isize
@@ -564,8 +564,8 @@ CONTAINS
                   helium_env(k)%helium%eij(i, j)%spline_data%x1 = x_spline
                END DO
             END DO
-            DO i = 1, isize-1
-               DO j = i+1, isize
+            DO i = 1, isize - 1
+               DO j = i + 1, isize
                   helium_env(k)%helium%uij(i, j) = helium_env(k)%helium%uij(j, i)
                   CALL spline_data_retain(helium_env(k)%helium%uij(i, j)%spline_data)
                   helium_env(k)%helium%eij(i, j) = helium_env(k)%helium%eij(j, i)
@@ -573,39 +573,39 @@ CONTAINS
                END DO
             END DO
 
-            isize = helium_env(k)%helium%pdx+1
+            isize = helium_env(k)%helium%pdx + 1
             ntab = 1
             DO i = 1, isize
                DO j = 1, i
                   helium_env(k)%helium%uij(i, j)%spline_data%y(:) = pot_transfer(:, ntab)* &
-                                                                    angstrom**(2*i-2)
+                                                                    angstrom**(2*i - 2)
                   CALL init_spline(helium_env(k)%helium%uij(i, j)%spline_data, dx=dx)
-                  ntab = ntab+1
+                  ntab = ntab + 1
                END DO
             END DO
             DO i = 1, isize
                DO j = 1, i
                   helium_env(k)%helium%eij(i, j)%spline_data%y(:) = pot_transfer(:, ntab)* &
-                                                                    angstrom**(2*i-2)/kelvin
+                                                                    angstrom**(2*i - 2)/kelvin
                   CALL init_spline(helium_env(k)%helium%eij(i, j)%spline_data, dx=dx)
-                  ntab = ntab+1
+                  ntab = ntab + 1
                END DO
             END DO
 
             ! ALLOCATE helium-related arrays
             i = helium_env(k)%helium%atoms
             j = helium_env(k)%helium%beads
-            ALLOCATE (helium_env(k)%helium%pos(3, i, j+1))
+            ALLOCATE (helium_env(k)%helium%pos(3, i, j + 1))
             helium_env(k)%helium%pos = 0.0_dp
-            ALLOCATE (helium_env(k)%helium%work(3, i, j+1))
-            ALLOCATE (helium_env(k)%helium%ptable(helium_env(k)%helium%maxcycle+1))
+            ALLOCATE (helium_env(k)%helium%work(3, i, j + 1))
+            ALLOCATE (helium_env(k)%helium%ptable(helium_env(k)%helium%maxcycle + 1))
             ALLOCATE (helium_env(k)%helium%permutation(i))
             ALLOCATE (helium_env(k)%helium%iperm(i))
             ALLOCATE (helium_env(k)%helium%tmatrix(i, i))
             ALLOCATE (helium_env(k)%helium%nmatrix(i, 2*i))
             ALLOCATE (helium_env(k)%helium%pmatrix(i, i))
             ALLOCATE (helium_env(k)%helium%ipmatrix(i, i))
-            itmp = helium_env(k)%helium%bisctlog2+2
+            itmp = helium_env(k)%helium%bisctlog2 + 2
             ALLOCATE (helium_env(k)%helium%num_accepted(itmp, helium_env(k)%helium%maxcycle))
             ALLOCATE (helium_env(k)%helium%plength_avrg(helium_env(k)%helium%atoms))
             ALLOCATE (helium_env(k)%helium%plength_inst(helium_env(k)%helium%atoms))
@@ -637,12 +637,12 @@ CONTAINS
                helium_env(k)%helium%bead_ratio = helium_env(k)%helium%beads/helium_env(k)%helium%solute_beads
 
                ! check if bead numbers are commensurate:
-               i = helium_env(k)%helium%bead_ratio*helium_env(k)%helium%solute_beads-helium_env(k)%helium%beads
+               i = helium_env(k)%helium%bead_ratio*helium_env(k)%helium%solute_beads - helium_env(k)%helium%beads
                CPASSERT(i == 0)
 !TODO       Adjust helium bead number if not comm. and if coords not given expl.
 
                ! check if tau, temperature and bead number are consistent:
-               tcheck = ABS((helium_env(k)%helium%tau*helium_env(k)%helium%beads-solute%beta)/solute%beta)
+               tcheck = ABS((helium_env(k)%helium%tau*helium_env(k)%helium%beads - solute%beta)/solute%beta)
                IF (tcheck > 1.0e-14_dp) THEN
                   msg_str = "Tau, temperature and bead number are inconsistent."
                   CPABORT(msg_str)
@@ -680,8 +680,8 @@ CONTAINS
                   ! since 2.9673 is in Angstrom
                   helium_env(k)%helium%e_corr = (twopi*helium_env(k)%helium%density/angstrom**3*10.8_dp* &
                                                  (544850.4_dp*EXP(-13.353384_dp*x1/2.9673_dp)*(2.9673_dp/13.353384_dp)**3* &
-                                                  (2.0_dp+2.0_dp*13.353384_dp*x1/2.9673_dp+(13.353384_dp*x1/2.9673_dp)**2)- &
-                                                  (((0.1781_dp/7.0_dp*(2.9673_dp/x1)**2+0.4253785_dp/5.0_dp)*(2.9673_dp/x1)**2+ &
+                                                  (2.0_dp + 2.0_dp*13.353384_dp*x1/2.9673_dp + (13.353384_dp*x1/2.9673_dp)**2) - &
+                                                  (((0.1781_dp/7.0_dp*(2.9673_dp/x1)**2 + 0.4253785_dp/5.0_dp)*(2.9673_dp/x1)**2 + &
                                                     1.3732412_dp/3.0_dp)*(2.9673_dp/x1)**3)*2.9673_dp**3))/kelvin
                END IF
             END IF
@@ -734,7 +734,7 @@ CONTAINS
                DEALLOCATE (helium_env(k)%env_all)
             END IF
             NULLIFY (helium_env(k)%env_all)
-            helium_env(k)%helium%ref_count = helium_env(k)%helium%ref_count-1
+            helium_env(k)%helium%ref_count = helium_env(k)%helium%ref_count - 1
             IF (helium_env(k)%helium%ref_count < 1) THEN
 
                ! DEALLOCATE temporary arrays
@@ -994,7 +994,7 @@ CONTAINS
 
             DO i = 1, helium_env(k)%helium%atoms
                ! TODO: Done also in helium_coord_init, but slighlty differently
-               helium_env(k)%helium%pos(:, i, helium_env(k)%helium%beads+1) = &
+               helium_env(k)%helium%pos(:, i, helium_env(k)%helium%beads + 1) = &
                   helium_env(k)%helium%pos(:, helium_env(k)%helium%permutation(i), 1)
             END DO
             helium_env(k)%helium%work = helium_env(k)%helium%pos
@@ -1097,7 +1097,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: initkT, solute_radius
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_coord_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       REAL(KIND=dp), PARAMETER                           :: minHeHedst = 5.669177966_dp
 
       INTEGER                                            :: ia, ib, ic, id, iter, k
@@ -1122,27 +1122,27 @@ CONTAINS
                invalidpos = .TRUE.
                iter = 0
                DO WHILE (invalidpos)
-                  iter = iter+1
+                  iter = iter + 1
                   invalidpos = .FALSE.
                   ! if sampling fails to often, reduce he he criterion
-                  minHeHedsttmp = 0.90_dp**MIN(0, iter-2)*minHeHedst
+                  minHeHedsttmp = 0.90_dp**MIN(0, iter - 2)*minHeHedst
                   DO ic = 1, 3
                      r1 = next_random_number(helium_env(k)%helium%rng_stream_uniform)
-                     r1 = 2.0_dp*r1-1.0_dp
+                     r1 = 2.0_dp*r1 - 1.0_dp
                      r1 = r1*helium_env(k)%helium%cell_size
                      centroids(ic, ia) = r1
                   END DO
                   ! check if helium is outside of cell
                   tvek(:) = centroids(:, ia)
                   CALL helium_pbc(helium_env(k)%helium, tvek(:))
-                  rvek(:) = tvek(:)-centroids(:, ia)
+                  rvek(:) = tvek(:) - centroids(:, ia)
                   r2 = DOT_PRODUCT(rvek, rvek)
                   IF (r2 > 1.0_dp*10.0_dp**(-6)) THEN
                      invalidpos = .TRUE.
                   ELSE
                      ! check for helium-helium collision
-                     DO id = 1, ia-1
-                        rvek = centroids(:, ia)-centroids(:, id)
+                     DO id = 1, ia - 1
+                        rvek = centroids(:, ia) - centroids(:, id)
                         CALL helium_pbc(helium_env(k)%helium, rvek)
                         r2 = DOT_PRODUCT(rvek, rvek)
                         IF (r2 < minHeHedsttmp**2) THEN
@@ -1154,7 +1154,7 @@ CONTAINS
                   IF (.NOT. invalidpos) THEN
                      ! check if centroid collides with molecule
                      IF (helium_env(k)%helium%solute_present) THEN
-                        rvek(:) = (cvek(:)-centroids(:, ia))
+                        rvek(:) = (cvek(:) - centroids(:, ia))
                         r2 = DOT_PRODUCT(rvek, rvek)
                         IF (r2 <= solute_radius**2) invalidpos = .TRUE.
                      END IF
@@ -1177,12 +1177,12 @@ CONTAINS
                   CALL helium_pbc(helium_env(k)%helium, helium_env(k)%helium%pos(:, ia, ib))
                   ! check if bead collides with molecule
                   IF (helium_env(k)%helium%solute_present) THEN
-                     rvek(:) = (cvek(:)-helium_env(k)%helium%pos(:, ia, ib))
+                     rvek(:) = (cvek(:) - helium_env(k)%helium%pos(:, ia, ib))
                      r2 = DOT_PRODUCT(rvek, rvek)
                      IF (r2 <= solute_radius**2) THEN
                         r1 = SQRT(r2)
                         helium_env(k)%helium%pos(:, ia, ib) = &
-                           cvek(:)+solute_radius/r1*rvek(:)
+                           cvek(:) + solute_radius/r1*rvek(:)
                      END IF
                   END IF
                END DO
@@ -1193,12 +1193,12 @@ CONTAINS
                invalidpos = .TRUE.
                DO WHILE (invalidpos)
                   invalidpos = .FALSE.
-                  iter = iter+1
+                  iter = iter + 1
                   ! if sampling fails to often, reduce he he criterion
-                  minHeHedsttmp = 0.90_dp**MIN(0, iter-2)*minHeHedst
+                  minHeHedsttmp = 0.90_dp**MIN(0, iter - 2)*minHeHedst
                   DO ic = 1, 3
                      rvek(ic) = next_random_number(helium_env(k)%helium%rng_stream_uniform)
-                     rvek(ic) = 2.0_dp*rvek(ic)-1.0_dp
+                     rvek(ic) = 2.0_dp*rvek(ic) - 1.0_dp
                      rvek(ic) = rvek(ic)*helium_env(k)%helium%droplet_radius
                   END DO
                   centroids(:, ia) = rvek(:)
@@ -1208,8 +1208,8 @@ CONTAINS
                      invalidpos = .TRUE.
                   ELSE
                      ! check for helium-helium collision
-                     DO id = 1, ia-1
-                        rvek = centroids(:, ia)-centroids(:, id)
+                     DO id = 1, ia - 1
+                        rvek = centroids(:, ia) - centroids(:, id)
                         r2 = DOT_PRODUCT(rvek, rvek)
                         IF (r2 < minHeHedsttmp**2) THEN
                            invalidpos = .TRUE.
@@ -1220,7 +1220,7 @@ CONTAINS
                   IF (.NOT. invalidpos) THEN
                      ! make sure the helium does not collide with the solute
                      IF (helium_env(k)%helium%solute_present) THEN
-                        rvek(:) = (cvek(:)-centroids(:, ia))
+                        rvek(:) = (cvek(:) - centroids(:, ia))
                         r2 = DOT_PRODUCT(rvek, rvek)
                         IF (r2 <= solute_radius**2) invalidpos = .TRUE.
                      END IF
@@ -1258,14 +1258,14 @@ CONTAINS
                   END IF
                   ! transfer to position around actual center of droplet
                   helium_env(k)%helium%pos(:, ia, ib) = &
-                     helium_env(k)%helium%pos(:, ia, ib)+ &
+                     helium_env(k)%helium%pos(:, ia, ib) + &
                      helium_env(k)%helium%center(:)
                END DO
             END DO
          END IF
          ! store positions at time slice nbeads+1 (rperez):
          DO ia = 1, helium_env(k)%helium%atoms
-            helium_env(k)%helium%pos(:, ia, helium_env(k)%helium%beads+1) = helium_env(k)%helium%pos(:, ia, 1)
+            helium_env(k)%helium%pos(:, ia, helium_env(k)%helium%beads + 1) = helium_env(k)%helium%pos(:, ia, 1)
          END DO
          helium_env(k)%helium%work = helium_env(k)%helium%pos
          DEALLOCATE (centroids)
@@ -1305,20 +1305,20 @@ CONTAINS
       ! set up normal mode backtransform matrix
       u2x(:, :) = 0.0_dp
       u2x(:, 1) = invsqrtp
-      DO i = 2, p/2+1
+      DO i = 2, p/2 + 1
          DO j = 1, p
-            u2x(j, i) = sqrt2p*COS(twopip*(i-1)*(j-1))
+            u2x(j, i) = sqrt2p*COS(twopip*(i - 1)*(j - 1))
          END DO
       END DO
-      DO i = p/2+2, p
+      DO i = p/2 + 2, p
          DO j = 1, p
-            u2x(j, i) = sqrt2p*SIN(twopip*(i-1)*(j-1))
+            u2x(j, i) = sqrt2p*SIN(twopip*(i - 1)*(j - 1))
          END DO
       END DO
       IF (MOD(p, 2) == 0) THEN
-         DO i = 1, p-1, 2
-            u2x(i, p/2+1) = invsqrtp
-            u2x(i+1, p/2+1) = -1.0_dp*invsqrtp
+         DO i = 1, p - 1, 2
+            u2x(i, p/2 + 1) = invsqrtp
+            u2x(i + 1, p/2 + 1) = -1.0_dp*invsqrtp
          END DO
       END IF
 
@@ -1326,7 +1326,7 @@ CONTAINS
          DO idim = 1, 3
             nmhecoords(1) = sqrtp*centroids(idim, iatom)
             DO imode = 2, p
-               omega = 2.0_dp*p*kbT*SIN((imode-1)*pip)
+               omega = 2.0_dp*p*kbT*SIN((imode - 1)*pip)
                variance = kbT*p/(helium_env%he_mass_au*omega**2)
                rand = next_random_number(helium_env%rng_stream_gaussian)
                nmhecoords(imode) = rand*SQRT(variance)
@@ -1351,7 +1351,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_coord_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: err_str, stmp
       INTEGER                                            :: actlen, i, k, msglen, num_env_restart, &
@@ -1395,19 +1395,19 @@ CONTAINS
 
          offset = 0
          DO i = 1, logger%para_env%mepos
-            offset = offset+helium_env(1)%env_all(i)
+            offset = offset + helium_env(1)%env_all(i)
          END DO
 
          ! distribute coordinates over processors (no message passing)
          DO k = 1, SIZE(helium_env)
             msglen = helium_env(k)%helium%atoms*helium_env(k)%helium%beads*3
-            off = msglen*MOD(offset+k-1, num_env_restart)
+            off = msglen*MOD(offset + k - 1, num_env_restart)
             NULLIFY (m, f)
             ALLOCATE (m(3, helium_env(k)%helium%atoms, helium_env(k)%helium%beads))
             ALLOCATE (f(3, helium_env(k)%helium%atoms, helium_env(k)%helium%beads))
             m(:, :, :) = .TRUE.
             f(:, :, :) = 0.0_dp
-            helium_env(k)%helium%pos(:, :, 1:helium_env(k)%helium%beads) = UNPACK(message(off+1:off+msglen), MASK=m, FIELD=f)
+            helium_env(k)%helium%pos(:, :, 1:helium_env(k)%helium%beads) = UNPACK(message(off + 1:off + msglen), MASK=m, FIELD=f)
             DEALLOCATE (f, m)
          END DO
 
@@ -1431,7 +1431,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_force_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: k
 
@@ -1457,7 +1457,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_force_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: err_str, stmp
       INTEGER                                            :: actlen, k, msglen
@@ -1522,7 +1522,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_perm_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ia, k
 
@@ -1553,7 +1553,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_perm_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: err_str, stmp
       INTEGER                                            :: actlen, i, ia, ic, k, msglen, &
@@ -1599,13 +1599,13 @@ CONTAINS
          ! distribute permutation state over processors
          offset = 0
          DO i = 1, logger%para_env%mepos
-            offset = offset+helium_env(1)%env_all(i)
+            offset = offset + helium_env(1)%env_all(i)
          END DO
 
          DO k = 1, SIZE(helium_env)
             msglen = helium_env(k)%helium%atoms
-            off = msglen*MOD(k-1+offset, num_env_restart)
-            helium_env(k)%helium%permutation(:) = message(off+1:off+msglen)
+            off = msglen*MOD(k - 1 + offset, num_env_restart)
+            helium_env(k)%helium%permutation(:) = message(off + 1:off + msglen)
          END DO
       END IF
 
@@ -1616,7 +1616,7 @@ CONTAINS
          DO ia = 1, msglen
             IF ((helium_env(k)%helium%permutation(ia) > 0) .AND. (helium_env(k)%helium%permutation(ia) <= msglen)) THEN
                helium_env(k)%helium%iperm(helium_env(k)%helium%permutation(ia)) = ia
-               ic = ic+1
+               ic = ic + 1
             END IF
          END DO
          err_str = "Invalid HELIUM%PERM state: some numbers not within (1,"
@@ -1646,7 +1646,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_averages_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, k, msglen, num_env_restart, off, &
                                                             offset
@@ -1659,7 +1659,7 @@ CONTAINS
 
       offset = 0
       DO i = 1, logger%para_env%mepos
-         offset = offset+helium_env(1)%env_all(i)
+         offset = offset + helium_env(1)%env_all(i)
       END DO
 
       ! restore projected area
@@ -1674,8 +1674,8 @@ CONTAINS
          num_env_restart = SIZE(message)/3 ! apparent number of environments
          msglen = 3
          DO k = 1, SIZE(helium_env)
-            off = msglen*MOD(offset+k-1, num_env_restart)
-            helium_env(k)%helium%proarea%rstr(:) = message(off+1:off+msglen)
+            off = msglen*MOD(offset + k - 1, num_env_restart)
+            helium_env(k)%helium%proarea%rstr(:) = message(off + 1:off + msglen)
          END DO
       ELSE
          DO k = 1, SIZE(helium_env)
@@ -1695,8 +1695,8 @@ CONTAINS
          num_env_restart = SIZE(message)/3 ! apparent number of environments
          msglen = 3
          DO k = 1, SIZE(helium_env)
-            off = msglen*MOD(offset+k-1, num_env_restart)
-            helium_env(k)%helium%prarea2%rstr(:) = message(off+1:off+msglen)
+            off = msglen*MOD(offset + k - 1, num_env_restart)
+            helium_env(k)%helium%prarea2%rstr(:) = message(off + 1:off + msglen)
          END DO
       ELSE
          DO k = 1, SIZE(helium_env)
@@ -1716,8 +1716,8 @@ CONTAINS
          num_env_restart = SIZE(message)/3 ! apparent number of environments
          msglen = 3
          DO k = 1, SIZE(helium_env)
-            off = msglen*MOD(offset+k-1, num_env_restart)
-            helium_env(k)%helium%wnmber2%rstr(:) = message(off+1:off+msglen)
+            off = msglen*MOD(offset + k - 1, num_env_restart)
+            helium_env(k)%helium%wnmber2%rstr(:) = message(off + 1:off + msglen)
          END DO
       ELSE
          DO k = 1, SIZE(helium_env)
@@ -1737,8 +1737,8 @@ CONTAINS
          num_env_restart = SIZE(message)/3 ! apparent number of environments
          msglen = 3
          DO k = 1, SIZE(helium_env)
-            off = msglen*MOD(offset+k-1, num_env_restart)
-            helium_env(k)%helium%mominer%rstr(:) = message(off+1:off+msglen)
+            off = msglen*MOD(offset + k - 1, num_env_restart)
+            helium_env(k)%helium%mominer%rstr(:) = message(off + 1:off + msglen)
          END DO
       ELSE
          DO k = 1, SIZE(helium_env)
@@ -1787,7 +1787,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rng_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: helium_seed, i, offset
       REAL(KIND=dp), DIMENSION(3, 2)                     :: initial_seed
@@ -1861,20 +1861,20 @@ CONTAINS
 
       offset = 0
       DO i = 1, logger%para_env%mepos
-         offset = offset+helium_env(1)%env_all(i)
+         offset = offset + helium_env(1)%env_all(i)
       END DO
 
       IF (ASSOCIATED(helium_env)) THEN
          DO i = 1, SIZE(helium_env)
             NULLIFY (helium_env(i)%helium%rng_stream_uniform, &
                      helium_env(i)%helium%rng_stream_gaussian)
-            helium_env(i)%helium%rng_stream_uniform => uniform_array(offset+i)%stream
-            helium_env(i)%helium%rng_stream_gaussian => gaussian_array(offset+i)%stream
+            helium_env(i)%helium%rng_stream_uniform => uniform_array(offset + i)%stream
+            helium_env(i)%helium%rng_stream_gaussian => gaussian_array(offset + i)%stream
          END DO
       END IF
 
       DO i = 1, helium_env(1)%helium%num_env
-         IF (i .LE. offset .OR. i .GT. offset+SIZE(helium_env)) THEN
+         IF (i .LE. offset .OR. i .GT. offset + SIZE(helium_env)) THEN
             CALL delete_rng_stream(uniform_array(i)%stream)
             CALL delete_rng_stream(gaussian_array(i)%stream)
          END IF
@@ -1902,7 +1902,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rng_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: err_str, stmp
       INTEGER                                            :: actlen, i, k, msglen, num_env_restart, &
@@ -1950,19 +1950,19 @@ CONTAINS
          ! unpack the buffer at each processor, set RNG state
          offset = 0
          DO i = 1, logger%para_env%mepos
-            offset = offset+helium_env(1)%env_all(i)
+            offset = offset + helium_env(1)%env_all(i)
          END DO
 
          DO k = 1, SIZE(helium_env)
             msglen = 40
-            off = msglen*(offset+k-1)
+            off = msglen*(offset + k - 1)
             m(:, :) = .TRUE.
             f(:, :) = 0.0_dp
-            bg(:, :) = UNPACK(message(off+1:off+6), MASK=m, FIELD=f)
-            cg(:, :) = UNPACK(message(off+7:off+12), MASK=m, FIELD=f)
-            ig(:, :) = UNPACK(message(off+13:off+18), MASK=m, FIELD=f)
-            bf = message(off+19)
-            bu = message(off+20)
+            bg(:, :) = UNPACK(message(off + 1:off + 6), MASK=m, FIELD=f)
+            cg(:, :) = UNPACK(message(off + 7:off + 12), MASK=m, FIELD=f)
+            ig(:, :) = UNPACK(message(off + 13:off + 18), MASK=m, FIELD=f)
+            bf = message(off + 19)
+            bu = message(off + 20)
             IF (bf .GT. 0) THEN
                lbf = .TRUE.
             ELSE
@@ -1970,11 +1970,11 @@ CONTAINS
             END IF
             CALL set_rng_stream(helium_env(k)%helium%rng_stream_uniform, bg=bg, cg=cg, ig=ig, &
                                 buffer=bu, buffer_filled=lbf)
-            bg(:, :) = UNPACK(message(off+21:off+26), MASK=m, FIELD=f)
-            cg(:, :) = UNPACK(message(off+27:off+32), MASK=m, FIELD=f)
-            ig(:, :) = UNPACK(message(off+33:off+38), MASK=m, FIELD=f)
-            bf = message(off+39)
-            bu = message(off+40)
+            bg(:, :) = UNPACK(message(off + 21:off + 26), MASK=m, FIELD=f)
+            cg(:, :) = UNPACK(message(off + 27:off + 32), MASK=m, FIELD=f)
+            ig(:, :) = UNPACK(message(off + 33:off + 38), MASK=m, FIELD=f)
+            bf = message(off + 39)
+            bu = message(off + 40)
             IF (bf .GT. 0) THEN
                lbf = .TRUE.
             ELSE
@@ -2001,7 +2001,7 @@ CONTAINS
       TYPE(helium_solvent_type), POINTER                 :: helium
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rdf_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: file_name
       CHARACTER(len=default_string_length)               :: err_str, stmp
@@ -2038,7 +2038,7 @@ CONTAINS
 
       ! increment number of centers if necessary
       IF (ASSOCIATED(coords)) THEN
-         helium%rdf_num_ctr = helium%rdf_num_ctr+SIZE(coords)/3
+         helium%rdf_num_ctr = helium%rdf_num_ctr + SIZE(coords)/3
       END IF
 
       ! set the flag for RDF and either proceed or return
@@ -2053,7 +2053,7 @@ CONTAINS
       ALLOCATE (helium%rdf_centers(3*helium%rdf_num_ctr))
       helium%rdf_centers(:) = 0.0_dp
       IF (ASSOCIATED(coords)) THEN
-         ii = 3*ifirst+1
+         ii = 3*ifirst + 1
          ij = 3*helium%rdf_num_ctr
          helium%rdf_centers(ii:ij) = coords(:)
          DEALLOCATE (coords)
@@ -2148,7 +2148,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rdf_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: stmp1, stmp2
       CHARACTER(len=max_line_length)                     :: err_str
@@ -2217,7 +2217,7 @@ CONTAINS
       TYPE(helium_solvent_type), POINTER                 :: helium
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rdf_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (helium%rdf_present) THEN
 
@@ -2260,7 +2260,7 @@ CONTAINS
       LOGICAL                                            :: is_active
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_property_active', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: input_path
       INTEGER                                            :: print_level
@@ -2327,7 +2327,7 @@ CONTAINS
       TYPE(helium_solvent_type), POINTER                 :: helium
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rho_property_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nc
 
@@ -2415,7 +2415,7 @@ CONTAINS
       TYPE(helium_solvent_type), POINTER                 :: helium
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rho_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ii, itmp, jtmp
       LOGICAL                                            :: explicit, ltmp
@@ -2431,7 +2431,7 @@ CONTAINS
          l_val=ltmp)
       IF (ltmp) THEN
          helium%rho_property(rho_atom_number)%is_calculated = .TRUE.
-         helium%rho_num_act = helium%rho_num_act+1
+         helium%rho_num_act = helium%rho_num_act + 1
          helium%rho_property(rho_atom_number)%component_index(1) = helium%rho_num_act
       END IF
 
@@ -2443,7 +2443,7 @@ CONTAINS
       IF (ltmp) THEN
          helium%rho_property(rho_projected_area)%is_calculated = .TRUE.
          DO ii = 1, helium%rho_property(rho_projected_area)%num_components
-            helium%rho_num_act = helium%rho_num_act+1
+            helium%rho_num_act = helium%rho_num_act + 1
             helium%rho_property(rho_projected_area)%component_index(ii) = helium%rho_num_act
          END DO
       END IF
@@ -2456,7 +2456,7 @@ CONTAINS
       IF (ltmp) THEN
          helium%rho_property(rho_winding_number)%is_calculated = .TRUE.
          DO ii = 1, helium%rho_property(rho_winding_number)%num_components
-            helium%rho_num_act = helium%rho_num_act+1
+            helium%rho_num_act = helium%rho_num_act + 1
             helium%rho_property(rho_winding_number)%component_index(ii) = helium%rho_num_act
          END DO
       END IF
@@ -2469,7 +2469,7 @@ CONTAINS
       IF (ltmp) THEN
          helium%rho_property(rho_winding_cycle)%is_calculated = .TRUE.
          DO ii = 1, helium%rho_property(rho_winding_cycle)%num_components
-            helium%rho_num_act = helium%rho_num_act+1
+            helium%rho_num_act = helium%rho_num_act + 1
             helium%rho_property(rho_winding_cycle)%component_index(ii) = helium%rho_num_act
          END DO
       END IF
@@ -2482,7 +2482,7 @@ CONTAINS
       IF (ltmp) THEN
          helium%rho_property(rho_moment_of_inertia)%is_calculated = .TRUE.
          DO ii = 1, helium%rho_property(rho_moment_of_inertia)%num_components
-            helium%rho_num_act = helium%rho_num_act+1
+            helium%rho_num_act = helium%rho_num_act + 1
             helium%rho_property(rho_moment_of_inertia)%component_index(ii) = helium%rho_num_act
          END DO
       END IF
@@ -2510,7 +2510,7 @@ CONTAINS
          itmp = SIZE(helium%rho_min_len_wdg_vals)
          IF (itmp .GT. 0) THEN
             helium%rho_num_min_len_wdg = itmp
-            helium%rho_num_act = helium%rho_num_act+itmp
+            helium%rho_num_act = helium%rho_num_act + itmp
          END IF
       END IF
 
@@ -2529,7 +2529,7 @@ CONTAINS
          itmp = SIZE(helium%rho_min_len_non_vals)
          IF (itmp .GT. 0) THEN
             helium%rho_num_min_len_non = itmp
-            helium%rho_num_act = helium%rho_num_act+itmp
+            helium%rho_num_act = helium%rho_num_act + itmp
          END IF
       END IF
 
@@ -2548,7 +2548,7 @@ CONTAINS
          itmp = SIZE(helium%rho_min_len_all_vals)
          IF (itmp .GT. 0) THEN
             helium%rho_num_min_len_all = itmp
-            helium%rho_num_act = helium%rho_num_act+itmp
+            helium%rho_num_act = helium%rho_num_act + itmp
          END IF
       END IF
 
@@ -2587,7 +2587,7 @@ CONTAINS
       TYPE(helium_solvent_p_type), DIMENSION(:), POINTER :: helium_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_rho_restore', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_string_length)               :: stmp1, stmp2
       CHARACTER(len=max_line_length)                     :: err_str
@@ -2653,7 +2653,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_set_solute_indices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, natoms
       REAL(KIND=dp)                                      :: mass
@@ -2702,7 +2702,7 @@ CONTAINS
       TYPE(pint_env_type), POINTER                       :: pint_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'helium_set_solute_cell', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: my_orthorhombic
       TYPE(cell_type), POINTER                           :: my_cell

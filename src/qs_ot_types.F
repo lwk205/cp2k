@@ -11,40 +11,40 @@
 !> \author Joost VandeVondele (06.2002)
 ! **************************************************************************************************
 MODULE qs_ot_types
-   USE bibliography,                    ONLY: VandeVondele2003,&
-                                              Weber2008,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_release,&
-                                              cp_blacs_env_retain,&
-                                              cp_blacs_env_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_m_by_n_from_row_template,&
-                                              cp_dbcsr_m_by_n_from_template,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_get,&
-                                              cp_fm_struct_type
-   USE cp_para_env,                     ONLY: cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_init_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_release_p,&
-                                              dbcsr_set,&
-                                              dbcsr_type,&
-                                              dbcsr_type_complex_default,&
-                                              dbcsr_type_no_symmetry,&
-                                              dbcsr_type_real_8
-   USE input_constants,                 ONLY: &
-        cholesky_reduce, ls_2pnt, ls_3pnt, ls_gold, ls_none, ot_algo_irac, ot_algo_taylor_or_diag, &
-        ot_chol_irac, ot_lwdn_irac, ot_mini_broyden, ot_mini_cg, ot_mini_diis, ot_mini_sd, &
-        ot_poly_irac, ot_precond_full_all, ot_precond_full_kinetic, ot_precond_full_single, &
-        ot_precond_full_single_inverse, ot_precond_none, ot_precond_s_inverse, &
-        ot_precond_solver_default, ot_precond_solver_direct, ot_precond_solver_inv_chol, &
-        ot_precond_solver_update
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE preconditioner_types,            ONLY: preconditioner_type
+   USE bibliography, ONLY: VandeVondele2003, &
+                           Weber2008, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_release, &
+                           cp_blacs_env_retain, &
+                           cp_blacs_env_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_m_by_n_from_row_template, &
+                                  cp_dbcsr_m_by_n_from_template, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_struct, ONLY: cp_fm_struct_get, &
+                           cp_fm_struct_type
+   USE cp_para_env, ONLY: cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_init_p, &
+                        dbcsr_p_type, &
+                        dbcsr_release_p, &
+                        dbcsr_set, &
+                        dbcsr_type, &
+                        dbcsr_type_complex_default, &
+                        dbcsr_type_no_symmetry, &
+                        dbcsr_type_real_8
+   USE input_constants, ONLY: &
+      cholesky_reduce, ls_2pnt, ls_3pnt, ls_gold, ls_none, ot_algo_irac, ot_algo_taylor_or_diag, &
+      ot_chol_irac, ot_lwdn_irac, ot_mini_broyden, ot_mini_cg, ot_mini_diis, ot_mini_sd, &
+      ot_poly_irac, ot_precond_full_all, ot_precond_full_kinetic, ot_precond_full_single, &
+      ot_precond_full_single_inverse, ot_precond_none, ot_precond_s_inverse, &
+      ot_precond_solver_default, ot_precond_solver_direct, ot_precond_solver_inv_chol, &
+      ot_precond_solver_update
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE preconditioner_types, ONLY: preconditioner_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -351,13 +351,13 @@ CONTAINS
 
       IF (qs_ot_env%settings%ot_method .EQ. "DIIS" .OR. &
           qs_ot_env%settings%ot_method .EQ. "BROY") THEN
-         ALLOCATE (qs_ot_env%ls_diis(m_diis+1, m_diis+1))
+         ALLOCATE (qs_ot_env%ls_diis(m_diis + 1, m_diis + 1))
          qs_ot_env%ls_diis = 0.0_dp
-         ALLOCATE (qs_ot_env%lss_diis(m_diis+1, m_diis+1))
-         ALLOCATE (qs_ot_env%c_diis(m_diis+1))
+         ALLOCATE (qs_ot_env%lss_diis(m_diis + 1, m_diis + 1))
+         ALLOCATE (qs_ot_env%c_diis(m_diis + 1))
          ALLOCATE (qs_ot_env%c_broy(m_diis))
          ALLOCATE (qs_ot_env%energy_h(m_diis))
-         ALLOCATE (qs_ot_env%ipivot(m_diis+1))
+         ALLOCATE (qs_ot_env%ipivot(m_diis + 1))
       ENDIF
 
       ALLOCATE (qs_ot_env%evals(k))
@@ -736,7 +736,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: output_unit
 
       CHARACTER(len=*), PARAMETER :: routineN = 'ot_readwrite_input', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ls_method, ot_algorithm, &
                                                             ot_method, ot_ortho_irac

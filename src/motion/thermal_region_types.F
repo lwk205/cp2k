@@ -12,8 +12,8 @@
 ! **************************************************************************************************
 MODULE thermal_region_types
 
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -52,7 +52,7 @@ CONTAINS
       TYPE(thermal_regions_type), POINTER                :: thermal_regions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_thermal_regions', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       LOGICAL                                            :: check
 
@@ -76,11 +76,11 @@ CONTAINS
       TYPE(thermal_regions_type), POINTER                :: thermal_regions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'retain_thermal_regions', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(thermal_regions)) THEN
          CPASSERT(thermal_regions%ref_count > 0)
-         thermal_regions%ref_count = thermal_regions%ref_count+1
+         thermal_regions%ref_count = thermal_regions%ref_count + 1
       END IF
 
    END SUBROUTINE retain_thermal_regions
@@ -95,7 +95,7 @@ CONTAINS
       TYPE(thermal_regions_type), POINTER                :: thermal_regions
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_thermal_regions', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ireg
       LOGICAL                                            :: check
@@ -104,7 +104,7 @@ CONTAINS
       IF (check) THEN
          check = thermal_regions%ref_count > 0
          CPASSERT(check)
-         thermal_regions%ref_count = thermal_regions%ref_count-1
+         thermal_regions%ref_count = thermal_regions%ref_count - 1
          IF (thermal_regions%ref_count < 1) THEN
             IF (ASSOCIATED(thermal_regions%thermal_region)) THEN
                DO ireg = 1, SIZE(thermal_regions%thermal_region)

@@ -13,10 +13,10 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE timings_types
-   USE dict,                            ONLY: dict_i4tuple_callstat_type,&
-                                              dict_str_i4_type
-   USE list_callstackentry,             ONLY: list_callstackentry_type
-   USE list_routinestat,                ONLY: list_routinestat_type
+   USE dict, ONLY: dict_i4tuple_callstat_type, &
+                   dict_str_i4_type
+   USE list_callstackentry, ONLY: list_callstackentry_type
+   USE list_routinestat, ONLY: list_routinestat_type
 
    IMPLICIT NONE
    PRIVATE

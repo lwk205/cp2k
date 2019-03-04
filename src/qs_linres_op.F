@@ -14,67 +14,67 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE qs_linres_op
-   USE cell_types,                      ONLY: cell_type,&
-                                              pbc
-   USE cp_array_utils,                  ONLY: cp_2d_i_p_type,&
-                                              cp_2d_r_p_type
-   USE cp_cfm_basic_linalg,             ONLY: cp_cfm_solve
-   USE cp_cfm_types,                    ONLY: cp_cfm_create,&
-                                              cp_cfm_get_info,&
-                                              cp_cfm_p_type,&
-                                              cp_cfm_release,&
-                                              cp_cfm_set_all
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_scale_and_add
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_create, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_p_type, cp_fm_release, &
-        cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        convert_offsets_to_sizes, dbcsr_checksum, dbcsr_copy, dbcsr_create, &
-        dbcsr_deallocate_matrix, dbcsr_distribution_type, dbcsr_p_type, dbcsr_set, dbcsr_type, &
-        dbcsr_type_antisymmetric, dbcsr_type_no_symmetry
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE mathconstants,                   ONLY: twopi
-   USE orbital_pointers,                ONLY: coset
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE qs_elec_field,                   ONLY: build_efg_matrix
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_fermi_contact,                ONLY: build_fermi_contact_matrix
-   USE qs_kind_types,                   ONLY: get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_linres_types,                 ONLY: current_env_type,&
-                                              get_current_env,&
-                                              get_issc_env,&
-                                              get_polar_env,&
-                                              issc_env_type,&
-                                              linres_control_type,&
-                                              polar_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_moments,                      ONLY: build_berry_moment_matrix
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_operators_ao,                 ONLY: build_ang_mom_matrix,&
-                                              build_lin_mom_matrix,&
-                                              rRc_xyz_ao
-   USE qs_spin_orbit,                   ONLY: build_pso_matrix
+   USE cell_types, ONLY: cell_type, &
+                         pbc
+   USE cp_array_utils, ONLY: cp_2d_i_p_type, &
+                             cp_2d_r_p_type
+   USE cp_cfm_basic_linalg, ONLY: cp_cfm_solve
+   USE cp_cfm_types, ONLY: cp_cfm_create, &
+                           cp_cfm_get_info, &
+                           cp_cfm_p_type, &
+                           cp_cfm_release, &
+                           cp_cfm_set_all
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_scale_and_add
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_create, cp_fm_get_info, cp_fm_get_submatrix, cp_fm_p_type, cp_fm_release, &
+      cp_fm_set_all, cp_fm_set_submatrix, cp_fm_to_fm, cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      convert_offsets_to_sizes, dbcsr_checksum, dbcsr_copy, dbcsr_create, &
+      dbcsr_deallocate_matrix, dbcsr_distribution_type, dbcsr_p_type, dbcsr_set, dbcsr_type, &
+      dbcsr_type_antisymmetric, dbcsr_type_no_symmetry
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE mathconstants, ONLY: twopi
+   USE orbital_pointers, ONLY: coset
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE qs_elec_field, ONLY: build_efg_matrix
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_fermi_contact, ONLY: build_fermi_contact_matrix
+   USE qs_kind_types, ONLY: get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_linres_types, ONLY: current_env_type, &
+                              get_current_env, &
+                              get_issc_env, &
+                              get_polar_env, &
+                              issc_env_type, &
+                              linres_control_type, &
+                              polar_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_moments, ONLY: build_berry_moment_matrix
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_operators_ao, ONLY: build_ang_mom_matrix, &
+                              build_lin_mom_matrix, &
+                              rRc_xyz_ao
+   USE qs_spin_orbit, ONLY: build_pso_matrix
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -111,7 +111,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'current_operators', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iao, icenter, idir, ii, iii, &
                                                             ispin, istate, j, nao, natom, &
@@ -253,15 +253,15 @@ CONTAINS
             CALL build_ang_mom_matrix(qs_env, op_ao, centers_set(ispin)%array(1:3, icenter))
             !
             ! accumulate checksums
-            chk(1) = chk(1)+dbcsr_checksum(op_ao(1)%matrix)
-            chk(2) = chk(2)+dbcsr_checksum(op_ao(2)%matrix)
-            chk(3) = chk(3)+dbcsr_checksum(op_ao(3)%matrix)
+            chk(1) = chk(1) + dbcsr_checksum(op_ao(1)%matrix)
+            chk(2) = chk(2) + dbcsr_checksum(op_ao(2)%matrix)
+            chk(3) = chk(3) + dbcsr_checksum(op_ao(3)%matrix)
             DO idir = 1, 3
                CALL cp_fm_set_all(rxp_psi0(ispin, idir)%matrix, 0.0_dp)
                CALL cp_dbcsr_sm_fm_multiply(op_ao(idir)%matrix, mo_coeff, &
                                             rxp_psi0(ispin, idir)%matrix, ncol=nmo, &
                                             alpha=-1.0_dp)
-               DO j = center_list(ispin)%array(1, icenter), center_list(ispin)%array(1, icenter+1)-1
+               DO j = center_list(ispin)%array(1, icenter), center_list(ispin)%array(1, icenter + 1) - 1
                   istate = center_list(ispin)%array(2, j)
                   ! the p_psi0 fm is used as temporary matrix to store the results for the psi0 centered in dk
                   CALL cp_fm_to_fm(rxp_psi0(ispin, idir)%matrix, &
@@ -642,7 +642,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'polar_operators', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       COMPLEX(KIND=dp), PARAMETER                        :: one = (1.0_dp, 0.0_dp), &
                                                             zero = (0.0_dp, 0.0_dp)
 
@@ -837,9 +837,9 @@ CONTAINS
 
       factor = 0.0_dp
 
-      IF ((b .EQ. a+1 .OR. b .EQ. a-2) .AND. (c .EQ. b+1 .OR. c .EQ. b-2)) THEN
+      IF ((b .EQ. a + 1 .OR. b .EQ. a - 2) .AND. (c .EQ. b + 1 .OR. c .EQ. b - 2)) THEN
          factor = 1.0_dp
-      ELSEIF ((b .EQ. a-1 .OR. b .EQ. a+2) .AND. (c .EQ. b-1 .OR. c .EQ. b+2)) THEN
+      ELSEIF ((b .EQ. a - 1 .OR. b .EQ. a + 2) .AND. (c .EQ. b - 1 .OR. c .EQ. b + 2)) THEN
          factor = -1.0_dp
       END IF
 
@@ -865,12 +865,12 @@ CONTAINS
          l(ii) = 1
       ELSEIF (ii == iii) THEN
          l(ii) = 2
-         i = coset(l(1), l(2), l(3))-1
+         i = coset(l(1), l(2), l(3)) - 1
       ELSE
          l(ii) = 1
          l(iii) = 1
       ENDIF
-      i = coset(l(1), l(2), l(3))-1
+      i = coset(l(1), l(2), l(3)) - 1
    END FUNCTION ind_m2
 
 ! **************************************************************************************************
@@ -908,11 +908,11 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: i1, i2
       INTEGER, INTENT(OUT)                               :: i3
 
-      IF ((i1+i2) == 3) THEN
+      IF ((i1 + i2) == 3) THEN
          i3 = 3
-      ELSEIF ((i1+i2) == 4) THEN
+      ELSEIF ((i1 + i2) == 4) THEN
          i3 = 2
-      ELSEIF ((i1+i2) == 5) THEN
+      ELSEIF ((i1 + i2) == 5) THEN
          i3 = 1
       ELSE
       END IF

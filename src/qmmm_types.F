@@ -8,18 +8,18 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE qmmm_types
-   USE cp_subsys_types,                 ONLY: cp_subsys_type
-   USE fist_energy_types,               ONLY: fist_energy_type
-   USE fist_environment_types,          ONLY: fist_env_get,&
-                                              fist_env_release,&
-                                              fist_environment_type
-   USE kinds,                           ONLY: dp
-   USE qmmm_types_low,                  ONLY: qmmm_env_qm_release,&
-                                              qmmm_env_qm_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_env_release,&
-                                              qs_environment_type
+   USE cp_subsys_types, ONLY: cp_subsys_type
+   USE fist_energy_types, ONLY: fist_energy_type
+   USE fist_environment_types, ONLY: fist_env_get, &
+                                     fist_env_release, &
+                                     fist_environment_type
+   USE kinds, ONLY: dp
+   USE qmmm_types_low, ONLY: qmmm_env_qm_release, &
+                             qmmm_env_qm_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_env_release, &
+                                   qs_environment_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -72,7 +72,7 @@ CONTAINS
          ! for conventional QM/MM, and force-mixing knows to put relevant energy there.
          CALL fist_env_get(qmmm_env%fist_env, thermo=thermo)
          CALL get_qs_env(qmmm_env%qs_env, energy=qs_energy)
-         potential_energy = thermo%pot+qs_energy%total
+         potential_energy = thermo%pot + qs_energy%total
       ENDIF
    END SUBROUTINE qmmm_env_get
 
@@ -85,11 +85,11 @@ CONTAINS
       TYPE(qmmm_env_type), POINTER                       :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(qmmm_env)) THEN
          CPASSERT(qmmm_env%ref_count > 0)
-         qmmm_env%ref_count = qmmm_env%ref_count-1
+         qmmm_env%ref_count = qmmm_env%ref_count - 1
          IF (qmmm_env%ref_count == 0) THEN
             CALL qs_env_release(qmmm_env%qs_env)
             CALL qmmm_env_qm_release(qmmm_env%qm)
@@ -109,11 +109,11 @@ CONTAINS
       TYPE(qmmm_env_type), POINTER                       :: qmmm_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qmmm_env_retain', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(qmmm_env))
       CPASSERT(qmmm_env%ref_count > 0)
-      qmmm_env%ref_count = qmmm_env%ref_count+1
+      qmmm_env%ref_count = qmmm_env%ref_count + 1
    END SUBROUTINE qmmm_env_retain
 
 END MODULE qmmm_types

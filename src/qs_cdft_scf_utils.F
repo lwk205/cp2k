@@ -10,27 +10,27 @@
 !> \author Nico Holmberg (03.2018)
 ! **************************************************************************************************
 MODULE qs_cdft_scf_utils
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_files,                        ONLY: close_file,&
-                                              get_unit_number,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_logger_create,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE input_constants,                 ONLY: &
-        broyden_type_1, broyden_type_1_explicit, broyden_type_1_explicit_ls, broyden_type_1_ls, &
-        broyden_type_2, broyden_type_2_explicit, broyden_type_2_explicit_ls, broyden_type_2_ls, &
-        jacobian_fd1, jacobian_fd1_backward, jacobian_fd1_central, jacobian_fd2, &
-        jacobian_fd2_backward, outer_scf_optimizer_broyden, outer_scf_optimizer_newton, &
-        outer_scf_optimizer_newton_ls
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE mathlib,                         ONLY: invert_matrix
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE scf_control_types,               ONLY: scf_control_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_files, ONLY: close_file, &
+                       get_unit_number, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_logger_create, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE input_constants, ONLY: &
+      broyden_type_1, broyden_type_1_explicit, broyden_type_1_explicit_ls, broyden_type_1_ls, &
+      broyden_type_2, broyden_type_2_explicit, broyden_type_2_explicit_ls, broyden_type_2_ls, &
+      jacobian_fd1, jacobian_fd1_backward, jacobian_fd1_central, jacobian_fd2, &
+      jacobian_fd2_backward, outer_scf_optimizer_broyden, outer_scf_optimizer_newton, &
+      outer_scf_optimizer_newton_ls
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE mathlib, ONLY: invert_matrix
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE scf_control_types, ONLY: scf_control_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -65,7 +65,7 @@ CONTAINS
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: coeff, step_multiplier, dh
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'prepare_jacobian_stencil', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=15)                                  :: fmt_code
       INTEGER                                            :: ivar
@@ -207,7 +207,7 @@ CONTAINS
       LOGICAL                                            :: used_history
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'build_diagonal_jacobian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ihistory, nvar, outer_scf_ihistory
       LOGICAL                                            :: use_md_history
@@ -233,14 +233,14 @@ CONTAINS
          use_md_history = .TRUE.
          ! Check that none of the history values are identical in which case we should try something different
          DO i = 1, nvar
-            IF (ABS(variable_history(i, 2)-variable_history(i, 1)) .LT. 1.0E-12_dp) &
+            IF (ABS(variable_history(i, 2) - variable_history(i, 1)) .LT. 1.0E-12_dp) &
                use_md_history = .FALSE.
          END DO
          IF (use_md_history) THEN
             ALLOCATE (jacobian(nvar, nvar))
             DO i = 1, nvar
-               jacobian(i, i) = (gradient_history(i, 2)-gradient_history(i, 1))/ &
-                                (variable_history(i, 2)-variable_history(i, 1))
+               jacobian(i, i) = (gradient_history(i, 2) - gradient_history(i, 1))/ &
+                                (variable_history(i, 2) - variable_history(i, 1))
             END DO
             IF (.NOT. ASSOCIATED(scf_env%outer_scf%inv_jacobian)) &
                ALLOCATE (scf_env%outer_scf%inv_jacobian(nvar, nvar))
@@ -263,8 +263,8 @@ CONTAINS
                           "to 3 for optimizers that build the Jacobian from SCF history.")
          ALLOCATE (jacobian(nvar, nvar))
          DO i = 1, nvar
-            jacobian(i, i) = (scf_env%outer_scf%gradient(i, ihistory)-scf_env%outer_scf%gradient(i, ihistory-1))/ &
-                             (scf_env%outer_scf%variables(i, ihistory)-scf_env%outer_scf%variables(i, ihistory-1))
+            jacobian(i, i) = (scf_env%outer_scf%gradient(i, ihistory) - scf_env%outer_scf%gradient(i, ihistory - 1))/ &
+                             (scf_env%outer_scf%variables(i, ihistory) - scf_env%outer_scf%variables(i, ihistory - 1))
          END DO
          IF (.NOT. ASSOCIATED(scf_env%outer_scf%inv_jacobian)) &
             ALLOCATE (scf_env%outer_scf%inv_jacobian(nvar, nvar))
@@ -288,7 +288,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'restart_inverse_jacobian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iwork, j, nvar
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: inv_jacobian
@@ -311,7 +311,7 @@ CONTAINS
       DO i = 1, nvar
          DO j = 1, nvar
             inv_jacobian(i, j) = scf_control%outer_scf%cdft_opt_control%jacobian_vector(iwork)
-            iwork = iwork+1
+            iwork = iwork + 1
          END DO
       END DO
       DEALLOCATE (scf_control%outer_scf%cdft_opt_control%jacobian_vector)
@@ -336,7 +336,7 @@ CONTAINS
       INTEGER                                            :: iter_count
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_inverse_jacobian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=default_path_length)                 :: project_name
       INTEGER                                            :: i, j, lp, nvar, output_unit
@@ -345,7 +345,7 @@ CONTAINS
       output_unit = get_unit_number()
       project_name = logger%iter_info%project_name
       lp = LEN_TRIM(project_name)
-      project_name(lp+1:LEN(project_name)) = ".inverseJacobian"
+      project_name(lp + 1:LEN(project_name)) = ".inverseJacobian"
       CALL open_file(file_name=project_name, file_status="UNKNOWN", &
                      file_action="WRITE", file_position="APPEND", &
                      unit_number=output_unit)
@@ -377,13 +377,13 @@ CONTAINS
       TYPE(cp_logger_type), INTENT(OUT), POINTER         :: tmp_logger
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_tmp_logger', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: lp
 
       IF (para_env%mepos == para_env%source) THEN
          lp = LEN_TRIM(project_name)
-         project_name(lp+1:LEN(project_name)) = suffix
+         project_name(lp + 1:LEN(project_name)) = suffix
          CALL open_file(file_name=project_name, file_status="UNKNOWN", &
                         file_action="WRITE", file_position="APPEND", &
                         unit_number=output_unit)
@@ -415,7 +415,7 @@ CONTAINS
                                                             used_history
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'initialize_inverse_jacobian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(scf_control))
       CPASSERT(ASSOCIATED(scf_env))

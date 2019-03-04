@@ -7,41 +7,41 @@
 !> \brief methods for deltaSCF calculations
 ! **************************************************************************************************
 MODULE qs_mom_methods
-   USE bibliography,                    ONLY: Barca2018,&
-                                              Gilbert2008,&
-                                              cite_reference
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_dbcsr_operations,             ONLY: cp_dbcsr_sm_fm_multiply
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_maxabsval,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type,&
-                                              cp_fm_vectorsnorm,&
-                                              cp_fm_vectorssum
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE input_constants,                 ONLY: momproj_norm,&
-                                              momproj_sum,&
-                                              momtype_imom,&
-                                              momtype_mom
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: dp
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type,&
-                                              set_mo_set
-   USE qs_scf_diagonalization,          ONLY: general_eigenproblem
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
-   USE scf_control_types,               ONLY: scf_control_type
-   USE string_utilities,                ONLY: integer_to_string
-   USE util,                            ONLY: sort,&
-                                              sort_unique
+   USE bibliography, ONLY: Barca2018, &
+                           Gilbert2008, &
+                           cite_reference
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_dbcsr_operations, ONLY: cp_dbcsr_sm_fm_multiply
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_maxabsval, &
+                          cp_fm_to_fm, &
+                          cp_fm_type, &
+                          cp_fm_vectorsnorm, &
+                          cp_fm_vectorssum
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE input_constants, ONLY: momproj_norm, &
+                              momproj_sum, &
+                              momtype_imom, &
+                              momtype_mom
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: dp
+   USE qs_mo_methods, ONLY: calculate_density_matrix
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type, &
+                          set_mo_set
+   USE qs_scf_diagonalization, ONLY: general_eigenproblem
+   USE qs_scf_types, ONLY: qs_scf_env_type
+   USE scf_control_types, ONLY: scf_control_type
+   USE string_utilities, ONLY: integer_to_string
+   USE util, ONLY: sort, &
+                   sort_unique
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -70,7 +70,7 @@ CONTAINS
       LOGICAL                                            :: is_unique
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mom_is_unique_orbital_indices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, norbs
       INTEGER, DIMENSION(:), POINTER                     :: tmp_iarr
@@ -118,7 +118,7 @@ CONTAINS
       CHARACTER(len=*), INTENT(in)                       :: spin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mom_reoccupy_orbitals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=10)                                  :: str_iorb, str_norbs
       CHARACTER(len=3)                                   :: str_prefix
@@ -171,8 +171,8 @@ CONTAINS
                iorb = occ_orb_set(norbs)
             ENDIF
 
-            IF (iorb-nmo > 1) THEN
-               CALL integer_to_string(iorb-nmo, str_iorb)
+            IF (iorb - nmo > 1) THEN
+               CALL integer_to_string(iorb - nmo, str_iorb)
                str_prefix = 's'
             ELSE
                str_iorb = 'an'

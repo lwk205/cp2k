@@ -8,62 +8,62 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE pao_methods
-   USE ao_util,                         ONLY: exp_radius
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: gto_basis_set_type
-   USE bibliography,                    ONLY: Kolafa2004,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_binary_read, dbcsr_checksum, dbcsr_complete_redistribute, &
-        dbcsr_copy_into_existing, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_get, &
-        dbcsr_distribution_new, dbcsr_distribution_type, dbcsr_filter, dbcsr_get_block_p, &
-        dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_scale, dbcsr_set, &
-        dbcsr_trace, dbcsr_type
-   USE dm_ls_scf_methods,               ONLY: density_matrix_trs4,&
-                                              ls_scf_init_matrix_S
-   USE dm_ls_scf_qs,                    ONLY: ls_scf_dm_to_ks,&
-                                              ls_scf_qs_atomic_guess,&
-                                              matrix_decluster,&
-                                              matrix_ls_to_qs,&
-                                              matrix_qs_to_ls
-   USE dm_ls_scf_types,                 ONLY: ls_mstruct_type,&
-                                              ls_scf_env_type
-   USE iterate_matrix,                  ONLY: purify_mcweeny
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE machine,                         ONLY: m_walltime
-   USE mathlib,                         ONLY: binomial,&
-                                              diamat_all
-   USE message_passing,                 ONLY: mp_max,&
-                                              mp_sum
-   USE pao_ml,                          ONLY: pao_ml_forces
-   USE pao_param,                       ONLY: pao_calc_U,&
-                                              pao_param_count,&
-                                              pao_update_AB
-   USE pao_types,                       ONLY: pao_env_type
-   USE particle_types,                  ONLY: particle_type
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_initial_guess,                ONLY: calculate_atomic_fock_matrix
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              pao_descriptor_type,&
-                                              pao_potential_type,&
-                                              qs_kind_type,&
-                                              set_qs_kind
-   USE qs_ks_methods,                   ONLY: qs_ks_update_qs_env
-   USE qs_ks_types,                     ONLY: qs_ks_did_change
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
+   USE ao_util, ONLY: exp_radius
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: gto_basis_set_type
+   USE bibliography, ONLY: Kolafa2004, &
+                           cite_reference
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_binary_read, dbcsr_checksum, dbcsr_complete_redistribute, &
+      dbcsr_copy_into_existing, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_get, &
+      dbcsr_distribution_new, dbcsr_distribution_type, dbcsr_filter, dbcsr_get_block_p, &
+      dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_scale, dbcsr_set, &
+      dbcsr_trace, dbcsr_type
+   USE dm_ls_scf_methods, ONLY: density_matrix_trs4, &
+                                ls_scf_init_matrix_S
+   USE dm_ls_scf_qs, ONLY: ls_scf_dm_to_ks, &
+                           ls_scf_qs_atomic_guess, &
+                           matrix_decluster, &
+                           matrix_ls_to_qs, &
+                           matrix_qs_to_ls
+   USE dm_ls_scf_types, ONLY: ls_mstruct_type, &
+                              ls_scf_env_type
+   USE iterate_matrix, ONLY: purify_mcweeny
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE machine, ONLY: m_walltime
+   USE mathlib, ONLY: binomial, &
+                      diamat_all
+   USE message_passing, ONLY: mp_max, &
+                              mp_sum
+   USE pao_ml, ONLY: pao_ml_forces
+   USE pao_param, ONLY: pao_calc_U, &
+                        pao_param_count, &
+                        pao_update_AB
+   USE pao_types, ONLY: pao_env_type
+   USE particle_types, ONLY: particle_type
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_initial_guess, ONLY: calculate_atomic_fock_matrix
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            pao_descriptor_type, &
+                            pao_potential_type, &
+                            qs_kind_type, &
+                            set_qs_kind
+   USE qs_ks_methods, ONLY: qs_ks_update_qs_env
+   USE qs_ks_types, ONLY: qs_ks_did_change
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
 
 !$ USE OMP_LIB, ONLY: omp_get_level
 #include "./base/base_uses.f90"
@@ -138,7 +138,7 @@ CONTAINS
       TYPE(pao_env_type), POINTER                        :: pao
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_print_atom_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, natoms
       INTEGER, DIMENSION(:), POINTER                     :: pao_basis, param_cols, param_rows, &
@@ -219,8 +219,8 @@ CONTAINS
             v = SQRT(evals(k))
             DO i = 1, N
                DO j = 1, N
-                  block_N(i, j) = block_N(i, j)+w*A(i, k)*A(j, k)
-                  block_N_inv(i, j) = block_N_inv(i, j)+v*A(i, k)*A(j, k)
+                  block_N(i, j) = block_N(i, j) + w*A(i, k)*A(j, k)
+                  block_N_inv(i, j) = block_N_inv(i, j) + v*A(i, k)*A(j, k)
                ENDDO
             ENDDO
          ENDDO
@@ -335,8 +335,8 @@ CONTAINS
       ! create new mapping of matrix-grid to processor-grid
       ALLOCATE (diag_row_dist(natoms), diag_col_dist(natoms))
       DO iatom = 1, natoms
-         diag_row_dist(iatom) = MOD(iatom-1, pgrid_rows)
-         diag_col_dist(iatom) = MOD((iatom-1)/pgrid_rows, pgrid_cols)
+         diag_row_dist(iatom) = MOD(iatom - 1, pgrid_rows)
+         diag_col_dist(iatom) = MOD((iatom - 1)/pgrid_rows, pgrid_cols)
       ENDDO
 
       ! instanciate distribution object
@@ -446,10 +446,10 @@ CONTAINS
       REAL(KIND=dp)                                      :: energy_diff, loop_eps, now, time_diff
 
       ! calculate progress
-      energy_diff = new_energy-pao%energy_prev
+      energy_diff = new_energy - pao%energy_prev
       pao%energy_prev = new_energy
       now = m_walltime()
-      time_diff = now-pao%step_start_time
+      time_diff = now - pao%step_start_time
       pao%step_start_time = now
 
       ! convergence criterion
@@ -485,7 +485,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT)                         :: energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_calc_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       REAL(KIND=dp)                                      :: penalty, trace_PH
@@ -505,11 +505,11 @@ CONTAINS
       energy = 0.0_dp
       DO ispin = 1, ls_scf_env%nspins
          CALL dbcsr_trace(ls_scf_env%matrix_p(ispin), ls_scf_env%matrix_ks(ispin), trace_PH)
-         energy = energy+trace_PH
+         energy = energy + trace_PH
       ENDDO
 
       ! add penalty term
-      energy = energy+penalty
+      energy = energy + penalty
 
       IF (pao%iw > 0) THEN
          WRITE (pao%iw, *) ""
@@ -526,7 +526,7 @@ CONTAINS
       TYPE(ls_scf_env_type)                              :: ls_scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_check_trace_PS', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       REAL(KIND=dp)                                      :: tmp, trace_PS
@@ -539,12 +539,12 @@ CONTAINS
       trace_PS = 0.0_dp
       DO ispin = 1, ls_scf_env%nspins
          CALL dbcsr_trace(ls_scf_env%matrix_p(ispin), matrix_S_desym, tmp)
-         trace_PS = trace_PS+tmp
+         trace_PS = trace_PS + tmp
       ENDDO
 
       CALL dbcsr_release(matrix_S_desym)
 
-      IF (ABS(ls_scf_env%nelectron_total-trace_PS) > 0.5) &
+      IF (ABS(ls_scf_env%nelectron_total - trace_PS) > 0.5) &
          CPABORT("Number of electrons wrong. Trace(PS) ="//cp_to_string(trace_PS))
 
       CALL timestop(handle)
@@ -560,7 +560,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_read_preopt_dm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       REAL(KIND=dp)                                      :: cs_pos
@@ -687,16 +687,16 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: matrix_M_diag
 
       CHARACTER(len=*), PARAMETER :: routineN = 'pao_calc_outer_grad_lnv', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nspin
       INTEGER, DIMENSION(:), POINTER                     :: pao_blk_sizes
       REAL(KIND=dp)                                      :: filter_eps
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_ks, matrix_s, rho_ao
       TYPE(dbcsr_type) :: matrix_HB, matrix_HPS, matrix_M, matrix_M1, matrix_M1_dc, matrix_M2, &
-         matrix_M2_dc, matrix_M3, matrix_M3_dc, matrix_NHB, matrix_NHBM2, matrix_NPA, &
-         matrix_NPAM1, matrix_NSB, matrix_NSBM3, matrix_PA, matrix_PH, matrix_PHP, matrix_PSP, &
-         matrix_SB, matrix_SP
+                          matrix_M2_dc, matrix_M3, matrix_M3_dc, matrix_NHB, matrix_NHBM2, matrix_NPA, &
+                          matrix_NPAM1, matrix_NSB, matrix_NSBM3, matrix_PA, matrix_PH, matrix_PHP, matrix_PSP, &
+                          matrix_SB, matrix_SP
       TYPE(dft_control_type), POINTER                    :: dft_control
       TYPE(ls_mstruct_type), POINTER                     :: ls_mstruct
       TYPE(pao_env_type), POINTER                        :: pao
@@ -953,23 +953,23 @@ CONTAINS
                SELECT CASE (pao%num_grad_order)
                CASE (2) ! calculate derivative to 2th order
                   Gij_num = -eval_point(block_X, i, j, -eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num+eval_point(block_X, i, j, +eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num + eval_point(block_X, i, j, +eps, pao, ls_scf_env, qs_env)
                   Gij_num = Gij_num/(2.0_dp*eps)
 
                CASE (4) ! calculate derivative to 4th order
                   Gij_num = eval_point(block_X, i, j, -2_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num-8_dp*eval_point(block_X, i, j, -1_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num+8_dp*eval_point(block_X, i, j, +1_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num-eval_point(block_X, i, j, +2_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num - 8_dp*eval_point(block_X, i, j, -1_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num + 8_dp*eval_point(block_X, i, j, +1_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num - eval_point(block_X, i, j, +2_dp*eps, pao, ls_scf_env, qs_env)
                   Gij_num = Gij_num/(12.0_dp*eps)
 
                CASE (6) ! calculate derivative to 6th order
                   Gij_num = -1_dp*eval_point(block_X, i, j, -3_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num+9_dp*eval_point(block_X, i, j, -2_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num-45_dp*eval_point(block_X, i, j, -1_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num+45_dp*eval_point(block_X, i, j, +1_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num-9_dp*eval_point(block_X, i, j, +2_dp*eps, pao, ls_scf_env, qs_env)
-                  Gij_num = Gij_num+1_dp*eval_point(block_X, i, j, +3_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num + 9_dp*eval_point(block_X, i, j, -2_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num - 45_dp*eval_point(block_X, i, j, -1_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num + 45_dp*eval_point(block_X, i, j, +1_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num - 9_dp*eval_point(block_X, i, j, +2_dp*eps, pao, ls_scf_env, qs_env)
+                  Gij_num = Gij_num + 1_dp*eval_point(block_X, i, j, +3_dp*eps, pao, ls_scf_env, qs_env)
                   Gij_num = Gij_num/(60.0_dp*eps)
 
                CASE DEFAULT
@@ -977,7 +977,7 @@ CONTAINS
                END SELECT
 
                IF (ASSOCIATED(block_X)) THEN
-                  delta = ABS(Gij_num-block_G(i, j))
+                  delta = ABS(Gij_num - block_G(i, j))
                   delta_max = MAX(delta_max, delta)
                   !WRITE (*,*) "gradient check", iatom, i, j, Gij_num, block_G(i,j), delta
                ENDIF
@@ -1019,7 +1019,7 @@ CONTAINS
 
       IF (ASSOCIATED(block_X)) THEN
          old_Xij = block_X(i, j) ! backup old block_X
-         block_X(i, j) = block_X(i, j)+eps ! add pertubation
+         block_X(i, j) = block_X(i, j) + eps ! add pertubation
       ENDIF
 
       ! calculate energy
@@ -1055,8 +1055,8 @@ CONTAINS
       pao => ls_scf_env%pao_env
       CALL get_qs_env(qs_env, dft_control=dft_control, matrix_s=matrix_s)
 
-      ls_scf_env%scf_history%istore = ls_scf_env%scf_history%istore+1
-      istore = MOD(ls_scf_env%scf_history%istore-1, ls_scf_env%scf_history%nstore)+1
+      ls_scf_env%scf_history%istore = ls_scf_env%scf_history%istore + 1
+      istore = MOD(ls_scf_env%scf_history%istore - 1, ls_scf_env%scf_history%nstore) + 1
       IF (pao%iw > 0) WRITE (pao%iw, *) "PAO| Storing density matrix for ASPC guess in slot:", istore
 
       ! initialize storage
@@ -1150,9 +1150,9 @@ CONTAINS
          ! actual extrapolation
          CALL dbcsr_set(matrix_P, 0.0_dp)
          DO iaspc = 1, naspc
-            alpha = (-1.0_dp)**(iaspc+1)*REAL(iaspc, KIND=dp)* &
-                    binomial(2*naspc, naspc-iaspc)/binomial(2*naspc-2, naspc-1)
-            istore = MOD(ls_scf_env%scf_history%istore-iaspc, ls_scf_env%scf_history%nstore)+1
+            alpha = (-1.0_dp)**(iaspc + 1)*REAL(iaspc, KIND=dp)* &
+                    binomial(2*naspc, naspc - iaspc)/binomial(2*naspc - 2, naspc - 1)
+            istore = MOD(ls_scf_env%scf_history%istore - iaspc, ls_scf_env%scf_history%nstore) + 1
             CALL dbcsr_add(matrix_P, ls_scf_env%scf_history%matrix(ispin, istore), 1.0_dp, alpha)
          ENDDO
 
@@ -1229,7 +1229,7 @@ CONTAINS
 
       CALL mp_sum(forces, para_env%group)
       DO iatom = 1, natoms
-         particle_set(iatom)%f = particle_set(iatom)%f+forces(iatom, :)
+         particle_set(iatom)%f = particle_set(iatom)%f + forces(iatom, :)
       ENDDO
 
       DEALLOCATE (forces)

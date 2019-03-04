@@ -17,26 +17,26 @@
 !> \author fawzi
 ! **************************************************************************************************
 MODULE replica_types
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_rm_iter_level
-   USE cp_para_env,                     ONLY: cp_cart_release,&
-                                              cp_para_env_release
-   USE cp_para_types,                   ONLY: cp_para_cart_type,&
-                                              cp_para_env_type
-   USE cp_result_methods,               ONLY: cp_results_mp_bcast
-   USE cp_result_types,                 ONLY: cp_result_p_type,&
-                                              cp_result_release
-   USE f77_interface,                   ONLY: destroy_force_env,&
-                                              f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_sum
-   USE qs_wf_history_types,             ONLY: qs_wf_history_p_type,&
-                                              wfi_release
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_rm_iter_level
+   USE cp_para_env, ONLY: cp_cart_release, &
+                          cp_para_env_release
+   USE cp_para_types, ONLY: cp_para_cart_type, &
+                            cp_para_env_type
+   USE cp_result_methods, ONLY: cp_results_mp_bcast
+   USE cp_result_types, ONLY: cp_result_p_type, &
+                              cp_result_release
+   USE f77_interface, ONLY: destroy_force_env, &
+                            f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE message_passing, ONLY: mp_sum
+   USE qs_wf_history_types, ONLY: qs_wf_history_p_type, &
+                                  wfi_release
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -137,14 +137,14 @@ CONTAINS
       TYPE(replica_env_type), POINTER                    :: rep_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ierr
 
       CALL timeset(routineN, handle)
       IF (ASSOCIATED(rep_env)) THEN
          CPASSERT(rep_env%ref_count > 0)
-         rep_env%ref_count = rep_env%ref_count-1
+         rep_env%ref_count = rep_env%ref_count - 1
          IF (rep_env%ref_count == 0) THEN
             CALL rep_env_destroy_low(rep_env%id_nr, ierr)
             IF (rep_env%f_env_id > 0) THEN
@@ -201,7 +201,7 @@ CONTAINS
       INTEGER, INTENT(out)                               :: ierr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_destroy_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: stat
       TYPE(cp_logger_type), POINTER                      :: logger
@@ -261,7 +261,7 @@ CONTAINS
       TYPE(cp_result_p_type), DIMENSION(:), POINTER      :: results
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_env_sync_results', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, irep, nrep, source
 
@@ -294,7 +294,7 @@ CONTAINS
       TYPE(replica_env_type), POINTER                    :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_envs_get_rep_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -322,7 +322,7 @@ CONTAINS
       TYPE(replica_env_type), POINTER                    :: rep_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_envs_add_rep_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, stat
       TYPE(replica_env_p_type), DIMENSION(:), POINTER    :: new_rep_envs
@@ -335,7 +335,7 @@ CONTAINS
                IF (.NOT. ASSOCIATED(rep_envs)) THEN
                   ALLOCATE (rep_envs(1))
                ELSE
-                  ALLOCATE (new_rep_envs(SIZE(rep_envs)+1))
+                  ALLOCATE (new_rep_envs(SIZE(rep_envs) + 1))
                   DO i = 1, SIZE(rep_envs)
                      new_rep_envs(i)%rep_env => rep_envs(i)%rep_env
                   END DO
@@ -360,18 +360,18 @@ CONTAINS
       TYPE(replica_env_type), POINTER                    :: rep_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'rep_envs_rm_rep_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ii
       TYPE(replica_env_p_type), DIMENSION(:), POINTER    :: new_rep_envs
 
       IF (ASSOCIATED(rep_env)) THEN
          CPASSERT(module_initialized)
-         ALLOCATE (new_rep_envs(SIZE(rep_envs)-1))
+         ALLOCATE (new_rep_envs(SIZE(rep_envs) - 1))
          ii = 0
          DO i = 1, SIZE(rep_envs)
             IF (rep_envs(i)%rep_env%id_nr /= rep_env%id_nr) THEN
-               ii = ii+1
+               ii = ii + 1
                new_rep_envs(ii)%rep_env => rep_envs(i)%rep_env
             END IF
          END DO

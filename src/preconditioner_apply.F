@@ -11,25 +11,25 @@
 !> \author Joost VandeVondele (09.2002)
 ! **************************************************************************************************
 MODULE preconditioner_apply
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_restore
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
-        dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_release, dbcsr_type
-   USE input_constants,                 ONLY: ot_precond_full_all,&
-                                              ot_precond_full_kinetic,&
-                                              ot_precond_full_single,&
-                                              ot_precond_full_single_inverse,&
-                                              ot_precond_s_inverse,&
-                                              ot_precond_solver_direct,&
-                                              ot_precond_solver_inv_chol,&
-                                              ot_precond_solver_update
-   USE kinds,                           ONLY: dp
-   USE preconditioner_types,            ONLY: preconditioner_type
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_restore
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
+      dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_release, dbcsr_type
+   USE input_constants, ONLY: ot_precond_full_all, &
+                              ot_precond_full_kinetic, &
+                              ot_precond_full_single, &
+                              ot_precond_full_single_inverse, &
+                              ot_precond_s_inverse, &
+                              ot_precond_solver_direct, &
+                              ot_precond_solver_inv_chol, &
+                              ot_precond_solver_update
+   USE kinds, ONLY: dp
+   USE preconditioner_types, ONLY: preconditioner_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -53,7 +53,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: matrix_in, matrix_out
 
       CHARACTER(len=*), PARAMETER :: routineN = 'apply_preconditioner_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -95,7 +95,7 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: matrix_in, matrix_out
 
       CHARACTER(len=*), PARAMETER :: routineN = 'apply_preconditioner_dbcsr', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -138,7 +138,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: matrix_in, matrix_out
 
       CHARACTER(len=*), PARAMETER :: routineN = 'apply_full_single', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, k, n
 
@@ -190,7 +190,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: matrix_in, matrix_out
 
       CHARACTER(len=*), PARAMETER :: routineN = 'apply_full_direct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, k, n
       TYPE(cp_fm_type), POINTER                          :: work
@@ -246,7 +246,7 @@ CONTAINS
       DO j = 1, ncol_local
       DO i = 1, nrow_local
          dum = 1.0_dp/MAX(preconditioner_env%energy_gap, &
-                          preconditioner_env%full_evals(row_indices(i))-preconditioner_env%occ_evals(col_indices(j)))
+                          preconditioner_env%full_evals(row_indices(i)) - preconditioner_env%occ_evals(col_indices(j)))
          local_data(i, j) = local_data(i, j)*dum
       ENDDO
       ENDDO
@@ -295,8 +295,8 @@ CONTAINS
          DO j = 1, col_size
          DO i = 1, row_size
             dum = 1.0_dp/MAX(preconditioner_env%energy_gap, &
-                             preconditioner_env%full_evals(row_offset+i-1) &
-                             -preconditioner_env%occ_evals(col_offset+j-1))
+                             preconditioner_env%full_evals(row_offset + i - 1) &
+                             - preconditioner_env%occ_evals(col_offset + j - 1))
             DATA(i, j) = DATA(i, j)*dum
          ENDDO
          ENDDO

@@ -5,135 +5,135 @@
 
 ! **************************************************************************************************
 MODULE cp2k_runs
-   USE dbcsr_acc_device,                ONLY: acc_get_ndevices,&
-                                              acc_set_active_device
-   USE atom,                            ONLY: atom_code
-   USE bibliography,                    ONLY: Hutter2014,&
-                                              cite_reference
-   USE bsse,                            ONLY: do_bsse_calculation
-   USE cell_opt,                        ONLY: cp_cell_opt
-   USE cp2k_debug,                      ONLY: cp2k_debug_energy_and_forces
-   USE cp2k_info,                       ONLY: compile_date,&
-                                              compile_revision,&
-                                              cp2k_version,&
-                                              cp2k_year
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_config
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_failure_level,&
-                                              cp_get_default_logger,&
-                                              cp_logger_get_default_io_unit,&
-                                              cp_logger_type,&
-                                              cp_logger_would_log,&
-                                              cp_note_level
-   USE cp_output_handling,              ONLY: cp_add_iter_level,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr,&
-                                              cp_rm_iter_level
-   USE cp_para_env,                     ONLY: cp_para_env_create,&
-                                              cp_para_env_release,&
-                                              cp_para_env_retain
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_parser_methods,               ONLY: parser_search_string
-   USE cp_parser_types,                 ONLY: cp_parser_type,&
-                                              parser_create,&
-                                              parser_release
-   USE cp_units,                        ONLY: cp_unit_set_create,&
-                                              cp_unit_set_release,&
-                                              cp_unit_set_type,&
-                                              print_all_units
-   USE cuda_profiling,                  ONLY: cuda_nvtx_init
-   USE dbcsr_api,                       ONLY: dbcsr_finalize_lib,&
-                                              dbcsr_init_lib,&
-                                              dbcsr_print_config
-   USE environment,                     ONLY: cp2k_finalize,&
-                                              cp2k_init,&
-                                              cp2k_read,&
-                                              cp2k_setup
-   USE f77_interface,                   ONLY: create_force_env,&
-                                              destroy_force_env,&
-                                              f77_default_para_env => default_para_env,&
-                                              f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE farming_methods,                 ONLY: do_deadlock,&
-                                              do_nothing,&
-                                              do_wait,&
-                                              farming_parse_input,&
-                                              get_next_job
-   USE farming_types,                   ONLY: deallocate_farming_env,&
-                                              farming_env_type,&
-                                              init_farming_env,&
-                                              job_finished,&
-                                              job_running
-   USE force_env_methods,               ONLY: force_env_calc_energy_force
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type
-   USE geo_opt,                         ONLY: cp_geo_opt
-   USE global_types,                    ONLY: global_environment_type,&
-                                              globenv_create,&
-                                              globenv_release,&
-                                              globenv_retain
-   USE input_constants,                 ONLY: &
-        bsse_run, cell_opt_run, debug_run, do_atom, do_band, do_cp2k, do_farming, do_fist, &
-        do_mixed, do_opt_basis, do_optimize_input, do_qmmm, do_qs, do_sirius, do_swarm, do_tamc, do_test, &
-        do_embed, do_tree_mc, do_tree_mc_ana, driver_run, ehrenfest, electronic_spectra_run, &
-        energy_force_run, energy_run, geo_opt_run, linear_response_run, mol_dyn_run, mon_car_run, &
-        none_run, pint_run, real_time_propagation, tree_mc_run, vib_anal, negf_run
-   USE input_cp2k,                      ONLY: create_cp2k_root_section
-   USE input_cp2k_check,                ONLY: check_cp2k_input
-   USE input_cp2k_global,               ONLY: create_global_section
-   USE input_cp2k_read,                 ONLY: empty_initial_variables,&
-                                              read_input
-   USE input_keyword_types,             ONLY: keyword_release
-   USE input_parsing,                   ONLY: section_vals_parse
-   USE input_section_types,             ONLY: &
-        section_describe_html, section_describe_index_html, section_release, section_type, &
-        section_vals_create, section_vals_get_subs_vals, section_vals_release, &
-        section_vals_retain, section_vals_type, section_vals_val_get, section_vals_write, &
-        write_section_xml
-   USE ipi_driver,                      ONLY: run_driver
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp,&
-                                              int_8
-   USE library_tests,                   ONLY: lib_test
-   USE machine,                         ONLY: default_output_unit,&
-                                              m_chdir,&
-                                              m_flush,&
-                                              m_getcwd,&
-                                              m_memory,&
-                                              m_memory_max,&
-                                              m_walltime
-   USE mc_run,                          ONLY: do_mon_car
-   USE md_run,                          ONLY: qs_mol_dyn
-   USE message_passing,                 ONLY: &
-        mp_any_source, mp_bcast, mp_comm_dup, mp_comm_free, mp_comm_split, mp_environ, mp_max, &
-        mp_recv, mp_send, mp_sum, mp_sync
-   USE mscfg_methods,                   ONLY: do_mol_loop,&
-                                              loop_over_molecules
-   USE neb_methods,                     ONLY: neb
-   USE negf_methods,                    ONLY: do_negf
-   USE optimize_basis,                  ONLY: run_optimize_basis
-   USE optimize_input,                  ONLY: run_optimize_input
-   USE pint_methods,                    ONLY: do_pint_run
-   USE pw_cuda,                         ONLY: pw_cuda_finalize,&
-                                              pw_cuda_init
-   USE qs_environment_types,            ONLY: get_qs_env
-   USE qs_linres_module,                ONLY: linres_calculation
-   USE qs_tddfpt_module,                ONLY: tddfpt_calculation
-   USE reference_manager,               ONLY: print_all_references,&
-                                              print_format_html
-   USE rt_propagation,                  ONLY: rt_prop_setup
-   USE sirius_interface,                ONLY: cp_sirius_init, cp_sirius_finalize
-   USE string_utilities,                ONLY: html_entity_table,&
-                                              write_html_tables
-   USE swarm,                           ONLY: run_swarm
-   USE tamc_run,                        ONLY: qs_tamc
-   USE tmc_setup,                       ONLY: do_analyze_files,&
-                                              do_tmc
-   USE vibrational_analysis,            ONLY: vb_anal
+   USE dbcsr_acc_device, ONLY: acc_get_ndevices, &
+                               acc_set_active_device
+   USE atom, ONLY: atom_code
+   USE bibliography, ONLY: Hutter2014, &
+                           cite_reference
+   USE bsse, ONLY: do_bsse_calculation
+   USE cell_opt, ONLY: cp_cell_opt
+   USE cp2k_debug, ONLY: cp2k_debug_energy_and_forces
+   USE cp2k_info, ONLY: compile_date, &
+                        compile_revision, &
+                        cp2k_version, &
+                        cp2k_year
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_config
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_failure_level, &
+                              cp_get_default_logger, &
+                              cp_logger_get_default_io_unit, &
+                              cp_logger_type, &
+                              cp_logger_would_log, &
+                              cp_note_level
+   USE cp_output_handling, ONLY: cp_add_iter_level, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr, &
+                                 cp_rm_iter_level
+   USE cp_para_env, ONLY: cp_para_env_create, &
+                          cp_para_env_release, &
+                          cp_para_env_retain
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_parser_methods, ONLY: parser_search_string
+   USE cp_parser_types, ONLY: cp_parser_type, &
+                              parser_create, &
+                              parser_release
+   USE cp_units, ONLY: cp_unit_set_create, &
+                       cp_unit_set_release, &
+                       cp_unit_set_type, &
+                       print_all_units
+   USE cuda_profiling, ONLY: cuda_nvtx_init
+   USE dbcsr_api, ONLY: dbcsr_finalize_lib, &
+                        dbcsr_init_lib, &
+                        dbcsr_print_config
+   USE environment, ONLY: cp2k_finalize, &
+                          cp2k_init, &
+                          cp2k_read, &
+                          cp2k_setup
+   USE f77_interface, ONLY: create_force_env, &
+                            destroy_force_env, &
+                            f77_default_para_env => default_para_env, &
+                            f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE farming_methods, ONLY: do_deadlock, &
+                              do_nothing, &
+                              do_wait, &
+                              farming_parse_input, &
+                              get_next_job
+   USE farming_types, ONLY: deallocate_farming_env, &
+                            farming_env_type, &
+                            init_farming_env, &
+                            job_finished, &
+                            job_running
+   USE force_env_methods, ONLY: force_env_calc_energy_force
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type
+   USE geo_opt, ONLY: cp_geo_opt
+   USE global_types, ONLY: global_environment_type, &
+                           globenv_create, &
+                           globenv_release, &
+                           globenv_retain
+   USE input_constants, ONLY: &
+      bsse_run, cell_opt_run, debug_run, do_atom, do_band, do_cp2k, do_farming, do_fist, &
+      do_mixed, do_opt_basis, do_optimize_input, do_qmmm, do_qs, do_sirius, do_swarm, do_tamc, do_test, &
+      do_embed, do_tree_mc, do_tree_mc_ana, driver_run, ehrenfest, electronic_spectra_run, &
+      energy_force_run, energy_run, geo_opt_run, linear_response_run, mol_dyn_run, mon_car_run, &
+      none_run, pint_run, real_time_propagation, tree_mc_run, vib_anal, negf_run
+   USE input_cp2k, ONLY: create_cp2k_root_section
+   USE input_cp2k_check, ONLY: check_cp2k_input
+   USE input_cp2k_global, ONLY: create_global_section
+   USE input_cp2k_read, ONLY: empty_initial_variables, &
+                              read_input
+   USE input_keyword_types, ONLY: keyword_release
+   USE input_parsing, ONLY: section_vals_parse
+   USE input_section_types, ONLY: &
+      section_describe_html, section_describe_index_html, section_release, section_type, &
+      section_vals_create, section_vals_get_subs_vals, section_vals_release, &
+      section_vals_retain, section_vals_type, section_vals_val_get, section_vals_write, &
+      write_section_xml
+   USE ipi_driver, ONLY: run_driver
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp, &
+                    int_8
+   USE library_tests, ONLY: lib_test
+   USE machine, ONLY: default_output_unit, &
+                      m_chdir, &
+                      m_flush, &
+                      m_getcwd, &
+                      m_memory, &
+                      m_memory_max, &
+                      m_walltime
+   USE mc_run, ONLY: do_mon_car
+   USE md_run, ONLY: qs_mol_dyn
+   USE message_passing, ONLY: &
+      mp_any_source, mp_bcast, mp_comm_dup, mp_comm_free, mp_comm_split, mp_environ, mp_max, &
+      mp_recv, mp_send, mp_sum, mp_sync
+   USE mscfg_methods, ONLY: do_mol_loop, &
+                            loop_over_molecules
+   USE neb_methods, ONLY: neb
+   USE negf_methods, ONLY: do_negf
+   USE optimize_basis, ONLY: run_optimize_basis
+   USE optimize_input, ONLY: run_optimize_input
+   USE pint_methods, ONLY: do_pint_run
+   USE pw_cuda, ONLY: pw_cuda_finalize, &
+                      pw_cuda_init
+   USE qs_environment_types, ONLY: get_qs_env
+   USE qs_linres_module, ONLY: linres_calculation
+   USE qs_tddfpt_module, ONLY: tddfpt_calculation
+   USE reference_manager, ONLY: print_all_references, &
+                                print_format_html
+   USE rt_propagation, ONLY: rt_prop_setup
+   USE sirius_interface, ONLY: cp_sirius_init, cp_sirius_finalize
+   USE string_utilities, ONLY: html_entity_table, &
+                               write_html_tables
+   USE swarm, ONLY: run_swarm
+   USE tamc_run, ONLY: qs_tamc
+   USE tmc_setup, ONLY: do_analyze_files, &
+                        do_tmc
+   USE vibrational_analysis, ONLY: vb_anal
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -399,7 +399,7 @@ CONTAINS
       IF (output_unit > 0) THEN
          WRITE (output_unit, *)
          WRITE (output_unit, '(T2,"MEMORY| Estimated peak process memory [MiB]",T73,I8)') &
-            (m_memory_max_mpi+(1024*1024)-1)/(1024*1024)
+            (m_memory_max_mpi + (1024*1024) - 1)/(1024*1024)
       ENDIF
 
       IF (prog_name_id == do_cp2k) THEN
@@ -491,8 +491,8 @@ CONTAINS
          IF (output_unit > 0) WRITE (output_unit, FMT="(T2,A)") "FARMING| using a master-slave setup"
 
          ALLOCATE (master_slave_partition(0:1))
-         master_slave_partition = (/1, para_env%num_pe-1/)
-         ALLOCATE (group_distribution(0:para_env%num_pe-1))
+         master_slave_partition = (/1, para_env%num_pe - 1/)
+         ALLOCATE (group_distribution(0:para_env%num_pe - 1))
 
          CALL mp_comm_split(para_env%group, slave_group, ngroups, group_distribution, &
                             n_subgroups=2, group_partition=master_slave_partition)
@@ -506,10 +506,10 @@ CONTAINS
             ! on the master node, num_slaves corresponds to the size of the master group
             ! due to the mp_environ call.
             CPASSERT(num_slaves == 1)
-            num_slaves = para_env%num_pe-1
+            num_slaves = para_env%num_pe - 1
             slave_rank = -1
          ENDIF
-         CPASSERT(num_slaves == para_env%num_pe-1)
+         CPASSERT(num_slaves == para_env%num_pe - 1)
       ELSE
          ! all processes are slaves
          IF (output_unit > 0) WRITE (output_unit, FMT="(T2,A)") "FARMING| using a slave-only setup"
@@ -519,19 +519,19 @@ CONTAINS
       IF (output_unit > 0) WRITE (output_unit, FMT="(T2,A,I0)") "FARMING| number of slaves ", num_slaves
 
       ! keep track of which para_env rank is which slave/master
-      ALLOCATE (slave_distribution(0:para_env%num_pe-1))
+      ALLOCATE (slave_distribution(0:para_env%num_pe - 1))
       slave_distribution = 0
       slave_distribution(para_env%mepos) = slave_rank
       CALL mp_sum(slave_distribution, para_env%group)
       ! we do have a primus inter pares
       primus_slave = 0
-      DO i = 1, para_env%num_pe-1
+      DO i = 1, para_env%num_pe - 1
          IF (slave_distribution(i) == 0) primus_slave = i
       ENDDO
 
       ! split the current communicator for the slaves
       ! in a new_group, new_size and new_rank according to the number of groups required according to the input
-      ALLOCATE (group_distribution(0:num_slaves-1))
+      ALLOCATE (group_distribution(0:num_slaves - 1))
       group_distribution = -1
       IF (slave) THEN
          IF (farming_env%group_size_wish_set) THEN
@@ -573,7 +573,7 @@ CONTAINS
       IF (output_unit > 0) THEN
          WRITE (output_unit, FMT="(T2,A,T71,I10)") "FARMING| Number of created MPI (slave) groups:", ngroups
          WRITE (output_unit, FMT="(T2,A)", ADVANCE="NO") "FARMING| MPI (slave) process to group correspondence:"
-         DO i = 0, num_slaves-1
+         DO i = 0, num_slaves - 1
             IF (MODULO(i, 4) == 0) WRITE (output_unit, *)
             WRITE (output_unit, FMT='(A3,I6,A3,I6,A1)', ADVANCE="NO") &
                "  (", i, " : ", group_distribution(i), ")"
@@ -586,11 +586,11 @@ CONTAINS
       ! and determine the future restart point
       IF (farming_env%cycle) THEN
          n_jobs_to_run = farming_env%max_steps*ngroups
-         i_job_to_restart = MODULO(farming_env%restart_n+n_jobs_to_run-1, farming_env%njobs)+1
+         i_job_to_restart = MODULO(farming_env%restart_n + n_jobs_to_run - 1, farming_env%njobs) + 1
       ELSE
          n_jobs_to_run = MIN(farming_env%njobs, farming_env%max_steps*ngroups)
-         n_jobs_to_run = MIN(n_jobs_to_run, farming_env%njobs-farming_env%restart_n+1)
-         i_job_to_restart = n_jobs_to_run+farming_env%restart_n
+         n_jobs_to_run = MIN(n_jobs_to_run, farming_env%njobs - farming_env%restart_n + 1)
+         i_job_to_restart = n_jobs_to_run + farming_env%restart_n
       ENDIF
 
       ! and write the restart now, that's the point where the next job starts, even if this one is running
@@ -603,8 +603,8 @@ CONTAINS
 
       ! this is the job range to be executed.
       ijob_start = farming_env%restart_n
-      ijob_end = ijob_start+n_jobs_to_run-1
-      IF (output_unit > 0 .AND. ijob_end-ijob_start < 0) THEN
+      ijob_end = ijob_start + n_jobs_to_run - 1
+      IF (output_unit > 0 .AND. ijob_end - ijob_start < 0) THEN
          WRITE (output_unit, FMT="(T2,A)") "FARMING| --- WARNING --- NO JOBS NEED EXECUTION ? "
          WRITE (output_unit, FMT="(T2,A)") "FARMING| is the cycle keyword required ?"
          WRITE (output_unit, FMT="(T2,A)") "FARMING| or is a stray RESTART file present ?"
@@ -642,7 +642,7 @@ CONTAINS
                   t1 = m_walltime()
                   DO
                      t2 = m_walltime()
-                     IF (t2-t1 > farming_env%wait_time) EXIT
+                     IF (t2 - t1 > farming_env%wait_time) EXIT
                   ENDDO
                CASE (do_nothing)
                   EXIT
@@ -651,9 +651,9 @@ CONTAINS
                END SELECT
             ENDDO
          ELSE ! master
-            ALLOCATE (slave_status(0:ngroups-1))
+            ALLOCATE (slave_status(0:ngroups - 1))
             slave_status = slave_status_wait
-            ijob_current = ijob_start-1
+            ijob_current = ijob_start - 1
 
             DO
                IF (ALL(slave_status == slave_status_done)) EXIT
@@ -712,21 +712,21 @@ CONTAINS
          ! the i-th job in the input is always executed by the MODULO(i-1,ngroups)-th group
          ! (needed for cyclic runs, we don't want two groups working on the same job)
          IF (output_unit > 0) THEN
-            IF (ijob_end-ijob_start >= 0) THEN
+            IF (ijob_end - ijob_start >= 0) THEN
                WRITE (output_unit, FMT="(T2,A)") "FARMING| List of jobs : "
                DO ijob = ijob_start, ijob_end
-                  i = MODULO(ijob-1, farming_env%njobs)+1
+                  i = MODULO(ijob - 1, farming_env%njobs) + 1
                   WRITE (output_unit, FMT=*) "Job: ", i, " Dir: ", TRIM(farming_env%Job(i)%cwd), " Input: ", &
-                     TRIM(farming_env%Job(i)%input), " MPI group:", MODULO(i-1, ngroups)
+                     TRIM(farming_env%Job(i)%input), " MPI group:", MODULO(i - 1, ngroups)
                ENDDO
             ENDIF
             CALL m_flush(output_unit)
          ENDIF
 
          DO ijob = ijob_start, ijob_end
-            i = MODULO(ijob-1, farming_env%njobs)+1
+            i = MODULO(ijob - 1, farming_env%njobs) + 1
             ! this farms out the jobs
-            IF (MODULO(i-1, ngroups) == group_distribution(slave_rank)) THEN
+            IF (MODULO(i - 1, ngroups) == group_distribution(slave_rank)) THEN
                IF (output_unit > 0) THEN
                   WRITE (output_unit, FMT="(T2,A,I5.5,A)", ADVANCE="NO") " Running Job ", i, &
                      " in "//TRIM(farming_env%Job(i)%cwd)//"."
@@ -746,16 +746,16 @@ CONTAINS
       t1 = m_walltime()
       CALL mp_sync(para_env%group)
       t2 = m_walltime()
-      ALLOCATE (waittime(0:para_env%num_pe-1))
+      ALLOCATE (waittime(0:para_env%num_pe - 1))
       waittime = 0.0_dp
-      waittime(para_env%mepos) = t2-t1
+      waittime(para_env%mepos) = t2 - t1
       CALL mp_sum(waittime, para_env%group)
       IF (output_unit > 0) THEN
          WRITE (output_unit, '(T2,A)') "Process idle times [s] at the end of the run"
-         DO i = 0, para_env%num_pe-1
+         DO i = 0, para_env%num_pe - 1
             WRITE (output_unit, FMT='(A2,I6,A3,F8.3,A1)', ADVANCE="NO") &
                " (", i, " : ", waittime(i), ")"
-            IF (MOD(i+1, 4) == 0) WRITE (output_unit, '(A)') ""
+            IF (MOD(i + 1, 4) == 0) WRITE (output_unit, '(A)') ""
          ENDDO
          CALL m_flush(output_unit)
       ENDIF
@@ -783,7 +783,7 @@ CONTAINS
 !> \param i ...
 ! **************************************************************************************************
       RECURSIVE SUBROUTINE execute_job(i)
-      INTEGER                                            :: i
+         INTEGER                                            :: i
 
 ! change to the new working directory
 
@@ -850,7 +850,7 @@ CONTAINS
    SUBROUTINE write_cp2k_html_manual()
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_cp2k_html_manual', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: unit_nr
       TYPE(section_type), POINTER                        :: root_section
@@ -1018,12 +1018,12 @@ CONTAINS
       WRITE (UNIT=unit_number, FMT="(A)") &
          "<!DOCTYPE documentElement["
       DO i = 1, SIZE(html_entity_table), 2
-         is = INDEX(html_entity_table(i), "&")+1
+         is = INDEX(html_entity_table(i), "&") + 1
          CPASSERT(is > 0)
-         ie = INDEX(html_entity_table(i), ";")-1
+         ie = INDEX(html_entity_table(i), ";") - 1
          CPASSERT(ie >= is)
          WRITE (UNIT=unit_number, FMT="(A)") &
-            "<!ENTITY "//html_entity_table(i) (is:ie)//" """//TRIM(html_entity_table(i+1))//""">"
+            "<!ENTITY "//html_entity_table(i) (is:ie)//" """//TRIM(html_entity_table(i + 1))//""">"
       END DO
       WRITE (UNIT=unit_number, FMT="(A)") &
          "]>"

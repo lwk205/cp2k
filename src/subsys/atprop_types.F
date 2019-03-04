@@ -11,7 +11,7 @@
 ! **************************************************************************************************
 MODULE atprop_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -106,7 +106,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: natom
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atprop_array_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(atarray)) THEN
          CPASSERT(SIZE(atarray) == natom)
@@ -125,7 +125,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), POINTER               :: atarray
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atprop_array_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(atarray)) THEN
          DEALLOCATE (atarray)
@@ -142,11 +142,11 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), POINTER               :: array_a, array_b
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atprop_array_add', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(array_b)) THEN
          CPASSERT(ASSOCIATED(array_a))
-         array_a = array_a+array_b
+         array_a = array_a + array_b
       END IF
 
    END SUBROUTINE atprop_array_add

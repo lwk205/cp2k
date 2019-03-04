@@ -18,104 +18,104 @@
 ! **************************************************************************************************
 
 MODULE qs_ks_utils
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE cell_types,                      ONLY: cell_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_ddapc,                        ONLY: cp_ddapc_apply_CD
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_deallocate_matrix, dbcsr_get_info, dbcsr_init_p, &
-        dbcsr_multiply, dbcsr_p_type, dbcsr_release_p, dbcsr_scale, dbcsr_scale_by_vector, &
-        dbcsr_set, dbcsr_trace, dbcsr_type
-   USE input_constants,                 ONLY: &
-        cdft_alpha_constraint, cdft_beta_constraint, cdft_charge_constraint, &
-        cdft_magnetization_constraint, do_ppl_grid, sic_ad, sic_eo, sic_list_all, &
-        sic_list_unpaired, sic_mauri_spz, sic_mauri_us, sic_none
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kahan_sum,                       ONLY: accurate_sum
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE lri_environment_methods,         ONLY: v_int_ppl_update
-   USE lri_environment_types,           ONLY: lri_density_type,&
-                                              lri_environment_type,&
-                                              lri_kind_type
-   USE lri_forces,                      ONLY: calculate_lri_forces,&
-                                              calculate_ri_forces
-   USE lri_ks_methods,                  ONLY: calculate_lri_ks_matrix,&
-                                              calculate_ri_ks_matrix
-   USE message_passing,                 ONLY: mp_sum
-   USE ps_implicit_types,               ONLY: MIXED_BC,&
-                                              MIXED_PERIODIC_BC,&
-                                              NEUMANN_BC,&
-                                              PERIODIC_BC
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_grid_types,                   ONLY: PW_MODE_DISTRIBUTED
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_copy,&
-                                              pw_integrate_function,&
-                                              pw_scale,&
-                                              pw_transfer,&
-                                              pw_zero
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_implicit,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_cdft_types,                   ONLY: cdft_control_type
-   USE qs_charges_types,                ONLY: qs_charges_type
-   USE qs_collocate_density,            ONLY: calculate_rho_elec
-   USE qs_energy_types,                 ONLY: qs_energy_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace,&
-                                              integrate_v_rspace_diagonal,&
-                                              integrate_v_rspace_one_center
-   USE qs_kind_types,                   ONLY: get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_ks_qmmm_methods,              ONLY: qmmm_modify_hartree_pot
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              mo_set_p_type
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE virial_types,                    ONLY: virial_type
-   USE xc,                              ONLY: xc_exc_calc,&
-                                              xc_vxc_pw_create1
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE cell_types, ONLY: cell_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_ddapc, ONLY: cp_ddapc_apply_CD
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_deallocate_matrix, dbcsr_get_info, dbcsr_init_p, &
+      dbcsr_multiply, dbcsr_p_type, dbcsr_release_p, dbcsr_scale, dbcsr_scale_by_vector, &
+      dbcsr_set, dbcsr_trace, dbcsr_type
+   USE input_constants, ONLY: &
+      cdft_alpha_constraint, cdft_beta_constraint, cdft_charge_constraint, &
+      cdft_magnetization_constraint, do_ppl_grid, sic_ad, sic_eo, sic_list_all, &
+      sic_list_unpaired, sic_mauri_spz, sic_mauri_us, sic_none
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kahan_sum, ONLY: accurate_sum
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE lri_environment_methods, ONLY: v_int_ppl_update
+   USE lri_environment_types, ONLY: lri_density_type, &
+                                    lri_environment_type, &
+                                    lri_kind_type
+   USE lri_forces, ONLY: calculate_lri_forces, &
+                         calculate_ri_forces
+   USE lri_ks_methods, ONLY: calculate_lri_ks_matrix, &
+                             calculate_ri_ks_matrix
+   USE message_passing, ONLY: mp_sum
+   USE ps_implicit_types, ONLY: MIXED_BC, &
+                                MIXED_PERIODIC_BC, &
+                                NEUMANN_BC, &
+                                PERIODIC_BC
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_grid_types, ONLY: PW_MODE_DISTRIBUTED
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_copy, &
+                         pw_integrate_function, &
+                         pw_scale, &
+                         pw_transfer, &
+                         pw_zero
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_implicit, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_cdft_types, ONLY: cdft_control_type
+   USE qs_charges_types, ONLY: qs_charges_type
+   USE qs_collocate_density, ONLY: calculate_rho_elec
+   USE qs_energy_types, ONLY: qs_energy_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace, &
+                                     integrate_v_rspace_diagonal, &
+                                     integrate_v_rspace_one_center
+   USE qs_kind_types, ONLY: get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_ks_qmmm_methods, ONLY: qmmm_modify_hartree_pot
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          mo_set_p_type
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE virial_types, ONLY: virial_type
+   USE xc, ONLY: xc_exc_calc, &
+                 xc_vxc_pw_create1
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -227,7 +227,7 @@ CONTAINS
       CPASSERT(n_rep == Nterms)
       CALL section_vals_val_get(low_spin_roks_section, "SPIN_CONFIGURATION", i_rep_val=1, i_vals=ivec)
       Nelectron = SIZE(ivec)
-      CPASSERT(Nelectron == k_alpha-k_beta)
+      CPASSERT(Nelectron == k_alpha - k_beta)
       ALLOCATE (occupations(2, Nelectron, Nterms))
       occupations = 0
       DO iterm = 1, Nterms
@@ -298,7 +298,7 @@ CONTAINS
             ! compute the proper density matrices with the required occupations
             CALL dbcsr_set(matrix_p(ispin)%matrix, 0.0_dp)
             scaling = 1.0_dp
-            scaling(k_alpha-Nelectron+1:k_alpha) = occupations(ispin, :, iterm)
+            scaling(k_alpha - Nelectron + 1:k_alpha) = occupations(ispin, :, iterm)
             CALL dbcsr_copy(fm_scaled, mo_coeff)
             CALL dbcsr_scale_by_vector(fm_scaled, scaling, side='right')
             CALL dbcsr_multiply('n', 't', 1.0_dp, mo_coeff, fm_scaled, &
@@ -320,7 +320,7 @@ CONTAINS
                                    pw_pool=xc_pw_pool, compute_virial=.FALSE., virial_xc=virial_xc_tmp)
          END IF
 
-         energy%exc = energy%exc+energy_scaling(iterm)*exc
+         energy%exc = energy%exc + energy_scaling(iterm)*exc
 
          ! add the corresponding derivatives to the MO derivatives
          IF (.NOT. just_energy) THEN
@@ -343,7 +343,7 @@ CONTAINS
                                    0.0_dp, dbcsr_deriv, last_column=k_alpha)
 
                scaling = 1.0_dp
-               scaling(k_alpha-Nelectron+1:k_alpha) = occupations(ispin, :, iterm)
+               scaling(k_alpha - Nelectron + 1:k_alpha) = occupations(ispin, :, iterm)
                CALL dbcsr_scale_by_vector(dbcsr_deriv, scaling, side='right')
                CALL dbcsr_add(mo_derivs(1)%matrix, dbcsr_deriv, 1.0_dp, 1.0_dp)
             ENDDO
@@ -396,7 +396,7 @@ CONTAINS
       TYPE(pw_pool_type), POINTER                        :: auxbas_pw_pool
 
       CHARACTER(*), PARAMETER :: routineN = 'sic_explicit_orbitals', &
-         routineP = moduleN//':'//routineN
+                                 routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, Iorb, k_alpha, k_beta, Norb
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: sic_orbital_list
@@ -482,18 +482,18 @@ CONTAINS
             CALL cp_fm_get_info(mo_coeff, ncol_global=k_beta)
          ENDIF
 
-         Norb = k_alpha+k_beta
+         Norb = k_alpha + k_beta
          ALLOCATE (sic_orbital_list(3, Norb))
 
          iorb = 0
          DO i = 1, k_alpha
-            iorb = iorb+1
+            iorb = iorb + 1
             sic_orbital_list(1, iorb) = 1
             sic_orbital_list(2, iorb) = i
             sic_orbital_list(3, iorb) = 1
          ENDDO
          DO i = 1, k_beta
-            iorb = iorb+1
+            iorb = iorb + 1
             sic_orbital_list(1, iorb) = 2
             sic_orbital_list(2, iorb) = i
             IF (SIZE(mo_derivs, 1) == 1) THEN
@@ -516,12 +516,12 @@ CONTAINS
          CALL get_mo_set(mo_set=mo_array(2)%mo_set, mo_coeff=mo_coeff)
          CALL cp_fm_get_info(mo_coeff, ncol_global=k_beta)
 
-         Norb = k_alpha-k_beta
+         Norb = k_alpha - k_beta
          ALLOCATE (sic_orbital_list(3, Norb))
 
          iorb = 0
-         DO i = k_beta+1, k_alpha
-            iorb = iorb+1
+         DO i = k_beta + 1, k_alpha
+            iorb = iorb + 1
             sic_orbital_list(1, iorb) = 1
             sic_orbital_list(2, iorb) = i
             ! we are guaranteed to be restricted
@@ -619,7 +619,7 @@ CONTAINS
          CALL pw_poisson_solve(poisson_env, orb_rho_g%pw, ener, work_v_gspace%pw)
          ! no PBC correction is done here, see "calc_v_sic_rspace" for SIC methods
          ! with PBC aware corrections
-         energy%hartree = energy%hartree-dft_control%sic_scaling_a*ener
+         energy%hartree = energy%hartree - dft_control%sic_scaling_a*ener
          IF (.NOT. just_energy) THEN
             CALL pw_transfer(work_v_gspace%pw, work_v_rspace%pw)
             CALL pw_scale(work_v_rspace%pw, -dft_control%sic_scaling_a*work_v_rspace%pw%pw_grid%dvol)
@@ -638,7 +638,7 @@ CONTAINS
             work_v_rspace%pw%cr3d = work_v_rspace%pw%cr3d- &
                                     dft_control%sic_scaling_b*vxc(1)%pw%pw_grid%dvol*vxc(1)%pw%cr3d
          END IF
-         energy%exc = energy%exc-dft_control%sic_scaling_b*exc
+         energy%exc = energy%exc - dft_control%sic_scaling_b*exc
 
          IF (.NOT. just_energy) THEN
             ! note, orb_h (which is being pointed to with orb_h_p) is zeroed above
@@ -754,7 +754,7 @@ CONTAINS
          CALL get_qs_env(qs_env, mos=mo_array)
          CALL get_mo_set(mo_set=mo_array(1)%mo_set, nelectron=nelec_a)
          CALL get_mo_set(mo_set=mo_array(2)%mo_set, nelectron=nelec_b)
-         nelec = nelec_a+nelec_b
+         nelec = nelec_a + nelec_b
          CALL pw_copy(rho_g(1)%pw, work_rho%pw)
          CALL pw_axpy(rho_g(2)%pw, work_rho%pw)
          scaling = 1.0_dp/REAL(nelec, KIND=dp)
@@ -770,14 +770,14 @@ CONTAINS
          CALL get_qs_env(qs_env=qs_env, force=force)
          nforce = 0
          DO i = 1, SIZE(force)
-            nforce = nforce+SIZE(force(i)%ch_pulay, 2)
+            nforce = nforce + SIZE(force(i)%ch_pulay, 2)
          ENDDO
          ALLOCATE (store_forces(3, nforce))
          nforce = 0
          DO i = 1, SIZE(force)
-            store_forces(1:3, nforce+1:nforce+SIZE(force(i)%ch_pulay, 2)) = force(i)%ch_pulay(:, :)
+            store_forces(1:3, nforce + 1:nforce + SIZE(force(i)%ch_pulay, 2)) = force(i)%ch_pulay(:, :)
             force(i)%ch_pulay(:, :) = 0.0_dp
-            nforce = nforce+SIZE(force(i)%ch_pulay, 2)
+            nforce = nforce + SIZE(force(i)%ch_pulay, 2)
          ENDDO
       ENDIF
 
@@ -796,15 +796,15 @@ CONTAINS
       CASE DEFAULT
          CPABORT("Unknown sic method id")
       END SELECT
-      energy%hartree = energy%hartree+full_scaling*ener
+      energy%hartree = energy%hartree + full_scaling*ener
 
       ! add scaled forces, restoring the old
       IF (calculate_forces) THEN
          nforce = 0
          DO i = 1, SIZE(force)
-            force(i)%ch_pulay(:, :) = force(i)%ch_pulay(:, :)*full_scaling+ &
-                                      store_forces(1:3, nforce+1:nforce+SIZE(force(i)%ch_pulay, 2))
-            nforce = nforce+SIZE(force(i)%ch_pulay, 2)
+            force(i)%ch_pulay(:, :) = force(i)%ch_pulay(:, :)*full_scaling + &
+                                      store_forces(1:3, nforce + 1:nforce + SIZE(force(i)%ch_pulay, 2))
+            nforce = nforce + SIZE(force(i)%ch_pulay, 2)
          ENDDO
       ENDIF
 
@@ -862,7 +862,7 @@ CONTAINS
                                          extension=".scfLog")
 
       CALL qs_rho_get(rho, tot_rho_r=tot_rho_r_arr, rho_ao_kp=rho_ao)
-      n_electrons = n_electrons-dft_control%charge
+      n_electrons = n_electrons - dft_control%charge
       tot_rho_r = accurate_sum(tot_rho_r_arr)
 
       trace = 0
@@ -870,7 +870,7 @@ CONTAINS
          DO ispin = 1, dft_control%nspins
             DO img = 1, dft_control%nimages
                CALL dbcsr_trace(rho_ao(ispin, img)%matrix, matrix_s(1, img)%matrix, trace_tmp)
-               trace = trace+trace_tmp
+               trace = trace + trace_tmp
             END DO
          END DO
       ENDIF
@@ -880,18 +880,18 @@ CONTAINS
          WRITE (UNIT=output_unit, FMT="((T3,A,T41,2F20.10))") &
             "Electronic density on regular grids: ", &
             tot_rho_r, &
-            tot_rho_r+ &
+            tot_rho_r + &
             REAL(n_electrons, dp), &
             "Core density on regular grids:", &
             qs_charges%total_rho_core_rspace, &
-            qs_charges%total_rho_core_rspace-REAL(n_electrons+dft_control%charge, dp)
+            qs_charges%total_rho_core_rspace - REAL(n_electrons + dft_control%charge, dp)
       END IF
       IF (dft_control%qs_control%gapw) THEN
          tot1_h = qs_charges%total_rho1_hard(1)
          tot1_s = qs_charges%total_rho1_soft(1)
          DO ispin = 2, dft_control%nspins
-            tot1_h = tot1_h+qs_charges%total_rho1_hard(ispin)
-            tot1_s = tot1_s+qs_charges%total_rho1_soft(ispin)
+            tot1_h = tot1_h + qs_charges%total_rho1_hard(ispin)
+            tot1_s = tot1_s + qs_charges%total_rho1_soft(ispin)
          END DO
          IF (output_unit > 0) THEN
             WRITE (UNIT=output_unit, FMT="((T3,A,T41,2F20.10))") &
@@ -899,21 +899,21 @@ CONTAINS
                tot1_h, tot1_s
             WRITE (UNIT=output_unit, FMT="(T3,A,T41,F20.10)") &
                "Total Rho_soft + Rho1_hard - Rho1_soft (r-space): ", &
-               tot_rho_r+tot1_h-tot1_s, &
+               tot_rho_r + tot1_h - tot1_s, &
                "Total charge density (r-space):      ", &
-               tot_rho_r+tot1_h-tot1_s &
-               +qs_charges%total_rho_core_rspace, &
+               tot_rho_r + tot1_h - tot1_s &
+               + qs_charges%total_rho_core_rspace, &
                "Total Rho_soft + Rho0_soft (g-space):", &
                qs_charges%total_rho_gspace
          END IF
-         qs_charges%background = tot_rho_r+tot1_h-tot1_s+ &
+         qs_charges%background = tot_rho_r + tot1_h - tot1_s + &
                                  qs_charges%total_rho_core_rspace
       ELSE IF (dft_control%qs_control%gapw_xc) THEN
          tot1_h = qs_charges%total_rho1_hard(1)
          tot1_s = qs_charges%total_rho1_soft(1)
          DO ispin = 2, dft_control%nspins
-            tot1_h = tot1_h+qs_charges%total_rho1_hard(ispin)
-            tot1_s = tot1_s+qs_charges%total_rho1_soft(ispin)
+            tot1_h = tot1_h + qs_charges%total_rho1_hard(ispin)
+            tot1_s = tot1_s + qs_charges%total_rho1_soft(ispin)
          END DO
          IF (output_unit > 0) THEN
             WRITE (UNIT=output_unit, FMT="(/,(T3,A,T41,2F20.10))") &
@@ -921,20 +921,20 @@ CONTAINS
                tot1_h, tot1_s
             WRITE (UNIT=output_unit, FMT="(T3,A,T41,F20.10)") &
                "Total Rho_soft + Rho1_hard - Rho1_soft (r-space): ", &
-               accurate_sum(tot_rho_r_arr)+tot1_h-tot1_s
+               accurate_sum(tot_rho_r_arr) + tot1_h - tot1_s
          END IF
-         qs_charges%background = tot_rho_r+ &
+         qs_charges%background = tot_rho_r + &
                                  qs_charges%total_rho_core_rspace
       ELSE
          IF (output_unit > 0) THEN
             WRITE (UNIT=output_unit, FMT="(T3,A,T41,F20.10)") &
                "Total charge density on r-space grids:     ", &
-               tot_rho_r+ &
+               tot_rho_r + &
                qs_charges%total_rho_core_rspace, &
                "Total charge density g-space grids:     ", &
                qs_charges%total_rho_gspace
          END IF
-         qs_charges%background = tot_rho_r+ &
+         qs_charges%background = tot_rho_r + &
                                  qs_charges%total_rho_core_rspace
       END IF
       IF (output_unit > 0) WRITE (UNIT=output_unit, FMT="()")
@@ -966,7 +966,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: mulliken_order_p
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_detailed_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: bc, n, output_unit, psolver
       REAL(KIND=dp)                                      :: ddapc_order_p, implicit_ps_ehartree, &
@@ -997,18 +997,18 @@ CONTAINS
                      "Core Hamiltonian energy:                       ", energy%core, &
                      "Hartree energy:                                ", implicit_ps_ehartree, &
                      "Electric enthalpy:                             ", energy%hartree, &
-                     "Exchange-correlation energy:                   ", energy%exc+energy%exc_aux_fit
+                     "Exchange-correlation energy:                   ", energy%exc + energy%exc_aux_fit
                CASE (PERIODIC_BC, NEUMANN_BC)
                   WRITE (UNIT=output_unit, FMT="(/,(T3,A,T61,F20.10))") &
                      "Core Hamiltonian energy:                       ", energy%core, &
                      "Hartree energy:                                ", energy%hartree, &
-                     "Exchange-correlation energy:                   ", energy%exc+energy%exc_aux_fit
+                     "Exchange-correlation energy:                   ", energy%exc + energy%exc_aux_fit
                END SELECT
             ELSE
                WRITE (UNIT=output_unit, FMT="(/,(T3,A,T61,F20.10))") &
                   "Core Hamiltonian energy:                       ", energy%core, &
                   "Hartree energy:                                ", energy%hartree, &
-                  "Exchange-correlation energy:                   ", energy%exc+energy%exc_aux_fit
+                  "Exchange-correlation energy:                   ", energy%exc + energy%exc_aux_fit
             END IF
          ELSE
 !ZMP to print some variables at each step
@@ -1123,7 +1123,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: matrix_vxc
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_matrix_vxc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin
       LOGICAL                                            :: gapw
@@ -1209,7 +1209,7 @@ CONTAINS
       LOGICAL, INTENT(in)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'sum_up_and_integrate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, igroup, ikind, ispin, nkind, &
                                                             nspins
@@ -1314,7 +1314,7 @@ CONTAINS
             ! CDFT constraint contribution
             IF (dft_control%qs_control%cdft) THEN
                DO igroup = 1, SIZE(cdft_control%group)
-                  SELECT CASE (cdft_control%group (igroup)%constraint_type)
+                  SELECT CASE (cdft_control%group(igroup)%constraint_type)
                   CASE (cdft_charge_constraint)
                      sign = 1.0_dp
                   CASE (cdft_magnetization_constraint)
@@ -1625,7 +1625,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: exc
 
       CHARACTER(*), PARAMETER :: routineN = 'calculate_zmp_potential', &
-         routineP = moduleN//':'//routineN
+                                 routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, my_val, nelectron, nspins, stat
       INTEGER, DIMENSION(2)                              :: nelectron_spin
@@ -1754,7 +1754,7 @@ CONTAINS
       LOGICAL                                            :: just_energy
 
       CHARACTER(*), PARAMETER :: routineN = 'get_embed_potential_energy', &
-         routineP = moduleN//':'//routineN
+                                 routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, ns1, ns2
       REAL(KIND=dp)                                      :: embed_corr_local
@@ -1793,9 +1793,9 @@ CONTAINS
             ns1 = SIZE(qs_env%spin_embed_pot%pw%cr3d)
             IF (ns1 .NE. ns2) CPABORT("Subsystem grids must be identical")
             IF (ispin .EQ. 1) v_rspace_embed(ispin)%pw%cr3d(:, :, :) = &
-               v_rspace_embed(ispin)%pw%cr3d(:, :, :)+qs_env%spin_embed_pot%pw%cr3d
+               v_rspace_embed(ispin)%pw%cr3d(:, :, :) + qs_env%spin_embed_pot%pw%cr3d
             IF (ispin .EQ. 2) v_rspace_embed(ispin)%pw%cr3d(:, :, :) = &
-               v_rspace_embed(ispin)%pw%cr3d(:, :, :)-qs_env%spin_embed_pot%pw%cr3d
+               v_rspace_embed(ispin)%pw%cr3d(:, :, :) - qs_env%spin_embed_pot%pw%cr3d
          ENDIF
          ! Integrate the density*potential
          embed_corr_local = accurate_sum(v_rspace_embed(ispin)%pw%cr3d*rho_r(ispin)%pw%cr3d)* &
@@ -1805,7 +1805,7 @@ CONTAINS
             CALL mp_sum(embed_corr_local, v_rspace_embed(ispin)%pw%pw_grid%para%group)
          END IF
 
-         embed_corr = embed_corr+embed_corr_local
+         embed_corr = embed_corr + embed_corr_local
 
       ENDDO
 

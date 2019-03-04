@@ -16,27 +16,27 @@
 ! **************************************************************************************************
 
 MODULE tmc_file_io
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_to_string
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE physcon,                         ONLY: au2a => angstrom
-   USE tmc_analysis_types,              ONLY: tmc_analysis_env
-   USE tmc_calculations,                ONLY: get_cell_scaling,&
-                                              get_scaled_cell
-   USE tmc_move_types,                  ONLY: nr_mv_types
-   USE tmc_stati,                       ONLY: TMC_STATUS_FAILED,&
-                                              TMC_STATUS_OK,&
-                                              TMC_STATUS_WAIT_FOR_NEW_TASK,&
-                                              tmc_default_restart_in_file_name,&
-                                              tmc_default_restart_out_file_name,&
-                                              tmc_default_trajectory_file_name
-   USE tmc_tree_types,                  ONLY: elem_array_type,&
-                                              tree_type
-   USE tmc_types,                       ONLY: tmc_env_type,&
-                                              tmc_param_type
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_to_string
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE physcon, ONLY: au2a => angstrom
+   USE tmc_analysis_types, ONLY: tmc_analysis_env
+   USE tmc_calculations, ONLY: get_cell_scaling, &
+                               get_scaled_cell
+   USE tmc_move_types, ONLY: nr_mv_types
+   USE tmc_stati, ONLY: TMC_STATUS_FAILED, &
+                        TMC_STATUS_OK, &
+                        TMC_STATUS_WAIT_FOR_NEW_TASK, &
+                        tmc_default_restart_in_file_name, &
+                        tmc_default_restart_out_file_name, &
+                        tmc_default_trajectory_file_name
+   USE tmc_tree_types, ONLY: elem_array_type, &
+                             tree_type
+   USE tmc_types, ONLY: tmc_env_type, &
+                        tmc_param_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -74,7 +74,7 @@ CONTAINS
       CHARACTER(LEN=default_path_length)                 :: result_file_name
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'expand_file_name_ending', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ind
 
@@ -82,7 +82,7 @@ CONTAINS
 
       ind = INDEX(file_name, ".", BACK=.TRUE.)
       IF (.NOT. ind .EQ. 0) THEN
-         WRITE (result_file_name, *) file_name(1:ind-1), ".", &
+         WRITE (result_file_name, *) file_name(1:ind - 1), ".", &
             TRIM(ADJUSTL(extra))
       ELSE
          WRITE (result_file_name, *) TRIM(file_name), ".", extra
@@ -104,7 +104,7 @@ CONTAINS
       CHARACTER(LEN=default_path_length)                 :: result_file_name
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'expand_file_name_char', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ind
 
@@ -112,7 +112,7 @@ CONTAINS
 
       ind = INDEX(file_name, ".", BACK=.TRUE.)
       IF (.NOT. ind .EQ. 0) THEN
-         WRITE (result_file_name, *) file_name(1:ind-1), "_", &
+         WRITE (result_file_name, *) file_name(1:ind - 1), "_", &
             TRIM(ADJUSTL(extra)), file_name(ind:LEN_TRIM(file_name))
       ELSE
          WRITE (result_file_name, *) TRIM(file_name), "_", extra
@@ -135,7 +135,7 @@ CONTAINS
       CHARACTER(LEN=default_path_length)                 :: result_file_name
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'expand_file_name_temp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=18)                                  :: rval_to_string
       INTEGER                                            :: ind
@@ -147,7 +147,7 @@ CONTAINS
       WRITE (rval_to_string, "(F16.2)") rvalue
       ind = INDEX(file_name, ".", BACK=.TRUE.)
       IF (.NOT. ind .EQ. 0) THEN
-         WRITE (result_file_name, *) file_name(1:ind-1), "_T", &
+         WRITE (result_file_name, *) file_name(1:ind - 1), "_T", &
             TRIM(ADJUSTL(rval_to_string)), file_name(ind:LEN_TRIM(file_name))
       ELSE
          IF (LEN(file_name) .EQ. 0) THEN
@@ -175,7 +175,7 @@ CONTAINS
       CHARACTER(LEN=default_path_length)                 :: result_file_name
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'expand_file_name_int', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=18)                                  :: rval_to_string
       INTEGER                                            :: ind
@@ -187,7 +187,7 @@ CONTAINS
       WRITE (rval_to_string, *) ivalue
       ind = INDEX(file_name, ".", BACK=.TRUE.)
       IF (.NOT. ind .EQ. 0) THEN
-         WRITE (result_file_name, *) file_name(1:ind-1), "_", &
+         WRITE (result_file_name, *) file_name(1:ind - 1), "_", &
             TRIM(ADJUSTL(rval_to_string)), file_name(ind:LEN_TRIM(file_name))
       ELSE
          IF (LEN(file_name) .EQ. 0) THEN
@@ -220,7 +220,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(4)                        :: timings
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'print_restart_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: c_tmp, file_name
       INTEGER                                            :: f_unit, i
@@ -293,7 +293,7 @@ CONTAINS
       CHARACTER(LEN=*)                                   :: file_name
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_restart_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: file_ptr, i, temp_size
       LOGICAL                                            :: flag
@@ -339,7 +339,7 @@ CONTAINS
          job_counts, &
          timings
 
-      IF (ANY(ABS(tmc_env%params%Temp(:)-tmp_temp(:)) .GE. 0.005)) &
+      IF (ANY(ABS(tmc_env%params%Temp(:) - tmp_temp(:)) .GE. 0.005)) &
          CALL cp_abort(__LOCATION__, "the temperatures differ from the previous calculation. "// &
                        "There were the following temperatures used:")
       IF (ANY(mv_weight_tmp(:) .NE. tmc_env%params%move_types%mv_weight(:))) &
@@ -385,7 +385,7 @@ CONTAINS
       TYPE(tmc_param_type), POINTER                      :: tmc_params
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_result_list_element', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name
       INTEGER                                            :: handle, i
@@ -443,7 +443,7 @@ CONTAINS
       CHARACTER(LEN=*), OPTIONAL                         :: conf_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_element_in_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name_act, tmp_name
       CHARACTER(LEN=default_string_length)               :: header
@@ -500,8 +500,8 @@ CONTAINS
             WRITE (file_ptr, *) TRIM(header)
             DO i = 1, SIZE(elem%pos), tmc_params%dim_per_elem
                WRITE (file_ptr, FMT="(A4,1X,1000F20.10)") &
-                  TRIM(tmc_params%atoms((i-1)/tmc_params%dim_per_elem+1)%name), &
-                  elem%pos(i:i+tmc_params%dim_per_elem-1)*au2a
+                  TRIM(tmc_params%atoms((i - 1)/tmc_params%dim_per_elem + 1)%name), &
+                  elem%pos(i:i + tmc_params%dim_per_elem - 1)*au2a
             END DO
             CALL close_file(unit_number=file_ptr)
          END IF
@@ -516,8 +516,8 @@ CONTAINS
             WRITE (file_ptr, *) TRIM(header)
             DO i = 1, SIZE(elem%pos), tmc_params%dim_per_elem
                WRITE (file_ptr, FMT="(A4,1X,1000F20.10)") &
-                  TRIM(tmc_params%atoms((i-1)/tmc_params%dim_per_elem+1)%name), &
-                  elem%frc(i:i+tmc_params%dim_per_elem-1)
+                  TRIM(tmc_params%atoms((i - 1)/tmc_params%dim_per_elem + 1)%name), &
+                  elem%frc(i:i + tmc_params%dim_per_elem - 1)
             END DO
             CALL close_file(unit_number=file_ptr)
          END IF
@@ -569,7 +569,7 @@ CONTAINS
                               unit_number=file_ptr)
             END IF
             WRITE (file_ptr, FMT="(I8,14F20.10)") conf_nr, elem%potential, elem%e_pot_approx, &
-               elem%scf_energies(MOD(elem%scf_energies_count, 4)+1), elem%ekin
+               elem%scf_energies(MOD(elem%scf_energies_count, 4) + 1), elem%ekin
             CALL close_file(unit_number=file_ptr)
          END IF
 
@@ -594,7 +594,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(in), OPTIONAL             :: file_ext
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_dipoles_in_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name_tmp
       INTEGER                                            :: file_ptr
@@ -642,7 +642,7 @@ CONTAINS
       INTEGER                                            :: conf_nr, stat
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_element_from_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: conf_nr_old, handle, i_tmp
       LOGICAL                                            :: files_conf_missmatch
@@ -772,7 +772,7 @@ CONTAINS
       CHARACTER(LEN=*), OPTIONAL                         :: header_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_pos_from_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: c_tmp
       INTEGER                                            :: handle, i, i_tmp, status
@@ -789,7 +789,7 @@ CONTAINS
 
       search_next_conf: DO
          c_tmp(:) = " "
-         tmc_ana%lc_traj = tmc_ana%lc_traj+1
+         tmc_ana%lc_traj = tmc_ana%lc_traj + 1
          READ (tmc_ana%id_traj, '(A)', IOSTAT=status) c_tmp(:)
          IF (status .GT. 0) &
             CALL cp_abort(__LOCATION__, &
@@ -800,7 +800,7 @@ CONTAINS
             EXIT search_next_conf
          END IF
          IF (INDEX(c_tmp, "=") .GT. 0) THEN
-            READ (c_tmp(INDEX(c_tmp, "=")+1:), *, IOSTAT=status) i_tmp ! read the configuration number
+            READ (c_tmp(INDEX(c_tmp, "=") + 1:), *, IOSTAT=status) i_tmp ! read the configuration number
             IF (status .NE. 0) &
                CALL cp_abort(__LOCATION__, &
                              "configuration header read error (for conf nr) at line: "// &
@@ -817,9 +817,9 @@ CONTAINS
 
       IF (stat .EQ. TMC_STATUS_OK) THEN
          pos_loop: DO i = 1, SIZE(elem%pos), tmc_ana%dim_per_elem
-            tmc_ana%lc_traj = tmc_ana%lc_traj+1
+            tmc_ana%lc_traj = tmc_ana%lc_traj + 1
             READ (tmc_ana%id_traj, FMT="(A4,1X,1000F20.10)", IOSTAT=status) &
-               c_tmp, elem%pos(i:i+tmc_ana%dim_per_elem-1)
+               c_tmp, elem%pos(i:i + tmc_ana%dim_per_elem - 1)
             IF (status .NE. 0) THEN
                CALL cp_abort(__LOCATION__, &
                              "configuration pos read error at line: "// &
@@ -848,7 +848,7 @@ CONTAINS
       INTEGER                                            :: stat, conf_nr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_dipole_from_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=250)                                 :: c_tmp
       INTEGER                                            :: handle, status
@@ -862,12 +862,12 @@ CONTAINS
 
       ! start the timing
       CALL timeset(routineN, handle)
-      tmc_ana%lc_dip = tmc_ana%lc_dip+1
+      tmc_ana%lc_dip = tmc_ana%lc_dip + 1
       READ (tmc_ana%id_dip, FMT="(A)", IOSTAT=status) c_tmp
       IF (status .EQ. 0) THEN
          ! skip the initial line (header)
          IF (INDEX(c_tmp, "#") .GT. 0) THEN
-            tmc_ana%lc_dip = tmc_ana%lc_dip+1
+            tmc_ana%lc_dip = tmc_ana%lc_dip + 1
             READ (tmc_ana%id_dip, FMT="(A)", IOSTAT=status) c_tmp
          END IF
       END IF
@@ -904,7 +904,7 @@ CONTAINS
       INTEGER                                            :: stat, conf_nr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_cell_from_file', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=250)                                 :: c_tmp
       INTEGER                                            :: handle, status
@@ -921,12 +921,12 @@ CONTAINS
       ! start the timing
       CALL timeset(routineN, handle)
 
-      tmc_ana%lc_cell = tmc_ana%lc_cell+1
+      tmc_ana%lc_cell = tmc_ana%lc_cell + 1
       READ (tmc_ana%id_cell, FMT="(A)", IOSTAT=status) c_tmp
       IF (status .EQ. 0) THEN
          ! skip the initial line (header)
          IF (INDEX(c_tmp, "#") .GT. 0) THEN
-            tmc_ana%lc_cell = tmc_ana%lc_cell+1
+            tmc_ana%lc_cell = tmc_ana%lc_cell + 1
             READ (tmc_ana%id_cell, FMT="(A)", IOSTAT=status) c_tmp
          END IF
       END IF
@@ -970,7 +970,7 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: dir_ind
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'analyse_files_open', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: dir_name, file_name_act, file_name_temp
       INTEGER                                            :: handle
@@ -1069,7 +1069,7 @@ CONTAINS
       TYPE(tmc_analysis_env), POINTER                    :: tmc_ana
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'analyse_files_close', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 

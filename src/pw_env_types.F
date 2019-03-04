@@ -10,27 +10,27 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE pw_env_types
-   USE cube_utils,                      ONLY: cube_info_type,&
-                                              destroy_cube_info
-   USE gaussian_gridlevels,             ONLY: destroy_gaussian_gridlevel,&
-                                              gridlevel_info_type
-   USE input_section_types,             ONLY: section_vals_release,&
-                                              section_vals_type
-   USE kinds,                           ONLY: dp
-   USE lgrid_types,                     ONLY: lgrid_release,&
-                                              lgrid_type
-   USE pw_poisson_types,                ONLY: pw_poisson_release,&
-                                              pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_p_type,&
-                                              pw_pool_release,&
-                                              pw_pool_type,&
-                                              pw_pools_dealloc
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_p_type,&
-                                              realspace_grid_desc_type,&
-                                              realspace_grid_p_type,&
-                                              realspace_grid_type,&
-                                              rs_grid_release,&
-                                              rs_grid_release_descriptor
+   USE cube_utils, ONLY: cube_info_type, &
+                         destroy_cube_info
+   USE gaussian_gridlevels, ONLY: destroy_gaussian_gridlevel, &
+                                  gridlevel_info_type
+   USE input_section_types, ONLY: section_vals_release, &
+                                  section_vals_type
+   USE kinds, ONLY: dp
+   USE lgrid_types, ONLY: lgrid_release, &
+                          lgrid_type
+   USE pw_poisson_types, ONLY: pw_poisson_release, &
+                               pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_p_type, &
+                            pw_pool_release, &
+                            pw_pool_type, &
+                            pw_pools_dealloc
+   USE realspace_grid_types, ONLY: realspace_grid_desc_p_type, &
+                                   realspace_grid_desc_type, &
+                                   realspace_grid_p_type, &
+                                   realspace_grid_type, &
+                                   rs_grid_release, &
+                                   rs_grid_release_descriptor
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -173,7 +173,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(pw_env))
       CPASSERT(pw_env%ref_count > 0)
-      pw_env%ref_count = pw_env%ref_count+1
+      pw_env%ref_count = pw_env%ref_count + 1
    END SUBROUTINE pw_env_retain
 
 ! **************************************************************************************************
@@ -197,7 +197,7 @@ CONTAINS
       IF (PRESENT(kg)) my_kg = kg
       IF (ASSOCIATED(pw_env)) THEN
          CPASSERT(pw_env%ref_count > 0)
-         pw_env%ref_count = pw_env%ref_count-1
+         pw_env%ref_count = pw_env%ref_count - 1
          IF (pw_env%ref_count < 1) THEN
             CALL pw_poisson_release(pw_env%poisson_env)
             CALL pw_pools_dealloc(pw_env%pw_pools)

@@ -14,35 +14,35 @@
 ! **************************************************************************************************
 MODULE qs_interactions
 
-   USE ao_util,                         ONLY: exp_radius
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type,&
-                                              set_gto_basis_set
-   USE cp_control_types,                ONLY: qs_control_type,&
-                                              semi_empirical_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_units,                        ONLY: cp_unit_from_cp2k
-   USE external_potential_types,        ONLY: all_potential_type,&
-                                              get_potential,&
-                                              gth_potential_type,&
-                                              set_potential,&
-                                              sgp_potential_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE paw_proj_set_types,              ONLY: get_paw_proj_set,&
-                                              paw_proj_set_type,&
-                                              set_paw_proj_set
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE string_utilities,                ONLY: uppercase
+   USE ao_util, ONLY: exp_radius
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type, &
+                              set_gto_basis_set
+   USE cp_control_types, ONLY: qs_control_type, &
+                               semi_empirical_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_units, ONLY: cp_unit_from_cp2k
+   USE external_potential_types, ONLY: all_potential_type, &
+                                       get_potential, &
+                                       gth_potential_type, &
+                                       set_potential, &
+                                       sgp_potential_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE paw_proj_set_types, ONLY: get_paw_proj_set, &
+                                 paw_proj_set_type, &
+                                 set_paw_proj_set
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE string_utilities, ONLY: uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -78,17 +78,17 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_interaction_radii', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: handle, i, iexp_ppl, ikind, ip, iprj_ppnl, j, l, lppl, lppnl, lprj, lprj_ppnl, &
-         maxl, maxnset, n_local, nexp_lpot, nexp_lsd, nexp_ppl, nkind, nloc
+                 maxl, maxnset, n_local, nexp_lpot, nexp_lsd, nexp_ppl, nkind, nloc
       INTEGER, DIMENSION(1:10)                           :: nrloc
       INTEGER, DIMENSION(:), POINTER                     :: nct_lpot, nct_lsd, nprj, nprj_ppnl
       LOGICAL                                            :: ecp_local, llsd, lpot, paw_atom
       LOGICAL, DIMENSION(0:5)                            :: is_nonlocal
       REAL(dp), DIMENSION(1:10)                          :: aloc, bloc
       REAL(KIND=dp) :: alpha_core_charge, alpha_ppl, ccore_charge, cerf_ppl, core_charge_radius, &
-         cval, ppl_radius, ppnl_radius, rcprj, zeta
+                       cval, ppl_radius, ppnl_radius, rcprj, zeta
       REAL(KIND=dp), DIMENSION(:), POINTER               :: a_local, a_nonlocal, alpha_lpot, &
                                                             alpha_lsd, alpha_ppnl, c_local, &
                                                             cexp_ppl
@@ -98,7 +98,7 @@ CONTAINS
       TYPE(all_potential_type), POINTER                  :: all_potential
       TYPE(gth_potential_type), POINTER                  :: gth_potential
       TYPE(gto_basis_set_type), POINTER :: aux_basis_set, aux_fit_basis_set, aux_gw_basis, &
-         harris_basis, lri_basis, mao_basis, orb_basis_set, ri_aux_basis_set, ri_basis, soft_basis
+                                           harris_basis, lri_basis, mao_basis, orb_basis_set, ri_aux_basis_set, ri_basis, soft_basis
       TYPE(paw_proj_set_type), POINTER                   :: paw_proj_set
       TYPE(sgp_potential_type), POINTER                  :: sgp_potential
 
@@ -183,7 +183,7 @@ CONTAINS
             ppl_radius = exp_radius(0, alpha_ppl, qs_control%eps_ppl, cerf_ppl)
 
             DO iexp_ppl = 1, nexp_ppl
-               lppl = 2*(iexp_ppl-1)
+               lppl = 2*(iexp_ppl - 1)
                ppl_radius = MAX(ppl_radius, &
                                 exp_radius(lppl, alpha_ppl, &
                                            qs_control%eps_ppl, &
@@ -198,7 +198,7 @@ CONTAINS
                                   cval_lpot=cval_lpot)
                DO j = 1, nexp_lpot
                   DO i = 1, nct_lpot(j)
-                     lppl = 2*(i-1)
+                     lppl = 2*(i - 1)
                      ppl_radius = MAX(ppl_radius, &
                                       exp_radius(lppl, alpha_lpot(j), qs_control%eps_ppl, cval_lpot(i, j)))
                   END DO
@@ -213,7 +213,7 @@ CONTAINS
                                   cval_lsd=cval_lsd)
                DO j = 1, nexp_lsd
                   DO i = 1, nct_lsd(j)
-                     lppl = 2*(i-1)
+                     lppl = 2*(i - 1)
                      ppl_radius = MAX(ppl_radius, &
                                       exp_radius(lppl, alpha_lsd(j), qs_control%eps_ppl, cval_lsd(i, j)))
                   END DO
@@ -225,7 +225,7 @@ CONTAINS
             ppnl_radius = 0.0_dp
             DO l = 0, lppnl
                DO iprj_ppnl = 1, nprj_ppnl(l)
-                  lprj_ppnl = l+2*(iprj_ppnl-1)
+                  lprj_ppnl = l + 2*(iprj_ppnl - 1)
                   ppnl_radius = MAX(ppnl_radius, &
                                     exp_radius(lprj_ppnl, alpha_ppnl(l), &
                                                qs_control%eps_pgf_orb, &
@@ -252,7 +252,7 @@ CONTAINS
             IF (ecp_local) THEN
                CALL get_potential(potential=sgp_potential, nloc=nloc, nrloc=nrloc, aloc=aloc, bloc=bloc)
                DO i = 1, nloc
-                  lppl = MAX(0, nrloc(i)-2)
+                  lppl = MAX(0, nrloc(i) - 2)
                   ppl_radius = MAX(ppl_radius, &
                                    exp_radius(lppl, bloc(i), qs_control%eps_ppl, aloc(i)))
                END DO
@@ -371,7 +371,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN), OPTIONAL                :: eps_pgf_short
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_interaction_radii_orb_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ipgf, iset, ishell, l, nset
       INTEGER, DIMENSION(:), POINTER                     :: npgf, nshell
@@ -451,7 +451,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_se_nlradius', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nkind
       REAL(KIND=dp)                                      :: kind_radius
@@ -612,7 +612,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_pgf_orb_radii', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=10)                                  :: bas
       CHARACTER(LEN=default_string_length)               :: name, unit_str

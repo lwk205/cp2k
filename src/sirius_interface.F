@@ -28,18 +28,18 @@ MODULE sirius_interface
    USE atom_types, ONLY: atom_gthpot_type, release_atom_potential
    USE atom_utils, ONLY: atom_local_potential
    USE atom_upf, ONLY: atom_read_upf, &
-      atom_release_upf, &
-      atom_upfpot_type
+                       atom_release_upf, &
+                       atom_upfpot_type
    USE cell_methods, ONLY: read_cell, write_cell
    USE cell_types, ONLY: real_to_scaled, cell_clone, cell_create, &
-      cell_release, cell_type
+                         cell_release, cell_type
    USE qs_grid_atom, ONLY: grid_atom_type, allocate_grid_atom, &
-      deallocate_grid_atom, create_grid_atom
+                           deallocate_grid_atom, create_grid_atom
    USE qs_kind_types, ONLY: &
       check_qs_kind_set, get_qs_kind, get_qs_kind_set, init_gapw_basis_set, init_gapw_nlcc, &
       init_qs_kind_set, qs_kind_type, set_qs_kind, write_gto_basis_sets, write_qs_kind_set
    USE qs_subsys_types, ONLY: qs_subsys_get, qs_subsys_retain, &
-      qs_subsys_release, qs_subsys_set, qs_subsys_type
+                              qs_subsys_release, qs_subsys_set, qs_subsys_type
    USE cp_para_types, ONLY: cp_para_env_type
    USE cp_subsys_methods, ONLY: cp_subsys_create
    USE cp_subsys_types, ONLY: cp_subsys_release, cp_subsys_set, cp_subsys_type
@@ -50,8 +50,8 @@ MODULE sirius_interface
       gth_potential_type, init_potential, local_potential_type, read_potential, &
       set_default_all_potential, set_potential, sgp_potential_type, write_potential
    USE mathconstants, ONLY: dfac, &
-      gamma1, &
-      pi, fourpi
+                            gamma1, &
+                            pi, fourpi
    USE pwdft_environment_types, ONLY: pwdft_environment_type, pwdft_energy_type, pwdft_env_set, pwdft_env_get
    USE ISO_C_BINDING, ONLY: &
       C_ASSOCIATED, C_BOOL, C_DOUBLE, C_FUNPTR, C_F_POINTER, C_INT, C_NULL_FUNPTR, C_NULL_PTR, &
@@ -109,7 +109,7 @@ CONTAINS
    SUBROUTINE cp_sirius_finalize()
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_sirius_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CALL sirius_finalize(bool(.FALSE.), bool(.FALSE.), bool(.FALSE.))
 
@@ -212,7 +212,7 @@ CONTAINS
 #endif
       CPASSERT(npool >= 1)
       num_ranks_k = para_env%num_pe/npool
-      i = INT(SQRT(REAL(num_ranks_k, KIND=dp)+1.0e-10_dp))
+      i = INT(SQRT(REAL(num_ranks_k, KIND=dp) + 1.0e-10_dp))
       IF (i*i /= num_ranks_k) THEN
          dims(1) = 1
          dims(2) = num_ranks_k
@@ -262,12 +262,12 @@ CONTAINS
                rp(1:nmesh) = atom_grid%rad(1:nmesh)
             ELSE
                DO i = 1, nmesh
-                  rp(i) = atom_grid%rad(nmesh-i+1)
+                  rp(i) = atom_grid%rad(nmesh - i + 1)
                END DO
             END IF
             ! add new atom type
             CALL sirius_add_atom_type(sctx, string(label), &
-                                      zn=NINT(zeff+0.001d0), &
+                                      zn=NINT(zeff + 0.001d0), &
                                       mass=REAL(mass, KIND=C_DOUBLE), &
                                       spin_orbit=bool(.FALSE.))
             !
@@ -285,11 +285,11 @@ CONTAINS
                ! we need to multiply by r so that data transfered to sirius are r \beta(r) not beta(r)
                ef(1:nmesh) = EXP(-0.5_dp*rp(1:nmesh)*rp(1:nmesh)/(rl*rl))
                DO i = 1, gth_atompot%nl(l)
-                  pf = rl**(l+0.5_dp*(4._dp*i-1._dp))
-                  j = l+2*i-1
+                  pf = rl**(l + 0.5_dp*(4._dp*i - 1._dp))
+                  j = l + 2*i - 1
                   pf = SQRT(2._dp)/(pf*SQRT(gamma1(j)))
-                  beta(:) = pf*rp**(l+2*i-2)*ef
-                  ibeta = ibeta+1
+                  beta(:) = pf*rp**(l + 2*i - 2)*ef
+                  ibeta = ibeta + 1
                   fun(1:nmesh) = beta(1:nmesh)*rp(1:nmesh)
                   CALL sirius_add_atom_type_radial_function(sctx, string(label), &
                                                             string("beta"), fun(1), nmesh, l=l)
@@ -303,8 +303,8 @@ CONTAINS
             dion = 0.0_dp
             DO l = 0, 3
                IF (gth_atompot%nl(l) == 0) CYCLE
-               ibeta = SUM(gth_atompot%nl(0:l-1))+1
-               i = ibeta+gth_atompot%nl(l)-1
+               ibeta = SUM(gth_atompot%nl(0:l - 1)) + 1
+               i = ibeta + gth_atompot%nl(l) - 1
                dion(ibeta:i, ibeta:i) = gth_atompot%hnl(1:gth_atompot%nl(l), 1:gth_atompot%nl(l), l)
             END DO
             CALL sirius_set_atom_type_dion(sctx, string(label), nbeta, dion(1, 1))
@@ -321,7 +321,7 @@ CONTAINS
                   fe(:) = EXP(-0.5_dp*rc(:)*rc(:))
                   DO j = 1, gth_atompot%nct_nlcc(i)
                      cval = gth_atompot%cval_nlcc(j, i)
-                     corden(:) = corden(:)+fe(:)*rc(:)**(2*j-2)*cval
+                     corden(:) = corden(:) + fe(:)*rc(:)**(2*j - 2)*cval
                   END DO
                END DO
                fun(1:nmesh) = corden(1:nmesh)*rp(1:nmesh)
@@ -352,7 +352,7 @@ CONTAINS
                   fun(1:nmesh) = wavefunction(1:nmesh, iwf)*rp(i)
                ELSE
                   DO i = 1, nmesh
-                     fun(i) = wavefunction(nmesh-i+1, iwf)*rp(i)
+                     fun(i) = wavefunction(nmesh - i + 1, iwf)*rp(i)
                   END DO
                END IF
                CALL sirius_add_atom_type_radial_function(sctx, &
@@ -365,7 +365,7 @@ CONTAINS
                fun(1:nmesh) = fourpi*density(1:nmesh)*atom_grid%rad(1:nmesh)**2
             ELSE
                DO i = 1, nmesh
-                  fun(i) = fourpi*density(nmesh-i+1)*atom_grid%rad(nmesh-i+1)**2
+                  fun(i) = fourpi*density(nmesh - i + 1)*atom_grid%rad(nmesh - i + 1)**2
                END DO
             END IF
             CALL sirius_add_atom_type_radial_function(sctx, string(label), string("ps_rho_total"), &
@@ -484,7 +484,7 @@ CONTAINS
       TYPE(pwdft_environment_type), POINTER              :: pwdft_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_sirius_update_context', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, natom
       REAL(KIND=C_DOUBLE), DIMENSION(3)                  :: a1, a2, a3, v2
@@ -579,7 +579,7 @@ CONTAINS
       TYPE(pwdft_environment_type), POINTER              :: pwdft_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'cp_sirius_energy_force', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: n1, n2
       REAL(KIND=C_DOUBLE)                                :: etotal

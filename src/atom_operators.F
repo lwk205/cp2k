@@ -11,28 +11,28 @@
 !>
 ! **************************************************************************************************
 MODULE atom_operators
-   USE ai_onecenter,                    ONLY: &
-        sg_coulomb, sg_erf, sg_erfc, sg_exchange, sg_gpot, sg_kinetic, sg_kinnuc, sg_nuclear, &
-        sg_overlap, sg_proj_ol, sto_kinetic, sto_nuclear, sto_overlap
-   USE atom_types,                      ONLY: &
-        atom_basis_gridrep, atom_basis_type, atom_compare_grids, atom_integrals, &
-        atom_potential_type, atom_state, cgto_basis, ecp_pseudo, gth_pseudo, gto_basis, lmat, &
-        no_pseudo, num_basis, release_atom_basis, sgp_pseudo, sto_basis, upf_pseudo
-   USE atom_utils,                      ONLY: &
-        atom_solve, contract2, contract2add, contract4, coulomb_potential_numeric, integrate_grid, &
-        numpot_matrix, slater_density, wigner_slater_functional
-   USE dkh_main,                        ONLY: dkh_atom_transformation
-   USE input_constants,                 ONLY: &
-        barrier_conf, do_dkh0_atom, do_dkh1_atom, do_dkh2_atom, do_dkh3_atom, do_nonrel_atom, &
-        do_sczoramp_atom, do_zoramp_atom, poly_conf
-   USE kinds,                           ONLY: dp
-   USE lapack,                          ONLY: lapack_sgesv
-   USE mathconstants,                   ONLY: gamma1,&
-                                              sqrt2
-   USE mathlib,                         ONLY: jacobi
-   USE periodic_table,                  ONLY: ptable
-   USE physcon,                         ONLY: a_fine
-   USE qs_grid_atom,                    ONLY: grid_atom_type
+   USE ai_onecenter, ONLY: &
+      sg_coulomb, sg_erf, sg_erfc, sg_exchange, sg_gpot, sg_kinetic, sg_kinnuc, sg_nuclear, &
+      sg_overlap, sg_proj_ol, sto_kinetic, sto_nuclear, sto_overlap
+   USE atom_types, ONLY: &
+      atom_basis_gridrep, atom_basis_type, atom_compare_grids, atom_integrals, &
+      atom_potential_type, atom_state, cgto_basis, ecp_pseudo, gth_pseudo, gto_basis, lmat, &
+      no_pseudo, num_basis, release_atom_basis, sgp_pseudo, sto_basis, upf_pseudo
+   USE atom_utils, ONLY: &
+      atom_solve, contract2, contract2add, contract4, coulomb_potential_numeric, integrate_grid, &
+      numpot_matrix, slater_density, wigner_slater_functional
+   USE dkh_main, ONLY: dkh_atom_transformation
+   USE input_constants, ONLY: &
+      barrier_conf, do_dkh0_atom, do_dkh1_atom, do_dkh2_atom, do_dkh3_atom, do_nonrel_atom, &
+      do_sczoramp_atom, do_zoramp_atom, poly_conf
+   USE kinds, ONLY: dp
+   USE lapack, ONLY: lapack_sgesv
+   USE mathconstants, ONLY: gamma1, &
+                            sqrt2
+   USE mathlib, ONLY: jacobi
+   USE periodic_table, ONLY: ptable
+   USE physcon, ONLY: a_fine
+   USE qs_grid_atom, ONLY: grid_atom_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -122,15 +122,15 @@ CONTAINS
                ELSEIF (potential%conf_type == barrier_conf) THEN
                   om = potential%rcon
                   ron = potential%scon
-                  rc = ron+om
+                  rc = ron + om
                   DO i = 1, m
                      IF (basis%grid%rad(i) < ron) THEN
                         cpot(i) = 0.0_dp
                      ELSEIF (basis%grid%rad(i) < rc) THEN
-                        x = (basis%grid%rad(i)-ron)/om
-                        x = 1._dp-x
-                        cpot(i) = -6._dp*x**5+15._dp*x**4-10._dp*x**3+1._dp
-                        x = (rc-basis%grid%rad(i))**2/om/(basis%grid%rad(i)-ron)
+                        x = (basis%grid%rad(i) - ron)/om
+                        x = 1._dp - x
+                        cpot(i) = -6._dp*x**5 + 15._dp*x**4 - 10._dp*x**3 + 1._dp
+                        x = (rc - basis%grid%rad(i))**2/om/(basis%grid%rad(i) - ron)
                         cpot(i) = cpot(i)*x
                      ELSE
                         cpot(i) = 1.0_dp
@@ -157,17 +157,17 @@ CONTAINS
                ll = 0
                DO l1 = 0, lmat
                   n1 = integrals%n(l1)
-                  nn1 = (n1*(n1+1))/2
+                  nn1 = (n1*(n1 + 1))/2
                   DO l2 = 0, l1
                      n2 = integrals%n(l2)
-                     nn2 = (n2*(n2+1))/2
+                     nn2 = (n2*(n2 + 1))/2
                      IF (integrals%all_nu) THEN
                         nx = MIN(2*l1, 2*l2)
                      ELSE
                         nx = 0
                      END IF
                      DO nu = 0, nx, 2
-                        ll = ll+1
+                        ll = ll + 1
                         CPASSERT(ll <= SIZE(integrals%ceri))
                         ALLOCATE (integrals%ceri(ll)%int(nn1, nn2))
                         integrals%ceri(ll)%int = 0._dp
@@ -181,12 +181,12 @@ CONTAINS
                ll = 0
                DO l1 = 0, lmat
                   n1 = integrals%n(l1)
-                  nn1 = (n1*(n1+1))/2
+                  nn1 = (n1*(n1 + 1))/2
                   DO l2 = 0, l1
                      n2 = integrals%n(l2)
-                     nn2 = (n2*(n2+1))/2
-                     DO nu = ABS(l1-l2), l1+l2, 2
-                        ll = ll+1
+                     nn2 = (n2*(n2 + 1))/2
+                     DO nu = ABS(l1 - l2), l1 + l2, 2
+                        ll = ll + 1
                         CPASSERT(ll <= SIZE(integrals%eeri))
                         ALLOCATE (integrals%eeri(ll)%int(nn1, nn2))
                         integrals%eeri(ll)%int = 0._dp
@@ -214,21 +214,21 @@ CONTAINS
                ll = 0
                DO l1 = 0, lmat
                   n1 = integrals%n(l1)
-                  nn1 = (n1*(n1+1))/2
+                  nn1 = (n1*(n1 + 1))/2
                   m1 = basis%nprim(l1)
-                  mm1 = (m1*(m1+1))/2
+                  mm1 = (m1*(m1 + 1))/2
                   DO l2 = 0, l1
                      n2 = integrals%n(l2)
-                     nn2 = (n2*(n2+1))/2
+                     nn2 = (n2*(n2 + 1))/2
                      m2 = basis%nprim(l2)
-                     mm2 = (m2*(m2+1))/2
+                     mm2 = (m2*(m2 + 1))/2
                      IF (integrals%all_nu) THEN
                         nx = MIN(2*l1, 2*l2)
                      ELSE
                         nx = 0
                      END IF
                      DO nu = 0, nx, 2
-                        ll = ll+1
+                        ll = ll + 1
                         CPASSERT(ll <= SIZE(integrals%ceri))
                         ALLOCATE (integrals%ceri(ll)%int(nn1, nn2))
                         integrals%ceri(ll)%int = 0._dp
@@ -247,16 +247,16 @@ CONTAINS
                ll = 0
                DO l1 = 0, lmat
                   n1 = integrals%n(l1)
-                  nn1 = (n1*(n1+1))/2
+                  nn1 = (n1*(n1 + 1))/2
                   m1 = basis%nprim(l1)
-                  mm1 = (m1*(m1+1))/2
+                  mm1 = (m1*(m1 + 1))/2
                   DO l2 = 0, l1
                      n2 = integrals%n(l2)
-                     nn2 = (n2*(n2+1))/2
+                     nn2 = (n2*(n2 + 1))/2
                      m2 = basis%nprim(l2)
-                     mm2 = (m2*(m2+1))/2
-                     DO nu = ABS(l1-l2), l1+l2, 2
-                        ll = ll+1
+                     mm2 = (m2*(m2 + 1))/2
+                     DO nu = ABS(l1 - l2), l1 + l2, 2
+                        ll = ll + 1
                         CPASSERT(ll <= SIZE(integrals%eeri))
                         ALLOCATE (integrals%eeri(ll)%int(nn1, nn2))
                         integrals%eeri(ll)%int = 0._dp
@@ -303,7 +303,7 @@ CONTAINS
                ii = 0
                DO i = 1, n
                   IF (w(i) > basis%eps_eig) THEN
-                     ii = ii+1
+                     ii = ii + 1
                      integrals%utrans(1:n, ii, l) = omat(1:n, i)/SQRT(w(i))
                   END IF
                END DO
@@ -337,7 +337,7 @@ CONTAINS
       TYPE(atom_potential_type), INTENT(IN)              :: potential
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_ppint_setup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, ii, j, k, l, m, n
       REAL(KIND=dp)                                      :: al, alpha, rc
@@ -386,17 +386,17 @@ CONTAINS
                   integrals%core(1:n, 1:n, l) = -potential%gth_pot%zion*omat(1:n, 1:n)
                   DO i = 1, potential%gth_pot%ncl
                      omat = 0._dp
-                     CALL sg_gpot(omat(1:n, 1:n), i-1, potential%gth_pot%rc, l, basis%am(1:n, l), basis%am(1:n, l))
-                     integrals%core(1:n, 1:n, l) = integrals%core(1:n, 1:n, l)+ &
+                     CALL sg_gpot(omat(1:n, 1:n), i - 1, potential%gth_pot%rc, l, basis%am(1:n, l), basis%am(1:n, l))
+                     integrals%core(1:n, 1:n, l) = integrals%core(1:n, 1:n, l) + &
                                                    potential%gth_pot%cl(i)*omat(1:n, 1:n)
                   END DO
                   IF (potential%gth_pot%lpotextended) THEN
                      DO k = 1, potential%gth_pot%nexp_lpot
                         DO i = 1, potential%gth_pot%nct_lpot(k)
                            omat = 0._dp
-                           CALL sg_gpot(omat(1:n, 1:n), i-1, potential%gth_pot%alpha_lpot(k), l, &
+                           CALL sg_gpot(omat(1:n, 1:n), i - 1, potential%gth_pot%alpha_lpot(k), l, &
                                         basis%am(1:n, l), basis%am(1:n, l))
-                           integrals%core(1:n, 1:n, l) = integrals%core(1:n, 1:n, l)+ &
+                           integrals%core(1:n, 1:n, l) = integrals%core(1:n, 1:n, l) + &
                                                          potential%gth_pot%cval_lpot(i, k)*omat(1:n, 1:n)
                         END DO
                      END DO
@@ -405,9 +405,9 @@ CONTAINS
                      DO k = 1, potential%gth_pot%nexp_lsd
                         DO i = 1, potential%gth_pot%nct_lsd(k)
                            omat = 0._dp
-                           CALL sg_gpot(omat(1:n, 1:n), i-1, potential%gth_pot%alpha_lsd(k), l, &
+                           CALL sg_gpot(omat(1:n, 1:n), i - 1, potential%gth_pot%alpha_lsd(k), l, &
                                         basis%am(1:n, l), basis%am(1:n, l))
-                           integrals%clsd(1:n, 1:n, l) = integrals%clsd(1:n, 1:n, l)+ &
+                           integrals%clsd(1:n, 1:n, l) = integrals%clsd(1:n, 1:n, l) + &
                                                          potential%gth_pot%cval_lsd(i, k)*omat(1:n, 1:n)
                         END DO
                      END DO
@@ -416,7 +416,7 @@ CONTAINS
                   spmat = 0._dp
                   m = potential%gth_pot%nl(l)
                   DO i = 1, m
-                     CALL sg_proj_ol(spmat(1:n, i), l, basis%am(1:n, l), i-1, potential%gth_pot%rcnl(l))
+                     CALL sg_proj_ol(spmat(1:n, i), l, basis%am(1:n, l), i - 1, potential%gth_pot%rcnl(l))
                   END DO
                   integrals%hnl(1:n, 1:n, l) = MATMUL(spmat(1:n, 1:m), &
                                                       MATMUL(potential%gth_pot%hnl(1:m, 1:m, l), TRANSPOSE(spmat(1:n, 1:m))))
@@ -459,7 +459,7 @@ CONTAINS
                      CALL contract2(integrals%core(1:n, 1:n, l), omat(1:m, 1:m), basis%cm(1:m, 1:n, l))
                      DO i = 1, potential%gth_pot%ncl
                         omat = 0._dp
-                        CALL sg_gpot(omat(1:m, 1:m), i-1, potential%gth_pot%rc, l, basis%am(1:m, l), basis%am(1:m, l))
+                        CALL sg_gpot(omat(1:m, 1:m), i - 1, potential%gth_pot%rc, l, basis%am(1:m, l), basis%am(1:m, l))
                         omat(1:m, 1:m) = potential%gth_pot%cl(i)*omat(1:m, 1:m)
                         CALL contract2add(integrals%core(1:n, 1:n, l), omat(1:m, 1:m), basis%cm(1:m, 1:n, l))
                      END DO
@@ -467,7 +467,7 @@ CONTAINS
                         DO k = 1, potential%gth_pot%nexp_lpot
                            DO i = 1, potential%gth_pot%nct_lpot(k)
                               omat = 0._dp
-                              CALL sg_gpot(omat(1:m, 1:m), i-1, potential%gth_pot%alpha_lpot(k), l, &
+                              CALL sg_gpot(omat(1:m, 1:m), i - 1, potential%gth_pot%alpha_lpot(k), l, &
                                            basis%am(1:m, l), basis%am(1:m, l))
                               omat(1:m, 1:m) = potential%gth_pot%cval_lpot(i, k)*omat(1:m, 1:m)
                               CALL contract2add(integrals%core(1:n, 1:n, l), omat(1:m, 1:m), basis%cm(1:m, 1:n, l))
@@ -478,7 +478,7 @@ CONTAINS
                         DO k = 1, potential%gth_pot%nexp_lsd
                            DO i = 1, potential%gth_pot%nct_lsd(k)
                               omat = 0._dp
-                              CALL sg_gpot(omat(1:m, 1:m), i-1, potential%gth_pot%alpha_lsd(k), l, &
+                              CALL sg_gpot(omat(1:m, 1:m), i - 1, potential%gth_pot%alpha_lsd(k), l, &
                                            basis%am(1:m, l), basis%am(1:m, l))
                               omat(1:m, 1:m) = potential%gth_pot%cval_lsd(i, k)*omat(1:m, 1:m)
                               CALL contract2add(integrals%clsd(1:n, 1:n, l), omat(1:m, 1:m), basis%cm(1:m, 1:n, l))
@@ -489,7 +489,7 @@ CONTAINS
                      spmat = 0._dp
                      k = potential%gth_pot%nl(l)
                      DO i = 1, k
-                        CALL sg_proj_ol(xmat(1:m), l, basis%am(1:m, l), i-1, potential%gth_pot%rcnl(l))
+                        CALL sg_proj_ol(xmat(1:m), l, basis%am(1:m, l), i - 1, potential%gth_pot%rcnl(l))
                         spmat(1:n, i) = MATMUL(TRANSPOSE(basis%cm(1:m, 1:n, l)), xmat(1:m))
                      END DO
                      IF (k > 0) THEN
@@ -530,15 +530,15 @@ CONTAINS
                   cpot(i) = potential%gth_pot%zion*erfc(alpha*rad(i))/rad(i)
                END DO
                DO i = 1, potential%gth_pot%ncl
-                  ii = 2*(i-1)
-                  cpot(1:m) = cpot(1:m)+potential%gth_pot%cl(i)*(rad/rc)**ii*EXP(-0.5_dp*(rad/rc)**2)
+                  ii = 2*(i - 1)
+                  cpot(1:m) = cpot(1:m) + potential%gth_pot%cl(i)*(rad/rc)**ii*EXP(-0.5_dp*(rad/rc)**2)
                END DO
                IF (potential%gth_pot%lpotextended) THEN
                   DO k = 1, potential%gth_pot%nexp_lpot
                      al = potential%gth_pot%alpha_lpot(k)
                      DO i = 1, potential%gth_pot%nct_lpot(k)
-                        ii = 2*(i-1)
-                        cpot(1:m) = cpot(1:m)+potential%gth_pot%cval_lpot(i, k)*(rad/al)**ii*EXP(-0.5_dp*(rad/al)**2)
+                        ii = 2*(i - 1)
+                        cpot(1:m) = cpot(1:m) + potential%gth_pot%cval_lpot(i, k)*(rad/al)**ii*EXP(-0.5_dp*(rad/al)**2)
                      END DO
                   END DO
                END IF
@@ -549,7 +549,7 @@ CONTAINS
                   omat = 0._dp
                   CALL sto_nuclear(omat(1:n, 1:n), basis%ns(1:n, l), basis%as(1:n, l), &
                                    basis%ns(1:n, l), basis%as(1:n, l))
-                  integrals%core(1:n, 1:n, l) = integrals%core(1:n, 1:n, l)-potential%gth_pot%zion*omat(1:n, 1:n)
+                  integrals%core(1:n, 1:n, l) = integrals%core(1:n, 1:n, l) - potential%gth_pot%zion*omat(1:n, 1:n)
                   DEALLOCATE (omat)
                END DO
 
@@ -558,8 +558,8 @@ CONTAINS
                   DO k = 1, potential%gth_pot%nexp_lsd
                      al = potential%gth_pot%alpha_lsd(k)
                      DO i = 1, potential%gth_pot%nct_lsd(k)
-                        ii = 2*(i-1)
-                        cpot(:) = cpot+potential%gth_pot%cval_lsd(i, k)*(rad/al)**ii*EXP(-0.5_dp*(rad/al)**2)
+                        ii = 2*(i - 1)
+                        cpot(:) = cpot + potential%gth_pot%cval_lsd(i, k)*(rad/al)**ii*EXP(-0.5_dp*(rad/al)**2)
                      END DO
                   END DO
                   CALL numpot_matrix(integrals%clsd, cpot, basis, 0)
@@ -573,7 +573,7 @@ CONTAINS
                   k = potential%gth_pot%nl(l)
                   DO i = 1, k
                      rc = potential%gth_pot%rcnl(l)
-                     cpot(:) = sqrt2/SQRT(gamma1(l+2*i-1))*rad**(l+2*i-2)*EXP(-0.5_dp*(rad/rc)**2)/rc**(l+2*i-0.5_dp)
+                     cpot(:) = sqrt2/SQRT(gamma1(l + 2*i - 1))*rad**(l + 2*i - 2)*EXP(-0.5_dp*(rad/rc)**2)/rc**(l + 2*i - 0.5_dp)
                      DO j = 1, basis%nbas(l)
                         spmat(j, i) = integrate_grid(cpot, basis%bf(:, j, l), basis%grid)
                      END DO
@@ -609,7 +609,7 @@ CONTAINS
             DO k = 1, potential%ecp_pot%nloc
                n = potential%ecp_pot%nrloc(k)
                alpha = potential%ecp_pot%bloc(k)
-               cpot(:) = cpot+potential%ecp_pot%aloc(k)*rad**(n-2)*EXP(-alpha*rad**2)
+               cpot(:) = cpot + potential%ecp_pot%aloc(k)*rad**(n - 2)*EXP(-alpha*rad**2)
             END DO
             CALL numpot_matrix(integrals%core, cpot, basis, 0)
             ! non local pseudopotential
@@ -618,7 +618,7 @@ CONTAINS
                DO k = 1, potential%ecp_pot%npot(l)
                   n = potential%ecp_pot%nrpot(k, l)
                   alpha = potential%ecp_pot%bpot(k, l)
-                  cpot(:) = cpot+potential%ecp_pot%apot(k, l)*rad**(n-2)*EXP(-alpha*rad**2)
+                  cpot(:) = cpot + potential%ecp_pot%apot(k, l)*rad**(n - 2)*EXP(-alpha*rad**2)
                END DO
                DO i = 1, basis%nbas(l)
                   DO j = i, basis%nbas(l)
@@ -681,7 +681,7 @@ CONTAINS
                IF (la == lb) THEN
                   DO k1 = 1, gbasis%nbas(la)
                      DO k2 = 1, gbasis%nbas(la)
-                        integrals%hnl(k1, k2, la) = integrals%hnl(k1, k2, la)+ &
+                        integrals%hnl(k1, k2, la) = integrals%hnl(k1, k2, la) + &
                                                     spmat(k1, i)*potential%upf_pot%dion(i, j)*spmat(k2, j)
                      END DO
                   END DO
@@ -693,13 +693,13 @@ CONTAINS
          ! semi local pseudopotential
          DO la = 0, potential%upf_pot%l_max
             IF (la == potential%upf_pot%l_local) CYCLE
-            m = SIZE(potential%upf_pot%vsemi(:, la+1))
+            m = SIZE(potential%upf_pot%vsemi(:, la + 1))
             ALLOCATE (spot(m))
-            spot(:) = potential%upf_pot%vsemi(:, la+1)-potential%upf_pot%vlocal(:)
+            spot(:) = potential%upf_pot%vsemi(:, la + 1) - potential%upf_pot%vlocal(:)
             n = basis%nbas(la)
             DO i = 1, n
                DO j = i, n
-                  integrals%core(i, j, la) = integrals%core(i, j, la)+ &
+                  integrals%core(i, j, la) = integrals%core(i, j, la) + &
                                              integrate_grid(spot(:), &
                                                             gbasis%bf(:, i, la), gbasis%bf(:, j, la), gbasis%grid)
                   integrals%core(j, i, la) = integrals%core(i, j, la)
@@ -744,10 +744,10 @@ CONTAINS
       zval = potential%sgp_pot%zion
       DO i = 1, m
          rc = rad(i)/potential%sgp_pot%ac_local/SQRT(2.0_dp)
-         cpot(i) = cpot(i)-zval/rad(i)*erf(rc)
+         cpot(i) = cpot(i) - zval/rad(i)*erf(rc)
       END DO
       DO i = 1, potential%sgp_pot%n_local
-         cpot(:) = cpot(:)+potential%sgp_pot%c_local(i)*EXP(-potential%sgp_pot%a_local(i)*rad(:)**2)
+         cpot(:) = cpot(:) + potential%sgp_pot%c_local(i)*EXP(-potential%sgp_pot%a_local(i)*rad(:)**2)
       END DO
       CALL numpot_matrix(integrals%core, cpot, basis, 0)
       DEALLOCATE (cpot)
@@ -769,7 +769,7 @@ CONTAINS
                DO j = 1, n
                   a = potential%sgp_pot%a_nonlocal(j)
                   c = potential%sgp_pot%c_nonlocal(j, i, l)
-                  pgauss(:) = pgauss(:)+c*EXP(-a*rad(:)**2)*rad(:)**l
+                  pgauss(:) = pgauss(:) + c*EXP(-a*rad(:)**2)*rad(:)**l
                END DO
                DO ia = 1, na
                   qmat(ia, i) = SUM(basis%bf(:, ia, l)*pgauss(:)*basis%grid%wr(:))
@@ -779,7 +779,7 @@ CONTAINS
                DO j = i, na
                   DO ia = 1, n
                      integrals%hnl(i, j, l) = integrals%hnl(i, j, l) &
-                                              +qmat(i, ia)*qmat(j, ia)*potential%sgp_pot%h_nonlocal(ia, l)
+                                              + qmat(i, ia)*qmat(j, ia)*potential%sgp_pot%h_nonlocal(ia, l)
                   END DO
                   integrals%hnl(j, i, l) = integrals%hnl(i, j, l)
                END DO
@@ -806,7 +806,7 @@ CONTAINS
       REAL(dp), INTENT(IN), OPTIONAL                     :: alpha
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_relint_setup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: dkhorder, handle, i, k1, k2, l, m, n, nl
       REAL(dp)                                           :: ascal, cspeed
@@ -852,12 +852,12 @@ CONTAINS
             ALLOCATE (modpot(1:m), cpot(1:m))
             CALL calculate_model_potential(modpot, basis%grid, zcore)
             ! Zora potential
-            cpot(1:m) = modpot(1:m)/(4._dp*cspeed*cspeed-2._dp*modpot(1:m))
+            cpot(1:m) = modpot(1:m)/(4._dp*cspeed*cspeed - 2._dp*modpot(1:m))
             cpot(1:m) = cpot(1:m)/basis%grid%rad2(1:m)
             CALL numpot_matrix(integrals%tzora, cpot, basis, 0)
             DO l = 0, lmat
                nl = basis%nbas(l)
-               integrals%tzora(1:nl, 1:nl, l) = REAL(l*(l+1), dp)*integrals%tzora(1:nl, 1:nl, l)
+               integrals%tzora(1:nl, 1:nl, l) = REAL(l*(l + 1), dp)*integrals%tzora(1:nl, 1:nl, l)
             END DO
             cpot(1:m) = cpot(1:m)*basis%grid%rad2(1:m)
             CALL numpot_matrix(integrals%tzora, cpot, basis, 2)
@@ -865,19 +865,19 @@ CONTAINS
             ! scaled ZORA
             IF (reltyp == do_sczoramp_atom) THEN
                ALLOCATE (hmat(n, n, 0:lmat), wfn(n, n, 0:lmat), ener(n, 0:lmat), pvp(n, n, 0:lmat), sps(n, n))
-               hmat(:, :, :) = integrals%kin+integrals%tzora
+               hmat(:, :, :) = integrals%kin + integrals%tzora
                ! model potential
                CALL numpot_matrix(hmat, modpot, basis, 0)
                ! eigenvalues and eigenvectors
                CALL atom_solve(hmat, integrals%utrans, wfn, ener, basis%nbas, integrals%nne, lmat)
                ! relativistic kinetic energy
-               cpot(1:m) = cspeed*cspeed/(2._dp*cspeed*cspeed-modpot(1:m))**2
+               cpot(1:m) = cspeed*cspeed/(2._dp*cspeed*cspeed - modpot(1:m))**2
                cpot(1:m) = cpot(1:m)/basis%grid%rad2(1:m)
                pvp = 0.0_dp
                CALL numpot_matrix(pvp, cpot, basis, 0)
                DO l = 0, lmat
                   nl = basis%nbas(l)
-                  pvp(1:nl, 1:nl, l) = REAL(l*(l+1), dp)*pvp(1:nl, 1:nl, l)
+                  pvp(1:nl, 1:nl, l) = REAL(l*(l + 1), dp)*pvp(1:nl, 1:nl, l)
                END DO
                cpot(1:m) = cpot(1:m)*basis%grid%rad2(1:m)
                CALL numpot_matrix(pvp, cpot, basis, 2)
@@ -888,7 +888,7 @@ CONTAINS
                   DO i = 1, integrals%nne(l)
                      IF (ener(i, l) < 0._dp) THEN
                         ascal = SUM(wfn(1:nl, i, l)*MATMUL(pvp(1:nl, 1:nl, l), wfn(1:nl, i, l)))
-                        ener(i, l) = ener(i, l)*ascal/(1.0_dp+ascal)
+                        ener(i, l) = ener(i, l)*ascal/(1.0_dp + ascal)
                      ELSE
                         ener(i, l) = 0.0_dp
                      END IF
@@ -901,7 +901,7 @@ CONTAINS
                   DO i = 1, integrals%nne(l)
                      DO k1 = 1, nl
                         DO k2 = 1, nl
-                           hmat(k1, k2, l) = hmat(k1, k2, l)+ener(i, l)*wfn(k1, i, l)*wfn(k2, i, l)
+                           hmat(k1, k2, l) = hmat(k1, k2, l) + ener(i, l)*wfn(k1, i, l)*wfn(k2, i, l)
                         END DO
                      END DO
                   END DO
@@ -909,7 +909,7 @@ CONTAINS
                   sps(1:nl, 1:nl) = MATMUL(integrals%ovlp(1:nl, 1:nl, l), &
                                            MATMUL(hmat(1:nl, 1:nl, l), integrals%ovlp(1:nl, 1:nl, l)))
                   ! add scaling correction to tzora
-                  integrals%tzora(1:nl, 1:nl, l) = integrals%tzora(1:nl, 1:nl, l)-sps(1:nl, 1:nl)
+                  integrals%tzora(1:nl, 1:nl, l) = integrals%tzora(1:nl, 1:nl, l) - sps(1:nl, 1:nl)
                END DO
 
                DEALLOCATE (hmat, wfn, ener, pvp, sps)
@@ -1014,7 +1014,7 @@ CONTAINS
                CPABORT("")
             CASE (GTO_BASIS)
                CPASSERT(n == m)
-               integrals%hdkh(1:n, 1:n, l) = tp(1:n, 1:n, l)+vp(1:n, 1:n, l)
+               integrals%hdkh(1:n, 1:n, l) = tp(1:n, 1:n, l) + vp(1:n, 1:n, l)
             CASE (CGTO_BASIS)
                CALL contract2(integrals%hdkh(1:n, 1:n, l), tp(1:m, 1:m, l), basis%cm(1:m, 1:n, l))
                CALL contract2add(integrals%hdkh(1:n, 1:n, l), vp(1:m, 1:m, l), basis%cm(1:m, 1:n, l))
@@ -1112,7 +1112,7 @@ CONTAINS
       TYPE(atom_integrals), INTENT(INOUT)                :: integrals
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_int_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ll
 
@@ -1151,7 +1151,7 @@ CONTAINS
       TYPE(atom_integrals), INTENT(INOUT)                :: integrals
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_ppint_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(integrals%hnl)) THEN
          DEALLOCATE (integrals%hnl)
@@ -1174,7 +1174,7 @@ CONTAINS
       TYPE(atom_integrals), INTENT(INOUT)                :: integrals
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_relint_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(integrals%tzora)) THEN
          DEALLOCATE (integrals%tzora)
@@ -1199,7 +1199,7 @@ CONTAINS
       REAL(dp), INTENT(IN)                               :: zcore
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_model_potential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ii, l, ll, n, z
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: pot, rho
@@ -1216,9 +1216,9 @@ CONTAINS
       DO l = 0, MIN(lmat, UBOUND(ptable(z)%e_conv, 1))
          IF (ptable(z)%e_conv(l) /= 0) THEN
             state%maxl_occ = l
-            ll = 2*(2*l+1)
+            ll = 2*(2*l + 1)
             DO i = 1, SIZE(state%occ, 2)
-               ii = ptable(z)%e_conv(l)-(i-1)*ll
+               ii = ptable(z)%e_conv(l) - (i - 1)*ll
                IF (ii <= ll) THEN
                   state%occ(l, i) = ii
                   EXIT
@@ -1234,11 +1234,11 @@ CONTAINS
       ! Coulomb potential
       CALL slater_density(rho, pot, NINT(zcore), state, grid)
       CALL coulomb_potential_numeric(pot, rho, grid)
-      modpot = modpot+pot
+      modpot = modpot + pot
 
       ! XC potential
       CALL wigner_slater_functional(rho, pot)
-      modpot = modpot+pot
+      modpot = modpot + pot
 
       DEALLOCATE (rho, pot)
 

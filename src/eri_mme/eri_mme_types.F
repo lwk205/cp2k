@@ -13,16 +13,16 @@
 
 MODULE eri_mme_types
 
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE eri_mme_error_control,           ONLY: calibrate_cutoff,&
-                                              cutoff_minimax_error
-   USE eri_mme_gaussian,                ONLY: get_minimax_coeff_v_gspace
-   USE eri_mme_util,                    ONLY: G_abs_min,&
-                                              R_abs_min
-   USE kinds,                           ONLY: dp
-   USE mathlib,                         ONLY: det_3x3,&
-                                              inv_3x3
-   USE orbital_pointers,                ONLY: init_orbital_pointers
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE eri_mme_error_control, ONLY: calibrate_cutoff, &
+                                    cutoff_minimax_error
+   USE eri_mme_gaussian, ONLY: get_minimax_coeff_v_gspace
+   USE eri_mme_util, ONLY: G_abs_min, &
+                           R_abs_min
+   USE kinds, ONLY: dp
+   USE mathlib, ONLY: det_3x3, &
+                      inv_3x3
+   USE orbital_pointers, ONLY: init_orbital_pointers
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -143,7 +143,7 @@ CONTAINS
       TYPE(cp_para_env_type), INTENT(IN), POINTER        :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'eri_mme_set_params', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, l_mm
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: l_c

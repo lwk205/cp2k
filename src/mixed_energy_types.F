@@ -9,7 +9,7 @@
 ! **************************************************************************************************
 MODULE mixed_energy_types
 
-   USE kinds,                           ONLY: dp
+   USE kinds, ONLY: dp
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -48,7 +48,7 @@ CONTAINS
       TYPE(mixed_energy_type), POINTER                   :: mixed_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'allocate_mixed_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (.NOT. ASSOCIATED(mixed_energy)) THEN
          ALLOCATE (mixed_energy)
@@ -67,7 +67,7 @@ CONTAINS
       TYPE(mixed_energy_type), POINTER                   :: mixed_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'deallocate_mixed_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(mixed_energy)) THEN
          DEALLOCATE (mixed_energy)
@@ -82,7 +82,7 @@ CONTAINS
       TYPE(mixed_energy_type), POINTER                   :: mixed_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'init_mixed_energy', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(mixed_energy)) THEN
          mixed_energy%pot = 0.0_dp

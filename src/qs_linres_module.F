@@ -14,79 +14,79 @@
 !> \author MI
 ! **************************************************************************************************
 MODULE qs_linres_module
-   USE bibliography,                    ONLY: Weber2009,&
-                                              cite_reference
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE dbcsr_api,                       ONLY: dbcsr_p_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_type,&
-                                              use_qmmm,&
-                                              use_qs_force
-   USE input_constants,                 ONLY: lr_current,&
-                                              lr_none,&
-                                              ot_precond_full_all,&
-                                              ot_precond_full_kinetic,&
-                                              ot_precond_full_single,&
-                                              ot_precond_full_single_inverse,&
-                                              ot_precond_none,&
-                                              ot_precond_s_inverse
-   USE input_section_types,             ONLY: section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_linres_current,               ONLY: current_build_chi,&
-                                              current_build_current
-   USE qs_linres_current_utils,         ONLY: current_env_cleanup,&
-                                              current_env_init,&
-                                              current_response
-   USE qs_linres_epr_nablavks,          ONLY: epr_nablavks
-   USE qs_linres_epr_ownutils,          ONLY: epr_g_print,&
-                                              epr_g_so,&
-                                              epr_g_soo,&
-                                              epr_g_zke,&
-                                              epr_ind_magnetic_field
-   USE qs_linres_epr_utils,             ONLY: epr_env_cleanup,&
-                                              epr_env_init
-   USE qs_linres_issc_utils,            ONLY: issc_env_cleanup,&
-                                              issc_env_init,&
-                                              issc_issc,&
-                                              issc_print,&
-                                              issc_response
-   USE qs_linres_methods,               ONLY: linres_localize
-   USE qs_linres_nmr_shift,             ONLY: nmr_shift,&
-                                              nmr_shift_print
-   USE qs_linres_nmr_utils,             ONLY: nmr_env_cleanup,&
-                                              nmr_env_init
-   USE qs_linres_op,                    ONLY: current_operators,&
-                                              issc_operators,&
-                                              polar_operators
-   USE qs_linres_polar_utils,           ONLY: polar_env_init,&
-                                              polar_polar,&
-                                              polar_print,&
-                                              polar_response
-   USE qs_linres_types,                 ONLY: current_env_type,&
-                                              epr_env_type,&
-                                              issc_env_type,&
-                                              linres_control_create,&
-                                              linres_control_release,&
-                                              linres_control_type,&
-                                              nmr_env_type
-   USE qs_mo_methods,                   ONLY: calculate_density_matrix
-   USE qs_mo_types,                     ONLY: mo_set_p_type
-   USE qs_p_env_methods,                ONLY: p_env_create,&
-                                              p_env_psi0_changed
-   USE qs_p_env_types,                  ONLY: p_env_release,&
-                                              qs_p_env_type
-   USE qs_rho_methods,                  ONLY: qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
+   USE bibliography, ONLY: Weber2009, &
+                           cite_reference
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE dbcsr_api, ONLY: dbcsr_p_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_type, &
+                              use_qmmm, &
+                              use_qs_force
+   USE input_constants, ONLY: lr_current, &
+                              lr_none, &
+                              ot_precond_full_all, &
+                              ot_precond_full_kinetic, &
+                              ot_precond_full_single, &
+                              ot_precond_full_single_inverse, &
+                              ot_precond_none, &
+                              ot_precond_s_inverse
+   USE input_section_types, ONLY: section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_linres_current, ONLY: current_build_chi, &
+                                current_build_current
+   USE qs_linres_current_utils, ONLY: current_env_cleanup, &
+                                      current_env_init, &
+                                      current_response
+   USE qs_linres_epr_nablavks, ONLY: epr_nablavks
+   USE qs_linres_epr_ownutils, ONLY: epr_g_print, &
+                                     epr_g_so, &
+                                     epr_g_soo, &
+                                     epr_g_zke, &
+                                     epr_ind_magnetic_field
+   USE qs_linres_epr_utils, ONLY: epr_env_cleanup, &
+                                  epr_env_init
+   USE qs_linres_issc_utils, ONLY: issc_env_cleanup, &
+                                   issc_env_init, &
+                                   issc_issc, &
+                                   issc_print, &
+                                   issc_response
+   USE qs_linres_methods, ONLY: linres_localize
+   USE qs_linres_nmr_shift, ONLY: nmr_shift, &
+                                  nmr_shift_print
+   USE qs_linres_nmr_utils, ONLY: nmr_env_cleanup, &
+                                  nmr_env_init
+   USE qs_linres_op, ONLY: current_operators, &
+                           issc_operators, &
+                           polar_operators
+   USE qs_linres_polar_utils, ONLY: polar_env_init, &
+                                    polar_polar, &
+                                    polar_print, &
+                                    polar_response
+   USE qs_linres_types, ONLY: current_env_type, &
+                              epr_env_type, &
+                              issc_env_type, &
+                              linres_control_create, &
+                              linres_control_release, &
+                              linres_control_type, &
+                              nmr_env_type
+   USE qs_mo_methods, ONLY: calculate_density_matrix
+   USE qs_mo_types, ONLY: mo_set_p_type
+   USE qs_p_env_methods, ONLY: p_env_create, &
+                               p_env_psi0_changed
+   USE qs_p_env_types, ONLY: p_env_release, &
+                             qs_p_env_type
+   USE qs_rho_methods, ONLY: qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -110,7 +110,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'linres_calculation', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
       TYPE(qs_environment_type), POINTER                 :: qs_env
@@ -155,7 +155,7 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'linres_calculation_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, output_unit
       LOGICAL                                            :: epr_present, issc_present, &

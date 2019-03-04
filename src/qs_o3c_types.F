@@ -9,13 +9,13 @@
 ! **************************************************************************************************
 MODULE qs_o3c_types
 
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type
-   USE kinds,                           ONLY: dp
-   USE qs_neighbor_list_types,          ONLY: &
-        get_iterator_info, get_neighbor_list_set_p, neighbor_list_iterate, &
-        neighbor_list_iterator_create, neighbor_list_iterator_p_type, &
-        neighbor_list_iterator_release, neighbor_list_set_p_type, nl_set_sub_iterator, &
-        nl_sub_iterate
+   USE basis_set_types, ONLY: gto_basis_set_p_type
+   USE kinds, ONLY: dp
+   USE qs_neighbor_list_types, ONLY: &
+      get_iterator_info, get_neighbor_list_set_p, neighbor_list_iterate, &
+      neighbor_list_iterator_create, neighbor_list_iterator_p_type, &
+      neighbor_list_iterator_release, neighbor_list_set_p_type, nl_set_sub_iterator, &
+      nl_sub_iterate
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -118,7 +118,7 @@ CONTAINS
          POINTER                                         :: sab_nl, sac_nl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'init_o3c_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: kkind, nij, nk, nkind
       LOGICAL                                            :: symmetric
@@ -146,7 +146,7 @@ CONTAINS
       nij = 0
       CALL neighbor_list_iterator_create(nl_iterator, sab_nl)
       DO WHILE (neighbor_list_iterate(nl_iterator) == 0)
-         nij = nij+1
+         nij = nij + 1
       END DO
       CALL neighbor_list_iterator_release(nl_iterator)
       o3c%nijpairs = nij
@@ -158,7 +158,7 @@ CONTAINS
       CALL neighbor_list_iterator_create(nl_iterator, sab_nl)
       CALL neighbor_list_iterator_create(ac_iterator, sac_nl, search=.TRUE.)
       DO WHILE (neighbor_list_iterate(nl_iterator) == 0)
-         nij = nij+1
+         nij = nij + 1
          ijpair => o3c%ijpair(nij)
          CALL get_iterator_info(nl_iterator, ikind=ijpair%ikind, jkind=ijpair%jkind, &
                                 iatom=ijpair%iatom, jatom=ijpair%jatom, &
@@ -168,7 +168,7 @@ CONTAINS
          DO kkind = 1, nkind
             CALL nl_set_sub_iterator(ac_iterator, ijpair%ikind, kkind, ijpair%iatom)
             DO WHILE (nl_sub_iterate(ac_iterator) == 0)
-               nk = nk+1
+               nk = nk + 1
             END DO
          END DO
          ! ijk lists
@@ -179,7 +179,7 @@ CONTAINS
          DO kkind = 1, nkind
             CALL nl_set_sub_iterator(ac_iterator, ijpair%ikind, kkind, ijpair%iatom)
             DO WHILE (nl_sub_iterate(ac_iterator) == 0)
-               nk = nk+1
+               nk = nk + 1
                ijk => ijpair%ijk(nk)
                CALL get_iterator_info(ac_iterator, jatom=ijk%katom, r=ijk%rik, cell=ijk%cellk)
                ijk%kkind = kkind
@@ -207,7 +207,7 @@ CONTAINS
       TYPE(o3c_container_type)                           :: o3c_container
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'release_o3c_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       o3c_container%ijsymmetric = .FALSE.
       o3c_container%nijpairs = 0
@@ -322,7 +322,7 @@ CONTAINS
          OPTIONAL, POINTER                               :: sab_nl, sac_nl
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_o3c_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (PRESENT(ijsymmetric)) ijsymmetric = o3c%ijsymmetric
       IF (PRESENT(nspin)) nspin = o3c%nspin
@@ -350,7 +350,7 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: nthread
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'o3c_iterator_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: n
 
@@ -363,8 +363,8 @@ CONTAINS
       o3c_iterator%o3c => o3c
       o3c_iterator%ijp_last = 0
       o3c_iterator%k_last = 0
-      ALLOCATE (o3c_iterator%ijp_thread(0:n-1))
-      ALLOCATE (o3c_iterator%k_thread(0:n-1))
+      ALLOCATE (o3c_iterator%ijp_thread(0:n - 1))
+      ALLOCATE (o3c_iterator%k_thread(0:n - 1))
       o3c_iterator%ijp_thread = 0
       o3c_iterator%k_thread = 0
 
@@ -378,7 +378,7 @@ CONTAINS
       TYPE(o3c_iterator_type)                            :: o3c_iterator
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'o3c_iterator_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       NULLIFY (o3c_iterator%o3c)
       o3c_iterator%ijp_last = 0
@@ -422,7 +422,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), OPTIONAL, POINTER  :: tvec, force_i, force_j, force_k
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'get_o3c_iterator_info', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ij, k, me
       TYPE(o3c_container_type), POINTER                  :: o3c
@@ -508,7 +508,7 @@ CONTAINS
       ELSE IF (klist == o3c%ijpair(ijpair)%nklist) THEN
          ! last step in this ij list
          istat = 1
-         DO ij = ijpair+1, o3c%nijpairs
+         DO ij = ijpair + 1, o3c%nijpairs
             IF (o3c%ijpair(ij)%nklist > 0) THEN
                o3c_iterator%ijp_thread(me) = ij
                o3c_iterator%k_thread(me) = 1
@@ -519,7 +519,7 @@ CONTAINS
       ELSE
          ! increase klist
          o3c_iterator%ijp_thread(me) = ijpair
-         o3c_iterator%k_thread(me) = klist+1
+         o3c_iterator%k_thread(me) = klist + 1
          istat = 0
       END IF
 
@@ -554,7 +554,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:, :), OPTIONAL, POINTER  :: tvec, force_i, force_j, force_k
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'set_o3c_container', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ij, k, me
       TYPE(o3c_container_type), POINTER                  :: o3c
@@ -614,7 +614,7 @@ CONTAINS
       TYPE(o3c_vec_type), DIMENSION(:)                   :: o3c_vec
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'o3c_vec_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

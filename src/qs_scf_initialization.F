@@ -7,106 +7,106 @@
 !> \brief Utility routines for qs_scf
 ! **************************************************************************************************
 MODULE qs_scf_initialization
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              cp_dbcsr_m_by_n_from_row_template,&
-                                              cp_dbcsr_sm_fm_multiply
-   USE cp_dbcsr_output,                 ONLY: write_fm_with_basis_info
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_triangular_invert
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_diag,                      ONLY: cp_fm_power
-   USE cp_fm_pool_types,                ONLY: cp_fm_pool_p_type,&
-                                              fm_pool_get_el_struct
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_get,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_info,&
-                                              cp_fm_p_type,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_to_fm_triangular,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_create,&
-                                              dbcsr_init_p,&
-                                              dbcsr_p_type,&
-                                              dbcsr_type,&
-                                              dbcsr_type_no_symmetry,&
-                                              dbcsr_type_real_default
-   USE input_constants,                 ONLY: &
-        broy_mix, broy_mix_new, cholesky_dbcsr, cholesky_inverse, cholesky_off, &
-        diag_block_davidson, diag_block_krylov, diag_filter_matrix, diag_ot, diag_standard, &
-        direct_p_mix, kerker_mix, multisec_mix, no_mix, ot2cdft, outer_scf_none, plus_u_lowdin, &
-        pulay_mix, wfi_frozen_method_nr, wfi_use_guess_method_nr
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE kpoint_types,                    ONLY: kpoint_type
-   USE pw_types,                        ONLY: pw_p_type
-   USE qmmm_image_charge,               ONLY: conditional_calc_image_matrix
-   USE qs_block_davidson_types,         ONLY: block_davidson_allocate,&
-                                              block_davidson_env_create
-   USE qs_cdft_opt_types,               ONLY: cdft_opt_type_copy
-   USE qs_density_mixing_types,         ONLY: direct_mixing_nr,&
-                                              mixing_storage_create,&
-                                              mixing_storage_release,&
-                                              no_mixing_nr
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type,&
-                                              set_qs_env
-   USE qs_fb_distribution_methods,      ONLY: fb_distribution_build
-   USE qs_fb_env_methods,               ONLY: fb_env_build_atomic_halos,&
-                                              fb_env_build_rcut_auto,&
-                                              fb_env_read_input,&
-                                              fb_env_write_info
-   USE qs_fb_env_types,                 ONLY: fb_env_create,&
-                                              fb_env_has_data
-   USE qs_gspace_mixing,                ONLY: mixing_allocate,&
-                                              mixing_init
-   USE qs_initial_guess,                ONLY: calculate_first_density_matrix
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type,&
-                                              set_qs_kind
-   USE qs_ks_types,                     ONLY: qs_ks_did_change
-   USE qs_matrix_pools,                 ONLY: mpools_get
-   USE qs_mo_occupation,                ONLY: set_mo_occupation
-   USE qs_mo_types,                     ONLY: get_mo_set,&
-                                              init_mo_set,&
-                                              mo_set_p_type
-   USE qs_outer_scf,                    ONLY: outer_loop_extrapolate,&
-                                              outer_loop_switch,&
-                                              outer_loop_variables_count
-   USE qs_rho_atom_types,               ONLY: rho_atom_type
-   USE qs_rho_methods,                  ONLY: duplicate_rho_type,&
-                                              qs_rho_update_rho
-   USE qs_rho_types,                    ONLY: qs_rho_create,&
-                                              qs_rho_get,&
-                                              qs_rho_type
-   USE qs_scf_diagonalization,          ONLY: diag_subspace_allocate
-   USE qs_scf_lanczos,                  ONLY: krylov_space_allocate
-   USE qs_scf_output,                   ONLY: qs_scf_initial_info
-   USE qs_scf_types,                    ONLY: &
-        block_davidson_diag_method_nr, block_krylov_diag_method_nr, diag_subspace_env_create, &
-        filter_matrix_diag_method_nr, general_diag_method_nr, krylov_space_create, &
-        ot_diag_method_nr, ot_method_nr, qs_scf_env_type, scf_env_create, special_diag_method_nr
-   USE qs_wf_history_methods,           ONLY: reorthogonalize_vectors,&
-                                              wfi_extrapolate,&
-                                              wfi_get_method_label,&
-                                              wfi_update
-   USE scf_control_types,               ONLY: scf_control_type
-   USE xas_env_types,                   ONLY: xas_environment_type
-   USE xas_restart,                     ONLY: xas_initialize_rho
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  cp_dbcsr_m_by_n_from_row_template, &
+                                  cp_dbcsr_sm_fm_multiply
+   USE cp_dbcsr_output, ONLY: write_fm_with_basis_info
+   USE cp_fm_basic_linalg, ONLY: cp_fm_triangular_invert
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_diag, ONLY: cp_fm_power
+   USE cp_fm_pool_types, ONLY: cp_fm_pool_p_type, &
+                               fm_pool_get_el_struct
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_get, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_info, &
+                          cp_fm_p_type, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm, &
+                          cp_fm_to_fm_triangular, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_create, &
+                        dbcsr_init_p, &
+                        dbcsr_p_type, &
+                        dbcsr_type, &
+                        dbcsr_type_no_symmetry, &
+                        dbcsr_type_real_default
+   USE input_constants, ONLY: &
+      broy_mix, broy_mix_new, cholesky_dbcsr, cholesky_inverse, cholesky_off, &
+      diag_block_davidson, diag_block_krylov, diag_filter_matrix, diag_ot, diag_standard, &
+      direct_p_mix, kerker_mix, multisec_mix, no_mix, ot2cdft, outer_scf_none, plus_u_lowdin, &
+      pulay_mix, wfi_frozen_method_nr, wfi_use_guess_method_nr
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE kpoint_types, ONLY: kpoint_type
+   USE pw_types, ONLY: pw_p_type
+   USE qmmm_image_charge, ONLY: conditional_calc_image_matrix
+   USE qs_block_davidson_types, ONLY: block_davidson_allocate, &
+                                      block_davidson_env_create
+   USE qs_cdft_opt_types, ONLY: cdft_opt_type_copy
+   USE qs_density_mixing_types, ONLY: direct_mixing_nr, &
+                                      mixing_storage_create, &
+                                      mixing_storage_release, &
+                                      no_mixing_nr
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type, &
+                                   set_qs_env
+   USE qs_fb_distribution_methods, ONLY: fb_distribution_build
+   USE qs_fb_env_methods, ONLY: fb_env_build_atomic_halos, &
+                                fb_env_build_rcut_auto, &
+                                fb_env_read_input, &
+                                fb_env_write_info
+   USE qs_fb_env_types, ONLY: fb_env_create, &
+                              fb_env_has_data
+   USE qs_gspace_mixing, ONLY: mixing_allocate, &
+                               mixing_init
+   USE qs_initial_guess, ONLY: calculate_first_density_matrix
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type, &
+                            set_qs_kind
+   USE qs_ks_types, ONLY: qs_ks_did_change
+   USE qs_matrix_pools, ONLY: mpools_get
+   USE qs_mo_occupation, ONLY: set_mo_occupation
+   USE qs_mo_types, ONLY: get_mo_set, &
+                          init_mo_set, &
+                          mo_set_p_type
+   USE qs_outer_scf, ONLY: outer_loop_extrapolate, &
+                           outer_loop_switch, &
+                           outer_loop_variables_count
+   USE qs_rho_atom_types, ONLY: rho_atom_type
+   USE qs_rho_methods, ONLY: duplicate_rho_type, &
+                             qs_rho_update_rho
+   USE qs_rho_types, ONLY: qs_rho_create, &
+                           qs_rho_get, &
+                           qs_rho_type
+   USE qs_scf_diagonalization, ONLY: diag_subspace_allocate
+   USE qs_scf_lanczos, ONLY: krylov_space_allocate
+   USE qs_scf_output, ONLY: qs_scf_initial_info
+   USE qs_scf_types, ONLY: &
+      block_davidson_diag_method_nr, block_krylov_diag_method_nr, diag_subspace_env_create, &
+      filter_matrix_diag_method_nr, general_diag_method_nr, krylov_space_create, &
+      ot_diag_method_nr, ot_method_nr, qs_scf_env_type, scf_env_create, special_diag_method_nr
+   USE qs_wf_history_methods, ONLY: reorthogonalize_vectors, &
+                                    wfi_extrapolate, &
+                                    wfi_get_method_label, &
+                                    wfi_update
+   USE scf_control_types, ONLY: scf_control_type
+   USE xas_env_types, ONLY: xas_environment_type
+   USE xas_restart, ONLY: xas_initialize_rho
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -134,7 +134,7 @@ CONTAINS
       TYPE(section_vals_type), OPTIONAL, POINTER         :: scf_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_env_initialize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dft_control_type), POINTER                    :: dft_control
       TYPE(scf_control_type), POINTER                    :: my_scf_control
@@ -193,7 +193,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_env_init_basic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dft_control_type), POINTER                    :: dft_control
       TYPE(scf_control_type), POINTER                    :: scf_control
@@ -233,7 +233,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_ensure_scf_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(pw_p_type), DIMENSION(:), POINTER             :: rho_g
       TYPE(qs_rho_type), POINTER                         :: rho
@@ -275,12 +275,12 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: nvar
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_ensure_outer_loop_vars', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nhistory, nvariables
 
       IF (scf_control%outer_scf%have_scf) THEN
-         nhistory = scf_control%outer_scf%max_scf+1
+         nhistory = scf_control%outer_scf%max_scf + 1
          IF (PRESENT(nvar)) THEN
             IF (nvar > 0) THEN
                nvariables = nvar
@@ -313,7 +313,7 @@ CONTAINS
       TYPE(scf_control_type), POINTER                    :: scf_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_ensure_cdft_loop_vars', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: nhistory, nvariables
       LOGICAL                                            :: do_kpoints
@@ -332,7 +332,7 @@ CONTAINS
          CPABORT("Section SCF&OUTER_SCF must be active for CDFT calculations.")
       ! Initialize CDFT and outer_loop variables (constraint settings active in scf_control)
       IF (dft_control%qs_control%cdft_control%constraint_control%have_scf) THEN
-         nhistory = dft_control%qs_control%cdft_control%constraint_control%max_scf+1
+         nhistory = dft_control%qs_control%cdft_control%constraint_control%max_scf + 1
          IF (scf_control%outer_scf%type /= outer_scf_none) THEN
             nvariables = outer_loop_variables_count(scf_control, &
                                                     dft_control%qs_control%cdft_control)
@@ -395,7 +395,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_ensure_mixing_store', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(dft_control_type), POINTER                    :: dft_control
 
@@ -425,7 +425,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_scf_ensure_work_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, is, nao, nrow_block, nw
       LOGICAL                                            :: do_kpoints
@@ -557,7 +557,7 @@ CONTAINS
       TYPE(qs_scf_env_type), POINTER                     :: scf_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'qs_scf_ensure_mos', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ic, ik, ikk, ispin, nmo, nmo_mat
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: mo_derivs_aux_fit
@@ -676,7 +676,7 @@ CONTAINS
          DO ik = 1, SIZE(kpoints%kp_env)
             CALL mpools_get(kpoints%mpools, ao_mo_fm_pools=ao_mo_fm_pools)
             mos_k => kpoints%kp_env(ik)%kpoint_env%mos
-            ikk = kpoints%kp_range(1)+ik-1
+            ikk = kpoints%kp_range(1) + ik - 1
             CPASSERT(ASSOCIATED(mos_k))
             DO ispin = 1, SIZE(mos_k, 2)
                DO ic = 1, SIZE(mos_k, 1)
@@ -712,7 +712,7 @@ CONTAINS
       TYPE(dft_control_type), POINTER                    :: dft_control
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_scf_ensure_mixing', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(section_vals_type), POINTER                   :: mixing_section
 
@@ -778,7 +778,7 @@ CONTAINS
       LOGICAL                                            :: has_unit_metric
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'qs_scf_ensure_diagonalization', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ispin, nao, nmo
       LOGICAL                                            :: do_kpoints, need_coeff_b, not_se_or_dftb
@@ -869,7 +869,7 @@ CONTAINS
       ELSEIF (scf_control%use_ot) THEN
          scf_env%method = ot_method_nr
          need_coeff_b = .TRUE.
-         IF (scf_control%added_mos(1)+scf_control%added_mos(2) > 0) &
+         IF (scf_control%added_mos(1) + scf_control%added_mos(2) > 0) &
             CPABORT("OT with ADDED_MOS/=0 not implemented")
          IF (dft_control%restricted .AND. dft_control%nspins .NE. 2) &
             CPABORT("nspin must be 2 for restricted (ROKS)")
@@ -1023,7 +1023,7 @@ CONTAINS
                                          extension=".scfLog")
       IF (output_unit > 0) THEN
          WRITE (UNIT=output_unit, FMT="(T2,A,T71,I10)") &
-            "Number of independent orbital functions:", nao-ndep
+            "Number of independent orbital functions:", nao - ndep
       END IF
       CALL cp_print_key_finished_output(output_unit, logger, scf_section, &
                                         "PRINT%PROGRAM_RUN_INFO")
@@ -1087,7 +1087,7 @@ CONTAINS
       TYPE(scf_control_type), POINTER                    :: scf_control
 
       CHARACTER(len=*), PARAMETER :: routineN = 'scf_env_initial_rho_setup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: extrapolation_method_nr, handle, ispin, &
                                                             nmo, output_unit

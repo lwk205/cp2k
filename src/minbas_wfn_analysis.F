@@ -10,82 +10,82 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE minbas_wfn_analysis
-   USE atomic_charges,                  ONLY: print_atomic_charges,&
-                                              print_bond_orders
-   USE atomic_kind_types,               ONLY: atomic_kind_type
-   USE bibliography,                    ONLY: Lu2004,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_plus_fm_fm_t,&
-                                              cp_dbcsr_sm_fm_multiply,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_column_scale
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_get_diag,&
-                                              cp_fm_release,&
-                                              cp_fm_to_fm,&
-                                              cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_finished_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_realspace_grid_cube,          ONLY: cp_pw_to_cube
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_copy, dbcsr_create, dbcsr_distribution_type, dbcsr_get_block_p, &
-        dbcsr_get_occupation, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, &
-        dbcsr_type_symmetric
-   USE input_section_types,             ONLY: section_get_ivals,&
-                                              section_vals_get,&
-                                              section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE iterate_matrix,                  ONLY: invert_Hotelling
-   USE kinds,                           ONLY: default_path_length,&
-                                              dp
-   USE message_passing,                 ONLY: mp_sum
-   USE minbas_methods,                  ONLY: minbas_calculation
-   USE molden_utils,                    ONLY: write_mos_molden
-   USE mulliken,                        ONLY: compute_bond_order,&
-                                              mulliken_charges
-   USE particle_list_types,             ONLY: particle_list_type
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_wavefunction
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_kind_types,                   ONLY: qs_kind_type
-   USE qs_ks_types,                     ONLY: get_ks_env,&
-                                              qs_ks_env_type
-   USE qs_mo_methods,                   ONLY: make_basis_lowdin
-   USE qs_mo_types,                     ONLY: allocate_mo_set,&
-                                              deallocate_mo_set,&
-                                              get_mo_set,&
-                                              mo_set_p_type,&
-                                              mo_set_type,&
-                                              set_mo_set
-   USE qs_subsys_types,                 ONLY: qs_subsys_get,&
-                                              qs_subsys_type
+   USE atomic_charges, ONLY: print_atomic_charges, &
+                             print_bond_orders
+   USE atomic_kind_types, ONLY: atomic_kind_type
+   USE bibliography, ONLY: Lu2004, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_plus_fm_fm_t, &
+                                  cp_dbcsr_sm_fm_multiply, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_column_scale
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_get_diag, &
+                          cp_fm_release, &
+                          cp_fm_to_fm, &
+                          cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_finished_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_realspace_grid_cube, ONLY: cp_pw_to_cube
+   USE dbcsr_api, ONLY: &
+      dbcsr_copy, dbcsr_create, dbcsr_distribution_type, dbcsr_get_block_p, &
+      dbcsr_get_occupation, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, &
+      dbcsr_type_symmetric
+   USE input_section_types, ONLY: section_get_ivals, &
+                                  section_vals_get, &
+                                  section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE iterate_matrix, ONLY: invert_Hotelling
+   USE kinds, ONLY: default_path_length, &
+                    dp
+   USE message_passing, ONLY: mp_sum
+   USE minbas_methods, ONLY: minbas_calculation
+   USE molden_utils, ONLY: write_mos_molden
+   USE mulliken, ONLY: compute_bond_order, &
+                       mulliken_charges
+   USE particle_list_types, ONLY: particle_list_type
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: calculate_wavefunction
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_kind_types, ONLY: qs_kind_type
+   USE qs_ks_types, ONLY: get_ks_env, &
+                          qs_ks_env_type
+   USE qs_mo_methods, ONLY: make_basis_lowdin
+   USE qs_mo_types, ONLY: allocate_mo_set, &
+                          deallocate_mo_set, &
+                          get_mo_set, &
+                          mo_set_p_type, &
+                          mo_set_type, &
+                          set_mo_set
+   USE qs_subsys_types, ONLY: qs_subsys_get, &
+                              qs_subsys_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -111,7 +111,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: unit_nr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'minbas_analysis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, homo, i, ispin, nao, natom, &
                                                             nimages, nmao, nmo, nspin
@@ -294,7 +294,7 @@ CONTAINS
                DO i = 1, natom, 2
                   IF (i < natom) THEN
                      WRITE (unit_nr, '(T2,A,I8,T20,A,F10.6,T42,A,I8,T60,A,F10.6)') &
-                        " Atom:", i, "Projection:", prmao(i, ispin), " Atom:", i+1, "Projection:", prmao(i+1, ispin)
+                        " Atom:", i, "Projection:", prmao(i, ispin), " Atom:", i + 1, "Projection:", prmao(i + 1, ispin)
                   ELSE
                      WRITE (unit_nr, '(T2,A,I8,T20,A,F10.6)') " Atom:", i, "Projection:", prmao(i, ispin)
                   END IF
@@ -309,7 +309,7 @@ CONTAINS
                WRITE (unit_nr, '(T64,A)') 'Occupied Orbitals'
                WRITE (unit_nr, '(8F10.6)') fnorm(1:homo, ispin)
                WRITE (unit_nr, '(T65,A)') 'Virtual Orbitals'
-               WRITE (unit_nr, '(8F10.6)') fnorm(homo+1:nmo, ispin)
+               WRITE (unit_nr, '(8F10.6)') fnorm(homo + 1:nmo, ispin)
             END IF
          END DO
          ! Mulliken population
@@ -428,11 +428,11 @@ CONTAINS
             n = SIZE(qblock, 2)
             wij = ABS(SUM(qblock*sblock))/REAL(n, KIND=dp)
             IF (wij > 0.1_dp) THEN
-               ecount(jatom, 1) = ecount(jatom, 1)+1
+               ecount(jatom, 1) = ecount(jatom, 1) + 1
             ELSEIF (wij > 0.01_dp) THEN
-               ecount(jatom, 2) = ecount(jatom, 2)+1
+               ecount(jatom, 2) = ecount(jatom, 2) + 1
             ELSEIF (wij > 0.001_dp) THEN
-               ecount(jatom, 3) = ecount(jatom, 3)+1
+               ecount(jatom, 3) = ecount(jatom, 3) + 1
             END IF
          END IF
       END DO
@@ -469,7 +469,7 @@ CONTAINS
             n = SIZE(qblock, 2)
             DO i = 1, n
                wi = SUM(qblock(:, i)*sblock(:, i))
-               prmao(iatom) = prmao(iatom)+wi/so(i, i)
+               prmao(iatom) = prmao(iatom) + wi/so(i, i)
             END DO
          END IF
       END DO
@@ -491,7 +491,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: ispin
 
       CHARACTER(len=*), PARAMETER :: routineN = 'post_minbas_cubes', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: filename, title
       INTEGER                                            :: i, i_rep, ivec, iw, j, n_rep, natom
@@ -528,7 +528,7 @@ CONTAINS
       CALL get_particle_set(particle_set, qs_kind_set, nmao=blk_sizes)
       first_bas(0) = 0
       DO i = 1, natom
-         first_bas(i) = first_bas(i-1)+blk_sizes(i)
+         first_bas(i) = first_bas(i - 1) + blk_sizes(i)
       END DO
 
       CALL pw_env_get(pw_env, auxbas_pw_pool=auxbas_pw_pool)
@@ -539,7 +539,7 @@ CONTAINS
       CALL section_vals_val_get(minbas_section, "ATOM_LIST", n_rep_val=n_rep)
       IF (n_rep == 0) THEN
          DO i = 1, natom
-            DO ivec = first_bas(i-1)+1, first_bas(i)
+            DO ivec = first_bas(i - 1) + 1, first_bas(i)
                WRITE (filename, '(a4,I5.5,a1,I1.1)') "MINBAS_", ivec, "_", ispin
                WRITE (title, *) "MINIMAL BASIS ", ivec, " atom ", i, " spin ", ispin
                mpi_io = .TRUE.
@@ -557,7 +557,7 @@ CONTAINS
             CALL section_vals_val_get(minbas_section, "ATOM_LIST", i_rep_val=i_rep, i_vals=ilist)
             DO i = 1, SIZE(ilist, 1)
                j = ilist(i)
-               DO ivec = first_bas(j-1)+1, first_bas(j)
+               DO ivec = first_bas(j - 1) + 1, first_bas(j)
                   WRITE (filename, '(a4,I5.5,a1,I1.1)') "MINBAS_", ivec, "_", ispin
                   WRITE (title, *) "MINIMAL BASIS ", ivec, " atom ", j, " spin ", ispin
                   mpi_io = .TRUE.

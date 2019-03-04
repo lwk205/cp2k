@@ -9,10 +9,10 @@
 !> \date 08.2008
 ! **************************************************************************************************
 MODULE cp_parser_status_types
-   USE cp_parser_buffer_types,          ONLY: buffer_type,&
-                                              create_buffer_type,&
-                                              release_buffer_type
-   USE kinds,                           ONLY: max_line_length
+   USE cp_parser_buffer_types, ONLY: buffer_type, &
+                                     create_buffer_type, &
+                                     release_buffer_type
+   USE kinds, ONLY: max_line_length
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -44,7 +44,7 @@ CONTAINS
       TYPE(status_type), POINTER                         :: status
 
       CHARACTER(len=*), PARAMETER :: routineN = 'create_status_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(.NOT. ASSOCIATED(status))
       ALLOCATE (status)
@@ -68,7 +68,7 @@ CONTAINS
       TYPE(status_type), POINTER                         :: status
 
       CHARACTER(len=*), PARAMETER :: routineN = 'release_status_type', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(status))
       CALL release_buffer_type(status%buffer)

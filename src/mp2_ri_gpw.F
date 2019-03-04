@@ -9,138 +9,138 @@
 !>      06.2012 created [Mauro Del Ben]
 ! **************************************************************************************************
 MODULE mp2_ri_gpw
-   USE ai_contraction_sphi,             ONLY: ab_contract,&
-                                              abc_contract
-   USE ai_coulomb,                      ONLY: coulomb2_new
-   USE ai_overlap3,                     ONLY: overlap3
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind_set
-   USE basis_set_types,                 ONLY: gto_basis_set_p_type,&
-                                              gto_basis_set_type
-   USE bibliography,                    ONLY: DelBen2013,&
-                                              cite_reference
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell,&
-                                              pbc
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_create,&
-                                              cp_blacs_env_release,&
-                                              cp_blacs_env_type
-   USE cp_cfm_basic_linalg,             ONLY: cp_cfm_cholesky_decompose,&
-                                              cp_cfm_gemm,&
-                                              cp_cfm_scale_and_add_fm,&
-                                              cp_cfm_triangular_invert
-   USE cp_cfm_types,                    ONLY: cp_cfm_create,&
-                                              cp_cfm_get_info,&
-                                              cp_cfm_release,&
-                                              cp_cfm_to_fm,&
-                                              cp_cfm_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_m_by_n_from_template,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_eri_mme_interface,            ONLY: cp_eri_mme_param,&
-                                              cp_eri_mme_set_params
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_triangular_invert
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_diag,                      ONLY: cp_fm_syevx
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: &
-        cp_fm_copy_general, cp_fm_create, cp_fm_get_info, cp_fm_indxg2p, cp_fm_p_type, &
-        cp_fm_release, cp_fm_set_all, cp_fm_to_fm, cp_fm_type
-   USE cp_gemm_interface,               ONLY: cp_gemm
-   USE cp_para_env,                     ONLY: cp_para_env_create,&
-                                              cp_para_env_release
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_complete_redistribute, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, &
-        dbcsr_desymmetrize, dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, &
-        dbcsr_get_block_p, dbcsr_get_info, dbcsr_get_stored_coordinates, &
-        dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
-        dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_p_type, dbcsr_put_block, &
-        dbcsr_release, dbcsr_release_p, dbcsr_reserve_all_blocks, dbcsr_reserve_blocks, dbcsr_set, &
-        dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry, dbcsr_type_real_8, &
-        dbcsr_type_symmetric
-   USE dbcsr_tensor_api,                ONLY: &
-        dbcsr_t_contract, dbcsr_t_create, dbcsr_t_destroy, dbcsr_t_distribution_destroy, &
-        dbcsr_t_distribution_new, dbcsr_t_distribution_type, dbcsr_t_get_block, &
-        dbcsr_t_get_stored_coordinates, dbcsr_t_iterator_blocks_left, dbcsr_t_iterator_next_block, &
-        dbcsr_t_iterator_start, dbcsr_t_iterator_stop, dbcsr_t_iterator_type, dbcsr_t_nd_mp_comm, &
-        dbcsr_t_nd_mp_free, dbcsr_t_put_block, dbcsr_t_reserve_blocks, dbcsr_t_split_blocks, &
-        dbcsr_t_type
-   USE gaussian_gridlevels,             ONLY: gaussian_gridlevel
-   USE input_constants,                 ONLY: do_eri_gpw,&
-                                              do_eri_mme,&
-                                              do_eri_os,&
-                                              ri_coulomb,&
-                                              ri_overlap
-   USE kinds,                           ONLY: dp,&
-                                              int_8
-   USE kpoint_coulomb_2c,               ONLY: build_2c_coulomb_matrix_kp
-   USE kpoint_methods,                  ONLY: kpoint_init_cell_index,&
-                                              rskp_transform
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE machine,                         ONLY: m_flush,&
-                                              m_memory,&
-                                              m_walltime
-   USE mathconstants,                   ONLY: pi
-   USE message_passing,                 ONLY: &
-        mp_allgather, mp_alltoall, mp_cart_create, mp_comm_free, mp_comm_split_direct, mp_environ, &
-        mp_max, mp_min, mp_sendrecv, mp_sum, mp_sync
-   USE molecule_kind_types,             ONLY: molecule_kind_type
-   USE molecule_types,                  ONLY: molecule_type
-   USE mp2_eri,                         ONLY: mp2_eri_2c_integrate,&
-                                              mp2_eri_3c_integrate
-   USE mp2_ri_grad_util,                ONLY: complete_gamma
-   USE mp2_types,                       ONLY: integ_mat_buffer_type,&
-                                              mp2_type,&
-                                              one_dim_int_array,&
-                                              two_dim_real_array
-   USE orbital_pointers,                ONLY: ncoset
-   USE particle_methods,                ONLY: get_particle_set
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_copy,&
-                                              pw_scale,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: REALDATA3D,&
-                                              REALSPACE,&
-                                              pw_p_type
-   USE qs_collocate_density,            ONLY: calculate_wavefunction
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_integral_utils,               ONLY: basis_set_list_setup
-   USE qs_integrate_potential,          ONLY: integrate_pgf_product_rspace,&
-                                              integrate_v_rspace
-   USE qs_interactions,                 ONLY: init_interaction_radii
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_ks_types,                     ONLY: set_ks_env
-   USE qs_neighbor_list_types,          ONLY: get_iterator_info,&
-                                              neighbor_list_iterate,&
-                                              neighbor_list_iterator_create,&
-                                              neighbor_list_iterator_p_type,&
-                                              neighbor_list_iterator_release,&
-                                              neighbor_list_set_p_type
-   USE qs_overlap,                      ONLY: build_overlap_matrix
-   USE realspace_grid_types,            ONLY: realspace_grid_desc_p_type,&
-                                              realspace_grid_p_type,&
-                                              rs_grid_release,&
-                                              rs_grid_retain
-   USE rpa_im_time,                     ONLY: communicate_buffer
-   USE rs_pw_interface,                 ONLY: potential_pw2rs
-   USE task_list_types,                 ONLY: task_list_type
-   USE util,                            ONLY: get_limit
+   USE ai_contraction_sphi, ONLY: ab_contract, &
+                                  abc_contract
+   USE ai_coulomb, ONLY: coulomb2_new
+   USE ai_overlap3, ONLY: overlap3
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind_set
+   USE basis_set_types, ONLY: gto_basis_set_p_type, &
+                              gto_basis_set_type
+   USE bibliography, ONLY: DelBen2013, &
+                           cite_reference
+   USE cell_types, ONLY: cell_type, &
+                         get_cell, &
+                         pbc
+   USE cp_blacs_env, ONLY: cp_blacs_env_create, &
+                           cp_blacs_env_release, &
+                           cp_blacs_env_type
+   USE cp_cfm_basic_linalg, ONLY: cp_cfm_cholesky_decompose, &
+                                  cp_cfm_gemm, &
+                                  cp_cfm_scale_and_add_fm, &
+                                  cp_cfm_triangular_invert
+   USE cp_cfm_types, ONLY: cp_cfm_create, &
+                           cp_cfm_get_info, &
+                           cp_cfm_release, &
+                           cp_cfm_to_fm, &
+                           cp_cfm_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_m_by_n_from_template, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_eri_mme_interface, ONLY: cp_eri_mme_param, &
+                                   cp_eri_mme_set_params
+   USE cp_fm_basic_linalg, ONLY: cp_fm_triangular_invert
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_diag, ONLY: cp_fm_syevx
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: &
+      cp_fm_copy_general, cp_fm_create, cp_fm_get_info, cp_fm_indxg2p, cp_fm_p_type, &
+      cp_fm_release, cp_fm_set_all, cp_fm_to_fm, cp_fm_type
+   USE cp_gemm_interface, ONLY: cp_gemm
+   USE cp_para_env, ONLY: cp_para_env_create, &
+                          cp_para_env_release
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_complete_redistribute, dbcsr_copy, dbcsr_create, dbcsr_deallocate_matrix, &
+      dbcsr_desymmetrize, dbcsr_distribution_type, dbcsr_filter, dbcsr_finalize, &
+      dbcsr_get_block_p, dbcsr_get_info, dbcsr_get_stored_coordinates, &
+      dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, dbcsr_iterator_start, &
+      dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, dbcsr_p_type, dbcsr_put_block, &
+      dbcsr_release, dbcsr_release_p, dbcsr_reserve_all_blocks, dbcsr_reserve_blocks, dbcsr_set, &
+      dbcsr_type, dbcsr_type_antisymmetric, dbcsr_type_no_symmetry, dbcsr_type_real_8, &
+      dbcsr_type_symmetric
+   USE dbcsr_tensor_api, ONLY: &
+      dbcsr_t_contract, dbcsr_t_create, dbcsr_t_destroy, dbcsr_t_distribution_destroy, &
+      dbcsr_t_distribution_new, dbcsr_t_distribution_type, dbcsr_t_get_block, &
+      dbcsr_t_get_stored_coordinates, dbcsr_t_iterator_blocks_left, dbcsr_t_iterator_next_block, &
+      dbcsr_t_iterator_start, dbcsr_t_iterator_stop, dbcsr_t_iterator_type, dbcsr_t_nd_mp_comm, &
+      dbcsr_t_nd_mp_free, dbcsr_t_put_block, dbcsr_t_reserve_blocks, dbcsr_t_split_blocks, &
+      dbcsr_t_type
+   USE gaussian_gridlevels, ONLY: gaussian_gridlevel
+   USE input_constants, ONLY: do_eri_gpw, &
+                              do_eri_mme, &
+                              do_eri_os, &
+                              ri_coulomb, &
+                              ri_overlap
+   USE kinds, ONLY: dp, &
+                    int_8
+   USE kpoint_coulomb_2c, ONLY: build_2c_coulomb_matrix_kp
+   USE kpoint_methods, ONLY: kpoint_init_cell_index, &
+                             rskp_transform
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE machine, ONLY: m_flush, &
+                      m_memory, &
+                      m_walltime
+   USE mathconstants, ONLY: pi
+   USE message_passing, ONLY: &
+      mp_allgather, mp_alltoall, mp_cart_create, mp_comm_free, mp_comm_split_direct, mp_environ, &
+      mp_max, mp_min, mp_sendrecv, mp_sum, mp_sync
+   USE molecule_kind_types, ONLY: molecule_kind_type
+   USE molecule_types, ONLY: molecule_type
+   USE mp2_eri, ONLY: mp2_eri_2c_integrate, &
+                      mp2_eri_3c_integrate
+   USE mp2_ri_grad_util, ONLY: complete_gamma
+   USE mp2_types, ONLY: integ_mat_buffer_type, &
+                        mp2_type, &
+                        one_dim_int_array, &
+                        two_dim_real_array
+   USE orbital_pointers, ONLY: ncoset
+   USE particle_methods, ONLY: get_particle_set
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_copy, &
+                         pw_scale, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_type
+   USE pw_types, ONLY: REALDATA3D, &
+                       REALSPACE, &
+                       pw_p_type
+   USE qs_collocate_density, ONLY: calculate_wavefunction
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_integral_utils, ONLY: basis_set_list_setup
+   USE qs_integrate_potential, ONLY: integrate_pgf_product_rspace, &
+                                     integrate_v_rspace
+   USE qs_interactions, ONLY: init_interaction_radii
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_ks_types, ONLY: set_ks_env
+   USE qs_neighbor_list_types, ONLY: get_iterator_info, &
+                                     neighbor_list_iterate, &
+                                     neighbor_list_iterator_create, &
+                                     neighbor_list_iterator_p_type, &
+                                     neighbor_list_iterator_release, &
+                                     neighbor_list_set_p_type
+   USE qs_overlap, ONLY: build_overlap_matrix
+   USE realspace_grid_types, ONLY: realspace_grid_desc_p_type, &
+                                   realspace_grid_p_type, &
+                                   rs_grid_release, &
+                                   rs_grid_retain
+   USE rpa_im_time, ONLY: communicate_buffer
+   USE rs_pw_interface, ONLY: potential_pw2rs
+   USE task_list_types, ONLY: task_list_type
+   USE util, ONLY: get_limit
 
 !$ USE OMP_LIB, ONLY: omp_get_max_threads, omp_get_thread_num
 #include "./base/base_uses.f90"
@@ -315,20 +315,20 @@ CONTAINS
                                                             mo_coeff_all_beta, mo_coeff_gw_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_ri_gpw_compute_in', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: color_sub_3c, cut_memory, cut_RI, eri_method, gw_corr_lev_total, handle, handle2, &
-         handle3, i, i_counter, itmp(2), LLL, max_row_col_local, max_row_col_local_beta, &
-         max_row_col_local_gw, max_row_col_local_occ_bse, max_row_col_local_virt_bse, mp_comm_2d, &
-         my_B_all_end, my_B_all_size, my_B_all_start, my_B_occ_bse_end, my_B_occ_bse_size, &
-         my_B_occ_bse_start, my_B_size, my_B_size_beta, my_B_virt_bse_end, my_B_virt_bse_size, &
-         my_B_virt_bse_start, my_B_virtual_end, my_B_virtual_end_beta, my_B_virtual_start, &
-         my_B_virtual_start_beta, my_group_L_end, my_group_L_size, my_group_L_start, natom
+                 handle3, i, i_counter, itmp(2), LLL, max_row_col_local, max_row_col_local_beta, &
+                 max_row_col_local_gw, max_row_col_local_occ_bse, max_row_col_local_virt_bse, mp_comm_2d, &
+                 my_B_all_end, my_B_all_size, my_B_all_start, my_B_occ_bse_end, my_B_occ_bse_size, &
+                 my_B_occ_bse_start, my_B_size, my_B_size_beta, my_B_virt_bse_end, my_B_virt_bse_size, &
+                 my_B_virt_bse_start, my_B_virtual_end, my_B_virtual_end_beta, my_B_virtual_start, &
+                 my_B_virtual_start_beta, my_group_L_end, my_group_L_size, my_group_L_start, natom
       INTEGER :: ngroup, ngroup_im_time, num_diff_blk, num_small_eigen, virtual, virtual_beta
       INTEGER, ALLOCATABLE, DIMENSION(:) :: local_atoms_for_mao_basis, my_group_L_ends_im_time, &
-         my_group_L_sizes_im_time, my_group_L_starts_im_time, sub_proc_map
+                                            my_group_L_sizes_im_time, my_group_L_starts_im_time, sub_proc_map
       INTEGER, ALLOCATABLE, DIMENSION(:, :) :: local_col_row_info, local_col_row_info_beta, &
-         local_col_row_info_gw, local_col_row_info_occ_bse, local_col_row_info_virt_bse
+                                               local_col_row_info_gw, local_col_row_info_occ_bse, local_col_row_info_virt_bse
       INTEGER, DIMENSION(2)                              :: myploc, pdims
       INTEGER, DIMENSION(3)                              :: periodic
       LOGICAL                                            :: do_alpha_beta, do_mult_2c, memory_info
@@ -342,8 +342,8 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env_L
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: mat_munu_local_L
       TYPE(dbcsr_type) :: matrix_bse_ab, matrix_bse_anu, matrix_bse_ij, matrix_bse_inu, &
-         matrix_ia_jb, matrix_ia_jb_beta, matrix_ia_jnu, matrix_ia_jnu_beta, matrix_in_jm, &
-         matrix_in_jm_beta, matrix_in_jnu, matrix_in_jnu_beta
+                          matrix_ia_jb, matrix_ia_jb_beta, matrix_ia_jnu, matrix_ia_jnu_beta, matrix_in_jm, &
+                          matrix_in_jm_beta, matrix_in_jnu, matrix_in_jnu_beta
       TYPE(kpoint_type), POINTER                         :: kpoints
       TYPE(pw_p_type)                                    :: psi_L
       TYPE(two_dim_real_array), ALLOCATABLE, &
@@ -379,8 +379,8 @@ CONTAINS
          CPASSERT(ri_metric_gw == ri_overlap)
       END IF
 
-      virtual = nmo-homo
-      gw_corr_lev_total = gw_corr_lev_virt+gw_corr_lev_occ
+      virtual = nmo - homo
+      gw_corr_lev_total = gw_corr_lev_virt + gw_corr_lev_occ
 
       do_mult_2c = qs_env%mp2_env%mp2_gpw%do_mult_2c
       eri_method = qs_env%mp2_env%eri_method
@@ -405,7 +405,7 @@ CONTAINS
 
          IF (do_alpha_beta) THEN
 
-            virtual_beta = nmo-homo_beta
+            virtual_beta = nmo - homo_beta
 
             CALL create_intermediate_matrices(matrix_ia_jnu_beta, matrix_ia_jb_beta, mo_coeff_o_beta, &
                                               virtual_beta, homo_beta, &
@@ -480,11 +480,11 @@ CONTAINS
 
       ngroup = para_env%num_pe/para_env_sub%num_pe
 
-      ALLOCATE (sub_proc_map(-para_env_sub%num_pe:2*para_env_sub%num_pe-1))
-      DO i = 0, para_env_sub%num_pe-1
+      ALLOCATE (sub_proc_map(-para_env_sub%num_pe:2*para_env_sub%num_pe - 1))
+      DO i = 0, para_env_sub%num_pe - 1
          sub_proc_map(i) = i
-         sub_proc_map(-i-1) = para_env_sub%num_pe-i-1
-         sub_proc_map(para_env_sub%num_pe+i) = i
+         sub_proc_map(-i - 1) = para_env_sub%num_pe - i - 1
+         sub_proc_map(para_env_sub%num_pe + i) = i
       END DO
 
       IF (eri_method == do_eri_gpw) THEN
@@ -554,7 +554,7 @@ CONTAINS
          ! we need (P|Q)^(-1/2) for future use, just save it
          ! in a fully (home made) distributed way
          itmp = get_limit(dimen_RI, para_env_sub%num_pe, para_env_sub%mepos)
-         lll = itmp(2)-itmp(1)+1
+         lll = itmp(2) - itmp(1) + 1
          ALLOCATE (qs_env%mp2_env%ri_grad%PQ_half(lll, my_group_L_size))
          qs_env%mp2_env%ri_grad%PQ_half(:, :) = my_Lrows(itmp(1):itmp(2), 1:my_group_L_size)
       END IF
@@ -566,8 +566,8 @@ CONTAINS
             "RI_INFO| Auxiliary basis set size:", dimen_RI
 
          mem_for_iaK = dimen_RI*REAL(homo, KIND=dp)*virtual*8.0_dp/(1024_dp**2)
-         IF (do_alpha_beta) mem_for_iaK = mem_for_iaK+ &
-                                          dimen_RI*REAL(homo_beta, KIND=dp)*(nmo-homo_beta)*8.0_dp/(1024_dp**2)
+         IF (do_alpha_beta) mem_for_iaK = mem_for_iaK + &
+                                          dimen_RI*REAL(homo_beta, KIND=dp)*(nmo - homo_beta)*8.0_dp/(1024_dp**2)
 
          WRITE (unit_nr, '(T3,A,T66,F11.2,A4)') 'RI_INFO| Total memory for (ia|K) integrals:', &
             mem_for_iaK, ' MiB'
@@ -732,13 +732,13 @@ CONTAINS
          ELSE IF (eri_method == do_eri_gpw) THEN
 
             DO LLL = my_group_L_start, my_group_L_end
-               i_counter = i_counter+1
+               i_counter = i_counter + 1
 
                ! pseudo psi_L
                CALL calculate_wavefunction(mo_coeff, 1, psi_L, rho_g, atomic_kind_set, &
                                            qs_kind_set, cell, dft_control, particle_set, pw_env_sub, &
                                            basis_type="RI_AUX", &
-                                           external_vector=my_Lrows(:, LLL-my_group_L_start+1))
+                                           external_vector=my_Lrows(:, LLL - my_group_L_start + 1))
 
                CALL timeset(routineN//"_pot", handle3)
                rho_r%pw%cr3d = psi_L%pw%cr3d
@@ -822,13 +822,13 @@ CONTAINS
 
          i_counter = 0
          DO LLL = my_group_L_start, my_group_L_end
-            i_counter = i_counter+1
+            i_counter = i_counter + 1
 
             ! pseudo psi_L
             CALL calculate_wavefunction(mo_coeff, 1, psi_L, rho_g, atomic_kind_set, &
                                         qs_kind_set, cell, dft_control, particle_set, pw_env_sub, &
                                         basis_type="RI_AUX", &
-                                        external_vector=my_Lrows(:, LLL-my_group_L_start+1))
+                                        external_vector=my_Lrows(:, LLL - my_group_L_start + 1))
 
             CALL timeset(routineN//"_pot_trunc", handle3)
             rho_r%pw%cr3d = psi_L%pw%cr3d
@@ -1028,7 +1028,7 @@ CONTAINS
       CALL mp_environ(nproc_glob, iproc_glob, mp_comm_2d)
 
       ! local block index for R/P and a
-      loc_P = igroup+1; loc_a = iproc+1
+      loc_P = igroup + 1; loc_a = iproc + 1
 
       CPASSERT(SIZE(sizes_L) .EQ. ngroup)
       CPASSERT(SIZE(sizes_B) .EQ. nproc)
@@ -1059,9 +1059,9 @@ CONTAINS
 
       ! setup distribution vectors such that distribution matches parallel data layout of BIb_C and my_Lrows
       dist_B_i = [0]
-      dist_B_a = (/(i, i=0, nproc-1)/)
-      dist_L_R = (/(MODULO(i, nproc), i=0, ngroup-1)/) ! R index is replicated in my_Lrows, we impose a cyclic distribution
-      dist_L_P = (/(i, i=0, ngroup-1)/)
+      dist_B_a = (/(i, i=0, nproc - 1)/)
+      dist_L_R = (/(MODULO(i, nproc), i=0, ngroup - 1)/) ! R index is replicated in my_Lrows, we impose a cyclic distribution
+      dist_L_P = (/(i, i=0, ngroup - 1)/)
 
       ! create distributions and tensors
       CALL dbcsr_t_distribution_new(dist_B, mp_comm_B, mp_comm_2d, map_B_1, map_B_2, dist_L_P, dist_B_a, dist_B_i)
@@ -1084,14 +1084,14 @@ CONTAINS
       ! in my_Lrows, R index is replicated. For (R|P), we distribute quadratic blocks cyclically over
       ! the processes in a subgroup.
       ! There are NG blocks, so each process holds at most NG/Nw+1 blocks.
-      ALLOCATE (block_ind_L_R(ngroup/nproc+1))
-      ALLOCATE (block_ind_L_P(ngroup/nproc+1))
+      ALLOCATE (block_ind_L_R(ngroup/nproc + 1))
+      ALLOCATE (block_ind_L_P(ngroup/nproc + 1))
       block_ind_L_R(:) = 0; block_ind_L_P(:) = 0
       ii = 0
       DO i = 1, ngroup
          CALL dbcsr_t_get_stored_coordinates(tL, [i, loc_P], check_proc)
          IF (check_proc == iproc_glob) THEN
-            ii = ii+1
+            ii = ii + 1
             block_ind_L_R(ii) = i
             block_ind_L_P(ii) = loc_P
          ENDIF
@@ -1104,8 +1104,8 @@ CONTAINS
       ! insert (R|P) blocks
       ioff = 0
       DO i = 1, ngroup
-         istart = ioff+1; iend = ioff+sizes_L(i)
-         ioff = ioff+sizes_L(i)
+         istart = ioff + 1; iend = ioff + sizes_L(i)
+         ioff = ioff + sizes_L(i)
          CALL dbcsr_t_get_stored_coordinates(tL, [i, loc_P], check_proc)
          IF (check_proc == iproc_glob) THEN
             CALL dbcsr_t_put_block(tL, [i, loc_P], [sizes_L(i), sizes_L(loc_P)], my_Lrows(istart:iend, :))
@@ -1131,11 +1131,11 @@ CONTAINS
             blk_offset_first(:) = blk_offset(:)
             first_block = .FALSE.
          ENDIF
-         offset_B(:) = blk_offset(:)-blk_offset_first(:)
+         offset_B(:) = blk_offset(:) - blk_offset_first(:)
          CALL dbcsr_t_get_block(tB_out_split, blk_ind, blk_data)
-         BIb_C(offset_B(1)+1:offset_B(1)+blk_sizes(1), &
-               offset_B(2)+1:offset_B(2)+blk_sizes(2), &
-               offset_B(3)+1:offset_B(3)+blk_sizes(3)) = &
+         BIb_C(offset_B(1) + 1:offset_B(1) + blk_sizes(1), &
+               offset_B(2) + 1:offset_B(2) + blk_sizes(2), &
+               offset_B(3) + 1:offset_B(3) + blk_sizes(3)) = &
             blk_data(:, :, :)
          DEALLOCATE (blk_data)
       END DO
@@ -1189,7 +1189,7 @@ CONTAINS
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: local_col_row_info
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_intermediate_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ncol_local, nfullcols_total, &
                                                             nfullrows_total, nrow_local
@@ -1262,7 +1262,7 @@ CONTAINS
       INTEGER                                            :: my_B_start, my_B_end, my_B_size, size_1
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'create_parallelization_arrays', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iproc, itmp(2)
 
@@ -1270,21 +1270,21 @@ CONTAINS
 
       ! divide the b states in the sub_group in such a way to create
       ! b_start and b_end for each proc inside the sub_group
-      ALLOCATE (sizes_B(0:para_env_sub%num_pe-1))
+      ALLOCATE (sizes_B(0:para_env_sub%num_pe - 1))
       sizes_B = 0
-      ALLOCATE (starts_B(0:para_env_sub%num_pe-1))
+      ALLOCATE (starts_B(0:para_env_sub%num_pe - 1))
       starts_B = 0
-      ALLOCATE (ends_B(0:para_env_sub%num_pe-1))
+      ALLOCATE (ends_B(0:para_env_sub%num_pe - 1))
       ends_B = 0
 
-      DO iproc = 0, para_env_sub%num_pe-1
+      DO iproc = 0, para_env_sub%num_pe - 1
          itmp = get_limit(size_1, para_env_sub%num_pe, iproc)
          !IF (itmp(2) < itmp(1)) THEN
          !   itmp(2) = itmp(1)
          !ENDIF
          starts_B(iproc) = itmp(1)
          ends_B(iproc) = itmp(2)
-         sizes_B(iproc) = itmp(2)-itmp(1)+1
+         sizes_B(iproc) = itmp(2) - itmp(1) + 1
       END DO
 
       my_B_start = starts_B(para_env_sub%mepos)
@@ -1441,7 +1441,7 @@ CONTAINS
       INTEGER                                            :: size_chol_from_input, unit_nr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'calculate_Lmin1', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_real_imag, i_size, j_size
       REAL(KIND=dp)                                      :: eps_pgf_orb_old
@@ -1587,7 +1587,7 @@ CONTAINS
                                                             fm_matrix_L_RI_metric
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_V_by_lattice_sum', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_dim, i_real_imag, ikp, nkp
       INTEGER, DIMENSION(3)                              :: periodic
@@ -1683,7 +1683,7 @@ CONTAINS
       INTEGER                                            :: dimen_RI
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'Obara_Saika_overlap_mat', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_real_imag, i_size, ikp, &
                                                             n_real_imag, nkp
@@ -1887,22 +1887,22 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: ri_metric
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_2c_integrals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: best_group_size, color_exc, color_L, comm_exc, comm_exchange, comm_L, dir, &
-         group_size, handle, handle2, handle3, i, i_bf, i_counter, i_counter_diff_bf, &
-         i_counter_diff_bf_at_any_atom, i_counter_diff_sets, i_global, iatom, igrid_level, igroup, &
-         iiB, ikind, inode, ipgf, iproc, iset, itmp(2), j, j_global, j_ref_atom, j_ref_bf, &
-         j_ref_kind, j_ref_set, jatom, jjB, jkind, jset, lb(3), LLL, location(3), m, &
-         my_group_L_q_end, my_group_L_q_size, my_group_L_q_start, my_group_pot_end, &
-         my_group_pot_size, my_group_pot_start, my_ri_metric, na1, na2, natom, ncoa, ncoa_a, &
-         ncoa_b, ncol_local, nkind
+                 group_size, handle, handle2, handle3, i, i_bf, i_counter, i_counter_diff_bf, &
+                 i_counter_diff_bf_at_any_atom, i_counter_diff_sets, i_global, iatom, igrid_level, igroup, &
+                 iiB, ikind, inode, ipgf, iproc, iset, itmp(2), j, j_global, j_ref_atom, j_ref_bf, &
+                 j_ref_kind, j_ref_set, jatom, jjB, jkind, jset, lb(3), LLL, location(3), m, &
+                 my_group_L_q_end, my_group_L_q_size, my_group_L_q_start, my_group_pot_end, &
+                 my_group_pot_size, my_group_pot_start, my_ri_metric, na1, na2, natom, ncoa, ncoa_a, &
+                 ncoa_b, ncol_local, nkind
       INTEGER :: nrow_local, nseta, nsetb, nsgf, offset, offsetb, proc_receive, &
-         proc_receive_static, proc_send, proc_send_static, proc_shift, rec_L_end, rec_L_size, &
-         rec_L_start, sgfa, sgfb, strat_group_size, sub_sub_color, tp(3), ub(3)
+                 proc_receive_static, proc_send, proc_send_static, proc_shift, rec_L_end, rec_L_size, &
+                 rec_L_start, sgfa, sgfb, strat_group_size, sub_sub_color, tp(3), ub(3)
       INTEGER, ALLOCATABLE, DIMENSION(:) :: diffbf_atom_arbitr_atom, diffbf_noinbas, &
-         diffbfatanyatom_noinbas, ends_array_pot, kind_of, proc_map, sizes_array_pot, &
-         starts_array_pot, sub_ends_array, sub_sizes_array, sub_starts_array
+                                            diffbfatanyatom_noinbas, ends_array_pot, kind_of, proc_map, sizes_array_pot, &
+                                            starts_array_pot, sub_ends_array, sub_sizes_array, sub_starts_array
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: atom_set_afo_diffbf, &
                                                             atom_set_afo_diffbf_atanyatom, &
                                                             diffsets_atom_set_bf, ref_matrix
@@ -1979,25 +1979,25 @@ CONTAINS
       DO iatom = 1, natom
          ikind = kind_of(iatom)
          CALL get_qs_kind(qs_kind=qs_kind_set(ikind), nsgf=nsgf, basis_type="RI_AUX")
-         dimen_RI = dimen_RI+nsgf
+         dimen_RI = dimen_RI + nsgf
       END DO
 
       ! check that very small systems are not running on too many processes
       CPASSERT(dimen_RI >= para_env%num_pe)
 
       ! calculate which rows of L^{-1} to have
-      ALLOCATE (sizes_array(0:ngroup-1))
+      ALLOCATE (sizes_array(0:ngroup - 1))
       sizes_array = 0
-      ALLOCATE (starts_array(0:ngroup-1))
+      ALLOCATE (starts_array(0:ngroup - 1))
       starts_array = 0
-      ALLOCATE (ends_array(0:ngroup-1))
+      ALLOCATE (ends_array(0:ngroup - 1))
       ends_array = 0
 
-      DO igroup = 0, ngroup-1
+      DO igroup = 0, ngroup - 1
          itmp = get_limit(dimen_RI, ngroup, igroup)
          starts_array(igroup) = itmp(1)
          ends_array(igroup) = itmp(2)
-         sizes_array(igroup) = itmp(2)-itmp(1)+1
+         sizes_array(igroup) = itmp(2) - itmp(1) + 1
       ENDDO
 
       my_group_L_size = sizes_array(color_sub)
@@ -2045,7 +2045,7 @@ CONTAINS
 
                   !pseudo-m quantum number runs from 1 to 2l+1
                   DO m = 1, nsgfa(iset)
-                     i_counter = i_counter+1
+                     i_counter = i_counter + 1
                      !first entry: l; only in case of la_max(iset)==la_min(iset) the shortcut will work, see IF below
                      ref_matrix(i_counter, 1) = la_max(iset)
                      !second entry: pseudo-m quantum number runs from 1 to 2l+1
@@ -2057,7 +2057,7 @@ CONTAINS
 
                      !Check, whether (l,m) combination already exists
                      IF (i_counter >= 2) THEN
-                        DO i_bf = 1, i_counter-1
+                        DO i_bf = 1, i_counter - 1
                            ! 6th row of ref_matrix contains number of first basis function with identical (l,m)
                            ! for set with la_min=/la_max at the same atom
                            IF (ref_matrix(i_bf, 1) == la_max(iset) .AND. ref_matrix(i_bf, 2) == m .AND. &
@@ -2073,7 +2073,7 @@ CONTAINS
 
                         END DO !loop already existing basis functions
 
-                        DO i_bf = 1, i_counter-1
+                        DO i_bf = 1, i_counter - 1
                            ! 6th row of ref_matrix contains number of first basis function with identical (l,m)
                            ! for set with la_min=/la_max AT ANY ATOM (!!DIFFERENCE!!)
                            IF (ref_matrix(i_bf, 1) == la_max(iset) .AND. ref_matrix(i_bf, 2) == m .AND. &
@@ -2096,7 +2096,7 @@ CONTAINS
                      END IF
                      ! for new (l,m) combination increase i_counter_diff_bf by 1 and set reference to itself
                      IF (ref_matrix(i_counter, 6) == 0) THEN
-                        i_counter_diff_bf = i_counter_diff_bf+1
+                        i_counter_diff_bf = i_counter_diff_bf + 1
                         ref_matrix(i_counter, 7) = i_counter_diff_bf
                         ! for already existing (l,m) combination, 7th entry refers to number/label of first (l,m) combination
                      ELSE
@@ -2107,7 +2107,7 @@ CONTAINS
                      ! for new (l,m) at any atom combination increase i_counter_diff_bf_at_any_atom by 1
                      !  and set reference to itself
                      IF (ref_matrix(i_counter, 9) == 0) THEN
-                        i_counter_diff_bf_at_any_atom = i_counter_diff_bf_at_any_atom+1
+                        i_counter_diff_bf_at_any_atom = i_counter_diff_bf_at_any_atom + 1
                         ref_matrix(i_counter, 10) = i_counter_diff_bf_at_any_atom
                         ! for already existing (l,m) combination, 7th entry refers to number/label of first (l,m) combination
                      ELSE
@@ -2120,7 +2120,7 @@ CONTAINS
                END DO !prim. gf.
 
                IF (ref_matrix(i_counter, 6) == 0) THEN
-                  i_counter_diff_sets = i_counter_diff_sets+1
+                  i_counter_diff_sets = i_counter_diff_sets + 1
                   ref_at_se_sgf_ofs(iatom, iset, 1) = iatom
                   ref_at_se_sgf_ofs(iatom, iset, 2) = iset
                   ref_at_se_sgf_ofs(iatom, iset, 3) = first_sgfa(1, iset)
@@ -2131,11 +2131,11 @@ CONTAINS
                   ref_at_se_sgf_ofs(iatom, iset, 3) = ref_matrix(ref_matrix(i_counter, 6), 8)
                END IF
 
-               naolimits(iatom, iset, 1) = ref_matrix(i_counter, 7)-nsgfa(iset)+1
+               naolimits(iatom, iset, 1) = ref_matrix(i_counter, 7) - nsgfa(iset) + 1
                naolimits(iatom, iset, 2) = ref_matrix(i_counter, 7)
 
                ref_at_se_sgf_ofs(iatom, iset, 4) = offset
-               offset = offset+nsgfa(iset)
+               offset = offset + nsgfa(iset)
 
             END DO !sets
 
@@ -2162,7 +2162,7 @@ CONTAINS
                diffbfatanyatom_noinbas(j) = i
                atom_set_afo_diffbf_atanyatom(j, 1) = ref_matrix(i, 3)
                atom_set_afo_diffbf_atanyatom(j, 2) = ref_matrix(i, 4)
-               j = j+1
+               j = j + 1
             END IF
          END DO
 
@@ -2173,7 +2173,7 @@ CONTAINS
                atom_set_afo_diffbf(j, 1) = ref_matrix(i, 3)
                atom_set_afo_diffbf(j, 2) = ref_matrix(i, 4)
                diffbf_atom_arbitr_atom(j) = ref_matrix(i, 10)
-               j = j+1
+               j = j + 1
             END IF
          END DO
 
@@ -2187,12 +2187,12 @@ CONTAINS
 
          j = 2
          DO i = 2, dimen_RI
-            IF (ref_matrix(i, 6) == 0 .AND. (diffsets_atom_set_bf(j-1, 1) /= ref_matrix(i, 3) .OR. &
-                                             diffsets_atom_set_bf(j-1, 2) /= ref_matrix(i, 4))) THEN
+            IF (ref_matrix(i, 6) == 0 .AND. (diffsets_atom_set_bf(j - 1, 1) /= ref_matrix(i, 3) .OR. &
+                                             diffsets_atom_set_bf(j - 1, 2) /= ref_matrix(i, 4))) THEN
                diffsets_atom_set_bf(j, 1) = ref_matrix(i, 3)
                diffsets_atom_set_bf(j, 2) = ref_matrix(i, 4)
                diffsets_atom_set_bf(j, 3) = ref_matrix(i, 7)
-               j = j+1
+               j = j + 1
             END IF
          END DO
 
@@ -2201,28 +2201,28 @@ CONTAINS
 
          my_group_L_q_start = naolimits(ref_matrix(my_group_L_start, 3), 1, 1)
          IF (ref_matrix(my_group_L_end, 3) /= natom) THEN
-            my_group_L_q_end = naolimits(ref_matrix(my_group_L_end, 3)+1, 1, 1)-1
+            my_group_L_q_end = naolimits(ref_matrix(my_group_L_end, 3) + 1, 1, 1) - 1
          ELSE
             nkind = kind_of(natom)
             CALL get_qs_kind(qs_kind=qs_kind_set(nkind), basis_set=basis_set_a, basis_type="RI_AUX")
             nseta = basis_set_a%nset
             my_group_L_q_end = naolimits(ref_matrix(my_group_L_end, 3), nseta, 2)
          END IF
-         my_group_L_q_size = my_group_L_q_end-my_group_L_q_start+1
+         my_group_L_q_size = my_group_L_q_end - my_group_L_q_start + 1
 
          ! calculate which potentials to calculate
-         ALLOCATE (sizes_array_pot(0:ngroup-1))
+         ALLOCATE (sizes_array_pot(0:ngroup - 1))
          sizes_array_pot = 0
-         ALLOCATE (starts_array_pot(0:ngroup-1))
+         ALLOCATE (starts_array_pot(0:ngroup - 1))
          starts_array_pot = 0
-         ALLOCATE (ends_array_pot(0:ngroup-1))
+         ALLOCATE (ends_array_pot(0:ngroup - 1))
          ends_array_pot = 0
 
-         DO igroup = 0, ngroup-1
+         DO igroup = 0, ngroup - 1
             itmp = get_limit(i_counter_diff_bf_at_any_atom, ngroup, igroup)
             starts_array_pot(igroup) = itmp(1)
             ends_array_pot(igroup) = itmp(2)
-            sizes_array_pot(igroup) = itmp(2)-itmp(1)+1
+            sizes_array_pot(igroup) = itmp(2) - itmp(1) + 1
          ENDDO
 
          my_group_pot_size = sizes_array_pot(color_sub)
@@ -2342,7 +2342,7 @@ CONTAINS
          !      at every atom. Use the potential (q_alpha|_p calculated in 2.0)
 
          DO j = my_group_L_q_start, my_group_L_q_end
-            i_counter = i_counter+1
+            i_counter = i_counter + 1
 
             jatom = atom_set_afo_diffbf(j, 1)
             jset = atom_set_afo_diffbf(j, 2)
@@ -2386,8 +2386,8 @@ CONTAINS
                sphi_a => basis_set_a%sphi
                zeta => basis_set_a%zet
 
-               ra(:) = pbc(particle_set(iatom)%r, cell)- &
-                       pbc(particle_set(jatom)%r, cell)+ &
+               ra(:) = pbc(particle_set(iatom)%r, cell) - &
+                       pbc(particle_set(jatom)%r, cell) + &
                        pbc(particle_set(j_ref_atom)%r, cell)
                rab = 0.0_dp
                rab2 = 0.0_dp
@@ -2408,14 +2408,14 @@ CONTAINS
                      tp(dir) = FLOOR(DOT_PRODUCT(cell%h_inv(dir, :), ra)*rs_v(igrid_level)%rs_grid%desc%npts(dir))
                      tp(dir) = MODULO(tp(dir), rs_v(igrid_level)%rs_grid%desc%npts(dir))
                      IF (rs_v(igrid_level)%rs_grid%desc%perd(dir) .NE. 1) THEN
-                        lb(dir) = rs_v(igrid_level)%rs_grid%lb_local(dir)+rs_v(igrid_level)%rs_grid%desc%border
-                        ub(dir) = rs_v(igrid_level)%rs_grid%ub_local(dir)-rs_v(igrid_level)%rs_grid%desc%border
+                        lb(dir) = rs_v(igrid_level)%rs_grid%lb_local(dir) + rs_v(igrid_level)%rs_grid%desc%border
+                        ub(dir) = rs_v(igrid_level)%rs_grid%ub_local(dir) - rs_v(igrid_level)%rs_grid%desc%border
                      ELSE
                         lb(dir) = rs_v(igrid_level)%rs_grid%lb_local(dir)
                         ub(dir) = rs_v(igrid_level)%rs_grid%ub_local(dir)
                      ENDIF
                      ! distributed grid, only map if it is local to the grid
-                     location(dir) = tp(dir)+rs_v(igrid_level)%rs_grid%desc%lb(dir)
+                     location(dir) = tp(dir) + rs_v(igrid_level)%rs_grid%desc%lb(dir)
                   ENDDO
                   IF (lb(1) <= location(1) .AND. location(1) <= ub(1) .AND. &
                       lb(2) <= location(2) .AND. location(2) <= ub(2) .AND. &
@@ -2427,11 +2427,11 @@ CONTAINS
                   IF (MODULO(offset, para_env_sub%num_pe) == para_env_sub%mepos) map_it_here = .TRUE.
                ENDIF
 
-               offset = offset+nsgfa(iset)
+               offset = offset + nsgfa(iset)
 
                IF (map_it_here) THEN
                   DO ipgf = 1, npgfa(iset)
-                     na1 = (ipgf-1)*ncoset(la_max(iset))+1
+                     na1 = (ipgf - 1)*ncoset(la_max(iset)) + 1
                      na2 = ipgf*ncoset(la_max(iset))
                      igrid_level = gaussian_gridlevel(pw_env_sub%gridlevel_info, exp_q(1))
 
@@ -2442,7 +2442,7 @@ CONTAINS
                                                        cell=cell, &
                                                        cube_info=pw_env_sub%cube_info(igrid_level), &
                                                        hab=I_tmp2, &
-                                                       o1=na1-1, &
+                                                       o1=na1 - 1, &
                                                        o2=0, &
                                                        map_consistent=.TRUE., &
                                                        eps_gvg_rspace=dft_control%qs_control%eps_gvg_rspace, &
@@ -2456,10 +2456,10 @@ CONTAINS
 
                   ! integration result has to be scaled since from basis set differing exponent exp_q
                   ! causes different normalization
-                  L_local_col_q(offset-nsgfa(iset)+1:offset, i_counter) = &
+                  L_local_col_q(offset - nsgfa(iset) + 1:offset, i_counter) = &
                      I_ab(1:nsgfa(iset), 1)* &
-                     (exp_q(1)/zeta(1, iset))**(la_max(iset)*0.5_dp+3.0_dp/4.0_dp)* &
-                     (exp_q(1)/zetb(1, j_ref_set))**(lb_max(j_ref_set)*0.5_dp+3.0_dp/4.0_dp)
+                     (exp_q(1)/zeta(1, iset))**(la_max(iset)*0.5_dp + 3.0_dp/4.0_dp)* &
+                     (exp_q(1)/zetb(1, j_ref_set))**(lb_max(j_ref_set)*0.5_dp + 3.0_dp/4.0_dp)
                END IF
 
                DEALLOCATE (I_tmp2)
@@ -2525,26 +2525,26 @@ CONTAINS
                   DO jset = 1, nsetb
 
                      ! for parallelization: check, if jset is in paralleliz. range
-                     IF (ref_at_se_sgf_ofs(jatom, jset, 4)+nsgfb(jset) >= my_group_L_start .AND. &
-                         ref_at_se_sgf_ofs(jatom, jset, 4)+1 <= my_group_L_end) THEN
+                     IF (ref_at_se_sgf_ofs(jatom, jset, 4) + nsgfb(jset) >= my_group_L_start .AND. &
+                         ref_at_se_sgf_ofs(jatom, jset, 4) + 1 <= my_group_L_end) THEN
 
                         ! add contribution from (q_a|q_b)_p
-                        scaling = 1.0_dp/(zeta(1, iset))**(la_max(iset)*0.5_dp+3.0_dp/4.0_dp)/ &
-                                  (zetb(1, jset))**(lb_max(jset)*0.5_dp+3.0_dp/4.0_dp)* &
-                                  exp_q(1)**(la_max(iset)*0.5_dp+3.0_dp/4.0_dp)* &
-                                  exp_q(1)**(lb_max(jset)*0.5_dp+3.0_dp/4.0_dp)
+                        scaling = 1.0_dp/(zeta(1, iset))**(la_max(iset)*0.5_dp + 3.0_dp/4.0_dp)/ &
+                                  (zetb(1, jset))**(lb_max(jset)*0.5_dp + 3.0_dp/4.0_dp)* &
+                                  exp_q(1)**(la_max(iset)*0.5_dp + 3.0_dp/4.0_dp)* &
+                                  exp_q(1)**(lb_max(jset)*0.5_dp + 3.0_dp/4.0_dp)
 
                         DO i = 1, nsgfa(iset)
                            DO j = 1, nsgfb(jset)
                               ! for parallelization: check, if sgf_j is in paralleliz. range
-                              IF (ref_at_se_sgf_ofs(jatom, jset, 4)+j >= my_group_L_start .AND. &
-                                  ref_at_se_sgf_ofs(jatom, jset, 4)+j <= my_group_L_end) THEN
+                              IF (ref_at_se_sgf_ofs(jatom, jset, 4) + j >= my_group_L_start .AND. &
+                                  ref_at_se_sgf_ofs(jatom, jset, 4) + j <= my_group_L_end) THEN
 
                                  ! Scale (q_a|q_b) by c_a*c_b, only implemented for uncontracted Gaussians and lmin=lmax
-                                 L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4)+i, &
-                                             ref_at_se_sgf_ofs(jatom, jset, 4)+j-my_group_L_start+1) = &
-                                    L_local_col_q(naolimits(iatom, iset, 1)+i-1, &
-                                                  naolimits(jatom, jset, 1)+j-1-my_group_L_q_start+1)* &
+                                 L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4) + i, &
+                                             ref_at_se_sgf_ofs(jatom, jset, 4) + j - my_group_L_start + 1) = &
+                                    L_local_col_q(naolimits(iatom, iset, 1) + i - 1, &
+                                                  naolimits(jatom, jset, 1) + j - 1 - my_group_L_q_start + 1)* &
                                     scaling
 
                               END IF
@@ -2554,12 +2554,12 @@ CONTAINS
                         ! for s-functions alpha and beta, we need additional correction V_a(G=0)-V_q(G=0))*beta(G=0)
                         ! and V_b(G=0)-V_q(G=0))*alpha(G=0), only add once for every subgroup (for mepos==0)
                         IF (la_max(iset) == 0 .AND. lb_max(jset) == 0 .AND. para_env_sub%mepos == 0) THEN
-                           L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4)+1, &
-                                       ref_at_se_sgf_ofs(jatom, jset, 4)-my_group_L_start+2) = &
-                              L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4)+1, &
-                                          ref_at_se_sgf_ofs(jatom, jset, 4)-my_group_L_start+2)- &
+                           L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4) + 1, &
+                                       ref_at_se_sgf_ofs(jatom, jset, 4) - my_group_L_start + 2) = &
+                              L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4) + 1, &
+                                          ref_at_se_sgf_ofs(jatom, jset, 4) - my_group_L_start + 2) - &
                               Pi/(rho_r%pw%pw_grid%vol)*(4.0_dp*Pi**2.0_dp/(zeta(1, iset)*zetb(1, jset)))**0.75_dp* &
-                              (2.0_dp/exp_q(1)-1.0_dp/zeta(1, iset)-1.0_dp/zetb(1, jset))
+                              (2.0_dp/exp_q(1) - 1.0_dp/zeta(1, iset) - 1.0_dp/zetb(1, jset))
                         END IF
 
                      END IF
@@ -2613,11 +2613,11 @@ CONTAINS
                DO jset = 1, nsetb
 
                   ! for parallelization: check, if (jatom,jset) is in paralleliz. range
-                  check_j = ref_at_se_sgf_ofs(jatom, jset, 4)+nsgfb(jset) >= my_group_L_start .AND. &
-                            ref_at_se_sgf_ofs(jatom, jset, 4)+1 <= my_group_L_end
+                  check_j = ref_at_se_sgf_ofs(jatom, jset, 4) + nsgfb(jset) >= my_group_L_start .AND. &
+                            ref_at_se_sgf_ofs(jatom, jset, 4) + 1 <= my_group_L_end
 
-                  check_i = ref_at_se_sgf_ofs(iatom, iset, 4)+nsgfa(iset) >= my_group_L_start .AND. &
-                            ref_at_se_sgf_ofs(iatom, iset, 4)+1 <= my_group_L_end .AND. &
+                  check_i = ref_at_se_sgf_ofs(iatom, iset, 4) + nsgfa(iset) >= my_group_L_start .AND. &
+                            ref_at_se_sgf_ofs(iatom, iset, 4) + 1 <= my_group_L_end .AND. &
                             iatom /= jatom
 
                   IF (check_j .OR. check_i) THEN
@@ -2630,8 +2630,8 @@ CONTAINS
                      ALLOCATE (I_tmp(ncoa_a, nsgfb(jset)))
                      ALLOCATE (I_tmp2(nsgfa(iset), nsgfb(jset)))
 
-                     ALLOCATE (f(0:la_max(iset)+lb_max(jset)+2), &
-                               v(ncoa_a, ncoa_b, la_max(iset)+lb_max(jset)+1), &
+                     ALLOCATE (f(0:la_max(iset) + lb_max(jset) + 2), &
+                               v(ncoa_a, ncoa_b, la_max(iset) + lb_max(jset) + 1), &
                                vac(ncoa_a, ncoa_b))
                      f = 0.0_dp
                      v = 0.0_dp
@@ -2639,7 +2639,7 @@ CONTAINS
                      I_tmp = 0.0_dp
                      I_tmp2 = 0.0_dp
 
-                     rac2 = rac(1)*rac(1)+rac(2)*rac(2)+rac(3)*rac(3)
+                     rac2 = rac(1)*rac(1) + rac(2)*rac(2) + rac(3)*rac(3)
 
                      ! calculate spherical matrix elements (a|b)_s
                      CALL coulomb2_new(la_max=la_max(iset), npgfa=npgfa(iset), zeta=zeta(:, iset), &
@@ -2649,8 +2649,8 @@ CONTAINS
                                        rac2=rac2, vac=vac, v=v, f=f)
 
                      ! trafo to spherical and add (a|b)_s to L_local_col
-                     I_tmp(1:ncoa_a, 1:nsgfb(jset)) = MATMUL(vac(1:ncoa_a, 1:ncoa_b), sphi_b(1:ncoa_b, sgfb:(sgfb+nsgfb(jset)-1)))
-                     I_tmp2(1:nsgfa(iset), 1:nsgfb(jset)) = MATMUL(TRANSPOSE(sphi_a(1:ncoa_a, sgfa:(sgfa+nsgfa(iset)-1))), &
+                   I_tmp(1:ncoa_a, 1:nsgfb(jset)) = MATMUL(vac(1:ncoa_a, 1:ncoa_b), sphi_b(1:ncoa_b, sgfb:(sgfb + nsgfb(jset) - 1)))
+                     I_tmp2(1:nsgfa(iset), 1:nsgfb(jset)) = MATMUL(TRANSPOSE(sphi_a(1:ncoa_a, sgfa:(sgfa + nsgfa(iset) - 1))), &
                                                                    I_tmp(1:ncoa_a, 1:nsgfb(jset)))
 
                      f = 0.0_dp
@@ -2667,41 +2667,41 @@ CONTAINS
                      ! trafo to spherical and scale by c_a*c_b, only implemented for uncontracted Gaussians and lmin=lmax
                      I_tmp(1:ncoa_a, 1:nsgfb(jset)) = MATMUL(vac(1:ncoa_a, 1:ncoa_b), &
                                                              sphi_b(1:ncoa_b, ref_at_se_sgf_ofs(jatom, jset, 3): &
-                                                                    (ref_at_se_sgf_ofs(jatom, jset, 3)+nsgfb(jset)-1)))
+                                                                    (ref_at_se_sgf_ofs(jatom, jset, 3) + nsgfb(jset) - 1)))
                      I_tmp2(1:nsgfa(iset), 1:nsgfb(jset)) = &
-                        I_tmp2(1:nsgfa(iset), 1:nsgfb(jset))- &
+                        I_tmp2(1:nsgfa(iset), 1:nsgfb(jset)) - &
                         MATMUL(TRANSPOSE(sphi_a(1:ncoa_a, ref_at_se_sgf_ofs(iatom, iset, 3): &
-                                                (ref_at_se_sgf_ofs(iatom, iset, 3)+nsgfa(iset)-1))), &
+                                                (ref_at_se_sgf_ofs(iatom, iset, 3) + nsgfa(iset) - 1))), &
                                I_tmp(1:ncoa_a, 1:nsgfb(jset)))/ &
-                        (zeta(1, iset))**(la_max(iset)*0.5_dp+3.0_dp/4.0_dp)/ &
-                        (zetb(1, jset))**(lb_max(jset)*0.5_dp+3.0_dp/4.0_dp)* &
-                        exp_q(1)**(la_max(iset)*1.0_dp+3.0_dp/2.0_dp)* &
-                        exp_q(1)**(lb_max(jset)*1.0_dp+3.0_dp/2.0_dp)/ &
-                        (zeta(1, ref_at_se_sgf_ofs(iatom, iset, 2)))**(la_max(iset)*0.5_dp+3.0_dp/4.0_dp)/ &
-                        (zetb(1, ref_at_se_sgf_ofs(jatom, jset, 2)))**(lb_max(jset)*0.5_dp+3.0_dp/4.0_dp)
+                        (zeta(1, iset))**(la_max(iset)*0.5_dp + 3.0_dp/4.0_dp)/ &
+                        (zetb(1, jset))**(lb_max(jset)*0.5_dp + 3.0_dp/4.0_dp)* &
+                        exp_q(1)**(la_max(iset)*1.0_dp + 3.0_dp/2.0_dp)* &
+                        exp_q(1)**(lb_max(jset)*1.0_dp + 3.0_dp/2.0_dp)/ &
+                        (zeta(1, ref_at_se_sgf_ofs(iatom, iset, 2)))**(la_max(iset)*0.5_dp + 3.0_dp/4.0_dp)/ &
+                        (zetb(1, ref_at_se_sgf_ofs(jatom, jset, 2)))**(lb_max(jset)*0.5_dp + 3.0_dp/4.0_dp)
 
                      ! add contribution from (a|b)_s-(q_a|q_b)_s
                      DO i = 1, nsgfa(iset)
                         DO j = 1, nsgfb(jset)
                            ! for parallelization: check, if sgf_j is in paralleliz. range
-                           IF (ref_at_se_sgf_ofs(jatom, jset, 4)+j >= my_group_L_start .AND. &
-                               ref_at_se_sgf_ofs(jatom, jset, 4)+j <= my_group_L_end .AND. &
+                           IF (ref_at_se_sgf_ofs(jatom, jset, 4) + j >= my_group_L_start .AND. &
+                               ref_at_se_sgf_ofs(jatom, jset, 4) + j <= my_group_L_end .AND. &
                                check_j) THEN
 
-                              L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4)+i, &
-                                          ref_at_se_sgf_ofs(jatom, jset, 4)+j-my_group_L_start+1) = &
-                                 L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4)+i, &
-                                             ref_at_se_sgf_ofs(jatom, jset, 4)+j-my_group_L_start+1)+ &
+                              L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4) + i, &
+                                          ref_at_se_sgf_ofs(jatom, jset, 4) + j - my_group_L_start + 1) = &
+                                 L_local_col(ref_at_se_sgf_ofs(iatom, iset, 4) + i, &
+                                             ref_at_se_sgf_ofs(jatom, jset, 4) + j - my_group_L_start + 1) + &
                                  I_tmp2(i, j)
                            END IF
 
-                           IF (ref_at_se_sgf_ofs(iatom, iset, 4)+i >= my_group_L_start .AND. &
-                               ref_at_se_sgf_ofs(iatom, iset, 4)+i <= my_group_L_end .AND. &
+                           IF (ref_at_se_sgf_ofs(iatom, iset, 4) + i >= my_group_L_start .AND. &
+                               ref_at_se_sgf_ofs(iatom, iset, 4) + i <= my_group_L_end .AND. &
                                check_i) THEN
-                              L_local_col(ref_at_se_sgf_ofs(jatom, jset, 4)+j, &
-                                          ref_at_se_sgf_ofs(iatom, iset, 4)+i-my_group_L_start+1) = &
-                                 L_local_col(ref_at_se_sgf_ofs(jatom, jset, 4)+j, &
-                                             ref_at_se_sgf_ofs(iatom, iset, 4)+i-my_group_L_start+1)+ &
+                              L_local_col(ref_at_se_sgf_ofs(jatom, jset, 4) + j, &
+                                          ref_at_se_sgf_ofs(iatom, iset, 4) + i - my_group_L_start + 1) = &
+                                 L_local_col(ref_at_se_sgf_ofs(jatom, jset, 4) + j, &
+                                             ref_at_se_sgf_ofs(iatom, iset, 4) + i - my_group_L_start + 1) + &
                                  I_tmp2(i, j)
                            END IF
                         END DO
@@ -2749,7 +2749,7 @@ CONTAINS
 
             i_counter = 0
             DO LLL = my_group_L_start, my_group_L_end
-               i_counter = i_counter+1
+               i_counter = i_counter + 1
 
                wf_vector = 0.0_dp
                wf_vector(LLL) = 1.0_dp
@@ -2820,14 +2820,14 @@ CONTAINS
                            tp(dir) = FLOOR(DOT_PRODUCT(cell%h_inv(dir, :), ra)*rs_v(igrid_level)%rs_grid%desc%npts(dir))
                            tp(dir) = MODULO(tp(dir), rs_v(igrid_level)%rs_grid%desc%npts(dir))
                            IF (rs_v(igrid_level)%rs_grid%desc%perd(dir) .NE. 1) THEN
-                              lb(dir) = rs_v(igrid_level)%rs_grid%lb_local(dir)+rs_v(igrid_level)%rs_grid%desc%border
-                              ub(dir) = rs_v(igrid_level)%rs_grid%ub_local(dir)-rs_v(igrid_level)%rs_grid%desc%border
+                              lb(dir) = rs_v(igrid_level)%rs_grid%lb_local(dir) + rs_v(igrid_level)%rs_grid%desc%border
+                              ub(dir) = rs_v(igrid_level)%rs_grid%ub_local(dir) - rs_v(igrid_level)%rs_grid%desc%border
                            ELSE
                               lb(dir) = rs_v(igrid_level)%rs_grid%lb_local(dir)
                               ub(dir) = rs_v(igrid_level)%rs_grid%ub_local(dir)
                            ENDIF
                            ! distributed grid, only map if it is local to the grid
-                           location(dir) = tp(dir)+rs_v(igrid_level)%rs_grid%desc%lb(dir)
+                           location(dir) = tp(dir) + rs_v(igrid_level)%rs_grid%desc%lb(dir)
                         ENDDO
                         IF (lb(1) <= location(1) .AND. location(1) <= ub(1) .AND. &
                             lb(2) <= location(2) .AND. location(2) <= ub(2) .AND. &
@@ -2839,13 +2839,13 @@ CONTAINS
                         IF (MODULO(offset, para_env_sub%num_pe) == para_env_sub%mepos) map_it_here = .TRUE.
                      ENDIF
 
-                     offset = offset+nsgfa(iset)
+                     offset = offset + nsgfa(iset)
 
                      IF (map_it_here) THEN
                         DO ipgf = 1, npgfa(iset)
                            sgfa = first_sgfa(1, iset)
 
-                           na1 = (ipgf-1)*ncoset(la_max(iset))+1
+                           na1 = (ipgf - 1)*ncoset(la_max(iset)) + 1
                            na2 = ipgf*ncoset(la_max(iset))
                            igrid_level = gaussian_gridlevel(pw_env_sub%gridlevel_info, zeta(ipgf, iset))
 
@@ -2857,7 +2857,7 @@ CONTAINS
                               cell=cell, &
                               cube_info=pw_env_sub%cube_info(igrid_level), &
                               hab=I_tmp2, &
-                              o1=na1-1, &
+                              o1=na1 - 1, &
                               o2=0, &
                               map_consistent=.TRUE., &
                               eps_gvg_rspace=dft_control%qs_control%eps_gvg_rspace, &
@@ -2869,7 +2869,7 @@ CONTAINS
                                    I_tmp2(1, 1), SIZE(I_tmp2, 1), &
                                    1.0_dp, I_ab(1, 1), SIZE(I_ab, 1))
 
-                        L_local_col(offset-nsgfa(iset)+1:offset, i_counter) = I_ab(1:nsgfa(iset), 1)
+                        L_local_col(offset - nsgfa(iset) + 1:offset, i_counter) = I_ab(1:nsgfa(iset), 1)
                      END IF
 
                      DEALLOCATE (I_tmp2)
@@ -2903,9 +2903,9 @@ CONTAINS
 
       min_mem_for_QK = REAL(dimen_RI, KIND=dp)*dimen_RI*3.0_dp*8.0_dp/1024_dp/1024_dp
 
-      group_size = strat_group_size-1
+      group_size = strat_group_size - 1
       DO iproc = strat_group_size, para_env%num_pe
-         group_size = group_size+1
+         group_size = group_size + 1
          ! check that group_size is a multiple of sub_group_size and a divisor of
          ! the total num of proc
          IF (MOD(para_env%num_pe, group_size) /= 0 .OR. MOD(group_size, para_env_sub%num_pe) /= 0) CYCLE
@@ -2940,19 +2940,19 @@ CONTAINS
       CALL cp_para_env_create(para_env_exchange, comm_exchange)
 
       ! crate the proc maps
-      ALLOCATE (proc_map(-para_env_exchange%num_pe:2*para_env_exchange%num_pe-1))
-      DO i = 0, para_env_exchange%num_pe-1
+      ALLOCATE (proc_map(-para_env_exchange%num_pe:2*para_env_exchange%num_pe - 1))
+      DO i = 0, para_env_exchange%num_pe - 1
          proc_map(i) = i
-         proc_map(-i-1) = para_env_exchange%num_pe-i-1
-         proc_map(para_env_exchange%num_pe+i) = i
+         proc_map(-i - 1) = para_env_exchange%num_pe - i - 1
+         proc_map(para_env_exchange%num_pe + i) = i
       END DO
 
       ! create the information array
-      ALLOCATE (sub_sizes_array(0:para_env_exchange%num_pe-1))
+      ALLOCATE (sub_sizes_array(0:para_env_exchange%num_pe - 1))
       sub_sizes_array = 0
-      ALLOCATE (sub_starts_array(0:para_env_exchange%num_pe-1))
+      ALLOCATE (sub_starts_array(0:para_env_exchange%num_pe - 1))
       sub_starts_array = 0
-      ALLOCATE (sub_ends_array(0:para_env_exchange%num_pe-1))
+      ALLOCATE (sub_ends_array(0:para_env_exchange%num_pe - 1))
       sub_ends_array = 0
 
       sub_sizes_array(para_env_exchange%mepos) = my_group_L_size
@@ -2997,17 +2997,17 @@ CONTAINS
             IF (j_global >= my_group_L_start .AND. j_global <= my_group_L_end) THEN
                DO iiB = 1, nrow_local
                   i_global = row_indices(iiB)
-                  fm_matrix_L%local_data(iiB, jjB) = L_local_col(i_global, j_global-my_group_L_start+1)
+                  fm_matrix_L%local_data(iiB, jjB) = L_local_col(i_global, j_global - my_group_L_start + 1)
                END DO
             END IF
          END DO
 
-         proc_send_static = proc_map(para_env_exchange%mepos+1)
-         proc_receive_static = proc_map(para_env_exchange%mepos-1)
+         proc_send_static = proc_map(para_env_exchange%mepos + 1)
+         proc_receive_static = proc_map(para_env_exchange%mepos - 1)
 
-         DO proc_shift = 1, para_env_exchange%num_pe-1
-            proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-            proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+         DO proc_shift = 1, para_env_exchange%num_pe - 1
+            proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+            proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
 
             rec_L_size = sub_sizes_array(proc_receive)
             rec_L_start = sub_starts_array(proc_receive)
@@ -3023,7 +3023,7 @@ CONTAINS
                IF (j_global >= rec_L_start .AND. j_global <= rec_L_end) THEN
                   DO iiB = 1, nrow_local
                      i_global = row_indices(iiB)
-                     fm_matrix_L%local_data(iiB, jjB) = L_external_col(i_global, j_global-rec_L_start+1)
+                     fm_matrix_L%local_data(iiB, jjB) = L_external_col(i_global, j_global - rec_L_start + 1)
                   END DO
                END IF
             END DO
@@ -3086,7 +3086,7 @@ CONTAINS
 
          num_small_eigen = 0
          DO iiB = 1, dimen_RI
-            IF (ABS(egen_L(iiB)) < 0.001_dp) num_small_eigen = num_small_eigen+1
+            IF (ABS(egen_L(iiB)) < 0.001_dp) num_small_eigen = num_small_eigen + 1
          END DO
 
          cond_num = MAXVAL(ABS(egen_L))/MINVAL(ABS(egen_L))
@@ -3121,11 +3121,11 @@ CONTAINS
                                                             dimen_RI
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'fill_fm_L_from_L_loc_non_blocking', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: dummy_proc, handle, handle2, i_entry_rec, i_row, i_row_global, iproc, j_col, &
-         j_col_global, LLL, MMM, ncol_block, ncol_local, npcol, nprow, nrow_block, nrow_local, &
-         proc_send, send_pcol, send_prow
+                 j_col_global, LLL, MMM, ncol_block, ncol_local, npcol, nprow, nrow_block, nrow_local, &
+                 proc_send, send_pcol, send_prow
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: entry_counter, num_entries_rec, &
                                                             num_entries_send
       INTEGER, DIMENSION(:), POINTER                     :: col_indices, row_indices
@@ -3149,8 +3149,8 @@ CONTAINS
       nprow = fm_matrix_L%matrix_struct%context%num_pe(1)
       npcol = fm_matrix_L%matrix_struct%context%num_pe(2)
 
-      ALLOCATE (num_entries_rec(0:para_env%num_pe-1))
-      ALLOCATE (num_entries_send(0:para_env%num_pe-1))
+      ALLOCATE (num_entries_rec(0:para_env%num_pe - 1))
+      ALLOCATE (num_entries_send(0:para_env%num_pe - 1))
 
       num_entries_rec(:) = 0
       num_entries_send(:) = 0
@@ -3170,7 +3170,7 @@ CONTAINS
 
             proc_send = fm_matrix_L%matrix_struct%context%blacs2mpi(send_prow, send_pcol)
 
-            num_entries_send(proc_send) = num_entries_send(proc_send)+1
+            num_entries_send(proc_send) = num_entries_send(proc_send) + 1
 
          END DO
 
@@ -3187,11 +3187,11 @@ CONTAINS
       CALL timeset(routineN//"_3", handle2)
 
       ! allocate buffers to send the entries and the information of the entries
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
       ! allocate data message and corresponding indices
-      DO iproc = 0, para_env%num_pe-1
+      DO iproc = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(iproc)%msg(num_entries_rec(iproc)))
          buffer_rec(iproc)%msg = 0.0_dp
@@ -3202,7 +3202,7 @@ CONTAINS
 
       CALL timeset(routineN//"_4", handle2)
 
-      DO iproc = 0, para_env%num_pe-1
+      DO iproc = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_send(iproc)%msg(num_entries_send(iproc)))
          buffer_send(iproc)%msg = 0.0_dp
@@ -3213,7 +3213,7 @@ CONTAINS
 
       CALL timeset(routineN//"_5", handle2)
 
-      DO iproc = 0, para_env%num_pe-1
+      DO iproc = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(iproc)%indx(num_entries_rec(iproc), 2))
          buffer_rec(iproc)%indx = 0
@@ -3224,7 +3224,7 @@ CONTAINS
 
       CALL timeset(routineN//"_6", handle2)
 
-      DO iproc = 0, para_env%num_pe-1
+      DO iproc = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_send(iproc)%indx(num_entries_send(iproc), 2))
          buffer_send(iproc)%indx = 0
@@ -3235,7 +3235,7 @@ CONTAINS
 
       CALL timeset(routineN//"_7", handle2)
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
       ! get the process, where the elements from L_local_col have to be sent and
@@ -3252,10 +3252,10 @@ CONTAINS
 
             proc_send = fm_matrix_L%matrix_struct%context%blacs2mpi(send_prow, send_pcol)
 
-            entry_counter(proc_send) = entry_counter(proc_send)+1
+            entry_counter(proc_send) = entry_counter(proc_send) + 1
 
             buffer_send(proc_send)%msg(entry_counter(proc_send)) = &
-               L_local_col(LLL, MMM-my_group_L_start+1)
+               L_local_col(LLL, MMM - my_group_L_start + 1)
 
             buffer_send(proc_send)%indx(entry_counter(proc_send), 1) = LLL
             buffer_send(proc_send)%indx(entry_counter(proc_send), 2) = MMM
@@ -3281,7 +3281,7 @@ CONTAINS
       CALL timeset(routineN//"_9", handle2)
 
       ! fill fm_matrix_L with the entries from buffer_rec
-      DO iproc = 0, para_env%num_pe-1
+      DO iproc = 0, para_env%num_pe - 1
 
          DO i_entry_rec = 1, num_entries_rec(iproc)
 
@@ -3312,7 +3312,7 @@ CONTAINS
 
       CALL timeset(routineN//"_10", handle2)
 
-      DO iproc = 0, para_env%num_pe-1
+      DO iproc = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(iproc)%msg)
          DEALLOCATE (buffer_rec(iproc)%indx)
          DEALLOCATE (buffer_send(iproc)%msg)
@@ -3343,7 +3343,7 @@ CONTAINS
       LOGICAL                                            :: do_inversion
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'cholesky_decomp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_global, iiB, info_chol, &
                                                             j_global, jjB, ncol_local, nrow_local
@@ -3391,9 +3391,9 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'inversion_of_S_and_mult_with_chol_dec_of_V', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       COMPLEX(KIND=dp), PARAMETER :: cone = CMPLX(1.0_dp, 0.0_dp, KIND=dp), &
-         czero = CMPLX(0.0_dp, 0.0_dp, KIND=dp), ione = CMPLX(0.0_dp, 1.0_dp, KIND=dp)
+                                     czero = CMPLX(0.0_dp, 0.0_dp, KIND=dp), ione = CMPLX(0.0_dp, 1.0_dp, KIND=dp)
 
       INTEGER                                            :: handle, i_global, iiB, ikp, info_chol, &
                                                             j_global, jjB, ncol_local, nkp, &
@@ -3501,7 +3501,7 @@ CONTAINS
       INTEGER                                            :: dimen_RI, color_cholesky
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'cholesky_decomp_in_subgroups', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_global, iiB, info_chol, &
                                                             j_global, jjB, ncol_local, nrow_local
@@ -3594,7 +3594,7 @@ CONTAINS
       INTEGER                                            :: size_chol_from_input, unit_nr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'parallel_cholesky_decomp', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: color_chol, comm_chol, group_size_chol, &
                                                             handle
@@ -3842,8 +3842,8 @@ CONTAINS
       CHARACTER(LEN=*), PARAMETER :: routineN = 'grep_Lcols', routineP = moduleN//':'//routineN
 
       INTEGER :: handle, handle2, i_global, iiB, j_global, jjB, max_row_col_local, ncol_local, &
-         ncol_rec, nrow_local, nrow_rec, proc_receive, proc_receive_static, proc_send, &
-         proc_send_static, proc_shift
+                 ncol_rec, nrow_local, nrow_rec, proc_receive, proc_receive_static, proc_send, &
+                 proc_send_static, proc_shift
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: proc_map
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: local_col_row_info, rec_col_row_info
       INTEGER, DIMENSION(:), POINTER                     :: col_indices, col_indices_rec, &
@@ -3859,11 +3859,11 @@ CONTAINS
       ! for negative and positive number > num_pe
       ! needed to know which is the processor, to respect to another one,
       ! for a given shift
-      ALLOCATE (proc_map(-para_env%num_pe:2*para_env%num_pe-1))
-      DO iiB = 0, para_env%num_pe-1
+      ALLOCATE (proc_map(-para_env%num_pe:2*para_env%num_pe - 1))
+      DO iiB = 0, para_env%num_pe - 1
          proc_map(iiB) = iiB
-         proc_map(-iiB-1) = para_env%num_pe-iiB-1
-         proc_map(para_env%num_pe+iiB) = iiB
+         proc_map(-iiB - 1) = para_env%num_pe - iiB - 1
+         proc_map(para_env%num_pe + iiB) = iiB
       END DO
 
       CALL cp_fm_get_info(matrix=fm_matrix_L, &
@@ -3896,19 +3896,19 @@ CONTAINS
          IF (j_global >= my_group_L_start .AND. j_global <= my_group_L_end) THEN
             DO iiB = 1, nrow_local
                i_global = row_indices(iiB)
-               my_Lrows(i_global, j_global-my_group_L_start+1) = local_L(iiB, jjB)
+               my_Lrows(i_global, j_global - my_group_L_start + 1) = local_L(iiB, jjB)
             END DO
          END IF
       END DO
 
-      proc_send_static = proc_map(para_env%mepos+1)
-      proc_receive_static = proc_map(para_env%mepos-1)
+      proc_send_static = proc_map(para_env%mepos + 1)
+      proc_receive_static = proc_map(para_env%mepos - 1)
 
       CALL timeset(routineN//"_comm", handle2)
 
-      DO proc_shift = 1, para_env%num_pe-1
-         proc_send = proc_map(para_env%mepos+proc_shift)
-         proc_receive = proc_map(para_env%mepos-proc_shift)
+      DO proc_shift = 1, para_env%num_pe - 1
+         proc_send = proc_map(para_env%mepos + proc_shift)
+         proc_receive = proc_map(para_env%mepos - proc_shift)
 
          ! first exchange information on the local data
          rec_col_row_info = 0
@@ -3934,7 +3934,7 @@ CONTAINS
             IF (j_global >= my_group_L_start .AND. j_global <= my_group_L_end) THEN
                DO iiB = 1, nrow_rec
                   i_global = row_indices_rec(iiB)
-                  my_Lrows(i_global, j_global-my_group_L_start+1) = rec_L(iiB, jjB)
+                  my_Lrows(i_global, j_global - my_group_L_start + 1) = rec_L(iiB, jjB)
                END DO
             END IF
          END DO
@@ -4014,7 +4014,7 @@ CONTAINS
       INTEGER                                            :: my_B_virtual_end, my_B_virtual_start
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'grep_my_integrals', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i_global, iiB, j_global, jjB, ncol_rec, &
                                                             nrow_rec, proc_receive, proc_send, &
@@ -4042,7 +4042,7 @@ CONTAINS
          IF (j_global >= my_B_virtual_start .AND. j_global <= my_B_virtual_end) THEN
             DO iiB = 1, nrow_rec
                i_global = row_indices_rec(iiB)
-               BIb_jb(j_global-my_B_virtual_start+1, i_global) = fm_BIb_jb%local_data(iiB, jjB)
+               BIb_jb(j_global - my_B_virtual_start + 1, i_global) = fm_BIb_jb%local_data(iiB, jjB)
             END DO
          END IF
       END DO
@@ -4054,9 +4054,9 @@ CONTAINS
          ALLOCATE (local_BI(nrow_rec, ncol_rec))
          local_BI(1:nrow_rec, 1:ncol_rec) = fm_BIb_jb%local_data(1:nrow_rec, 1:ncol_rec)
 
-         DO proc_shift = 1, para_env_sub%num_pe-1
-            proc_send = proc_map(para_env_sub%mepos+proc_shift)
-            proc_receive = proc_map(para_env_sub%mepos-proc_shift)
+         DO proc_shift = 1, para_env_sub%num_pe - 1
+            proc_send = proc_map(para_env_sub%mepos + proc_shift)
+            proc_receive = proc_map(para_env_sub%mepos - proc_shift)
 
             ! first exchange information on the local data
             rec_col_row_info = 0
@@ -4082,7 +4082,7 @@ CONTAINS
                IF (j_global >= my_B_virtual_start .AND. j_global <= my_B_virtual_end) THEN
                   DO iiB = 1, nrow_rec
                      i_global = row_indices_rec(iiB)
-                     BIb_jb(j_global-my_B_virtual_start+1, i_global) = rec_BI(iiB, jjB)
+                     BIb_jb(j_global - my_B_virtual_start + 1, i_global) = rec_BI(iiB, jjB)
                   END DO
                END IF
             END DO
@@ -4157,28 +4157,28 @@ CONTAINS
                                                             starts_B_virtual_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_ri_gpw_compute_en', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: a, a_global, b, b_global, best_block_size, best_integ_group_size, block_size, &
-         comm_exchange, comm_P, end_point, handle, handle2, handle3, iiB, ij_counter, &
-         ij_counter_send, ij_index, integ_group_size, irep, jjB, Lend_pos, Lstart_pos, &
-         max_ij_pairs, min_integ_group_size, my_B_size, my_B_size_beta, my_B_virtual_end, &
-         my_B_virtual_end_beta, my_B_virtual_start, my_B_virtual_start_beta, my_block_size, &
-         my_group_L_end, my_group_L_size, my_group_L_size_orig, my_group_L_start, my_homo_beta, &
-         my_i, my_ij_pairs, my_j, my_new_group_L_size, my_num_dgemm_call, ngroup, num_IJ_blocks
+                 comm_exchange, comm_P, end_point, handle, handle2, handle3, iiB, ij_counter, &
+                 ij_counter_send, ij_index, integ_group_size, irep, jjB, Lend_pos, Lstart_pos, &
+                 max_ij_pairs, min_integ_group_size, my_B_size, my_B_size_beta, my_B_virtual_end, &
+                 my_B_virtual_end_beta, my_B_virtual_start, my_B_virtual_start_beta, my_block_size, &
+                 my_group_L_end, my_group_L_size, my_group_L_size_orig, my_group_L_start, my_homo_beta, &
+                 my_i, my_ij_pairs, my_j, my_new_group_L_size, my_num_dgemm_call, ngroup, num_IJ_blocks
       INTEGER :: num_integ_group, pos_integ_group, proc_receive, proc_send, proc_shift, &
-         rec_B_size, rec_B_virtual_end, rec_B_virtual_start, rec_L_size, send_B_size, &
-         send_B_virtual_end, send_B_virtual_start, send_block_size, send_i, send_ij_index, send_j, &
-         start_point, sub_P_color, sub_sub_color, total_ij_pairs, virtual, virtual_beta
+                 rec_B_size, rec_B_virtual_end, rec_B_virtual_start, rec_L_size, send_B_size, &
+                 send_B_virtual_end, send_B_virtual_start, send_block_size, send_i, send_ij_index, send_j, &
+                 start_point, sub_P_color, sub_sub_color, total_ij_pairs, virtual, virtual_beta
       INTEGER, ALLOCATABLE, DIMENSION(:) :: integ_group_pos2color_sub, new_sizes_array, &
-         num_ij_pairs, proc_map, proc_map_rep, sizes_array_orig, sub_proc_map
+                                            num_ij_pairs, proc_map, proc_map_rep, sizes_array_orig, sub_proc_map
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: ij_map
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: ranges_info_array
       LOGICAL                                            :: my_alpha_alpha_case, my_alpha_beta_case, &
                                                             my_beta_beta_case, my_open_shell_SS
       REAL(KIND=dp) :: actual_flop_rate, amp_fac, mem_for_aK, mem_for_comm, mem_for_iaK, &
-         mem_for_rep, mem_min, mem_per_group, mem_real, my_flop_rate, null_mat_rec(2, 2, 2), &
-         null_mat_send(2, 2, 2), sym_fac, t_end, t_start
+                       mem_for_rep, mem_min, mem_per_group, mem_real, my_flop_rate, null_mat_rec(2, 2, 2), &
+                       null_mat_send(2, 2, 2), sym_fac, t_end, t_start
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: external_ab, external_i_aL, local_ab, &
                                                             local_ba, t_ab
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: B_ia_Q, B_ia_Q_beta, BI_C_rec, &
@@ -4229,8 +4229,8 @@ CONTAINS
 
       IF (my_alpha_beta_case) amp_fac = 1.0_dp
 
-      virtual = nmo-homo
-      IF (my_alpha_beta_case) virtual_beta = nmo-homo_beta
+      virtual = nmo - homo
+      IF (my_alpha_beta_case) virtual_beta = nmo - homo_beta
 
       CALL mp2_ri_get_sizes( &
          mp2_env, para_env, para_env_sub, ends_array, ends_B_virtual, sizes_array, sizes_B_virtual, &
@@ -4273,7 +4273,7 @@ CONTAINS
       CALL mp2_ri_communication(my_alpha_beta_case, total_ij_pairs, homo, my_homo_beta, num_IJ_blocks, &
                                 block_size, ngroup, ij_map, color_sub, my_ij_pairs, my_open_shell_SS, unit_nr)
 
-      ALLOCATE (num_ij_pairs(0:para_env_exchange%num_pe-1))
+      ALLOCATE (num_ij_pairs(0:para_env_exchange%num_pe - 1))
       num_ij_pairs = 0
       num_ij_pairs(para_env_exchange%mepos) = my_ij_pairs
       CALL mp_sum(num_ij_pairs, para_env_exchange%group)
@@ -4307,26 +4307,26 @@ CONTAINS
 
          IF (ij_index <= my_ij_pairs) THEN
             ! We have work to do
-            ij_counter = (ij_index-MIN(1, color_sub))*ngroup+color_sub
+            ij_counter = (ij_index - MIN(1, color_sub))*ngroup + color_sub
             my_i = ij_map(ij_counter, 1)
             my_j = ij_map(ij_counter, 2)
             my_block_size = ij_map(ij_counter, 3)
 
             local_i_aL = 0.0_dp
             ! local_i_aL(my_group_L_start:my_group_L_end,1:my_B_size)=BIb_C(1:my_group_L_size,1:my_B_size,my_i)
-            DO irep = 0, num_integ_group-1
+            DO irep = 0, num_integ_group - 1
                Lstart_pos = ranges_info_array(1, irep, para_env_exchange%mepos)
                Lend_pos = ranges_info_array(2, irep, para_env_exchange%mepos)
                start_point = ranges_info_array(3, irep, para_env_exchange%mepos)
                end_point = ranges_info_array(4, irep, para_env_exchange%mepos)
 
                local_i_aL(Lstart_pos:Lend_pos, 1:my_B_size, 1:my_block_size) = &
-                  BIb_C(start_point:end_point, 1:my_B_size, my_i:my_i+my_block_size-1)
+                  BIb_C(start_point:end_point, 1:my_B_size, my_i:my_i + my_block_size - 1)
             END DO
 
             local_j_aL = 0.0_dp
             ! local_j_aL(my_group_L_start:my_group_L_end,1:my_B_size)=BIb_C(1:my_group_L_size,1:my_B_size,my_j)
-            DO irep = 0, num_integ_group-1
+            DO irep = 0, num_integ_group - 1
                Lstart_pos = ranges_info_array(1, irep, para_env_exchange%mepos)
                Lend_pos = ranges_info_array(2, irep, para_env_exchange%mepos)
                start_point = ranges_info_array(3, irep, para_env_exchange%mepos)
@@ -4334,18 +4334,18 @@ CONTAINS
 
                IF (.NOT. my_alpha_beta_case) THEN
                   local_j_aL(Lstart_pos:Lend_pos, 1:my_B_size, 1:my_block_size) = &
-                     BIb_C(start_point:end_point, 1:my_B_size, my_j:my_j+my_block_size-1)
+                     BIb_C(start_point:end_point, 1:my_B_size, my_j:my_j + my_block_size - 1)
                ELSE
                   local_j_aL(Lstart_pos:Lend_pos, 1:my_B_size_beta, 1:my_block_size) = &
-                     BIb_C_beta(start_point:end_point, 1:my_B_size_beta, my_j:my_j+my_block_size-1)
+                     BIb_C_beta(start_point:end_point, 1:my_B_size_beta, my_j:my_j + my_block_size - 1)
                END IF
             END DO
 
             ! collect data from other proc
             CALL timeset(routineN//"_comm", handle3)
-            DO proc_shift = 1, para_env_exchange%num_pe-1
-               proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-               proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+            DO proc_shift = 1, para_env_exchange%num_pe - 1
+               proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+               proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
 
                send_ij_index = num_ij_pairs(proc_send)
 
@@ -4354,7 +4354,7 @@ CONTAINS
 
                IF (ij_index <= send_ij_index) THEN
                   ! ij_counter_send=(ij_index-MIN(1,proc_send))*ngroup+proc_send
-                  ij_counter_send = (ij_index-MIN(1, integ_group_pos2color_sub(proc_send)))*ngroup+ &
+                  ij_counter_send = (ij_index - MIN(1, integ_group_pos2color_sub(proc_send)))*ngroup + &
                                     integ_group_pos2color_sub(proc_send)
                   send_i = ij_map(ij_counter_send, 1)
                   send_j = ij_map(ij_counter_send, 2)
@@ -4362,10 +4362,10 @@ CONTAINS
 
                   ! occupied i
                   BI_C_rec = 0.0_dp
-                  CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_i:send_i+send_block_size-1), proc_send, &
+                  CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_i:send_i + send_block_size - 1), proc_send, &
                                    BI_C_rec(1:rec_L_size, 1:my_B_size, 1:my_block_size), proc_receive, &
                                    para_env_exchange%group)
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -4379,16 +4379,16 @@ CONTAINS
                   ! occupied j
                   BI_C_rec = 0.0_dp
                   IF (.NOT. my_alpha_beta_case) THEN
-                     CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_j:send_j+send_block_size-1), proc_send, &
+                     CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_j:send_j + send_block_size - 1), proc_send, &
                                       BI_C_rec(1:rec_L_size, 1:my_B_size, 1:my_block_size), proc_receive, &
                                       para_env_exchange%group)
                   ELSE
-                     CALL mp_sendrecv(BIb_C_beta(1:my_group_L_size, 1:my_B_size_beta, send_j:send_j+send_block_size-1), proc_send, &
+                 CALL mp_sendrecv(BIb_C_beta(1:my_group_L_size, 1:my_B_size_beta, send_j:send_j + send_block_size - 1), proc_send, &
                                       BI_C_rec(1:rec_L_size, 1:my_B_size_beta, 1:my_block_size), proc_receive, &
                                       para_env_exchange%group)
                   END IF
 
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -4413,7 +4413,7 @@ CONTAINS
                                    BI_C_rec(1:rec_L_size, 1:my_B_size, 1:my_block_size), proc_receive, &
                                    para_env_exchange%group)
 
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -4435,7 +4435,7 @@ CONTAINS
                                       BI_C_rec(1:rec_L_size, 1:my_B_size_beta, 1:my_block_size), proc_receive, &
                                       para_env_exchange%group)
                   END IF
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -4472,9 +4472,9 @@ CONTAINS
                              local_i_aL(:, :, iiB), dimen_RI, local_j_aL(:, :, jjB), dimen_RI, &
                              0.0_dp, local_ab(my_B_virtual_start:my_B_virtual_end, 1:my_B_size_beta), my_B_size)
                   t_end = m_walltime()
-                  actual_flop_rate = 2.0_dp*my_B_size*my_B_size_beta*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end-t_start))
-                  my_flop_rate = my_flop_rate+actual_flop_rate
-                  my_num_dgemm_call = my_num_dgemm_call+1
+                  actual_flop_rate = 2.0_dp*my_B_size*my_B_size_beta*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end - t_start))
+                  my_flop_rate = my_flop_rate + actual_flop_rate
+                  my_num_dgemm_call = my_num_dgemm_call + 1
                   ! Additional integrals only for alpha_beta case and forces
                   IF ((my_alpha_beta_case) .AND. (calc_forces)) THEN
                      t_start = m_walltime()
@@ -4482,14 +4482,14 @@ CONTAINS
                                 local_j_aL(:, :, iiB), dimen_RI, local_i_aL(:, :, jjB), dimen_RI, &
                                 0.0_dp, local_ba(my_B_virtual_start_beta:my_B_virtual_end_beta, 1:my_B_size), my_B_size_beta)
                      t_end = m_walltime()
-                     actual_flop_rate = 2.0_dp*my_B_size*my_B_size_beta*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end-t_start))
-                     my_flop_rate = my_flop_rate+actual_flop_rate
-                     my_num_dgemm_call = my_num_dgemm_call+1
+                     actual_flop_rate = 2.0_dp*my_B_size*my_B_size_beta*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end - t_start))
+                     my_flop_rate = my_flop_rate + actual_flop_rate
+                     my_num_dgemm_call = my_num_dgemm_call + 1
                   ENDIF
                   ! ... and from the other of my subgroup
-                  DO proc_shift = 1, para_env_sub%num_pe-1
-                     proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-                     proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+                  DO proc_shift = 1, para_env_sub%num_pe - 1
+                     proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+                     proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
                      rec_B_size = sizes_B_virtual(proc_receive)
                      rec_B_virtual_end = ends_B_virtual(proc_receive)
@@ -4509,9 +4509,9 @@ CONTAINS
                                 0.0_dp, local_ab(rec_B_virtual_start:rec_B_virtual_end, 1:my_B_size_beta), rec_B_size)
 
                      t_end = m_walltime()
-                     actual_flop_rate = 2.0_dp*rec_B_size*my_B_size_beta*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end-t_start))
-                     my_flop_rate = my_flop_rate+actual_flop_rate
-                     my_num_dgemm_call = my_num_dgemm_call+1
+                     actual_flop_rate = 2.0_dp*rec_B_size*my_B_size_beta*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end - t_start))
+                     my_flop_rate = my_flop_rate + actual_flop_rate
+                     my_num_dgemm_call = my_num_dgemm_call + 1
 
                      DEALLOCATE (external_i_aL)
                      ! Additional integrals only for alpha_beta case and forces
@@ -4533,9 +4533,9 @@ CONTAINS
                                    external_i_aL, dimen_RI, local_i_aL(:, :, iiB), dimen_RI, &
                                    0.0_dp, local_ba(rec_B_virtual_start:rec_B_virtual_end, 1:my_B_size), rec_B_size)
                         t_end = m_walltime()
-                        actual_flop_rate = 2.0_dp*rec_B_size*my_B_size*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end-t_start))
-                        my_flop_rate = my_flop_rate+actual_flop_rate
-                        my_num_dgemm_call = my_num_dgemm_call+1
+                        actual_flop_rate = 2.0_dp*rec_B_size*my_B_size*REAL(dimen_RI, KIND=dp)/(MAX(0.01_dp, t_end - t_start))
+                        my_flop_rate = my_flop_rate + actual_flop_rate
+                        my_num_dgemm_call = my_num_dgemm_call + 1
 
                         DEALLOCATE (external_i_aL)
                      ENDIF
@@ -4553,19 +4553,19 @@ CONTAINS
                   IF (.NOT. my_alpha_beta_case) THEN
                      ! IF(my_open_shell_SS) sym_fac=sym_fac/2.0_dp
                      DO b = 1, my_B_size
-                        b_global = b+my_B_virtual_start-1
+                        b_global = b + my_B_virtual_start - 1
                         DO a = 1, virtual
-                           Emp2_Cou = Emp2_Cou-sym_fac*2.0_dp*local_ab(a, b)**2/ &
-                                      (Eigenval(homo+a)+Eigenval(homo+b_global)-Eigenval(my_i+iiB-1)-Eigenval(my_j+jjB-1))
+                           Emp2_Cou = Emp2_Cou - sym_fac*2.0_dp*local_ab(a, b)**2/ &
+                              (Eigenval(homo + a) + Eigenval(homo + b_global) - Eigenval(my_i + iiB - 1) - Eigenval(my_j + jjB - 1))
                         END DO
                      END DO
                   ELSE
                      DO b = 1, my_B_size_beta
-                        b_global = b+my_B_virtual_start_beta-1
+                        b_global = b + my_B_virtual_start_beta - 1
                         DO a = 1, virtual
-                           Emp2_Cou = Emp2_Cou-local_ab(a, b)**2/ &
-                                      (Eigenval(homo+a)+Eigenval_beta(homo_beta+b_global)- &
-                                       Eigenval(my_i+iiB-1)-Eigenval_beta(my_j+jjB-1))
+                           Emp2_Cou = Emp2_Cou - local_ab(a, b)**2/ &
+                                      (Eigenval(homo + a) + Eigenval_beta(homo_beta + b_global) - &
+                                       Eigenval(my_i + iiB - 1) - Eigenval_beta(my_j + jjB - 1))
                         END DO
                      END DO
                   END IF
@@ -4576,21 +4576,21 @@ CONTAINS
                      ! IF(my_open_shell_SS) sym_fac=sym_fac*2.0_dp
                      IF (calc_forces .AND. (.NOT. my_alpha_beta_case)) t_ab = 0.0_dp
                      DO b = 1, my_B_size
-                        b_global = b+my_B_virtual_start-1
+                        b_global = b + my_B_virtual_start - 1
                         DO a = 1, my_B_size
-                           a_global = a+my_B_virtual_start-1
-                           Emp2_Ex = Emp2_Ex+sym_fac*local_ab(a_global, b)*local_ab(b_global, a)/ &
-                                     (Eigenval(homo+a_global)+Eigenval(homo+b_global)-Eigenval(my_i+iiB-1)-Eigenval(my_j+jjB-1))
+                           a_global = a + my_B_virtual_start - 1
+                           Emp2_Ex = Emp2_Ex + sym_fac*local_ab(a_global, b)*local_ab(b_global, a)/ &
+                       (Eigenval(homo + a_global) + Eigenval(homo + b_global) - Eigenval(my_i + iiB - 1) - Eigenval(my_j + jjB - 1))
                            IF (calc_forces .AND. (.NOT. my_alpha_beta_case)) &
-                              t_ab(a_global, b) = -(amp_fac*local_ab(a_global, b)-local_ab(b_global, a))/ &
-                                                  (Eigenval(homo+a_global)+Eigenval(homo+b_global)- &
-                                                   Eigenval(my_i+iiB-1)-Eigenval(my_j+jjB-1))
+                              t_ab(a_global, b) = -(amp_fac*local_ab(a_global, b) - local_ab(b_global, a))/ &
+                                                  (Eigenval(homo + a_global) + Eigenval(homo + b_global) - &
+                                                   Eigenval(my_i + iiB - 1) - Eigenval(my_j + jjB - 1))
                         END DO
                      END DO
                      ! ... and then with external data
-                     DO proc_shift = 1, para_env_sub%num_pe-1
-                        proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-                        proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+                     DO proc_shift = 1, para_env_sub%num_pe - 1
+                        proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+                        proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
                         rec_B_size = sizes_B_virtual(proc_receive)
                         rec_B_virtual_end = ends_B_virtual(proc_receive)
@@ -4608,15 +4608,15 @@ CONTAINS
                                          para_env_sub%group)
 
                         DO b = 1, my_B_size
-                           b_global = b+my_B_virtual_start-1
+                           b_global = b + my_B_virtual_start - 1
                            DO a = 1, rec_B_size
-                              a_global = a+rec_B_virtual_start-1
-                              Emp2_Ex = Emp2_Ex+sym_fac*local_ab(a_global, b)*external_ab(b, a)/ &
-                                        (Eigenval(homo+a_global)+Eigenval(homo+b_global)-Eigenval(my_i+iiB-1)-Eigenval(my_j+jjB-1))
+                              a_global = a + rec_B_virtual_start - 1
+                              Emp2_Ex = Emp2_Ex + sym_fac*local_ab(a_global, b)*external_ab(b, a)/ &
+                       (Eigenval(homo + a_global) + Eigenval(homo + b_global) - Eigenval(my_i + iiB - 1) - Eigenval(my_j + jjB - 1))
                               IF (calc_forces .AND. (.NOT. my_alpha_beta_case)) &
-                                 t_ab(a_global, b) = -(amp_fac*local_ab(a_global, b)-external_ab(b, a))/ &
-                                                     (Eigenval(homo+a_global)+Eigenval(homo+b_global)- &
-                                                      Eigenval(my_i+iiB-1)-Eigenval(my_j+jjB-1))
+                                 t_ab(a_global, b) = -(amp_fac*local_ab(a_global, b) - external_ab(b, a))/ &
+                                                     (Eigenval(homo + a_global) + Eigenval(homo + b_global) - &
+                                                      Eigenval(my_i + iiB - 1) - Eigenval(my_j + jjB - 1))
                            END DO
                         END DO
 
@@ -4655,32 +4655,32 @@ CONTAINS
          ELSE
             ! No work to do and we know that we have to receive nothing, but send something
             ! send data to other proc
-            DO proc_shift = 1, para_env_exchange%num_pe-1
-               proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-               proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+            DO proc_shift = 1, para_env_exchange%num_pe - 1
+               proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+               proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
 
                send_ij_index = num_ij_pairs(proc_send)
 
                IF (ij_index <= send_ij_index) THEN
                   ! something to send
                   ! ij_counter_send=(ij_index-MIN(1,proc_send))*ngroup+proc_send
-                  ij_counter_send = (ij_index-MIN(1, integ_group_pos2color_sub(proc_send)))*ngroup+ &
+                  ij_counter_send = (ij_index - MIN(1, integ_group_pos2color_sub(proc_send)))*ngroup + &
                                     integ_group_pos2color_sub(proc_send)
                   send_i = ij_map(ij_counter_send, 1)
                   send_j = ij_map(ij_counter_send, 2)
                   send_block_size = ij_map(ij_counter_send, 3)
 
                   ! occupied i
-                  CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_i:send_i+send_block_size-1), proc_send, &
+                  CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_i:send_i + send_block_size - 1), proc_send, &
                                    null_mat_rec, proc_receive, &
                                    para_env_exchange%group)
                   ! occupied j
                   IF (.NOT. my_alpha_beta_case) THEN
-                     CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_j:send_j+send_block_size-1), proc_send, &
+                     CALL mp_sendrecv(BIb_C(1:my_group_L_size, 1:my_B_size, send_j:send_j + send_block_size - 1), proc_send, &
                                       null_mat_rec, proc_receive, &
                                       para_env_exchange%group)
                   ELSE
-                     CALL mp_sendrecv(BIb_C_beta(1:my_group_L_size, 1:my_B_size_beta, send_j:send_j+send_block_size-1), proc_send, &
+                 CALL mp_sendrecv(BIb_C_beta(1:my_group_L_size, 1:my_B_size_beta, send_j:send_j + send_block_size - 1), proc_send, &
                                       null_mat_rec, proc_receive, &
                                       para_env_exchange%group)
                   END IF
@@ -4815,7 +4815,7 @@ CONTAINS
          ! recover original information (before replication)
          DEALLOCATE (sizes_array)
          iiB = SIZE(sizes_array_orig)
-         ALLOCATE (sizes_array(0:iiB-1))
+         ALLOCATE (sizes_array(0:iiB - 1))
          sizes_array(:) = sizes_array_orig
          DEALLOCATE (sizes_array_orig)
 
@@ -4844,10 +4844,10 @@ CONTAINS
          ! sum Gamma and dereplicate
          ALLOCATE (BIb_C(homo, my_B_size, my_group_L_size))
          IF (my_alpha_beta_case) ALLOCATE (BIb_C_beta(homo_beta, my_B_size_beta, my_group_L_size))
-         DO proc_shift = 1, para_env_rep%num_pe-1
+         DO proc_shift = 1, para_env_rep%num_pe - 1
             ! invert order
-            proc_send = proc_map_rep(para_env_rep%mepos-proc_shift)
-            proc_receive = proc_map_rep(para_env_rep%mepos+proc_shift)
+            proc_send = proc_map_rep(para_env_rep%mepos - proc_shift)
+            proc_receive = proc_map_rep(para_env_rep%mepos + proc_shift)
 
             start_point = ranges_info_array(3, proc_shift, para_env_exchange%mepos)
             end_point = ranges_info_array(4, proc_shift, para_env_exchange%mepos)
@@ -4858,20 +4858,20 @@ CONTAINS
                CALL mp_sendrecv(mp2_env%ri_grad%Gamma_P_ia(1:homo, 1:my_B_size, start_point:end_point), &
                                 proc_send, BIb_C, proc_receive, para_env_rep%group)
                mp2_env%ri_grad%Gamma_P_ia(1:homo, 1:my_B_size, 1:my_group_L_size) = &
-                  mp2_env%ri_grad%Gamma_P_ia(1:homo, 1:my_B_size, 1:my_group_L_size)+BIb_C
+                  mp2_env%ri_grad%Gamma_P_ia(1:homo, 1:my_B_size, 1:my_group_L_size) + BIb_C
             ENDIF
             ! Beta-beta
             IF (my_beta_beta_case) THEN
                CALL mp_sendrecv(mp2_env%ri_grad%Gamma_P_ia_beta(1:homo, 1:my_B_size, start_point:end_point), &
                                 proc_send, BIb_C, proc_receive, para_env_rep%group)
                mp2_env%ri_grad%Gamma_P_ia_beta(1:homo, 1:my_B_size, 1:my_group_L_size) = &
-                  mp2_env%ri_grad%Gamma_P_ia_beta(1:homo, 1:my_B_size, 1:my_group_L_size)+BIb_C
+                  mp2_env%ri_grad%Gamma_P_ia_beta(1:homo, 1:my_B_size, 1:my_group_L_size) + BIb_C
             ENDIF
             IF (my_alpha_beta_case) THEN ! Beta-beta part of alpha-beta case
                CALL mp_sendrecv(mp2_env%ri_grad%Gamma_P_ia_beta(1:homo_beta, 1:my_B_size_beta, start_point:end_point), &
                                 proc_send, BIb_C_beta, proc_receive, para_env_rep%group)
                mp2_env%ri_grad%Gamma_P_ia_beta(1:homo_beta, 1:my_B_size_beta, 1:my_group_L_size) = &
-                  mp2_env%ri_grad%Gamma_P_ia_beta(1:homo_beta, 1:my_B_size_beta, 1:my_group_L_size)+BIb_C_beta
+                  mp2_env%ri_grad%Gamma_P_ia_beta(1:homo_beta, 1:my_B_size_beta, 1:my_group_L_size) + BIb_C_beta
             ENDIF
 
          END DO
@@ -4937,7 +4937,7 @@ CONTAINS
 
       END IF
 
-      Emp2 = Emp2_Cou+Emp2_EX
+      Emp2 = Emp2_Cou + Emp2_EX
 
       DEALLOCATE (proc_map)
       DEALLOCATE (sub_proc_map)
@@ -5009,7 +5009,7 @@ CONTAINS
       INTEGER, ALLOCATABLE, DIMENSION(:, :, :)           :: ranges_info_array
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'replicate_iaK_2intgroup', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: comm_rep, end_point, handle, i, &
                                                             max_L_size, proc_receive, proc_send, &
@@ -5022,32 +5022,32 @@ CONTAINS
       CALL timeset(routineN, handle)
 
       ! create the replication group
-      sub_sub_color = para_env_sub%mepos*para_env_exchange%num_pe+para_env_exchange%mepos
+      sub_sub_color = para_env_sub%mepos*para_env_exchange%num_pe + para_env_exchange%mepos
       CALL mp_comm_split_direct(para_env%group, comm_rep, sub_sub_color)
       NULLIFY (para_env_rep)
       CALL cp_para_env_create(para_env_rep, comm_rep)
 
       ! crate the proc maps
-      ALLOCATE (proc_map_rep(-para_env_rep%num_pe:2*para_env_rep%num_pe-1))
-      DO i = 0, para_env_rep%num_pe-1
+      ALLOCATE (proc_map_rep(-para_env_rep%num_pe:2*para_env_rep%num_pe - 1))
+      DO i = 0, para_env_rep%num_pe - 1
          proc_map_rep(i) = i
-         proc_map_rep(-i-1) = para_env_rep%num_pe-i-1
-         proc_map_rep(para_env_rep%num_pe+i) = i
+         proc_map_rep(-i - 1) = para_env_rep%num_pe - i - 1
+         proc_map_rep(para_env_rep%num_pe + i) = i
       END DO
 
       ! create the new limits for K according to the size
       ! of the integral group
-      ALLOCATE (new_sizes_array(0:para_env_exchange%num_pe-1))
+      ALLOCATE (new_sizes_array(0:para_env_exchange%num_pe - 1))
       new_sizes_array = 0
-      ALLOCATE (ranges_info_array(4, 0:para_env_rep%num_pe-1, 0:para_env_exchange%num_pe-1))
+      ALLOCATE (ranges_info_array(4, 0:para_env_rep%num_pe - 1, 0:para_env_exchange%num_pe - 1))
       ranges_info_array = 0
 
       ! info array for replication
-      ALLOCATE (rep_ends_array(0:para_env_rep%num_pe-1))
+      ALLOCATE (rep_ends_array(0:para_env_rep%num_pe - 1))
       rep_ends_array = 0
-      ALLOCATE (rep_starts_array(0:para_env_rep%num_pe-1))
+      ALLOCATE (rep_starts_array(0:para_env_rep%num_pe - 1))
       rep_starts_array = 0
-      ALLOCATE (rep_sizes_array(0:para_env_rep%num_pe-1))
+      ALLOCATE (rep_sizes_array(0:para_env_rep%num_pe - 1))
       rep_sizes_array = 0
 
       rep_sizes_array(para_env_rep%mepos) = my_group_L_size
@@ -5065,15 +5065,15 @@ CONTAINS
       ranges_info_array(3, 0, para_env_exchange%mepos) = 1
       ranges_info_array(4, 0, para_env_exchange%mepos) = my_group_L_size
 
-      DO proc_shift = 1, para_env_rep%num_pe-1
-         proc_send = proc_map_rep(para_env_rep%mepos+proc_shift)
-         proc_receive = proc_map_rep(para_env_rep%mepos-proc_shift)
+      DO proc_shift = 1, para_env_rep%num_pe - 1
+         proc_send = proc_map_rep(para_env_rep%mepos + proc_shift)
+         proc_receive = proc_map_rep(para_env_rep%mepos - proc_shift)
 
-         my_new_group_L_size = my_new_group_L_size+rep_sizes_array(proc_receive)
+         my_new_group_L_size = my_new_group_L_size + rep_sizes_array(proc_receive)
 
          ranges_info_array(1, proc_shift, para_env_exchange%mepos) = rep_starts_array(proc_receive)
          ranges_info_array(2, proc_shift, para_env_exchange%mepos) = rep_ends_array(proc_receive)
-         ranges_info_array(3, proc_shift, para_env_exchange%mepos) = ranges_info_array(4, proc_shift-1, para_env_exchange%mepos)+1
+       ranges_info_array(3, proc_shift, para_env_exchange%mepos) = ranges_info_array(4, proc_shift - 1, para_env_exchange%mepos) + 1
          ranges_info_array(4, proc_shift, para_env_exchange%mepos) = my_new_group_L_size
 
       END DO
@@ -5097,9 +5097,9 @@ CONTAINS
 
          BIb_C(start_point:end_point, 1:my_B_size, 1:homo) = BIb_C_copy
 
-         DO proc_shift = 1, para_env_rep%num_pe-1
-            proc_send = proc_map_rep(para_env_rep%mepos+proc_shift)
-            proc_receive = proc_map_rep(para_env_rep%mepos-proc_shift)
+         DO proc_shift = 1, para_env_rep%num_pe - 1
+            proc_send = proc_map_rep(para_env_rep%mepos + proc_shift)
+            proc_receive = proc_map_rep(para_env_rep%mepos - proc_shift)
 
             start_point = ranges_info_array(3, proc_shift, para_env_exchange%mepos)
             end_point = ranges_info_array(4, proc_shift, para_env_exchange%mepos)
@@ -5123,7 +5123,7 @@ CONTAINS
 
          DEALLOCATE (BIb_C)
 
-         ALLOCATE (BIb_C_gather(max_L_size, my_B_size, homo, 0:para_env_rep%num_pe-1))
+         ALLOCATE (BIb_C_gather(max_L_size, my_B_size, homo, 0:para_env_rep%num_pe - 1))
          BIb_C_gather = 0.0_dp
 
          CALL mp_allgather(BIb_C_copy, BIb_C_gather, para_env_rep%group)
@@ -5134,15 +5134,15 @@ CONTAINS
          BIb_C = 0.0_dp
 
          ! reorder data
-         DO proc_shift = 0, para_env_rep%num_pe-1
-            proc_send = proc_map_rep(para_env_rep%mepos+proc_shift)
-            proc_receive = proc_map_rep(para_env_rep%mepos-proc_shift)
+         DO proc_shift = 0, para_env_rep%num_pe - 1
+            proc_send = proc_map_rep(para_env_rep%mepos + proc_shift)
+            proc_receive = proc_map_rep(para_env_rep%mepos - proc_shift)
 
             start_point = ranges_info_array(3, proc_shift, para_env_exchange%mepos)
             end_point = ranges_info_array(4, proc_shift, para_env_exchange%mepos)
 
             BIb_C(start_point:end_point, 1:my_B_size, 1:homo) = &
-               BIb_C_gather(1:end_point-start_point+1, 1:my_B_size, 1:homo, proc_receive)
+               BIb_C_gather(1:end_point - start_point + 1, 1:my_B_size, 1:homo, proc_receive)
 
          END DO
 
@@ -5173,7 +5173,7 @@ CONTAINS
       WRITE (*, *)
       DO iii = 1, SIZE(mat, 1)
          DO jjj = 1, SIZE(mat, 2), 20
-            WRITE (*, '(1000F10.5)') mat(iii, jjj:MIN(SIZE(mat, 2), jjj+19))
+            WRITE (*, '(1000F10.5)') mat(iii, jjj:MIN(SIZE(mat, 2), jjj + 19))
          END DO
          WRITE (*, *)
       END DO
@@ -5221,7 +5221,7 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: virtual_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_ri_allocate', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle
 
@@ -5296,11 +5296,11 @@ CONTAINS
       INTEGER                                            :: unit_nr
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_ri_communication', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: assigned_blocks, first_I_block, first_J_block, handle, iiB, ij_block_counter, &
-         ij_counter, jjB, last_i_block, last_J_block, num_block_per_group, total_ij_block, &
-         total_ij_pairs_blocks
+                 ij_counter, jjB, last_i_block, last_J_block, num_block_per_group, total_ij_block, &
+                 total_ij_pairs_blocks
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: ij_marker
 
 ! Calculate the maximum number of ij pairs that have to be computed
@@ -5309,19 +5309,19 @@ CONTAINS
       CALL timeset(routineN, handle)
 
       IF (.NOT. my_alpha_beta_case) THEN
-         total_ij_pairs = homo*(1+homo)/2
-         num_IJ_blocks = homo/block_size-1
+         total_ij_pairs = homo*(1 + homo)/2
+         num_IJ_blocks = homo/block_size - 1
 
          first_I_block = 1
-         last_i_block = block_size*(num_IJ_blocks-1)
+         last_i_block = block_size*(num_IJ_blocks - 1)
 
-         first_J_block = block_size+1
-         last_J_block = block_size*(num_IJ_blocks+1)
+         first_J_block = block_size + 1
+         last_J_block = block_size*(num_IJ_blocks + 1)
 
          ij_block_counter = 0
          DO iiB = first_I_block, last_i_block, block_size
-            DO jjB = iiB+block_size, last_J_block, block_size
-               ij_block_counter = ij_block_counter+1
+            DO jjB = iiB + block_size, last_J_block, block_size
+               ij_block_counter = ij_block_counter + 1
             END DO
          END DO
 
@@ -5329,7 +5329,7 @@ CONTAINS
          num_block_per_group = total_ij_block/ngroup
          assigned_blocks = num_block_per_group*ngroup
 
-         total_ij_pairs_blocks = assigned_blocks+(total_ij_pairs-assigned_blocks*(block_size**2))
+         total_ij_pairs_blocks = assigned_blocks + (total_ij_pairs - assigned_blocks*(block_size**2))
 
          ALLOCATE (ij_marker(homo, homo))
          ij_marker = 0
@@ -5338,24 +5338,24 @@ CONTAINS
          ij_counter = 0
          my_ij_pairs = 0
          DO iiB = first_I_block, last_i_block, block_size
-            DO jjB = iiB+block_size, last_J_block, block_size
-               IF (ij_counter+1 > assigned_blocks) EXIT
-               ij_counter = ij_counter+1
-               ij_marker(iiB:iiB+block_size-1, jjB:jjB+block_size-1) = 1
+            DO jjB = iiB + block_size, last_J_block, block_size
+               IF (ij_counter + 1 > assigned_blocks) EXIT
+               ij_counter = ij_counter + 1
+               ij_marker(iiB:iiB + block_size - 1, jjB:jjB + block_size - 1) = 1
                ij_map(ij_counter, 1) = iiB
                ij_map(ij_counter, 2) = jjB
                ij_map(ij_counter, 3) = block_size
-               IF (MOD(ij_counter, ngroup) == color_sub) my_ij_pairs = my_ij_pairs+1
+               IF (MOD(ij_counter, ngroup) == color_sub) my_ij_pairs = my_ij_pairs + 1
             END DO
          END DO
          DO iiB = 1, homo
             DO jjB = iiB, homo
                IF (ij_marker(iiB, jjB) == 0) THEN
-                  ij_counter = ij_counter+1
+                  ij_counter = ij_counter + 1
                   ij_map(ij_counter, 1) = iiB
                   ij_map(ij_counter, 2) = jjB
                   ij_map(ij_counter, 3) = 1
-                  IF (MOD(ij_counter, ngroup) == color_sub) my_ij_pairs = my_ij_pairs+1
+                  IF (MOD(ij_counter, ngroup) == color_sub) my_ij_pairs = my_ij_pairs + 1
                END IF
             END DO
          END DO
@@ -5369,7 +5369,7 @@ CONTAINS
                ELSE
                   WRITE (UNIT=unit_nr, FMT="(T3,A,T66,F15.1)") &
                      "RI_INFO| Percentage of ij pairs communicated with block size 1:", &
-                     100.0_dp*REAL((total_ij_pairs-assigned_blocks*(block_size**2)), KIND=dp)/REAL(total_ij_pairs, KIND=dp)
+                     100.0_dp*REAL((total_ij_pairs - assigned_blocks*(block_size**2)), KIND=dp)/REAL(total_ij_pairs, KIND=dp)
                END IF
                CALL m_flush(unit_nr)
             END IF
@@ -5384,11 +5384,11 @@ CONTAINS
          my_ij_pairs = 0
          DO iiB = 1, homo
             DO jjB = 1, homo_beta
-               ij_counter = ij_counter+1
+               ij_counter = ij_counter + 1
                ij_map(ij_counter, 1) = iiB
                ij_map(ij_counter, 2) = jjB
                ij_map(ij_counter, 3) = 1
-               IF (MOD(ij_counter, ngroup) == color_sub) my_ij_pairs = my_ij_pairs+1
+               IF (MOD(ij_counter, ngroup) == color_sub) my_ij_pairs = my_ij_pairs + 1
             END DO
          END DO
       END IF
@@ -5440,7 +5440,7 @@ CONTAINS
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: sizes_array
       LOGICAL, INTENT(IN)                                :: calc_forces
       INTEGER :: comm_exchange, integ_group_size, my_B_size, iiB, my_group_L_end, my_group_L_size, &
-         my_group_L_size_orig, my_group_L_start, my_new_group_L_size, sub_sub_color
+                 my_group_L_size_orig, my_group_L_start, my_new_group_L_size, sub_sub_color
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: integ_group_pos2color_sub, &
                                                             new_sizes_array, proc_map, &
                                                             proc_map_rep, sizes_array_orig, &
@@ -5450,30 +5450,30 @@ CONTAINS
       INTEGER                                            :: num_integ_group
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_ri_create_group', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i
 
       CALL timeset(routineN, handle)
       !
-      sub_sub_color = para_env_sub%mepos*num_integ_group+color_sub/integ_group_size
+      sub_sub_color = para_env_sub%mepos*num_integ_group + color_sub/integ_group_size
       CALL mp_comm_split_direct(para_env%group, comm_exchange, sub_sub_color)
       NULLIFY (para_env_exchange)
       CALL cp_para_env_create(para_env_exchange, comm_exchange)
 
       ! create the proc maps
-      ALLOCATE (proc_map(-para_env_exchange%num_pe:2*para_env_exchange%num_pe-1))
-      DO i = 0, para_env_exchange%num_pe-1
+      ALLOCATE (proc_map(-para_env_exchange%num_pe:2*para_env_exchange%num_pe - 1))
+      DO i = 0, para_env_exchange%num_pe - 1
          proc_map(i) = i
-         proc_map(-i-1) = para_env_exchange%num_pe-i-1
-         proc_map(para_env_exchange%num_pe+i) = i
+         proc_map(-i - 1) = para_env_exchange%num_pe - i - 1
+         proc_map(para_env_exchange%num_pe + i) = i
       END DO
 
-      ALLOCATE (sub_proc_map(-para_env_sub%num_pe:2*para_env_sub%num_pe-1))
-      DO i = 0, para_env_sub%num_pe-1
+      ALLOCATE (sub_proc_map(-para_env_sub%num_pe:2*para_env_sub%num_pe - 1))
+      DO i = 0, para_env_sub%num_pe - 1
          sub_proc_map(i) = i
-         sub_proc_map(-i-1) = para_env_sub%num_pe-i-1
-         sub_proc_map(para_env_sub%num_pe+i) = i
+         sub_proc_map(-i - 1) = para_env_sub%num_pe - i - 1
+         sub_proc_map(para_env_sub%num_pe + i) = i
       END DO
 
       CALL replicate_iaK_2intgroup(BIb_C, para_env, para_env_sub, para_env_exchange, para_env_rep, &
@@ -5483,14 +5483,14 @@ CONTAINS
                                    my_group_L_size, my_group_L_start, my_group_L_end, &
                                    my_new_group_L_size, new_sizes_array, ranges_info_array)
 
-      ALLOCATE (integ_group_pos2color_sub(0:para_env_exchange%num_pe-1))
+      ALLOCATE (integ_group_pos2color_sub(0:para_env_exchange%num_pe - 1))
       integ_group_pos2color_sub = 0
       integ_group_pos2color_sub(para_env_exchange%mepos) = color_sub
       CALL mp_sum(integ_group_pos2color_sub, para_env_exchange%group)
 
       IF (calc_forces) THEN
          iiB = SIZE(sizes_array)
-         ALLOCATE (sizes_array_orig(0:iiB-1))
+         ALLOCATE (sizes_array_orig(0:iiB - 1))
          sizes_array_orig(:) = sizes_array
       END IF
 
@@ -5498,7 +5498,7 @@ CONTAINS
       my_group_L_size = my_new_group_L_size
       DEALLOCATE (sizes_array)
 
-      ALLOCATE (sizes_array(0:integ_group_size-1))
+      ALLOCATE (sizes_array(0:integ_group_size - 1))
       sizes_array(:) = new_sizes_array
 
       DEALLOCATE (new_sizes_array)
@@ -5563,16 +5563,16 @@ CONTAINS
                                                             sizes_B_virtual, starts_array, &
                                                             starts_B_virtual
       INTEGER :: homo, dimen_RI, unit_nr, color_sub, best_block_size, best_integ_group_size, &
-         block_size, integ_group_size, min_integ_group_size, my_B_size, my_B_virtual_end, &
-         my_B_virtual_start, my_group_L_size, my_group_L_start, my_group_L_end, ngroup, &
-         num_IJ_blocks, num_integ_group, pos_integ_group, virtual
+                 block_size, integ_group_size, min_integ_group_size, my_B_size, my_B_virtual_end, &
+                 my_B_virtual_start, my_group_L_size, my_group_L_start, my_group_L_end, ngroup, &
+                 num_IJ_blocks, num_integ_group, pos_integ_group, virtual
       LOGICAL                                            :: my_alpha_beta_case, my_open_shell_SS
       REAL(KIND=dp)                                      :: mem_for_aK, mem_for_comm, mem_for_iaK, &
                                                             mem_for_rep, mem_min, mem_per_group, &
                                                             mem_real
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_ri_get_sizes', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iiB
       INTEGER(KIND=int_8)                                :: mem
@@ -5587,13 +5587,13 @@ CONTAINS
       mem_for_aK = REAL(virtual, KIND=dp)*dimen_RI*8.0_dp/(1024_dp**2)
 
       CALL m_memory(mem)
-      mem_real = (mem+1024*1024-1)/(1024*1024)
+      mem_real = (mem + 1024*1024 - 1)/(1024*1024)
       ! mp_min .... a hack.. it should be mp_max, but as it turns out, on some processes the previously freed memory (hfx)
       ! has not been given back to the OS yet.
       CALL mp_min(mem_real, para_env%group)
 
       mem_min = 2.0_dp*REAL(homo, KIND=dp)*MAXVAL(sizes_B_virtual)*MAXVAL(sizes_array)*8.0_dp/(1024**2)
-      mem_min = mem_min+3.0_dp*MAXVAL(sizes_B_virtual)*REAL(dimen_RI, KIND=dp)*8.0_dp/(1024**2)
+      mem_min = mem_min + 3.0_dp*MAXVAL(sizes_B_virtual)*REAL(dimen_RI, KIND=dp)*8.0_dp/(1024**2)
 
       IF ((.NOT. my_open_shell_SS) .AND. (.NOT. my_alpha_beta_case)) THEN
          IF (unit_nr > 0) WRITE (unit_nr, '(T3,A,T68,F9.2,A4)') 'RI_INFO| Minimum required memory per MPI process:', &
@@ -5613,16 +5613,16 @@ CONTAINS
          ! Here we split the memory half for the communication, half for replication
          IF (mp2_env%ri_mp2%block_size > 0) THEN
             best_block_size = mp2_env%ri_mp2%block_size
-            mem_for_rep = MAX(mem_min, mem_per_group-2.0_dp*mem_for_aK*best_block_size)
+            mem_for_rep = MAX(mem_min, mem_per_group - 2.0_dp*mem_for_aK*best_block_size)
          ELSE
             mem_for_rep = mem_per_group/2.0_dp
          END IF
          ! calculate the minimum replication group size according to the available memory
          min_integ_group_size = CEILING(2.0_dp*mem_for_iaK/mem_for_rep)
 
-         integ_group_size = MIN(min_integ_group_size, ngroup)-1
-         DO iiB = min_integ_group_size+1, ngroup
-            integ_group_size = integ_group_size+1
+         integ_group_size = MIN(min_integ_group_size, ngroup) - 1
+         DO iiB = min_integ_group_size + 1, ngroup
+            integ_group_size = integ_group_size + 1
             ! check that the ngroup is a multiple of  integ_group_size
             IF (MOD(ngroup, integ_group_size) /= 0) CYCLE
             ! check that the integ group size is not too small (10% is empirical for now)
@@ -5633,21 +5633,21 @@ CONTAINS
          END DO
 
          IF (.NOT. (mp2_env%ri_mp2%block_size > 0)) THEN
-            mem_for_comm = mem_per_group-2.0_dp*mem_for_iaK/best_integ_group_size
+            mem_for_comm = mem_per_group - 2.0_dp*mem_for_iaK/best_integ_group_size
             !k_size=MAX(INT(mem_for_comm/(2.0_dp*mem_for_aK)),1)
             DO
                num_IJ_blocks = (homo/best_block_size)
-               num_IJ_blocks = (num_IJ_blocks*num_IJ_blocks-num_IJ_blocks)/2
+               num_IJ_blocks = (num_IJ_blocks*num_IJ_blocks - num_IJ_blocks)/2
                IF (num_IJ_blocks > ngroup .OR. best_block_size == 1) THEN
                   EXIT
                ELSE
-                  best_block_size = best_block_size-1
+                  best_block_size = best_block_size - 1
                END IF
             END DO
          END IF
 
          ! check that best_block_size is not bigger than homo/2-1
-         best_block_size = MIN(MAX(homo/2-1+MOD(homo, 2), 1), best_block_size)
+         best_block_size = MIN(MAX(homo/2 - 1 + MOD(homo, 2), 1), best_block_size)
       END IF
 
       integ_group_size = best_integ_group_size
@@ -5748,11 +5748,11 @@ CONTAINS
          OPTIONAL                                        :: local_ba
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_update_P_gamma', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: a, b, b_global, handle, proc_receive, proc_send, proc_shift, rec_B_size, &
-         rec_B_virtual_end, rec_B_virtual_start, send_B_size, send_B_virtual_end, &
-         send_B_virtual_start
+                 rec_B_virtual_end, rec_B_virtual_start, send_B_size, send_B_virtual_end, &
+                 send_B_virtual_start
       LOGICAL                                            :: alpha_beta
       REAL(KIND=dp)                                      :: factor, P_ij_diag
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: external_ab, send_ab
@@ -5776,30 +5776,30 @@ CONTAINS
       ! divide the (ia|jb) integrals by Delta_ij^ab
       IF (.NOT. alpha_beta) THEN
          DO b = 1, my_B_size
-            b_global = b+my_B_virtual_start-1
+            b_global = b + my_B_virtual_start - 1
             DO a = 1, virtual
                local_ab(a, b) = -local_ab(a, b)/ &
-                                (Eigenval(homo+a)+Eigenval(homo+b_global)-Eigenval(my_i+iiB-1)-Eigenval(my_j+jjB-1))
+                              (Eigenval(homo + a) + Eigenval(homo + b_global) - Eigenval(my_i + iiB - 1) - Eigenval(my_j + jjB - 1))
             END DO
          END DO
          ! update diagonal part of P_ij
          P_ij_diag = -SUM(local_ab*t_ab)*factor
       ELSE
          DO b = 1, my_B_size_beta
-            b_global = b+my_B_virtual_start_beta-1
+            b_global = b + my_B_virtual_start_beta - 1
             DO a = 1, virtual
                local_ab(a, b) = -local_ab(a, b)/ &
-                                (Eigenval(homo+a)+Eigenval_beta(homo_beta+b_global)-Eigenval(my_i+iiB-1)-Eigenval_beta(my_j+jjB-1))
+               (Eigenval(homo + a) + Eigenval_beta(homo_beta + b_global) - Eigenval(my_i + iiB - 1) - Eigenval_beta(my_j + jjB - 1))
             END DO
          END DO
          ! update diagonal part of P_ij
          P_ij_diag = -SUM(local_ab*local_ab)
          ! More integrals needed only for alpha-beta case: local_ba
          DO b = 1, my_B_size
-            b_global = b+my_B_virtual_start-1
+            b_global = b + my_B_virtual_start - 1
             DO a = 1, virtual_beta
                local_ba(a, b) = -local_ba(a, b)/ &
-                                (Eigenval_beta(homo_beta+a)+Eigenval(homo+b_global)-Eigenval(my_i+iiB-1)-Eigenval_beta(my_j+jjB-1))
+               (Eigenval_beta(homo_beta + a) + Eigenval(homo + b_global) - Eigenval(my_i + iiB - 1) - Eigenval_beta(my_j + jjB - 1))
             END DO
          END DO
       ENDIF
@@ -5811,16 +5811,16 @@ CONTAINS
          CALL dgemm('T', 'N', my_B_size, my_B_size, virtual, 1.0_dp, &
                     t_ab(:, :), virtual, local_ab(:, :), virtual, &
                     1.0_dp, mp2_env%ri_grad%P_ab(1:my_B_size, my_B_virtual_start:my_B_virtual_end), my_B_size)
-         mp2_env%ri_grad%P_ij(my_i+iiB-1, my_i+iiB-1) = &
-            mp2_env%ri_grad%P_ij(my_i+iiB-1, my_i+iiB-1)+P_ij_diag
+         mp2_env%ri_grad%P_ij(my_i + iiB - 1, my_i + iiB - 1) = &
+            mp2_env%ri_grad%P_ij(my_i + iiB - 1, my_i + iiB - 1) + P_ij_diag
       ENDIF
       ! Beta_beta case
       IF (beta_beta) THEN
          CALL dgemm('T', 'N', my_B_size, my_B_size, virtual, 1.0_dp, &
                     t_ab(:, :), virtual, local_ab(:, :), virtual, &
                     1.0_dp, mp2_env%ri_grad%P_ab_beta(1:my_B_size, my_B_virtual_start:my_B_virtual_end), my_B_size)
-         mp2_env%ri_grad%P_ij_beta(my_i+iiB-1, my_i+iiB-1) = &
-            mp2_env%ri_grad%P_ij_beta(my_i+iiB-1, my_i+iiB-1)+P_ij_diag
+         mp2_env%ri_grad%P_ij_beta(my_i + iiB - 1, my_i + iiB - 1) = &
+            mp2_env%ri_grad%P_ij_beta(my_i + iiB - 1, my_i + iiB - 1) + P_ij_diag
       ENDIF
       ! Alpha_beta case
       IF (alpha_beta) THEN
@@ -5828,14 +5828,14 @@ CONTAINS
                     local_ba(:, :), virtual_beta, local_ba(:, :), virtual_beta, 1.0_dp, &
                     mp2_env%ri_grad%P_ab(1:my_B_size, my_B_virtual_start: &
                                          my_B_virtual_end), my_B_size)
-         mp2_env%ri_grad%P_ij(my_i+iiB-1, my_i+iiB-1) = &
-            mp2_env%ri_grad%P_ij(my_i+iiB-1, my_i+iiB-1)+P_ij_diag
+         mp2_env%ri_grad%P_ij(my_i + iiB - 1, my_i + iiB - 1) = &
+            mp2_env%ri_grad%P_ij(my_i + iiB - 1, my_i + iiB - 1) + P_ij_diag
          CALL dgemm('T', 'N', my_B_size_beta, my_B_size_beta, virtual, 1.0_dp, &
                     local_ab(:, :), virtual, local_ab(:, :), virtual, 1.0_dp, &
                     mp2_env%ri_grad%P_ab_beta(1:my_B_size_beta, my_B_virtual_start_beta: &
                                               my_B_virtual_end_beta), my_B_size_beta)
-         mp2_env%ri_grad%P_ij_beta(my_j+jjB-1, my_j+jjB-1) = &
-            mp2_env%ri_grad%P_ij_beta(my_j+jjB-1, my_j+jjB-1)+P_ij_diag
+         mp2_env%ri_grad%P_ij_beta(my_j + jjB - 1, my_j + jjB - 1) = &
+            mp2_env%ri_grad%P_ij_beta(my_j + jjB - 1, my_j + jjB - 1) + P_ij_diag
       ENDIF
       ! The summation is over unique pairs. In alpha-beta case, all pairs are unique: subroutine is called for
       ! both i^alpha,j^beta and i^beta,j^alpha. Formally, my_i can be equal to my_j, but they are different
@@ -5852,8 +5852,8 @@ CONTAINS
                        local_ab(:, :), virtual, &
                        1.0_dp, mp2_env%ri_grad%P_ab(1:my_B_size, 1:virtual), my_B_size)
             ! CHECK CORRECTNESS IF BLOCK SIZE greater than 1
-            mp2_env%ri_grad%P_ij(my_j+jjB-1, my_j+jjB-1) = &
-               mp2_env%ri_grad%P_ij(my_j+jjB-1, my_j+jjB-1)+P_ij_diag
+            mp2_env%ri_grad%P_ij(my_j + jjB - 1, my_j + jjB - 1) = &
+               mp2_env%ri_grad%P_ij(my_j + jjB - 1, my_j + jjB - 1) + P_ij_diag
          ENDIF
          ! Beta_beta_case
          IF (beta_beta) THEN
@@ -5862,13 +5862,13 @@ CONTAINS
                        local_ab(:, :), virtual, &
                        1.0_dp, mp2_env%ri_grad%P_ab_beta(1:my_B_size, 1:virtual), my_B_size)
             ! CHECK CORRECTNESS IF BLOCK SIZE greater than 1
-            mp2_env%ri_grad%P_ij_beta(my_j+jjB-1, my_j+jjB-1) = &
-               mp2_env%ri_grad%P_ij_beta(my_j+jjB-1, my_j+jjB-1)+P_ij_diag
+            mp2_env%ri_grad%P_ij_beta(my_j + jjB - 1, my_j + jjB - 1) = &
+               mp2_env%ri_grad%P_ij_beta(my_j + jjB - 1, my_j + jjB - 1) + P_ij_diag
          ENDIF
       END IF
-      DO proc_shift = 1, para_env_sub%num_pe-1
-         proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-         proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+      DO proc_shift = 1, para_env_sub%num_pe - 1
+         proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+         proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
          ! Alpha-alpha, beta-beta, closed shell
          IF (.NOT. alpha_beta) THEN
             rec_B_size = sizes_B_virtual(proc_receive)
@@ -5960,10 +5960,10 @@ CONTAINS
 
             ! Alpha_alpha or closed-shell case
             IF (((.NOT. open_ss) .AND. (.NOT. alpha_beta)) .OR. alpha_alpha) &
-               mp2_env%ri_grad%P_ab(:, :) = mp2_env%ri_grad%P_ab+external_ab
+               mp2_env%ri_grad%P_ab(:, :) = mp2_env%ri_grad%P_ab + external_ab
             ! Beta_beta case
             IF (beta_beta) &
-               mp2_env%ri_grad%P_ab_beta(:, :) = mp2_env%ri_grad%P_ab_beta+external_ab
+               mp2_env%ri_grad%P_ab_beta(:, :) = mp2_env%ri_grad%P_ab_beta + external_ab
 
             DEALLOCATE (external_ab)
             DEALLOCATE (send_ab)
@@ -5999,9 +5999,9 @@ CONTAINS
       ALLOCATE (external_ab(my_B_size, dimen_RI))
       external_ab = 0.0_dp
       !
-      DO proc_shift = 1, para_env_sub%num_pe-1
-         proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-         proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+      DO proc_shift = 1, para_env_sub%num_pe - 1
+         proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+         proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
          rec_B_size = sizes_B_virtual(proc_receive)
          rec_B_virtual_end = ends_B_virtual(proc_receive)
@@ -6022,7 +6022,7 @@ CONTAINS
             ! Alpha-alpha, beta-beta and closed shell
 
             Y_i_aP(1:my_B_size, 1:dimen_RI, iiB) = &
-               Y_i_aP(1:my_B_size, 1:dimen_RI, iiB)+external_ab
+               Y_i_aP(1:my_B_size, 1:dimen_RI, iiB) + external_ab
 
             DEALLOCATE (send_ab)
          ELSE ! Alpha-beta case
@@ -6035,7 +6035,7 @@ CONTAINS
                        0.0_dp, send_ab(1:send_B_size, 1:dimen_RI), send_B_size)
             CALL mp_sendrecv(send_ab, proc_send, external_ab, proc_receive, para_env_sub%group)
             Y_i_aP(1:my_B_size, 1:dimen_RI, iiB) = &
-               Y_i_aP(1:my_B_size, 1:dimen_RI, iiB)+external_ab
+               Y_i_aP(1:my_B_size, 1:dimen_RI, iiB) + external_ab
             DEALLOCATE (send_ab)
          ENDIF
       END DO
@@ -6045,9 +6045,9 @@ CONTAINS
          ! For beta-beta part (in alpha-beta case) we need a new parallel code
          ALLOCATE (external_ab(my_B_size_beta, dimen_RI))
          external_ab = 0.0_dp
-         DO proc_shift = 1, para_env_sub%num_pe-1
-            proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-            proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+         DO proc_shift = 1, para_env_sub%num_pe - 1
+            proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+            proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
             send_B_size = sizes_B_virtual_beta(proc_send)
             send_B_virtual_end = ends_B_virtual_beta(proc_send)
@@ -6061,7 +6061,7 @@ CONTAINS
                        0.0_dp, send_ab(1:send_B_size, 1:dimen_RI), send_B_size)
             CALL mp_sendrecv(send_ab, proc_send, external_ab, proc_receive, para_env_sub%group)
             Y_j_aP(1:my_B_size_beta, 1:dimen_RI, jjB) = &
-               Y_j_aP(1:my_B_size_beta, 1:dimen_RI, jjB)+external_ab
+               Y_j_aP(1:my_B_size_beta, 1:dimen_RI, jjB) + external_ab
             DEALLOCATE (send_ab)
 
          END DO
@@ -6075,9 +6075,9 @@ CONTAINS
                     local_i_aL(1:dimen_RI, 1:my_B_size, iiB), dimen_RI, &
                     1.0_dp, Y_j_aP(1:my_B_size, 1:dimen_RI, jjB), my_B_size)
 
-         DO proc_shift = 1, para_env_sub%num_pe-1
-            proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-            proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+         DO proc_shift = 1, para_env_sub%num_pe - 1
+            proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+            proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
             rec_B_size = sizes_B_virtual(proc_receive)
             rec_B_virtual_end = ends_B_virtual(proc_receive)
@@ -6160,11 +6160,11 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: my_B_size_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mp2_redistribute_gamma', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: end_point, handle, handle2, iiB, ij_counter_rec, irep, jjb, kkk, Lend_pos, lll, &
-         Lstart_pos, proc_receive, proc_send, proc_shift, rec_block_size, rec_i, rec_ij_index, &
-         rec_j, send_L_size, start_point
+                 Lstart_pos, proc_receive, proc_send, proc_shift, rec_block_size, rec_i, rec_ij_index, &
+                 rec_j, send_L_size, start_point
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: BI_C_rec, BI_C_rec_beta, BI_C_send, &
                                                             BI_C_send_beta
 
@@ -6175,7 +6175,7 @@ CONTAINS
          ! somethig to send
          ! start with myself
          CALL timeset(routineN//"_comm2_w", handle2)
-         DO irep = 0, num_integ_group-1
+         DO irep = 0, num_integ_group - 1
             Lstart_pos = ranges_info_array(1, irep, para_env_exchange%mepos)
             Lend_pos = ranges_info_array(2, irep, para_env_exchange%mepos)
             start_point = ranges_info_array(3, irep, para_env_exchange%mepos)
@@ -6186,15 +6186,15 @@ CONTAINS
 !$OMP                                            mp2_env,my_i,iiB,my_B_size,Y_i_aP,&
 !$OMP                                     alpha_alpha,beta_beta,open_shell)
                DO kkk = start_point, end_point
-                  lll = kkk-start_point+Lstart_pos
+                  lll = kkk - start_point + Lstart_pos
                   IF (alpha_alpha .OR. (.NOT. open_shell)) THEN
-                     mp2_env%ri_grad%Gamma_P_ia(my_i+iiB-1, 1:my_B_size, kkk) = &
-                        mp2_env%ri_grad%Gamma_P_ia(my_i+iiB-1, 1:my_B_size, kkk)+ &
+                     mp2_env%ri_grad%Gamma_P_ia(my_i + iiB - 1, 1:my_B_size, kkk) = &
+                        mp2_env%ri_grad%Gamma_P_ia(my_i + iiB - 1, 1:my_B_size, kkk) + &
                         Y_i_aP(1:my_B_size, lll, iiB)
                   ENDIF
                   IF (beta_beta) THEN
-                     mp2_env%ri_grad%Gamma_P_ia_beta(my_i+iiB-1, 1:my_B_size, kkk) = &
-                        mp2_env%ri_grad%Gamma_P_ia_beta(my_i+iiB-1, 1:my_B_size, kkk)+ &
+                     mp2_env%ri_grad%Gamma_P_ia_beta(my_i + iiB - 1, 1:my_B_size, kkk) = &
+                        mp2_env%ri_grad%Gamma_P_ia_beta(my_i + iiB - 1, 1:my_B_size, kkk) + &
                         Y_i_aP(1:my_B_size, lll, iiB)
                   ENDIF
                END DO
@@ -6207,15 +6207,15 @@ CONTAINS
 !$OMP                                               mp2_env,my_j,jjB,my_B_size,Y_j_aP,&
 !$OMP                                        alpha_alpha,beta_beta,open_shell)
                   DO kkk = start_point, end_point
-                     lll = kkk-start_point+Lstart_pos
+                     lll = kkk - start_point + Lstart_pos
                      IF (alpha_alpha .OR. (.NOT. open_shell)) THEN
-                        mp2_env%ri_grad%Gamma_P_ia(my_j+jjB-1, 1:my_B_size, kkk) = &
-                           mp2_env%ri_grad%Gamma_P_ia(my_j+jjB-1, 1:my_B_size, kkk)+ &
+                        mp2_env%ri_grad%Gamma_P_ia(my_j + jjB - 1, 1:my_B_size, kkk) = &
+                           mp2_env%ri_grad%Gamma_P_ia(my_j + jjB - 1, 1:my_B_size, kkk) + &
                            Y_j_aP(1:my_B_size, lll, jjB)
                      ENDIF
                      IF (beta_beta) THEN
-                        mp2_env%ri_grad%Gamma_P_ia_beta(my_j+jjB-1, 1:my_B_size, kkk) = &
-                           mp2_env%ri_grad%Gamma_P_ia_beta(my_j+jjB-1, 1:my_B_size, kkk)+ &
+                        mp2_env%ri_grad%Gamma_P_ia_beta(my_j + jjB - 1, 1:my_B_size, kkk) = &
+                           mp2_env%ri_grad%Gamma_P_ia_beta(my_j + jjB - 1, 1:my_B_size, kkk) + &
                            Y_j_aP(1:my_B_size, lll, jjB)
                      ENDIF
                   END DO
@@ -6225,9 +6225,9 @@ CONTAINS
 !$OMP                                        SHARED(start_point,end_point,Lstart_pos,Lend_pos,&
 !$OMP                                               mp2_env,my_j,jjB,my_B_size_beta,Y_j_aP)
                   DO kkk = start_point, end_point
-                     lll = kkk-start_point+Lstart_pos
-                     mp2_env%ri_grad%Gamma_P_ia_beta(my_j+jjB-1, 1:my_B_size_beta, kkk) = &
-                        mp2_env%ri_grad%Gamma_P_ia_beta(my_j+jjB-1, 1:my_B_size_beta, kkk)+ &
+                     lll = kkk - start_point + Lstart_pos
+                     mp2_env%ri_grad%Gamma_P_ia_beta(my_j + jjB - 1, 1:my_B_size_beta, kkk) = &
+                        mp2_env%ri_grad%Gamma_P_ia_beta(my_j + jjB - 1, 1:my_B_size_beta, kkk) + &
                         Y_j_aP(1:my_B_size_beta, lll, jjB)
                   ENDDO
 !$OMP              END PARALLEL DO
@@ -6248,9 +6248,9 @@ CONTAINS
 
          ! Y_i_aP(my_B_size,dimen_RI,block_size)
 
-         DO proc_shift = 1, para_env_exchange%num_pe-1
-            proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-            proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+         DO proc_shift = 1, para_env_exchange%num_pe - 1
+            proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+            proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
 
             send_L_size = sizes_array(proc_send)
             IF (.NOT. alpha_beta) THEN
@@ -6262,7 +6262,7 @@ CONTAINS
             CALL timeset(routineN//"_comm2_w", handle2)
             BI_C_send = 0.0_dp
             IF (alpha_beta) BI_C_send_beta = 0.0_dp
-            DO irep = 0, num_integ_group-1
+            DO irep = 0, num_integ_group - 1
                Lstart_pos = ranges_info_array(1, irep, proc_send)
                Lend_pos = ranges_info_array(2, irep, proc_send)
                start_point = ranges_info_array(3, irep, proc_send)
@@ -6272,7 +6272,7 @@ CONTAINS
 !$OMP                                       SHARED(start_point,end_point,Lstart_pos,Lend_pos,&
 !$OMP                                              BI_C_send,iiB,my_B_size,Y_i_aP)
                   DO kkk = start_point, end_point
-                     lll = kkk-start_point+Lstart_pos
+                     lll = kkk - start_point + Lstart_pos
                      BI_C_send(iiB, 1:my_B_size, kkk) = Y_i_aP(1:my_B_size, lll, iiB)
                   END DO
 !$OMP             END PARALLEL DO
@@ -6283,8 +6283,8 @@ CONTAINS
 !$OMP                                          SHARED(start_point,end_point,Lstart_pos,Lend_pos,my_block_size,&
 !$OMP                                                 BI_C_send,jjB,my_B_size,Y_j_aP)
                      DO kkk = start_point, end_point
-                        lll = kkk-start_point+Lstart_pos
-                        BI_C_send(jjB+my_block_size, 1:my_B_size, kkk) = Y_j_aP(1:my_B_size, lll, jjB)
+                        lll = kkk - start_point + Lstart_pos
+                        BI_C_send(jjB + my_block_size, 1:my_B_size, kkk) = Y_j_aP(1:my_B_size, lll, jjB)
                      END DO
 !$OMP                END PARALLEL DO
                   ELSE
@@ -6292,7 +6292,7 @@ CONTAINS
 !$OMP                                          SHARED(start_point,end_point,Lstart_pos,Lend_pos,&
 !$OMP                                                 BI_C_send_beta,jjB,my_B_size_beta,Y_j_aP)
                      DO kkk = start_point, end_point
-                        lll = kkk-start_point+Lstart_pos
+                        lll = kkk - start_point + Lstart_pos
                         BI_C_send_beta(jjB, 1:my_B_size_beta, kkk) = Y_j_aP(1:my_B_size_beta, lll, jjB)
                      END DO
 !$OMP                END PARALLEL DO
@@ -6314,7 +6314,7 @@ CONTAINS
             IF (ij_index <= rec_ij_index) THEN
                ! we know that proc_receive has something to send for us, let's see what
                ij_counter_rec = &
-                  (ij_index-MIN(1, integ_group_pos2color_sub(proc_receive)))*ngroup+integ_group_pos2color_sub(proc_receive)
+                  (ij_index - MIN(1, integ_group_pos2color_sub(proc_receive)))*ngroup + integ_group_pos2color_sub(proc_receive)
 
                rec_i = ij_map(ij_counter_rec, 1)
                rec_j = ij_map(ij_counter_rec, 2)
@@ -6340,7 +6340,7 @@ CONTAINS
                ENDIF
 
                CALL timeset(routineN//"_comm2_w", handle2)
-               DO irep = 0, num_integ_group-1
+               DO irep = 0, num_integ_group - 1
                   Lstart_pos = ranges_info_array(1, irep, para_env_exchange%mepos)
                   Lend_pos = ranges_info_array(2, irep, para_env_exchange%mepos)
                   start_point = ranges_info_array(3, irep, para_env_exchange%mepos)
@@ -6352,13 +6352,13 @@ CONTAINS
 !$OMP                                         alpha_alpha,beta_beta,open_shell)
                      DO kkk = start_point, end_point
                         IF (alpha_alpha .OR. (.NOT. open_shell)) THEN
-                           mp2_env%ri_grad%Gamma_P_ia(rec_i+iiB-1, 1:my_B_size, kkk) = &
-                              mp2_env%ri_grad%Gamma_P_ia(rec_i+iiB-1, 1:my_B_size, kkk)+ &
+                           mp2_env%ri_grad%Gamma_P_ia(rec_i + iiB - 1, 1:my_B_size, kkk) = &
+                              mp2_env%ri_grad%Gamma_P_ia(rec_i + iiB - 1, 1:my_B_size, kkk) + &
                               BI_C_rec(iiB, 1:my_B_size, kkk)
                         ENDIF
                         IF (beta_beta) THEN
-                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_i+iiB-1, 1:my_B_size, kkk) = &
-                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_i+iiB-1, 1:my_B_size, kkk)+ &
+                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_i + iiB - 1, 1:my_B_size, kkk) = &
+                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_i + iiB - 1, 1:my_B_size, kkk) + &
                               BI_C_rec(iiB, 1:my_B_size, kkk)
                         ENDIF
                      END DO
@@ -6372,14 +6372,14 @@ CONTAINS
 !$OMP                                             alpha_alpha,beta_beta,open_shell)
                         DO kkk = start_point, end_point
                            IF (alpha_alpha .OR. (.NOT. open_shell)) THEN
-                              mp2_env%ri_grad%Gamma_P_ia(rec_j+jjB-1, 1:my_B_size, kkk) = &
-                                 mp2_env%ri_grad%Gamma_P_ia(rec_j+jjB-1, 1:my_B_size, kkk)+ &
-                                 BI_C_rec(jjB+rec_block_size, 1:my_B_size, kkk)
+                              mp2_env%ri_grad%Gamma_P_ia(rec_j + jjB - 1, 1:my_B_size, kkk) = &
+                                 mp2_env%ri_grad%Gamma_P_ia(rec_j + jjB - 1, 1:my_B_size, kkk) + &
+                                 BI_C_rec(jjB + rec_block_size, 1:my_B_size, kkk)
                            ENDIF
                            IF (beta_beta) THEN
-                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size, kkk) = &
-                                 mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size, kkk)+ &
-                                 BI_C_rec(jjB+rec_block_size, 1:my_B_size, kkk)
+                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size, kkk) = &
+                                 mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size, kkk) + &
+                                 BI_C_rec(jjB + rec_block_size, 1:my_B_size, kkk)
                            ENDIF
                         END DO
 !$OMP                   END PARALLEL DO
@@ -6388,8 +6388,8 @@ CONTAINS
 !$OMP                                             SHARED(start_point,end_point,&
 !$OMP                                           mp2_env,rec_j,jjB,my_B_size_beta,BI_C_rec_beta)
                         DO kkk = start_point, end_point
-                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size_beta, kkk) = &
-                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size_beta, kkk)+ &
+                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size_beta, kkk) = &
+                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size_beta, kkk) + &
                               BI_C_rec_beta(jjB, 1:my_B_size_beta, kkk)
                         END DO
 !$OMP                   END PARALLEL DO
@@ -6431,15 +6431,15 @@ CONTAINS
 
       ELSE
          ! noting to send check if we have to receive
-         DO proc_shift = 1, para_env_exchange%num_pe-1
-            proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-            proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+         DO proc_shift = 1, para_env_exchange%num_pe - 1
+            proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+            proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
             rec_ij_index = num_ij_pairs(proc_receive)
 
             IF (ij_index <= rec_ij_index) THEN
                ! we know that proc_receive has something to send for us, let's see what
                ij_counter_rec = &
-                  (ij_index-MIN(1, integ_group_pos2color_sub(proc_receive)))*ngroup+integ_group_pos2color_sub(proc_receive)
+                  (ij_index - MIN(1, integ_group_pos2color_sub(proc_receive)))*ngroup + integ_group_pos2color_sub(proc_receive)
 
                rec_i = ij_map(ij_counter_rec, 1)
                rec_j = ij_map(ij_counter_rec, 2)
@@ -6465,7 +6465,7 @@ CONTAINS
                ENDIF
 
                CALL timeset(routineN//"_comm2_w", handle2)
-               DO irep = 0, num_integ_group-1
+               DO irep = 0, num_integ_group - 1
                   Lstart_pos = ranges_info_array(1, irep, para_env_exchange%mepos)
                   Lend_pos = ranges_info_array(2, irep, para_env_exchange%mepos)
                   start_point = ranges_info_array(3, irep, para_env_exchange%mepos)
@@ -6477,13 +6477,13 @@ CONTAINS
 !$OMP                                         alpha_alpha,beta_beta,open_shell)
                      DO kkk = start_point, end_point
                         IF (alpha_alpha .OR. (.NOT. open_shell)) THEN
-                           mp2_env%ri_grad%Gamma_P_ia(rec_i+iiB-1, 1:my_B_size, kkk) = &
-                              mp2_env%ri_grad%Gamma_P_ia(rec_i+iiB-1, 1:my_B_size, kkk)+ &
+                           mp2_env%ri_grad%Gamma_P_ia(rec_i + iiB - 1, 1:my_B_size, kkk) = &
+                              mp2_env%ri_grad%Gamma_P_ia(rec_i + iiB - 1, 1:my_B_size, kkk) + &
                               BI_C_rec(iiB, 1:my_B_size, kkk)
                         ENDIF
                         IF (beta_beta) THEN
-                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_i+iiB-1, 1:my_B_size, kkk) = &
-                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_i+iiB-1, 1:my_B_size, kkk)+ &
+                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_i + iiB - 1, 1:my_B_size, kkk) = &
+                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_i + iiB - 1, 1:my_B_size, kkk) + &
                               BI_C_rec(iiB, 1:my_B_size, kkk)
                         ENDIF
                      END DO
@@ -6497,14 +6497,14 @@ CONTAINS
 !$OMP                                            alpha_alpha,beta_beta,open_shell)
                         DO kkk = start_point, end_point
                            IF (alpha_alpha .OR. (.NOT. open_shell)) THEN
-                              mp2_env%ri_grad%Gamma_P_ia(rec_j+jjB-1, 1:my_B_size, kkk) = &
-                                 mp2_env%ri_grad%Gamma_P_ia(rec_j+jjB-1, 1:my_B_size, kkk)+ &
-                                 BI_C_rec(jjB+rec_block_size, 1:my_B_size, kkk)
+                              mp2_env%ri_grad%Gamma_P_ia(rec_j + jjB - 1, 1:my_B_size, kkk) = &
+                                 mp2_env%ri_grad%Gamma_P_ia(rec_j + jjB - 1, 1:my_B_size, kkk) + &
+                                 BI_C_rec(jjB + rec_block_size, 1:my_B_size, kkk)
                            ENDIF
                            IF (beta_beta) THEN
-                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size, kkk) = &
-                                 mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size, kkk)+ &
-                                 BI_C_rec(jjB+rec_block_size, 1:my_B_size, kkk)
+                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size, kkk) = &
+                                 mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size, kkk) + &
+                                 BI_C_rec(jjB + rec_block_size, 1:my_B_size, kkk)
                            ENDIF
                         END DO
 !$OMP                  END PARALLEL DO
@@ -6513,8 +6513,8 @@ CONTAINS
 !$OMP                                         SHARED(start_point,end_point,&
 !$OMP                                       mp2_env,rec_j,jjB,my_B_size_beta,BI_C_rec_beta)
                         DO kkk = start_point, end_point
-                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size_beta, kkk) = &
-                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j+jjB-1, 1:my_B_size_beta, kkk)+ &
+                           mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size_beta, kkk) = &
+                              mp2_env%ri_grad%Gamma_P_ia_beta(rec_j + jjB - 1, 1:my_B_size_beta, kkk) + &
                               BI_C_rec_beta(jjB, 1:my_B_size_beta, kkk)
                         END DO
 !$OMP                  END PARALLEL DO
@@ -6633,14 +6633,14 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: my_B_virtual_end_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'quasi_degenerate_P_ij', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: a, a_global, b, b_global, end_point, handle, handle2, ijk_counter, &
-         ijk_counter_send, ijk_index, iloops, irep, Lend_pos, Lstart_pos, max_ijk, max_ijk_beta, &
-         max_ijk_loop, my_i, my_ijk, my_ijk_beta, my_j, my_k, my_virtual, nloops, proc_receive, &
-         proc_send, proc_shift, rec_B_size, rec_B_virtual_end, rec_B_virtual_start, rec_L_size, &
-         send_B_size, send_B_virtual_end, send_B_virtual_start, send_i, send_ijk_index, send_j, &
-         send_k, size_B_i, size_B_j, size_B_k, start_point
+                 ijk_counter_send, ijk_index, iloops, irep, Lend_pos, Lstart_pos, max_ijk, max_ijk_beta, &
+                 max_ijk_loop, my_i, my_ijk, my_ijk_beta, my_j, my_k, my_virtual, nloops, proc_receive, &
+                 proc_send, proc_shift, rec_B_size, rec_B_virtual_end, rec_B_virtual_start, rec_L_size, &
+                 send_B_size, send_B_virtual_end, send_B_virtual_start, send_i, send_ijk_index, send_j, &
+                 send_k, size_B_i, size_B_j, size_B_k, start_point
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: num_ijk, num_ijk_beta
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: ijk_map, ijk_map_beta
       REAL(KIND=dp)                                      :: amp_fac, null_mat_rec(2, 2, 2), &
@@ -6701,7 +6701,7 @@ CONTAINS
             IF (iloops .EQ. 2) my_ijk = my_ijk_beta
             IF (ijk_index <= my_ijk) THEN
                ! work to be done
-               ijk_counter = (ijk_index-MIN(1, color_sub))*ngroup+color_sub
+               ijk_counter = (ijk_index - MIN(1, color_sub))*ngroup + color_sub
                IF (iloops .EQ. 1) THEN
                   my_i = ijk_map(ijk_counter, 1)
                   my_j = ijk_map(ijk_counter, 2)
@@ -6715,7 +6715,7 @@ CONTAINS
                local_i_aL = 0.0_dp
                local_j_al = 0.0_dp
                local_k_al = 0.0_dp
-               DO irep = 0, num_integ_group-1
+               DO irep = 0, num_integ_group - 1
                   Lstart_pos = ranges_info_array(1, irep, para_env_exchange%mepos)
                   Lend_pos = ranges_info_array(2, irep, para_env_exchange%mepos)
                   start_point = ranges_info_array(3, irep, para_env_exchange%mepos)
@@ -6738,9 +6738,9 @@ CONTAINS
                   ENDIF
                END DO
 
-               DO proc_shift = 1, para_env_exchange%num_pe-1
-                  proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-                  proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+               DO proc_shift = 1, para_env_exchange%num_pe - 1
+                  proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+                  proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
 
                   send_ijk_index = num_ijk(proc_send)
                   IF (iloops .EQ. 2) send_ijk_index = num_ijk_beta(proc_send)
@@ -6750,8 +6750,8 @@ CONTAINS
 
                   IF (ijk_index <= send_ijk_index) THEN
                      ! something to send
-                     ijk_counter_send = (ijk_index-MIN(1, integ_group_pos2color_sub(proc_send)))* &
-                                        ngroup+integ_group_pos2color_sub(proc_send)
+                     ijk_counter_send = (ijk_index - MIN(1, integ_group_pos2color_sub(proc_send)))* &
+                                        ngroup + integ_group_pos2color_sub(proc_send)
                      IF (iloops .EQ. 1) THEN
                         send_i = ijk_map(ijk_counter_send, 1)
                         send_j = ijk_map(ijk_counter_send, 2)
@@ -6781,7 +6781,7 @@ CONTAINS
                                       BI_C_rec(1:rec_L_size, 1:size_B_i, 1:1), proc_receive, &
                                       para_env_exchange%group)
                   END IF
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -6811,7 +6811,7 @@ CONTAINS
                                       BI_C_rec(1:rec_L_size, 1:size_B_j, 1:1), proc_receive, &
                                       para_env_exchange%group)
                   END IF
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -6849,7 +6849,7 @@ CONTAINS
                                       BI_C_rec(1:rec_L_size, 1:size_B_k, 1:1), proc_receive, &
                                       para_env_exchange%group)
                   END IF
-                  DO irep = 0, num_integ_group-1
+                  DO irep = 0, num_integ_group - 1
                      Lstart_pos = ranges_info_array(1, irep, proc_receive)
                      Lend_pos = ranges_info_array(2, irep, proc_receive)
                      start_point = ranges_info_array(3, irep, proc_receive)
@@ -6876,9 +6876,9 @@ CONTAINS
                              local_i_aL(:, :, 1), dimen_RI, local_k_aL(:, :, 1), dimen_RI, &
                              0.0_dp, local_ab(my_B_virtual_start:my_B_virtual_end, 1:size_B_k), size_B_i)
                ENDIF
-               DO proc_shift = 1, para_env_sub%num_pe-1
-                  proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-                  proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+               DO proc_shift = 1, para_env_sub%num_pe - 1
+                  proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+                  proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
                   IF (iloops .EQ. 1) THEN
                      rec_B_size = sizes_B_virtual(proc_receive)
@@ -6911,41 +6911,41 @@ CONTAINS
                ! Alpha-alpha, beta-beta and closed shell
                IF (.NOT. alpha_beta) THEN
                   DO b = 1, size_B_k
-                     b_global = b+my_B_virtual_start-1
+                     b_global = b + my_B_virtual_start - 1
                      DO a = 1, my_B_size
-                        a_global = a+my_B_virtual_start-1
-                        t_ab(a_global, b) = (amp_fac*local_ab(a_global, b)-local_ab(b_global, a))/ &
-                                            (Eigenval(my_i)+Eigenval(my_k)-Eigenval(homo+a_global)-Eigenval(homo+b_global))
+                        a_global = a + my_B_virtual_start - 1
+                        t_ab(a_global, b) = (amp_fac*local_ab(a_global, b) - local_ab(b_global, a))/ &
+                                           (Eigenval(my_i) + Eigenval(my_k) - Eigenval(homo + a_global) - Eigenval(homo + b_global))
                      END DO
                   END DO
                ELSE
                   IF (iloops .EQ. 1) THEN ! Alpha-beta for alpha-alpha density
                      DO b = 1, size_B_k
-                        b_global = b+my_B_virtual_start_beta-1
+                        b_global = b + my_B_virtual_start_beta - 1
                         DO a = 1, my_B_size
-                           a_global = a+my_B_virtual_start-1
+                           a_global = a + my_B_virtual_start - 1
                            t_ab(a_global, b) = local_ab(a_global, b)/ &
-                                               (Eigenval(my_i)+Eigenval_beta(my_k)-Eigenval(homo+a_global)- &
-                                                Eigenval_beta(homo_beta+b_global))
+                                               (Eigenval(my_i) + Eigenval_beta(my_k) - Eigenval(homo + a_global) - &
+                                                Eigenval_beta(homo_beta + b_global))
                         END DO
                      END DO
                   ELSE ! Alpha-beta for beta-beta density
                      DO b = 1, size_B_k
-                        b_global = b+my_B_virtual_start-1
+                        b_global = b + my_B_virtual_start - 1
                         DO a = 1, my_B_size_beta
-                           a_global = a+my_B_virtual_start_beta-1
+                           a_global = a + my_B_virtual_start_beta - 1
                            t_ab(a_global, b) = local_ab(a_global, b)/ &
-                                               (Eigenval_beta(my_i)+Eigenval(my_k)-Eigenval_beta(homo_beta+a_global)- &
-                                                Eigenval(homo+b_global))
+                                               (Eigenval_beta(my_i) + Eigenval(my_k) - Eigenval_beta(homo_beta + a_global) - &
+                                                Eigenval(homo + b_global))
                         END DO
                      END DO
                   ENDIF
                ENDIF
 
                IF (.NOT. alpha_beta) THEN
-                  DO proc_shift = 1, para_env_sub%num_pe-1
-                     proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-                     proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+                  DO proc_shift = 1, para_env_sub%num_pe - 1
+                     proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+                     proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
                      rec_B_size = sizes_B_virtual(proc_receive)
                      rec_B_virtual_end = ends_B_virtual(proc_receive)
                      rec_B_virtual_start = starts_B_virtual(proc_receive)
@@ -6959,11 +6959,11 @@ CONTAINS
                                       external_ab(1:size_B_i, 1:rec_B_size), proc_receive, para_env_sub%group)
 
                      DO b = 1, my_B_size
-                        b_global = b+my_B_virtual_start-1
+                        b_global = b + my_B_virtual_start - 1
                         DO a = 1, rec_B_size
-                           a_global = a+rec_B_virtual_start-1
-                           t_ab(a_global, b) = (amp_fac*local_ab(a_global, b)-external_ab(b, a))/ &
-                                               (Eigenval(my_i)+Eigenval(my_k)-Eigenval(homo+a_global)-Eigenval(homo+b_global))
+                           a_global = a + rec_B_virtual_start - 1
+                           t_ab(a_global, b) = (amp_fac*local_ab(a_global, b) - external_ab(b, a))/ &
+                                           (Eigenval(my_i) + Eigenval(my_k) - Eigenval(homo + a_global) - Eigenval(homo + b_global))
                         END DO
                      END DO
 
@@ -6986,9 +6986,9 @@ CONTAINS
                              0.0_dp, local_ab(my_B_virtual_start:my_B_virtual_end, 1:size_B_k), size_B_j)
                ENDIF
 
-               DO proc_shift = 1, para_env_sub%num_pe-1
-                  proc_send = sub_proc_map(para_env_sub%mepos+proc_shift)
-                  proc_receive = sub_proc_map(para_env_sub%mepos-proc_shift)
+               DO proc_shift = 1, para_env_sub%num_pe - 1
+                  proc_send = sub_proc_map(para_env_sub%mepos + proc_shift)
+                  proc_receive = sub_proc_map(para_env_sub%mepos - proc_shift)
 
                   IF (iloops .EQ. 1) THEN
                      rec_B_size = sizes_B_virtual(proc_receive)
@@ -7019,32 +7019,32 @@ CONTAINS
                ! Alpha-alpha, beta-beta and closed shell
                IF (.NOT. alpha_beta) THEN
                   DO b = 1, size_B_k
-                     b_global = b+my_B_virtual_start-1
+                     b_global = b + my_B_virtual_start - 1
                      DO a = 1, my_B_size
-                        a_global = a+my_B_virtual_start-1
+                        a_global = a + my_B_virtual_start - 1
                         local_ab(a_global, b) = local_ab(a_global, b)/ &
-                                                (Eigenval(my_j)+Eigenval(my_k)-Eigenval(homo+a_global)-Eigenval(homo+b_global))
+                                           (Eigenval(my_j) + Eigenval(my_k) - Eigenval(homo + a_global) - Eigenval(homo + b_global))
                      END DO
                   END DO
                ELSE
                   IF (iloops .EQ. 1) THEN ! Alpha-beta for alpha-alpha density
                      DO b = 1, size_B_k
-                        b_global = b+my_B_virtual_start_beta-1
+                        b_global = b + my_B_virtual_start_beta - 1
                         DO a = 1, my_B_size
-                           a_global = a+my_B_virtual_start-1
+                           a_global = a + my_B_virtual_start - 1
                            local_ab(a_global, b) = local_ab(a_global, b)/ &
-                                                   (Eigenval(my_j)+Eigenval_beta(my_k)-Eigenval(homo+a_global)- &
-                                                    Eigenval_beta(homo_beta+b_global))
+                                                   (Eigenval(my_j) + Eigenval_beta(my_k) - Eigenval(homo + a_global) - &
+                                                    Eigenval_beta(homo_beta + b_global))
                         END DO
                      END DO
                   ELSE ! Alpha-beta for beta-beta density
                      DO b = 1, size_B_k
-                        b_global = b+my_B_virtual_start-1
+                        b_global = b + my_B_virtual_start - 1
                         DO a = 1, my_B_size_beta
-                           a_global = a+my_B_virtual_start_beta-1
+                           a_global = a + my_B_virtual_start_beta - 1
                            local_ab(a_global, b) = local_ab(a_global, b)/ &
-                                                   (Eigenval_beta(my_j)+Eigenval(my_k)-Eigenval_beta(homo_beta+a_global)- &
-                                                    Eigenval(homo+b_global))
+                                                   (Eigenval_beta(my_j) + Eigenval(my_k) - Eigenval_beta(homo_beta + a_global) - &
+                                                    Eigenval(homo + b_global))
                         END DO
                      END DO
                   ENDIF
@@ -7055,25 +7055,25 @@ CONTAINS
                   P_ij_elem = P_ij_elem*2.0_dp
                ENDIF
                IF ((beta_beta) .OR. (iloops .EQ. 2)) THEN
-                  mp2_env%ri_grad%P_ij_beta(my_i, my_j) = mp2_env%ri_grad%P_ij_beta(my_i, my_j)-P_ij_elem
-                  mp2_env%ri_grad%P_ij_beta(my_j, my_i) = mp2_env%ri_grad%P_ij_beta(my_j, my_i)-P_ij_elem
+                  mp2_env%ri_grad%P_ij_beta(my_i, my_j) = mp2_env%ri_grad%P_ij_beta(my_i, my_j) - P_ij_elem
+                  mp2_env%ri_grad%P_ij_beta(my_j, my_i) = mp2_env%ri_grad%P_ij_beta(my_j, my_i) - P_ij_elem
                ELSE
-                  mp2_env%ri_grad%P_ij(my_i, my_j) = mp2_env%ri_grad%P_ij(my_i, my_j)-P_ij_elem
-                  mp2_env%ri_grad%P_ij(my_j, my_i) = mp2_env%ri_grad%P_ij(my_j, my_i)-P_ij_elem
+                  mp2_env%ri_grad%P_ij(my_i, my_j) = mp2_env%ri_grad%P_ij(my_i, my_j) - P_ij_elem
+                  mp2_env%ri_grad%P_ij(my_j, my_i) = mp2_env%ri_grad%P_ij(my_j, my_i) - P_ij_elem
                ENDIF
                CALL timestop(handle2)
             ELSE
                ! no work to be done, possible messeges to be exchanged
-               DO proc_shift = 1, para_env_exchange%num_pe-1
-                  proc_send = proc_map(para_env_exchange%mepos+proc_shift)
-                  proc_receive = proc_map(para_env_exchange%mepos-proc_shift)
+               DO proc_shift = 1, para_env_exchange%num_pe - 1
+                  proc_send = proc_map(para_env_exchange%mepos + proc_shift)
+                  proc_receive = proc_map(para_env_exchange%mepos - proc_shift)
 
                   send_ijk_index = num_ijk(proc_send)
                   IF (iloops .EQ. 2) send_ijk_index = num_ijk_beta(proc_send)
 
                   IF (ijk_index <= send_ijk_index) THEN
                      ! somethig to send
-                     ijk_counter_send = (ijk_index-MIN(1, integ_group_pos2color_sub(proc_send)))*ngroup+ &
+                     ijk_counter_send = (ijk_index - MIN(1, integ_group_pos2color_sub(proc_send)))*ngroup + &
                                         integ_group_pos2color_sub(proc_send)
                      IF (iloops .EQ. 1) THEN
                         send_i = ijk_map(ijk_counter_send, 1)
@@ -7190,7 +7190,7 @@ CONTAINS
       INTEGER, OPTIONAL                                  :: max_ijk_beta, my_ijk_beta
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'Find_quasi_degenerate_ij', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iib, ijk_counter, jjb, kkb, my_homo, &
                                                             num_sing_ij, total_ijk
@@ -7205,9 +7205,9 @@ CONTAINS
       num_sing_ij = 0
       DO iiB = 1, homo
          ! diagonal elements already updated
-         DO jjB = iiB+1, homo
-            IF (ABS(Eigenval(jjB)-Eigenval(iiB)) < mp2_env%ri_mp2%eps_canonical) &
-               num_sing_ij = num_sing_ij+1
+         DO jjB = iiB + 1, homo
+            IF (ABS(Eigenval(jjB) - Eigenval(iiB)) < mp2_env%ri_mp2%eps_canonical) &
+               num_sing_ij = num_sing_ij + 1
          END DO
       END DO
       IF (.NOT. beta_beta) THEN
@@ -7229,19 +7229,19 @@ CONTAINS
       ijk_counter = 0
       DO iiB = 1, homo
          ! diagonal elements already updated
-         DO jjB = iiB+1, homo
-            IF (ABS(Eigenval(jjB)-Eigenval(iiB)) >= mp2_env%ri_mp2%eps_canonical) CYCLE
+         DO jjB = iiB + 1, homo
+            IF (ABS(Eigenval(jjB) - Eigenval(iiB)) >= mp2_env%ri_mp2%eps_canonical) CYCLE
             DO kkB = 1, my_homo
-               ijk_counter = ijk_counter+1
+               ijk_counter = ijk_counter + 1
                ijk_map(ijk_counter, 1) = iiB
                ijk_map(ijk_counter, 2) = jjB
                ijk_map(ijk_counter, 3) = kkB
-               IF (MOD(ijk_counter, ngroup) == color_sub) my_ijk = my_ijk+1
+               IF (MOD(ijk_counter, ngroup) == color_sub) my_ijk = my_ijk + 1
             END DO
          END DO
       END DO
 
-      ALLOCATE (num_ijk(0:para_env_exchange%num_pe-1))
+      ALLOCATE (num_ijk(0:para_env_exchange%num_pe - 1))
       num_ijk = 0
       num_ijk(para_env_exchange%mepos) = my_ijk
       CALL mp_sum(num_ijk, para_env_exchange%group)
@@ -7252,9 +7252,9 @@ CONTAINS
          num_sing_ij = 0
          DO iiB = 1, homo_beta
             ! diagonal elements already updated
-            DO jjB = iiB+1, homo_beta
-               IF (ABS(Eigenval_beta(jjB)-Eigenval_beta(iiB)) < mp2_env%ri_mp2%eps_canonical) &
-                  num_sing_ij = num_sing_ij+1
+            DO jjB = iiB + 1, homo_beta
+               IF (ABS(Eigenval_beta(jjB) - Eigenval_beta(iiB)) < mp2_env%ri_mp2%eps_canonical) &
+                  num_sing_ij = num_sing_ij + 1
             END DO
          END DO
          ! total number of elemets that have to be computed
@@ -7265,18 +7265,18 @@ CONTAINS
          ijk_counter = 0
          DO iiB = 1, homo_beta
             ! diagonal elements already updated
-            DO jjB = iiB+1, homo_beta
-               IF (ABS(Eigenval_beta(jjB)-Eigenval_beta(iiB)) >= mp2_env%ri_mp2%eps_canonical) CYCLE
+            DO jjB = iiB + 1, homo_beta
+               IF (ABS(Eigenval_beta(jjB) - Eigenval_beta(iiB)) >= mp2_env%ri_mp2%eps_canonical) CYCLE
                DO kkB = 1, homo
-                  ijk_counter = ijk_counter+1
+                  ijk_counter = ijk_counter + 1
                   ijk_map_beta(ijk_counter, 1) = iiB
                   ijk_map_beta(ijk_counter, 2) = jjB
                   ijk_map_beta(ijk_counter, 3) = kkB
-                  IF (MOD(ijk_counter, ngroup) == color_sub) my_ijk_beta = my_ijk_beta+1
+                  IF (MOD(ijk_counter, ngroup) == color_sub) my_ijk_beta = my_ijk_beta + 1
                END DO
             END DO
          END DO
-         ALLOCATE (num_ijk_beta(0:para_env_exchange%num_pe-1))
+         ALLOCATE (num_ijk_beta(0:para_env_exchange%num_pe - 1))
          num_ijk_beta = 0
          num_ijk_beta(para_env_exchange%mepos) = my_ijk_beta
          CALL mp_sum(num_ijk_beta, para_env_exchange%group)
@@ -7329,35 +7329,35 @@ CONTAINS
       INTEGER                                            :: num_diff_blk
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'compute_3c_overlap_int', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: acell, atom_RI, atom_RI_end, atom_RI_start, bcell, block_end_col, block_end_row, &
-         block_start_col, block_start_row, col, col_basis_size_mao_occ, col_basis_size_mao_virt, &
-         end_col_from_LLL_mao_occ, end_col_from_LLL_mao_virt, end_row_from_LLL_mao_occ, &
-         end_row_from_LLL_mao_virt, handle, handle2, i_cut_RI, i_img, iatom, &
-         iatom_basis_size_mao_occ, iatom_basis_size_mao_virt, iatom_outer, iblk, iblk_send, ikind, &
-         img_col, img_row, iset, isgf_RI, isgfa, j_img, jatom, jatom_basis_size_mao_occ, &
-         jatom_basis_size_mao_virt, jatom_outer, jkind, jset, jsgfb, kind_RI, LLL, LLL_set_end
+                 block_start_col, block_start_row, col, col_basis_size_mao_occ, col_basis_size_mao_virt, &
+                 end_col_from_LLL_mao_occ, end_col_from_LLL_mao_virt, end_row_from_LLL_mao_occ, &
+                 end_row_from_LLL_mao_virt, handle, handle2, i_cut_RI, i_img, iatom, &
+                 iatom_basis_size_mao_occ, iatom_basis_size_mao_virt, iatom_outer, iblk, iblk_send, ikind, &
+                 img_col, img_row, iset, isgf_RI, isgfa, j_img, jatom, jatom_basis_size_mao_occ, &
+                 jatom_basis_size_mao_virt, jatom_outer, jkind, jset, jsgfb, kind_RI, LLL, LLL_set_end
       INTEGER :: LLL_set_start, maxval_1, maxval_2, maxval_3, mepos, minval_1, minval_2, minval_3, &
-         my_group_L_end, my_group_L_size, my_group_L_start, natom, nco_RI, ncoa, ncob, nimg, &
-         nkind, nset_RI, nseta, nsetb, nthread, offset_col_from_LLL, offset_row_from_LLL, row, &
-         row_basis_size_mao_occ, row_basis_size_mao_virt, set_RI, sgf_RI, sgfa, sgfb, &
-         start_col_from_LLL_mao_occ, start_col_from_LLL_mao_virt, start_row_from_LLL_mao_occ, &
-         start_row_from_LLL_mao_virt
+                 my_group_L_end, my_group_L_size, my_group_L_start, natom, nco_RI, ncoa, ncob, nimg, &
+                 nkind, nset_RI, nseta, nsetb, nthread, offset_col_from_LLL, offset_row_from_LLL, row, &
+                 row_basis_size_mao_occ, row_basis_size_mao_virt, set_RI, sgf_RI, sgfa, sgfb, &
+                 start_col_from_LLL_mao_occ, start_col_from_LLL_mao_virt, start_row_from_LLL_mao_occ, &
+                 start_row_from_LLL_mao_virt
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_from_RI_index, kind_of
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: indices_for_uncommon_blocks
       INTEGER, DIMENSION(3)                              :: bcellvec, cell_vec, outer_cell_vec, &
                                                             size_cell_to_index
       INTEGER, DIMENSION(:), POINTER :: blk_sizes_mao_occ, blk_sizes_mao_virt, col_blk_sizes, &
-         l_max_RI, l_min_RI, la_max, la_min, lb_max, lb_min, npgf_RI, npgfa, npgfb, nsgf_RI, &
-         nsgfa, nsgfb, row_blk_end, row_blk_sizes, row_blk_start
+                                        l_max_RI, l_min_RI, la_max, la_min, lb_max, lb_min, npgf_RI, npgfa, npgfb, nsgf_RI, &
+                                        nsgfa, nsgfb, row_blk_end, row_blk_sizes, row_blk_start
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgf_RI, first_sgfa, first_sgfb
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
       LOGICAL                                            :: do_kpoints_cubic_RPA, found
       REAL(KIND=dp)                                      :: dab, daRI, dbRI
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :) :: block, block_mao_for_occ, &
-         block_mao_for_occ_transposed, block_mao_for_virt, block_mao_for_virt_transposed, &
-         block_transposed, temp_mat_mao_occ_virt, temp_mat_mao_virt_occ
+                                                  block_mao_for_occ_transposed, block_mao_for_virt, block_mao_for_virt_transposed, &
+                                                     block_transposed, temp_mat_mao_occ_virt, temp_mat_mao_virt_occ
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :)     :: s_abRI, s_abRI_contr, &
                                                             s_abRI_contr_transposed
       REAL(KIND=dp), DIMENSION(3)                        :: rab, rab_outer, raRI, rbRI
@@ -7556,7 +7556,7 @@ CONTAINS
 
                               IF (.NOT. (acell == i_img)) CYCLE
 
-                              bcellvec = -outer_cell_vec+cell_vec
+                              bcellvec = -outer_cell_vec + cell_vec
 
                               IF (bcellvec(1) < minval_1) CYCLE
                               IF (bcellvec(1) > maxval_1) CYCLE
@@ -7572,7 +7572,7 @@ CONTAINS
                            END IF
 
                            raRI = rab_outer
-                           rbRI = raRI-rab
+                           rbRI = raRI - rab
 
                         ELSE IF (atom_RI .EQ. iatom_outer .AND. &
                                  iatom .EQ. jatom_outer) THEN
@@ -7583,7 +7583,7 @@ CONTAINS
                            END IF
 
                            raRI = -rab_outer
-                           rbRI = raRI-rab
+                           rbRI = raRI - rab
 
                         ELSE IF (jatom .EQ. iatom_outer .AND. &
                                  atom_RI .EQ. jatom_outer) THEN
@@ -7594,7 +7594,7 @@ CONTAINS
                            END IF
 
                            rbRI = rab_outer
-                           raRI = rbRI+rab
+                           raRI = rbRI + rab
 
                         ELSE IF (atom_RI .EQ. iatom_outer .AND. &
                                  jatom .EQ. jatom_outer) THEN
@@ -7605,7 +7605,7 @@ CONTAINS
                            END IF
 
                            rbRI = -rab_outer
-                           raRI = rbRI+rab
+                           raRI = rbRI + rab
 
                         END IF
 
@@ -7643,12 +7643,12 @@ CONTAINS
 
                            DO iset = 1, nseta
 
-                              IF (set_radius_a(iset)+set_radius_RI(set_RI) < daRI) CYCLE
+                              IF (set_radius_a(iset) + set_radius_RI(set_RI) < daRI) CYCLE
 
                               DO jset = 1, nsetb
 
-                                 IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
-                                 IF (set_radius_b(jset)+set_radius_RI(set_RI) < dbRI) CYCLE
+                                 IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
+                                 IF (set_radius_b(jset) + set_radius_RI(set_RI) < dbRI) CYCLE
 
                                  nco_RI = npgf_RI(set_RI)*ncoset(l_max_RI(set_RI))
                                  ncoa = npgfa(iset)*ncoset(la_max(iset))
@@ -7658,11 +7658,11 @@ CONTAINS
                                  sgfa = first_sgfa(1, iset)
                                  sgfb = first_sgfb(1, jset)
 
-                                 LLL_set_start = 1+sgf_RI-1-my_group_L_start+1+row_blk_start(atom_RI)-1
+                                 LLL_set_start = 1 + sgf_RI - 1 - my_group_L_start + 1 + row_blk_start(atom_RI) - 1
 
                                  IF (LLL_set_start > my_group_L_size) CYCLE
 
-                                 LLL_set_end = nsgf_RI(set_RI)+sgf_RI-1-my_group_L_start+1+row_blk_start(atom_RI)-1
+                                 LLL_set_end = nsgf_RI(set_RI) + sgf_RI - 1 - my_group_L_start + 1 + row_blk_start(atom_RI) - 1
 
                                  IF (LLL_set_end < 1) CYCLE
 
@@ -7695,7 +7695,7 @@ CONTAINS
 
                                     DO isgf_RI = 1, nsgf_RI(set_RI)
 
-                                       LLL = isgf_RI+sgf_RI-1-my_group_L_start+1+row_blk_start(atom_RI)-1
+                                       LLL = isgf_RI + sgf_RI - 1 - my_group_L_start + 1 + row_blk_start(atom_RI) - 1
 
                                        IF (LLL < 1) CYCLE
                                        IF (LLL > my_group_L_size) CYCLE
@@ -7722,49 +7722,49 @@ CONTAINS
                                        ALLOCATE (block_transposed(col_blk_sizes(col), row_blk_sizes(row)*my_group_L_size))
                                        block_transposed = 0.0_dp
 
-                                       offset_row_from_LLL = (LLL-1)*row_blk_sizes(row)
-                                       offset_col_from_LLL = (LLL-1)*col_blk_sizes(col)
+                                       offset_row_from_LLL = (LLL - 1)*row_blk_sizes(row)
+                                       offset_col_from_LLL = (LLL - 1)*col_blk_sizes(col)
 
                                        IF (iatom < jatom) THEN
 
                                           block_start_row = sgfa
-                                          block_end_row = sgfa+nsgfa(iset)-1
+                                          block_end_row = sgfa + nsgfa(iset) - 1
                                           block_start_col = sgfb
-                                          block_end_col = sgfb+nsgfb(jset)-1
+                                          block_end_col = sgfb + nsgfb(jset) - 1
 
                                           ! factor 0.5 is necessary due to double filling due to double iterate loop
                                           block(block_start_row:block_end_row, &
-                                                block_start_col+offset_col_from_LLL:block_end_col+offset_col_from_LLL) = &
+                                                block_start_col + offset_col_from_LLL:block_end_col + offset_col_from_LLL) = &
                                              0.5_dp*s_abRI_contr(:, :, isgf_RI)
 
                                           block_transposed(block_start_col:block_end_col, &
-                                                           block_start_row+offset_row_from_LLL: &
-                                                           block_end_row+offset_row_from_LLL) = &
+                                                           block_start_row + offset_row_from_LLL: &
+                                                           block_end_row + offset_row_from_LLL) = &
                                              0.5_dp*s_abRI_contr_transposed(:, :, isgf_RI)
 
                                        ELSE IF (iatom > jatom) THEN
 
                                           block_start_row = sgfb
-                                          block_end_row = sgfb+nsgfb(jset)-1
+                                          block_end_row = sgfb + nsgfb(jset) - 1
                                           block_start_col = sgfa
-                                          block_end_col = sgfa+nsgfa(iset)-1
+                                          block_end_col = sgfa + nsgfa(iset) - 1
 
                                           ! factor 0.5 is necessary due to double filling due to double iterate loop
                                           block(block_start_row:block_end_row, &
-                                                block_start_col+offset_col_from_LLL:block_end_col+offset_col_from_LLL) = &
+                                                block_start_col + offset_col_from_LLL:block_end_col + offset_col_from_LLL) = &
                                              0.5_dp*s_abRI_contr_transposed(:, :, isgf_RI)
 
                                           block_transposed(block_start_col:block_end_col, &
-                                                           block_start_row+offset_row_from_LLL: &
-                                                           block_end_row+offset_row_from_LLL) = &
+                                                           block_start_row + offset_row_from_LLL: &
+                                                           block_end_row + offset_row_from_LLL) = &
                                              0.5_dp*s_abRI_contr(:, :, isgf_RI)
 
                                        ELSE IF (iatom .EQ. jatom) THEN
 
                                           block_start_row = sgfa
-                                          block_end_row = sgfa+nsgfa(iset)-1
-                                          block_start_col = sgfb+offset_col_from_LLL
-                                          block_end_col = sgfb+nsgfb(jset)-1+offset_col_from_LLL
+                                          block_end_row = sgfa + nsgfa(iset) - 1
+                                          block_start_col = sgfb + offset_col_from_LLL
+                                          block_end_col = sgfb + nsgfb(jset) - 1 + offset_col_from_LLL
 
                                           block(block_start_row:block_end_row, &
                                                 block_start_col:block_end_col) = s_abRI_contr(:, :, isgf_RI)
@@ -7814,22 +7814,22 @@ CONTAINS
 
                                           ! transform from the primary Gaussian basis into the MAO basis
                                           CALL ab_contract(temp_mat_mao_occ_virt(:, :), s_abRI_contr(:, :, isgf_RI), &
-                                                           mao_coeff_repl_occ(iatom)%array(sgfa:sgfa+nsgfa(iset)-1, :), &
-                                                           mao_coeff_repl_virt(jatom)%array(sgfb:sgfb+nsgfb(jset)-1, :), &
+                                                           mao_coeff_repl_occ(iatom)%array(sgfa:sgfa + nsgfa(iset) - 1, :), &
+                                                           mao_coeff_repl_virt(jatom)%array(sgfb:sgfb + nsgfb(jset) - 1, :), &
                                                            nsgfa(iset), nsgfb(jset), &
                                                            iatom_basis_size_mao_occ, jatom_basis_size_mao_virt)
 
                                           CALL ab_contract(temp_mat_mao_virt_occ(:, :), s_abRI_contr(:, :, isgf_RI), &
-                                                           mao_coeff_repl_virt(iatom)%array(sgfa:sgfa+nsgfa(iset)-1, :), &
-                                                           mao_coeff_repl_occ(jatom)%array(sgfb:sgfb+nsgfb(jset)-1, :), &
+                                                           mao_coeff_repl_virt(iatom)%array(sgfa:sgfa + nsgfa(iset) - 1, :), &
+                                                           mao_coeff_repl_occ(jatom)%array(sgfb:sgfb + nsgfb(jset) - 1, :), &
                                                            nsgfa(iset), nsgfb(jset), &
                                                            iatom_basis_size_mao_virt, jatom_basis_size_mao_occ)
 
-                                          start_row_from_LLL_mao_occ = (LLL-1)*row_basis_size_mao_occ+1
-                                          start_col_from_LLL_mao_occ = (LLL-1)*col_basis_size_mao_occ+1
+                                          start_row_from_LLL_mao_occ = (LLL - 1)*row_basis_size_mao_occ + 1
+                                          start_col_from_LLL_mao_occ = (LLL - 1)*col_basis_size_mao_occ + 1
 
-                                          start_row_from_LLL_mao_virt = (LLL-1)*row_basis_size_mao_virt+1
-                                          start_col_from_LLL_mao_virt = (LLL-1)*col_basis_size_mao_virt+1
+                                          start_row_from_LLL_mao_virt = (LLL - 1)*row_basis_size_mao_virt + 1
+                                          start_col_from_LLL_mao_virt = (LLL - 1)*col_basis_size_mao_virt + 1
 
                                           end_row_from_LLL_mao_occ = LLL*row_basis_size_mao_occ
                                           end_col_from_LLL_mao_occ = LLL*col_basis_size_mao_occ
@@ -8037,20 +8037,20 @@ CONTAINS
       INTEGER, ALLOCATABLE, DIMENSION(:), OPTIONAL       :: local_atoms_for_mao_basis
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'reserve_blocks_3c', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: acell, atom_RI, atom_RI_end, atom_RI_start, bcell, blk, blk_cnt, col, handle, &
-         handle2, i_cut_RI, i_img, i_img_outer, i_loop, iatom, iatom_outer, ikind, iset, isgf_RI, &
-         j_img, j_img_outer, jatom, jatom_outer, jkind, jset, kind_RI, LLL, LLL_set_end, &
-         LLL_set_start, maxval_1, maxval_2, maxval_3, minval_1, minval_2, minval_3, &
-         my_group_L_end, my_group_L_size, my_group_L_start, natom, nblkrows_total, nco_RI, ncoa, &
-         ncob, nimg, nkind, nset_RI, nseta, nsetb, num_loops, row, set_RI, sgf_RI, sgfa, sgfb
+                 handle2, i_cut_RI, i_img, i_img_outer, i_loop, iatom, iatom_outer, ikind, iset, isgf_RI, &
+                 j_img, j_img_outer, jatom, jatom_outer, jkind, jset, kind_RI, LLL, LLL_set_end, &
+                 LLL_set_start, maxval_1, maxval_2, maxval_3, minval_1, minval_2, minval_3, &
+                 my_group_L_end, my_group_L_size, my_group_L_start, natom, nblkrows_total, nco_RI, ncoa, &
+                 ncob, nimg, nkind, nset_RI, nseta, nsetb, num_loops, row, set_RI, sgf_RI, sgfa, sgfb
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_from_RI_index, kind_of, tmp
       INTEGER, ALLOCATABLE, DIMENSION(:, :)              :: old_col, old_row
       INTEGER, DIMENSION(3)                              :: cell_vec, outer_cell_vec
       INTEGER, DIMENSION(:), POINTER :: col_blk_sizes, col_blk_sizes_scaled, l_max_RI, l_min_RI, &
-         la_max, la_min, lb_max, lb_min, npgf_RI, npgfa, npgfb, nsgf_RI, nsgfa, nsgfb, &
-         row_blk_end, row_blk_offset, row_blk_sizes, row_blk_sizes_scaled, row_blk_start
+                                        la_max, la_min, lb_max, lb_min, npgf_RI, npgfa, npgfb, nsgf_RI, nsgfa, nsgfb, &
+                                        row_blk_end, row_blk_offset, row_blk_sizes, row_blk_sizes_scaled, row_blk_start
       INTEGER, DIMENSION(:, :), POINTER                  :: first_sgf_RI, first_sgfa, first_sgfb
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
       LOGICAL                                            :: do_kpoints_cubic_RPA, new_block
@@ -8251,24 +8251,24 @@ CONTAINS
                                  IF (outer_cell_vec(3) < minval_3) CYCLE
                                  IF (outer_cell_vec(3) > maxval_3) CYCLE
 
-                                 IF (-outer_cell_vec(1)+cell_vec(1) < minval_1) CYCLE
-                                 IF (-outer_cell_vec(1)+cell_vec(1) > maxval_1) CYCLE
-                                 IF (-outer_cell_vec(2)+cell_vec(2) < minval_2) CYCLE
-                                 IF (-outer_cell_vec(2)+cell_vec(2) > maxval_2) CYCLE
-                                 IF (-outer_cell_vec(3)+cell_vec(3) < minval_3) CYCLE
-                                 IF (-outer_cell_vec(3)+cell_vec(3) > maxval_3) CYCLE
+                                 IF (-outer_cell_vec(1) + cell_vec(1) < minval_1) CYCLE
+                                 IF (-outer_cell_vec(1) + cell_vec(1) > maxval_1) CYCLE
+                                 IF (-outer_cell_vec(2) + cell_vec(2) < minval_2) CYCLE
+                                 IF (-outer_cell_vec(2) + cell_vec(2) > maxval_2) CYCLE
+                                 IF (-outer_cell_vec(3) + cell_vec(3) < minval_3) CYCLE
+                                 IF (-outer_cell_vec(3) + cell_vec(3) > maxval_3) CYCLE
 
                                  acell = cell_to_index(-outer_cell_vec(1), -outer_cell_vec(2), -outer_cell_vec(3))
                                  IF (.NOT. (acell == i_img)) CYCLE
-                                 bcell = cell_to_index(-outer_cell_vec(1)+cell_vec(1), &
-                                                       -outer_cell_vec(2)+cell_vec(2), &
-                                                       -outer_cell_vec(3)+cell_vec(3))
+                                 bcell = cell_to_index(-outer_cell_vec(1) + cell_vec(1), &
+                                                       -outer_cell_vec(2) + cell_vec(2), &
+                                                       -outer_cell_vec(3) + cell_vec(3))
                                  IF (.NOT. (bcell == j_img)) CYCLE
 
                               END IF
 
                               raRI = rab_outer
-                              rbRI = raRI-rab
+                              rbRI = raRI - rab
 
                            ELSE IF (atom_RI .EQ. iatom_outer .AND. &
                                     iatom .EQ. jatom_outer) THEN
@@ -8279,7 +8279,7 @@ CONTAINS
                               END IF
 
                               raRI = -rab_outer
-                              rbRI = raRI-rab
+                              rbRI = raRI - rab
 
                            ELSE IF (jatom .EQ. iatom_outer .AND. &
                                     atom_RI .EQ. jatom_outer) THEN
@@ -8290,7 +8290,7 @@ CONTAINS
                               END IF
 
                               rbRI = rab_outer
-                              raRI = rbRI+rab
+                              raRI = rbRI + rab
 
                            ELSE IF (atom_RI .EQ. iatom_outer .AND. &
                                     jatom .EQ. jatom_outer) THEN
@@ -8301,7 +8301,7 @@ CONTAINS
                               END IF
 
                               rbRI = -rab_outer
-                              raRI = rbRI+rab
+                              raRI = rbRI + rab
 
                            END IF
 
@@ -8344,12 +8344,12 @@ CONTAINS
 
                               DO iset = 1, nseta
 
-                                 IF (set_radius_a(iset)+set_radius_RI(set_RI) < daRI) CYCLE
+                                 IF (set_radius_a(iset) + set_radius_RI(set_RI) < daRI) CYCLE
 
                                  DO jset = 1, nsetb
 
-                                    IF (set_radius_a(iset)+set_radius_b(jset) < dab) CYCLE
-                                    IF (set_radius_b(jset)+set_radius_RI(set_RI) < dbRI) CYCLE
+                                    IF (set_radius_a(iset) + set_radius_b(jset) < dab) CYCLE
+                                    IF (set_radius_b(jset) + set_radius_RI(set_RI) < dbRI) CYCLE
 
                                     nco_RI = npgf_RI(set_RI)*ncoset(l_max_RI(set_RI))
                                     ncoa = npgfa(iset)*ncoset(la_max(iset))
@@ -8359,11 +8359,11 @@ CONTAINS
                                     sgfa = first_sgfa(1, iset)
                                     sgfb = first_sgfb(1, jset)
 
-                                    LLL_set_start = 1+sgf_RI-1-my_group_L_start+1+row_blk_start(atom_RI)-1
+                                    LLL_set_start = 1 + sgf_RI - 1 - my_group_L_start + 1 + row_blk_start(atom_RI) - 1
 
                                     IF (LLL_set_start > my_group_L_size) CYCLE
 
-                                    LLL_set_end = nsgf_RI(set_RI)+sgf_RI-1-my_group_L_start+1+row_blk_start(atom_RI)-1
+                                    LLL_set_end = nsgf_RI(set_RI) + sgf_RI - 1 - my_group_L_start + 1 + row_blk_start(atom_RI) - 1
 
                                     IF (LLL_set_end < 1) CYCLE
 
@@ -8371,7 +8371,7 @@ CONTAINS
 
                                        DO isgf_RI = 1, nsgf_RI(set_RI)
 
-                                          LLL = isgf_RI+sgf_RI-1-my_group_L_start+1+row_blk_start(atom_RI)-1
+                                          LLL = isgf_RI + sgf_RI - 1 - my_group_L_start + 1 + row_blk_start(atom_RI) - 1
 
                                           IF (LLL < 1) CYCLE
                                           IF (LLL > my_group_L_size) CYCLE
@@ -8443,14 +8443,14 @@ CONTAINS
                                                    ALLOCATE (tmp(blk_cnt))
                                                    tmp(1:blk_cnt) = rows_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt)
                                                    DEALLOCATE (rows_to_alloc(i_img_outer, j_img_outer)%array)
-                                                   ALLOCATE (rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+1))
+                                                   ALLOCATE (rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 1))
                                                    rows_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt) = tmp(1:blk_cnt)
-                                                   rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+1) = row
+                                                   rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 1) = row
                                                    tmp(1:blk_cnt) = cols_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt)
                                                    DEALLOCATE (cols_to_alloc(i_img_outer, j_img_outer)%array)
-                                                   ALLOCATE (cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+1))
+                                                   ALLOCATE (cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 1))
                                                    cols_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt) = tmp(1:blk_cnt)
-                                                   cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+1) = col
+                                                   cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 1) = col
                                                    DEALLOCATE (tmp)
 
                                                    old_row(i_img_outer, j_img_outer) = row
@@ -8461,16 +8461,16 @@ CONTAINS
                                                    ALLOCATE (tmp(blk_cnt))
                                                    tmp(1:blk_cnt) = rows_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt)
                                                    DEALLOCATE (rows_to_alloc(i_img_outer, j_img_outer)%array)
-                                                   ALLOCATE (rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+2))
+                                                   ALLOCATE (rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 2))
                                                    rows_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt) = tmp(1:blk_cnt)
-                                                   rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+1) = row
-                                                   rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+2) = col
+                                                   rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 1) = row
+                                                   rows_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 2) = col
                                                    tmp(1:blk_cnt) = cols_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt)
                                                    DEALLOCATE (cols_to_alloc(i_img_outer, j_img_outer)%array)
-                                                   ALLOCATE (cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+2))
+                                                   ALLOCATE (cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 2))
                                                    cols_to_alloc(i_img_outer, j_img_outer)%array(1:blk_cnt) = tmp(1:blk_cnt)
-                                                   cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+1) = col
-                                                   cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt+2) = row
+                                                   cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 1) = col
+                                                   cols_to_alloc(i_img_outer, j_img_outer)%array(blk_cnt + 2) = row
                                                    DEALLOCATE (tmp)
 
                                                    old_row(i_img_outer, j_img_outer) = row
@@ -8618,10 +8618,10 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'replicate_mao_coeff', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: atom_rec, block_size, col, col_size, end_msg, handle, iatom, imepos, mao_size, &
-         num_atom_from_imepos, prim_size, row, row_size, start_msg
+                 num_atom_from_imepos, prim_size, row, row_size, start_msg
       INTEGER, ALLOCATABLE, DIMENSION(:)                 :: atom_counter, entry_counter, &
                                                             num_entries_atoms_rec, &
                                                             num_entries_atoms_send, sizes_rec, &
@@ -8641,10 +8641,10 @@ CONTAINS
 
       ALLOCATE (mao_coeff_repl(1:natom))
 
-      ALLOCATE (num_entries_atoms_send(0:2*para_env%num_pe-1))
+      ALLOCATE (num_entries_atoms_send(0:2*para_env%num_pe - 1))
       num_entries_atoms_send(:) = 0
 
-      ALLOCATE (num_entries_atoms_rec(0:2*para_env%num_pe-1))
+      ALLOCATE (num_entries_atoms_rec(0:2*para_env%num_pe - 1))
       num_entries_atoms_rec(:) = 0
 
       DO iatom = 1, natom
@@ -8658,8 +8658,8 @@ CONTAINS
 
             CALL dbcsr_get_stored_coordinates(mao_coeff(1)%matrix, iatom, iatom, imepos)
 
-            num_entries_atoms_rec(2*imepos) = num_entries_atoms_rec(2*imepos)+prim_size*mao_size
-            num_entries_atoms_rec(2*imepos+1) = num_entries_atoms_rec(2*imepos+1)+1
+            num_entries_atoms_rec(2*imepos) = num_entries_atoms_rec(2*imepos) + prim_size*mao_size
+            num_entries_atoms_rec(2*imepos + 1) = num_entries_atoms_rec(2*imepos + 1) + 1
 
          END IF
 
@@ -8671,11 +8671,11 @@ CONTAINS
          num_entries_atoms_send(0:1) = num_entries_atoms_rec(0:1)
       END IF
 
-      ALLOCATE (buffer_rec(0:para_env%num_pe-1))
-      ALLOCATE (buffer_send(0:para_env%num_pe-1))
+      ALLOCATE (buffer_rec(0:para_env%num_pe - 1))
+      ALLOCATE (buffer_send(0:para_env%num_pe - 1))
 
       ! allocate data message and corresponding indices
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          ALLOCATE (buffer_rec(imepos)%msg(num_entries_atoms_rec(2*imepos)))
          buffer_rec(imepos)%msg = 0.0_dp
@@ -8683,18 +8683,18 @@ CONTAINS
          ALLOCATE (buffer_send(imepos)%msg(num_entries_atoms_send(2*imepos)))
          buffer_send(imepos)%msg = 0.0_dp
 
-         ALLOCATE (buffer_rec(imepos)%indx(num_entries_atoms_rec(2*imepos+1), 6))
+         ALLOCATE (buffer_rec(imepos)%indx(num_entries_atoms_rec(2*imepos + 1), 6))
          buffer_rec(imepos)%indx = 0
 
-         ALLOCATE (buffer_send(imepos)%indx(num_entries_atoms_send(2*imepos+1), 6))
+         ALLOCATE (buffer_send(imepos)%indx(num_entries_atoms_send(2*imepos + 1), 6))
          buffer_send(imepos)%indx = 0
 
       END DO
 
-      ALLOCATE (entry_counter(0:para_env%num_pe-1))
+      ALLOCATE (entry_counter(0:para_env%num_pe - 1))
       entry_counter(:) = 0
 
-      ALLOCATE (atom_counter(0:para_env%num_pe-1))
+      ALLOCATE (atom_counter(0:para_env%num_pe - 1))
       atom_counter = 0
 
       DO iatom = 1, natom
@@ -8704,7 +8704,7 @@ CONTAINS
 
             CALL dbcsr_get_stored_coordinates(mao_coeff(1)%matrix, iatom, iatom, imepos)
 
-            atom_counter(imepos) = atom_counter(imepos)+1
+            atom_counter(imepos) = atom_counter(imepos) + 1
 
             buffer_rec(imepos)%indx(atom_counter(imepos), 1) = iatom
 
@@ -8714,10 +8714,10 @@ CONTAINS
 
       ALLOCATE (req_array(1:para_env%num_pe, 4))
 
-      ALLOCATE (sizes_rec(0:para_env%num_pe-1))
-      ALLOCATE (sizes_send(0:para_env%num_pe-1))
+      ALLOCATE (sizes_rec(0:para_env%num_pe - 1))
+      ALLOCATE (sizes_send(0:para_env%num_pe - 1))
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
          sizes_send(imepos) = num_entries_atoms_send(2*imepos)
          sizes_rec(imepos) = num_entries_atoms_rec(2*imepos)
@@ -8739,18 +8739,18 @@ CONTAINS
          ! for the mao trafo matrix, only the diagonal blocks should be allocated
          CPASSERT(row == col)
 
-         DO imepos = 0, para_env%num_pe-1
+         DO imepos = 0, para_env%num_pe - 1
 
             IF (ANY(buffer_send(imepos)%indx(:, 1) == row)) THEN
 
                block_size = row_size*col_size
-               start_msg = entry_counter(imepos)+1
-               end_msg = entry_counter(imepos)+block_size
+               start_msg = entry_counter(imepos) + 1
+               end_msg = entry_counter(imepos) + block_size
 
                buffer_send(imepos)%msg(start_msg:end_msg) = RESHAPE(data_block(1:row_size, 1:col_size), (/block_size/))
 
-               entry_counter(imepos) = entry_counter(imepos)+block_size
-               atom_counter(imepos) = atom_counter(imepos)+1
+               entry_counter(imepos) = entry_counter(imepos) + block_size
+               atom_counter(imepos) = atom_counter(imepos) + 1
 
                buffer_send(imepos)%indx(atom_counter(imepos), 2) = row
                buffer_send(imepos)%indx(atom_counter(imepos), 3) = row_size
@@ -8772,9 +8772,9 @@ CONTAINS
       DEALLOCATE (req_array, sizes_rec, sizes_send)
 
       ! fill mao_coeff_repl
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
 
-         num_atom_from_imepos = num_entries_atoms_rec(2*imepos+1)
+         num_atom_from_imepos = num_entries_atoms_rec(2*imepos + 1)
 
          DO atom_rec = 1, num_atom_from_imepos
 
@@ -8793,7 +8793,7 @@ CONTAINS
 
       DEALLOCATE (num_entries_atoms_send, num_entries_atoms_rec, entry_counter, atom_counter)
 
-      DO imepos = 0, para_env%num_pe-1
+      DO imepos = 0, para_env%num_pe - 1
          DEALLOCATE (buffer_rec(imepos)%msg)
          DEALLOCATE (buffer_rec(imepos)%indx)
          DEALLOCATE (buffer_send(imepos)%msg)
@@ -8865,14 +8865,14 @@ CONTAINS
       TYPE(qs_environment_type), POINTER                 :: qs_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'setup_group_L_im_time', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: cut_RI_old, handle, iblk_RI, icut, &
                                                             itmp(2), natom, nblks_RI, nkind, &
                                                             size_RI, start_RI
       INTEGER, ALLOCATABLE, DIMENSION(:) :: ends_array_mem_cut, my_group_L_ends_im_time_tmp, &
-         my_group_L_starts_im_time_tmp, row_blk_end_RI, row_blk_offset_RI, sizes_array_mem_cut, &
-         starts_array_mem_cut
+                                            my_group_L_starts_im_time_tmp, row_blk_end_RI, row_blk_offset_RI, sizes_array_mem_cut, &
+                                            starts_array_mem_cut
       INTEGER, DIMENSION(:), POINTER                     :: row_blk_sizes_RI
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
       TYPE(gto_basis_set_p_type), DIMENSION(:), POINTER  :: basis_set_ri_aux
@@ -8881,19 +8881,19 @@ CONTAINS
 
       CALL timeset(routineN, handle)
 
-      ALLOCATE (sizes_array_mem_cut(0:cut_memory-1))
+      ALLOCATE (sizes_array_mem_cut(0:cut_memory - 1))
       sizes_array_mem_cut = 0
-      ALLOCATE (starts_array_mem_cut(0:cut_memory-1))
+      ALLOCATE (starts_array_mem_cut(0:cut_memory - 1))
       starts_array_mem_cut = 0
-      ALLOCATE (ends_array_mem_cut(0:cut_memory-1))
+      ALLOCATE (ends_array_mem_cut(0:cut_memory - 1))
       ends_array_mem_cut = 0
 
-      DO icut = 0, cut_memory-1
+      DO icut = 0, cut_memory - 1
 
          itmp = get_limit(dimen_RI, cut_memory, icut)
          starts_array_mem_cut(icut) = itmp(1)
          ends_array_mem_cut(icut) = itmp(2)
-         sizes_array_mem_cut(icut) = itmp(2)-itmp(1)+1
+         sizes_array_mem_cut(icut) = itmp(2) - itmp(1) + 1
 
       END DO
 
@@ -8902,15 +8902,15 @@ CONTAINS
       ALLOCATE (my_group_L_ends_im_time(1:cut_memory))
       my_group_L_ends_im_time = 0
 
-      DO icut = 0, cut_memory-1
+      DO icut = 0, cut_memory - 1
 
          size_RI = sizes_array_mem_cut(icut)
          start_RI = starts_array_mem_cut(icut)
 
          itmp = get_limit(size_RI, ngroup, color_sub)
 
-         my_group_L_starts_im_time(icut+1) = itmp(1)+start_RI-1
-         my_group_L_ends_im_time(icut+1) = itmp(2)+start_RI-1
+         my_group_L_starts_im_time(icut + 1) = itmp(1) + start_RI - 1
+         my_group_L_ends_im_time(icut + 1) = itmp(2) + start_RI - 1
 
       END DO
 
@@ -8938,12 +8938,12 @@ CONTAINS
 
       row_blk_offset_RI(1) = 1
       DO iblk_RI = 2, nblks_RI
-         row_blk_offset_RI(iblk_RI) = row_blk_offset_RI(iblk_RI-1)+row_blk_sizes_RI(iblk_RI-1)
+         row_blk_offset_RI(iblk_RI) = row_blk_offset_RI(iblk_RI - 1) + row_blk_sizes_RI(iblk_RI - 1)
       END DO
 
       row_blk_end_RI(nblks_RI) = dimen_RI
-      DO iblk_RI = 1, nblks_RI-1
-         row_blk_end_RI(iblk_RI) = row_blk_offset_RI(iblk_RI+1)-1
+      DO iblk_RI = 1, nblks_RI - 1
+         row_blk_end_RI(iblk_RI) = row_blk_offset_RI(iblk_RI + 1) - 1
       END DO
 
       cut_RI = cut_memory
@@ -8961,10 +8961,10 @@ CONTAINS
                    row_blk_offset_RI(iblk_RI) <= my_group_L_ends_im_time(icut) .AND. &
                    row_blk_end_RI(iblk_RI) < my_group_L_ends_im_time(icut)) THEN
 
-                  cut_RI = cut_RI+1
+                  cut_RI = cut_RI + 1
 
-                  ALLOCATE (my_group_L_starts_im_time_tmp(cut_RI-1))
-                  ALLOCATE (my_group_L_ends_im_time_tmp(cut_RI-1))
+                  ALLOCATE (my_group_L_starts_im_time_tmp(cut_RI - 1))
+                  ALLOCATE (my_group_L_ends_im_time_tmp(cut_RI - 1))
 
                   my_group_L_starts_im_time_tmp(:) = my_group_L_starts_im_time(:)
                   my_group_L_ends_im_time_tmp(:) = my_group_L_ends_im_time(:)
@@ -8976,16 +8976,16 @@ CONTAINS
                   ALLOCATE (my_group_L_ends_im_time(cut_RI))
 
                   my_group_L_starts_im_time(1:icut) = my_group_L_starts_im_time_tmp(1:icut)
-                  my_group_L_starts_im_time(icut+1) = row_blk_offset_RI(iblk_RI+1)
-                  IF (cut_RI >= icut+2) THEN
-                     my_group_L_starts_im_time(icut+2:cut_RI) = my_group_L_starts_im_time_tmp(icut+1:cut_RI-1)
+                  my_group_L_starts_im_time(icut + 1) = row_blk_offset_RI(iblk_RI + 1)
+                  IF (cut_RI >= icut + 2) THEN
+                     my_group_L_starts_im_time(icut + 2:cut_RI) = my_group_L_starts_im_time_tmp(icut + 1:cut_RI - 1)
                   END IF
 
-                  IF (icut-1 >= 1) THEN
-                     my_group_L_ends_im_time(1:icut-1) = my_group_L_ends_im_time_tmp(1:icut-1)
+                  IF (icut - 1 >= 1) THEN
+                     my_group_L_ends_im_time(1:icut - 1) = my_group_L_ends_im_time_tmp(1:icut - 1)
                   END IF
-                  my_group_L_ends_im_time(icut) = row_blk_offset_RI(iblk_RI+1)-1
-                  my_group_L_ends_im_time(icut+1:cut_RI) = my_group_L_ends_im_time_tmp(icut:cut_RI-1)
+                  my_group_L_ends_im_time(icut) = row_blk_offset_RI(iblk_RI + 1) - 1
+                  my_group_L_ends_im_time(icut + 1:cut_RI) = my_group_L_ends_im_time_tmp(icut:cut_RI - 1)
 
                   DEALLOCATE (my_group_L_starts_im_time_tmp)
                   DEALLOCATE (my_group_L_ends_im_time_tmp)
@@ -8999,7 +8999,7 @@ CONTAINS
       END DO
 
       ALLOCATE (my_group_L_sizes_im_time(cut_RI))
-      my_group_L_sizes_im_time(:) = my_group_L_ends_im_time(:)-my_group_L_starts_im_time(:)+1
+      my_group_L_sizes_im_time(:) = my_group_L_ends_im_time(:) - my_group_L_starts_im_time(:) + 1
 
       ALLOCATE (qs_env%mp2_env%ri_rpa_im_time_util(cut_memory))
 

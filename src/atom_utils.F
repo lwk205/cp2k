@@ -11,43 +11,43 @@
 !>
 ! **************************************************************************************************
 MODULE atom_utils
-   USE ai_onecenter,                    ONLY: sg_overlap,&
-                                              sto_overlap
-   USE ai_overlap,                      ONLY: overlap_ab_s,&
-                                              overlap_ab_sp
-   USE ao_util,                         ONLY: exp_radius
-   USE atom_types,                      ONLY: &
-        CGTO_BASIS, GTO_BASIS, NUM_BASIS, STO_BASIS, atom_basis_type, atom_gthpot_type, &
-        atom_potential_type, atom_state, atom_type, ecp_pseudo, eri, gth_pseudo, lmat, no_pseudo, &
-        sgp_pseudo, upf_pseudo
-   USE basis_set_types,                 ONLY: srules
-   USE cp_files,                        ONLY: close_file,&
-                                              get_unit_number,&
-                                              open_file
-   USE input_constants,                 ONLY: do_rhf_atom,&
-                                              do_rks_atom,&
-                                              do_rohf_atom,&
-                                              do_uhf_atom,&
-                                              do_uks_atom
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE lapack,                          ONLY: lapack_ssyev
-   USE mathconstants,                   ONLY: dfac,&
-                                              fac,&
-                                              fourpi,&
-                                              maxfac,&
-                                              rootpi
-   USE mathlib,                         ONLY: invmat_symm
-   USE orbital_pointers,                ONLY: deallocate_orbital_pointers,&
-                                              init_orbital_pointers
-   USE orbital_transformation_matrices, ONLY: deallocate_spherical_harmonics,&
+   USE ai_onecenter, ONLY: sg_overlap, &
+                           sto_overlap
+   USE ai_overlap, ONLY: overlap_ab_s, &
+                         overlap_ab_sp
+   USE ao_util, ONLY: exp_radius
+   USE atom_types, ONLY: &
+      CGTO_BASIS, GTO_BASIS, NUM_BASIS, STO_BASIS, atom_basis_type, atom_gthpot_type, &
+      atom_potential_type, atom_state, atom_type, ecp_pseudo, eri, gth_pseudo, lmat, no_pseudo, &
+      sgp_pseudo, upf_pseudo
+   USE basis_set_types, ONLY: srules
+   USE cp_files, ONLY: close_file, &
+                       get_unit_number, &
+                       open_file
+   USE input_constants, ONLY: do_rhf_atom, &
+                              do_rks_atom, &
+                              do_rohf_atom, &
+                              do_uhf_atom, &
+                              do_uks_atom
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE lapack, ONLY: lapack_ssyev
+   USE mathconstants, ONLY: dfac, &
+                            fac, &
+                            fourpi, &
+                            maxfac, &
+                            rootpi
+   USE mathlib, ONLY: invmat_symm
+   USE orbital_pointers, ONLY: deallocate_orbital_pointers, &
+                               init_orbital_pointers
+   USE orbital_transformation_matrices, ONLY: deallocate_spherical_harmonics, &
                                               init_spherical_harmonics
-   USE periodic_table,                  ONLY: nelem,&
-                                              ptable
-   USE physcon,                         ONLY: bohr
-   USE qs_grid_atom,                    ONLY: grid_atom_type
-   USE splines,                         ONLY: spline3ders
-   USE string_utilities,                ONLY: uppercase
+   USE periodic_table, ONLY: nelem, &
+                             ptable
+   USE physcon, ONLY: bohr
+   USE qs_grid_atom, ONLY: grid_atom_type
+   USE splines, ONLY: spline3ders
+   USE string_utilities, ONLY: uppercase
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -99,7 +99,7 @@ CONTAINS
       INTEGER, INTENT(OUT), OPTIONAL                     :: multiplicity
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_set_occupation', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=2)                                   :: elem
       CHARACTER(LEN=default_string_length)               :: pstring
@@ -121,8 +121,8 @@ CONTAINS
          IF (INDEX(ostring(is), "(") /= 0) THEN
             i1 = INDEX(ostring(is), "(")
             i2 = INDEX(ostring(is), ")")
-            CPASSERT((i2-i1-1 > 0) .AND. (i2-i1-1 < 3))
-            elem = ostring(is) (i1+1:i2-1)
+            CPASSERT((i2 - i1 - 1 > 0) .AND. (i2 - i1 - 1 < 3))
+            elem = ostring(is) (i1 + 1:i2 - 1)
             IF (INDEX(elem, "HS") /= 0) THEN
                mult = -2 !High spin
             ELSE IF (INDEX(elem, "LS") /= 0) THEN
@@ -130,23 +130,23 @@ CONTAINS
             ELSE
                READ (elem, *) mult
             END IF
-            is = is+1
+            is = is + 1
          END IF
       END IF
 
       IF (is <= no) THEN
-         IF (INDEX(ostring(is), "CORE") /= 0) is = is+1 !Pseudopotential detected
+         IF (INDEX(ostring(is), "CORE") /= 0) is = is + 1 !Pseudopotential detected
       END IF
       IF (is <= no) THEN
-         IF (INDEX(ostring(is), "none") /= 0) is = is+1 !no electrons, used with CORE
+         IF (INDEX(ostring(is), "none") /= 0) is = is + 1 !no electrons, used with CORE
       END IF
       IF (is <= no) THEN
          IF (INDEX(ostring(is), "[") /= 0) THEN
             ! core occupation from element [XX]
             i1 = INDEX(ostring(is), "[")
             i2 = INDEX(ostring(is), "]")
-            CPASSERT((i2-i1-1 > 0) .AND. (i2-i1-1 < 3))
-            elem = ostring(is) (i1+1:i2-1)
+            CPASSERT((i2 - i1 - 1 > 0) .AND. (i2 - i1 - 1 < 3))
+            elem = ostring(is) (i1 + 1:i2 - 1)
             ielem = 0
             DO k = 1, nelem
                IF (elem == ptable(k)%symbol) THEN
@@ -156,15 +156,15 @@ CONTAINS
             END DO
             CPASSERT(ielem /= 0)
             DO l = 0, MIN(lmat, UBOUND(ptable(ielem)%e_conv, 1))
-               el = 2._dp*(2._dp*REAL(l, dp)+1._dp)
+               el = 2._dp*(2._dp*REAL(l, dp) + 1._dp)
                e0 = ptable(ielem)%e_conv(l)
                DO k = 1, 10
                   occupation(l, k) = MIN(el, e0)
-                  e0 = e0-el
+                  e0 = e0 - el
                   IF (e0 <= 0._dp) EXIT
                END DO
             END DO
-            is = is+1
+            is = is + 1
          END IF
 
       END IF
@@ -176,42 +176,42 @@ CONTAINS
          jp = INDEX(pstring, "P")
          jd = INDEX(pstring, "D")
          jf = INDEX(pstring, "F")
-         CPASSERT(js+jp+jd+jf > 0)
+         CPASSERT(js + jp + jd + jf > 0)
          IF (js > 0) THEN
-            CPASSERT(jp+jd+jf == 0)
-            READ (pstring(1:js-1), *) n
-            READ (pstring(js+1:), *) oo
+            CPASSERT(jp + jd + jf == 0)
+            READ (pstring(1:js - 1), *) n
+            READ (pstring(js + 1:), *) oo
             CPASSERT(n > 0)
             CPASSERT(oo >= 0._dp)
             CPASSERT(occupation(0, n) == 0)
             occupation(0, n) = oo
          END IF
          IF (jp > 0) THEN
-            CPASSERT(js+jd+jf == 0)
-            READ (pstring(1:jp-1), *) n
-            READ (pstring(jp+1:), *) oo
+            CPASSERT(js + jd + jf == 0)
+            READ (pstring(1:jp - 1), *) n
+            READ (pstring(jp + 1:), *) oo
             CPASSERT(n > 1)
             CPASSERT(oo >= 0._dp)
-            CPASSERT(occupation(1, n-1) == 0)
-            occupation(1, n-1) = oo
+            CPASSERT(occupation(1, n - 1) == 0)
+            occupation(1, n - 1) = oo
          END IF
          IF (jd > 0) THEN
-            CPASSERT(js+jp+jf == 0)
-            READ (pstring(1:jd-1), *) n
-            READ (pstring(jd+1:), *) oo
+            CPASSERT(js + jp + jf == 0)
+            READ (pstring(1:jd - 1), *) n
+            READ (pstring(jd + 1:), *) oo
             CPASSERT(n > 2)
             CPASSERT(oo >= 0._dp)
-            CPASSERT(occupation(2, n-2) == 0)
-            occupation(2, n-2) = oo
+            CPASSERT(occupation(2, n - 2) == 0)
+            occupation(2, n - 2) = oo
          END IF
          IF (jf > 0) THEN
-            CPASSERT(js+jp+jd == 0)
-            READ (pstring(1:jf-1), *) n
-            READ (pstring(jf+1:), *) oo
+            CPASSERT(js + jp + jd == 0)
+            READ (pstring(1:jf - 1), *) n
+            READ (pstring(jf + 1:), *) oo
             CPASSERT(n > 3)
             CPASSERT(oo >= 0._dp)
-            CPASSERT(occupation(3, n-3) == 0)
-            occupation(3, n-3) = oo
+            CPASSERT(occupation(3, n - 3) == 0)
+            occupation(3, n - 3) = oo
          END IF
 
       END DO
@@ -221,7 +221,7 @@ CONTAINS
          k = 0
          DO i = 1, 10
             IF (occupation(l, i) /= 0._dp) THEN
-               k = k+1
+               k = k + 1
                wfnocc(l, k) = occupation(l, i)
             END IF
          END DO
@@ -232,10 +232,10 @@ CONTAINS
          ! count open shells
          js = 0
          DO l = 0, lmat
-            k = 2*(2*l+1)
+            k = 2*(2*l + 1)
             DO i = 1, 10
                IF (wfnocc(l, i) /= 0._dp .AND. wfnocc(l, i) /= REAL(k, dp)) THEN
-                  js = js+1
+                  js = js + 1
                   i1 = l
                   i2 = i
                END IF
@@ -251,10 +251,10 @@ CONTAINS
             l = i1
             i = i2
             k = NINT(wfnocc(l, i))
-            IF (k > (2*l+1)) k = 2*(2*l+1)-k
-            IF (mult == -2) mult = k+1
-            IF (mult == -3) mult = MOD(k, 2)+1
-            CPASSERT(MOD(k+1-mult, 2) == 0)
+            IF (k > (2*l + 1)) k = 2*(2*l + 1) - k
+            IF (mult == -2) mult = k + 1
+            IF (mult == -3) mult = MOD(k, 2) + 1
+            CPASSERT(MOD(k + 1 - mult, 2) == 0)
          END IF
          IF (js > 1 .AND. mult /= -2) THEN
             CPASSERT(mult == -2)
@@ -298,7 +298,7 @@ CONTAINS
       maxn = 0
       DO l = 0, lmat
          DO k = 1, 10
-            IF (occupation(l, k) /= 0._dp) maxn(l) = maxn(l)+1
+            IF (occupation(l, k) /= 0._dp) maxn(l) = maxn(l) + 1
          END DO
       END DO
 
@@ -331,7 +331,7 @@ CONTAINS
          DO i = 1, MIN(n, maxn(l))
             DO k = 1, nbas(l)
                DO j = 1, nbas(l)
-                  pmat(j, k, l) = pmat(j, k, l)+occ(l, i)*wfn(j, i, l)*wfn(k, i, l)
+                  pmat(j, k, l) = pmat(j, k, l) + occ(l, i)*wfn(j, i, l)*wfn(k, i, l)
                END DO
             END DO
          END DO
@@ -375,19 +375,19 @@ CONTAINS
                ff = pmat(i, j, l)
                IF (i /= j) ff = 2._dp*pmat(i, j, l)
                IF (my_typ == "RHO") THEN
-                  density(:) = density(:)+ff*basis%bf(:, i, l)*basis%bf(:, j, l)
+                  density(:) = density(:) + ff*basis%bf(:, i, l)*basis%bf(:, j, l)
                ELSE IF (my_typ == "DER") THEN
-                  density(:) = density(:)+ff*basis%dbf(:, i, l)*basis%bf(:, j, l) &
-                               +ff*basis%bf(:, i, l)*basis%dbf(:, j, l)
+                  density(:) = density(:) + ff*basis%dbf(:, i, l)*basis%bf(:, j, l) &
+                               + ff*basis%bf(:, i, l)*basis%dbf(:, j, l)
                ELSE IF (my_typ == "KIN") THEN
-                  density(:) = density(:)+0.5_dp*ff*( &
-                               basis%dbf(:, i, l)*basis%dbf(:, j, l)+ &
-                               REAL(l*(l+1), dp)*basis%bf(:, i, l)*basis%bf(:, j, l)/rr(:))
+                  density(:) = density(:) + 0.5_dp*ff*( &
+                               basis%dbf(:, i, l)*basis%dbf(:, j, l) + &
+                               REAL(l*(l + 1), dp)*basis%bf(:, i, l)*basis%bf(:, j, l)/rr(:))
                ELSE IF (my_typ == "LAP") THEN
-                  density(:) = density(:)+ff*basis%ddbf(:, i, l)*basis%bf(:, j, l) &
-                               +ff*basis%bf(:, i, l)*basis%ddbf(:, j, l) &
-                               +2._dp*ff*basis%dbf(:, i, l)*basis%bf(:, j, l)/rr(:) &
-                               +2._dp*ff*basis%bf(:, i, l)*basis%dbf(:, j, l)/rr(:)
+                  density(:) = density(:) + ff*basis%ddbf(:, i, l)*basis%bf(:, j, l) &
+                               + ff*basis%bf(:, i, l)*basis%ddbf(:, j, l) &
+                               + 2._dp*ff*basis%dbf(:, i, l)*basis%bf(:, j, l)/rr(:) &
+                               + 2._dp*ff*basis%bf(:, i, l)*basis%dbf(:, j, l)/rr(:)
                ELSE
                   CPABORT("")
                END IF
@@ -410,7 +410,7 @@ CONTAINS
       TYPE(atom_type), INTENT(IN)                        :: atom
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_write_zmp_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: extunit, i, k, l, n
 
@@ -449,7 +449,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_read_zmp_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: er, extunit, i, k, l, maxl, n
       INTEGER, DIMENSION(0:lmat)                         :: maxn, nbas
@@ -511,7 +511,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_read_external_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: filename
       INTEGER                                            :: extunit, ir, j, k, l, maxl_occ, maxnbas, &
@@ -540,11 +540,11 @@ CONTAINS
 
          DO ir = 1, nr
             READ (extunit, *) rr, density(ir)
-            IF (ABS(rr-atom%basis%grid%rad(ir)) .GT. atom%zmpgrid_tol) THEN
+            IF (ABS(rr - atom%basis%grid%rad(ir)) .GT. atom%zmpgrid_tol) THEN
                IF (iw > 0) WRITE (iw, fmt="(' ZMP       | ERROR! Grid points do not coincide: ')")
                IF (iw > 0) WRITE (iw, fmt='(" ZMP       |",T20,"R_out[bohr]",T36,"R_in[bohr]",T61,"R_diff[bohr]")')
                IF (iw > 0) WRITE (iw, fmt='(" ZMP       |",T14,E24.15,T39,E24.15,T64,E24.15)') &
-                  rr, atom%basis%grid%rad(ir), ABS(rr-atom%basis%grid%rad(ir))
+                  rr, atom%basis%grid%rad(ir), ABS(rr - atom%basis%grid%rad(ir))
                CPABORT("")
             ENDIF
          ENDDO
@@ -606,7 +606,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: iw
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_read_external_vxc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: adum, filename
       INTEGER                                            :: extunit, ir, nr
@@ -630,11 +630,11 @@ CONTAINS
       ENDIF
       DO ir = 1, nr
          READ (extunit, *) rr, vxc(ir)
-         IF (ABS(rr-atom%basis%grid%rad(ir)) .GT. atom%zmpvxcgrid_tol) THEN
+         IF (ABS(rr - atom%basis%grid%rad(ir)) .GT. atom%zmpvxcgrid_tol) THEN
             IF (iw > 0) WRITE (iw, fmt="(' ZMP       | ERROR! Grid points do not coincide: ')")
             IF (iw > 0) WRITE (iw, fmt='(" ZMP       |",T20,"R_out[bohr]",T36,"R_in[bohr]",T61,"R_diff[bohr]")')
             IF (iw > 0) WRITE (iw, fmt='(" ZMP       |",T14,E24.15,T39,E24.15,T64,E24.15)') &
-               rr, atom%basis%grid%rad(ir), ABS(rr-atom%basis%grid%rad(ir))
+               rr, atom%basis%grid%rad(ir), ABS(rr - atom%basis%grid%rad(ir))
             CPABORT("")
          ENDIF
       ENDDO
@@ -657,7 +657,7 @@ CONTAINS
       TYPE(atom_basis_type), INTENT(IN)                  :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_orbital_charge', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, m, n
       REAL(KIND=dp)                                      :: ff
@@ -671,7 +671,7 @@ CONTAINS
       DO i = 1, n
          DO j = 1, n
             ff = wfn(i)*wfn(j)
-            den(1:m) = den(1:m)+ff*basis%bf(1:m, i, l)*basis%bf(1:m, j, l)
+            den(1:m) = den(1:m) + ff*basis%bf(1:m, i, l)*basis%bf(1:m, j, l)
          END DO
       END DO
       DO i = 1, m
@@ -695,7 +695,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), INTENT(IN)            :: rr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_core_density', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=3)                                   :: my_typ
       INTEGER                                            :: i, j, m, n
@@ -723,20 +723,20 @@ CONTAINS
                DO j = 1, potential%gth_pot%nct_nlcc(i)
                   cval = potential%gth_pot%cval_nlcc(j, i)
                   IF (my_typ == "RHO") THEN
-                     corden(:) = corden(:)+fe(:)*rc**(2*j-2)*cval
+                     corden(:) = corden(:) + fe(:)*rc**(2*j - 2)*cval
                   ELSE IF (my_typ == "DER") THEN
-                     corden(:) = corden(:)-fe(:)*rc**(2*j-1)*cval/a
+                     corden(:) = corden(:) - fe(:)*rc**(2*j - 1)*cval/a
                      IF (j > 1) THEN
-                        corden(:) = corden(:)+REAL(2*j-2, dp)*fe(:)*rc**(2*j-3)*cval/a
+                        corden(:) = corden(:) + REAL(2*j - 2, dp)*fe(:)*rc**(2*j - 3)*cval/a
                      END IF
                   ELSE IF (my_typ == "LAP") THEN
                      fb = 2._dp*cval/a
-                     corden(:) = corden(:)-fb*fe(:)/rr(:)*rc**(2*j-1)
-                     corden(:) = corden(:)+fe(:)*rc**(2*j)*cval/a2
+                     corden(:) = corden(:) - fb*fe(:)/rr(:)*rc**(2*j - 1)
+                     corden(:) = corden(:) + fe(:)*rc**(2*j)*cval/a2
                      IF (j > 1) THEN
-                        corden(:) = corden(:)+fb*REAL(2*j-2, dp)*fe(:)/rr(:)*rc**(2*j-3)
-                        corden(:) = corden(:)+REAL((2*j-2)*(2*j-3), dp)*fe(:)*rc**(2*j-4)*cval/a2
-                        corden(:) = corden(:)-REAL(2*j-2, dp)*fe(:)*rc**(2*j-2)*cval/a2
+                        corden(:) = corden(:) + fb*REAL(2*j - 2, dp)*fe(:)/rr(:)*rc**(2*j - 3)
+                        corden(:) = corden(:) + REAL((2*j - 2)*(2*j - 3), dp)*fe(:)*rc**(2*j - 4)*cval/a2
+                        corden(:) = corden(:) - REAL(2*j - 2, dp)*fe(:)*rc**(2*j - 2)*cval/a2
                      END IF
                   ELSE
                      CPABORT("")
@@ -754,7 +754,7 @@ CONTAINS
             ALLOCATE (rhoc(m), rval(m))
             IF (reverse) THEN
                DO i = 1, m
-                  rval(i) = rr(m-i+1)
+                  rval(i) = rr(m - i + 1)
                END DO
             ELSE
                rval(1:m) = rr(1:m)
@@ -773,11 +773,11 @@ CONTAINS
             END IF
             IF (reverse) THEN
                DO i = 1, m
-                  rval(i) = rr(m-i+1)
-                  corden(i) = corden(i)+rhoc(m-i+1)
+                  rval(i) = rr(m - i + 1)
+                  corden(i) = corden(i) + rhoc(m - i + 1)
                END DO
             ELSE
-               corden(1:m) = corden(1:m)+rhoc(1:m)
+               corden(1:m) = corden(1:m) + rhoc(1:m)
             END IF
             DEALLOCATE (rhoc, rval)
          END IF
@@ -802,7 +802,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), INTENT(IN)            :: rr
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_local_potential', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, m, n
       REAL(KIND=dp)                                      :: a
@@ -817,7 +817,7 @@ CONTAINS
       n = gthpot%ncl
       fe(:) = EXP(-0.5_dp*rc(:)*rc(:))
       DO i = 1, n
-         locpot(:) = locpot(:)+fe(:)*rc**(2*i-2)*gthpot%cl(i)
+         locpot(:) = locpot(:) + fe(:)*rc**(2*i - 2)*gthpot%cl(i)
       END DO
       IF (gthpot%lpotextended) THEN
          DO j = 1, gthpot%nexp_lpot
@@ -826,7 +826,7 @@ CONTAINS
             fe(:) = EXP(-0.5_dp*rc(:)*rc(:))
             n = gthpot%nct_lpot(j)
             DO i = 1, n
-               locpot(:) = locpot(:)+fe(:)*rc**(2*i-2)*gthpot%cval_lpot(i, j)
+               locpot(:) = locpot(:) + fe(:)*rc**(2*i - 2)*gthpot%cval_lpot(i, j)
             END DO
          END DO
       END IF
@@ -849,7 +849,7 @@ CONTAINS
       TYPE(atom_basis_type), INTENT(IN)                  :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_orbital_max', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, m, n
       REAL(KIND=dp)                                      :: ff
@@ -861,12 +861,12 @@ CONTAINS
       dorb = 0._dp
       DO i = 1, n
          ff = wfn(i)
-         dorb(1:m) = dorb(1:m)+ff*basis%dbf(1:m, i, l)
+         dorb(1:m) = dorb(1:m) + ff*basis%dbf(1:m, i, l)
       END DO
       rmax = -1._dp
-      DO i = 1, m-1
+      DO i = 1, m - 1
          IF (basis%grid%rad(i) < 2*rcov) THEN
-            IF (dorb(i)*dorb(i+1) < 0._dp) THEN
+            IF (dorb(i)*dorb(i + 1) < 0._dp) THEN
                rmax = MAX(rmax, basis%grid%rad(i))
             END IF
          END IF
@@ -890,7 +890,7 @@ CONTAINS
       TYPE(atom_basis_type), INTENT(IN)                  :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_orbital_nodes', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, m, n
       REAL(KIND=dp)                                      :: ff
@@ -903,11 +903,11 @@ CONTAINS
       orb = 0._dp
       DO i = 1, n
          ff = wfn(i)
-         orb(1:m) = orb(1:m)+ff*basis%bf(1:m, i, l)
+         orb(1:m) = orb(1:m) + ff*basis%bf(1:m, i, l)
       END DO
-      DO i = 1, m-1
+      DO i = 1, m - 1
          IF (basis%grid%rad(i) < rcov) THEN
-            IF (orb(i)*orb(i+1) < 0._dp) node = node+1
+            IF (orb(i)*orb(i + 1) < 0._dp) node = node + 1
          END IF
       END DO
       DEALLOCATE (orb)
@@ -932,7 +932,7 @@ CONTAINS
       m = MAXVAL(MINLOC(basis%grid%rad))
       n = basis%nbas(0)
       DO i = 1, n
-         value = value+wfn(i)*basis%bf(m, i, 0)
+         value = value + wfn(i)*basis%bf(m, i, 0)
       END DO
    END SUBROUTINE atom_wfnr0
 ! **************************************************************************************************
@@ -1075,7 +1075,7 @@ CONTAINS
       TYPE(grid_atom_type), INTENT(IN)                   :: grid
 
       CHARACTER(len=*), PARAMETER :: routineN = 'coulomb_potential_numeric', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, nc
       REAL(dp)                                           :: int1, int2
@@ -1092,9 +1092,9 @@ CONTAINS
       ! test that grid is decreasing
       CPASSERT(r(1) > r(nc))
       DO i = 1, nc
-         cpot(i) = int1/r(i)+int2
-         int1 = int1-fourpi*density(i)*wr(i)
-         int2 = int2+fourpi*density(i)*wr(i)/r(i)
+         cpot(i) = int1/r(i) + int2
+         int1 = int1 - fourpi*density(i)*wr(i)
+         int2 = int2 + fourpi*density(i)*wr(i)/r(i)
       END DO
 
    END SUBROUTINE coulomb_potential_numeric
@@ -1117,7 +1117,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: maxl
 
       CHARACTER(len=*), PARAMETER :: routineN = 'coulomb_potential_analytic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, k, l, m, n
       REAL(KIND=dp)                                      :: a, b, ff, oab, sab
@@ -1142,24 +1142,24 @@ CONTAINS
                   IF (i /= j) ff = 2._dp*ff
                   a = basis%am(i, l)
                   b = basis%am(j, l)
-                  sab = SQRT(a+b)
-                  oab = rootpi/(a+b)**(l+1.5_dp)*ff
+                  sab = SQRT(a + b)
+                  oab = rootpi/(a + b)**(l + 1.5_dp)*ff
                   z(:) = sab*grid%rad(:)
                   DO k = 1, SIZE(erfa)
                      erfa(k) = oab*erf(z(k))/grid%rad(k)
                   END DO
-                  expa(:) = EXP(-z(:)**2)*ff/(a+b)**(l+1)
+                  expa(:) = EXP(-z(:)**2)*ff/(a + b)**(l + 1)
                   SELECT CASE (l)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     cpot(:) = cpot(:)+0.25_dp*erfa(:)
+                     cpot(:) = cpot(:) + 0.25_dp*erfa(:)
                   CASE (1)
-                     cpot(:) = cpot(:)+0.375_dp*erfa(:)-0.25_dp*expa(:)
+                     cpot(:) = cpot(:) + 0.375_dp*erfa(:) - 0.25_dp*expa(:)
                   CASE (2)
-                     cpot(:) = cpot(:)+0.9375_dp*erfa(:)-expa(:)*(0.875_dp+0.25_dp*z(:)**2)
+                     cpot(:) = cpot(:) + 0.9375_dp*erfa(:) - expa(:)*(0.875_dp + 0.25_dp*z(:)**2)
                   CASE (3)
-                     cpot(:) = cpot(:)+3.28125_dp*erfa(:)-expa(:)*(3.5625_dp+1.375_dp*z(:)**2+0.25*z(:)**4)
+                     cpot(:) = cpot(:) + 3.28125_dp*erfa(:) - expa(:)*(3.5625_dp + 1.375_dp*z(:)**2 + 0.25*z(:)**4)
                   END SELECT
                END DO
             END DO
@@ -1177,24 +1177,24 @@ CONTAINS
                   IF (i /= j) ff = 2._dp*ff
                   a = basis%am(i, l)
                   b = basis%am(j, l)
-                  sab = SQRT(a+b)
-                  oab = rootpi/(a+b)**(l+1.5_dp)*ff
+                  sab = SQRT(a + b)
+                  oab = rootpi/(a + b)**(l + 1.5_dp)*ff
                   z(:) = sab*grid%rad(:)
                   DO k = 1, SIZE(erfa)
                      erfa(k) = oab*erf(z(k))/grid%rad(k)
                   END DO
-                  expa(:) = EXP(-z(:)**2)*ff/(a+b)**(l+1)
+                  expa(:) = EXP(-z(:)**2)*ff/(a + b)**(l + 1)
                   SELECT CASE (l)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     cpot(:) = cpot(:)+0.25_dp*erfa(:)
+                     cpot(:) = cpot(:) + 0.25_dp*erfa(:)
                   CASE (1)
-                     cpot(:) = cpot(:)+0.375_dp*erfa(:)-0.25_dp*expa(:)
+                     cpot(:) = cpot(:) + 0.375_dp*erfa(:) - 0.25_dp*expa(:)
                   CASE (2)
-                     cpot(:) = cpot(:)+0.9375_dp*erfa(:)-expa(:)*(0.875_dp+0.25_dp*z(:)**2)
+                     cpot(:) = cpot(:) + 0.9375_dp*erfa(:) - expa(:)*(0.875_dp + 0.25_dp*z(:)**2)
                   CASE (3)
-                     cpot(:) = cpot(:)+3.28125_dp*erfa(:)-expa(:)*(3.5625_dp+1.375_dp*z(:)**2+0.25*z(:)**4)
+                     cpot(:) = cpot(:) + 3.28125_dp*erfa(:) - expa(:)*(3.5625_dp + 1.375_dp*z(:)**2 + 0.25*z(:)**4)
                   END SELECT
                END DO
             END DO
@@ -1224,7 +1224,7 @@ CONTAINS
       TYPE(atom_basis_type), INTENT(IN)                  :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'exchange_numeric', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ia, ib, k, lad, lbc, lh, ll, nbas, &
                                                             norb, nr, nu
@@ -1253,11 +1253,11 @@ CONTAINS
             orb = 0._dp
             DO i = 1, norb
                DO k = 1, nbas
-                  orb(:, i) = orb(:, i)+wfn(k, i, lbc)*basis%bf(:, k, lbc)
+                  orb(:, i) = orb(:, i) + wfn(k, i, lbc)*basis%bf(:, k, lbc)
                END DO
             END DO
-            DO nu = ABS(lad-lbc), lad+lbc, 2
-               almn = arho(-lad+lbc+nu)*arho(lad-lbc+nu)*arho(lad+lbc-nu)/(REAL(lad+lbc+nu+1, dp)*arho(lad+lbc+nu))
+            DO nu = ABS(lad - lbc), lad + lbc, 2
+          almn = arho(-lad + lbc + nu)*arho(lad - lbc + nu)*arho(lad + lbc - nu)/(REAL(lad + lbc + nu + 1, dp)*arho(lad + lbc + nu))
                almn = -0.5_dp*almn
 
                DO ia = 1, basis%nbas(lad)
@@ -1265,7 +1265,7 @@ CONTAINS
                      nai(:) = orb(:, i)*basis%bf(:, ia, lad)
                      CALL potential_numeric(cpot, nai, nu, basis%grid)
                      DO ib = 1, basis%nbas(lad)
-                        kmat(ia, ib, lad) = kmat(ia, ib, lad)+almn*occ(lbc, i)* &
+                        kmat(ia, ib, lad) = kmat(ia, ib, lad) + almn*occ(lbc, i)* &
                                             integrate_grid(cpot, orb(:, i), basis%bf(:, ib, lad), basis%grid)
                      END DO
                   END DO
@@ -1298,7 +1298,7 @@ CONTAINS
       TYPE(atom_basis_type), INTENT(IN)                  :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'exchange_semi_analytic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, ia, ib, k, lad, lbc, lh, ll, nbas, &
                                                             norb, nr, nu
@@ -1330,11 +1330,11 @@ CONTAINS
             orb = 0._dp
             DO i = 1, norb
                DO k = 1, nbas
-                  orb(:, i) = orb(:, i)+wfn(k, i, lbc)*basis%bf(:, k, lbc)
+                  orb(:, i) = orb(:, i) + wfn(k, i, lbc)*basis%bf(:, k, lbc)
                END DO
             END DO
-            DO nu = ABS(lad-lbc), lad+lbc, 2
-               almn = arho(-lad+lbc+nu)*arho(lad-lbc+nu)*arho(lad+lbc-nu)/(REAL(lad+lbc+nu+1, dp)*arho(lad+lbc+nu))
+            DO nu = ABS(lad - lbc), lad + lbc, 2
+          almn = arho(-lad + lbc + nu)*arho(lad - lbc + nu)*arho(lad + lbc - nu)/(REAL(lad + lbc + nu + 1, dp)*arho(lad + lbc + nu))
                almn = -0.5_dp*almn
                ! calculate potential for basis function pair (lad,lbc)
                pot = 0._dp
@@ -1343,10 +1343,10 @@ CONTAINS
                   DO i = 1, norb
                      cpot = 0._dp
                      DO k = 1, nbas
-                        cpot(:) = cpot(:)+pot(:, ia, k)*wfn(k, i, lbc)
+                        cpot(:) = cpot(:) + pot(:, ia, k)*wfn(k, i, lbc)
                      END DO
                      DO ib = 1, basis%nbas(lad)
-                        kmat(ia, ib, lad) = kmat(ia, ib, lad)+almn*occ(lbc, i)* &
+                        kmat(ia, ib, lad) = kmat(ia, ib, lad) + almn*occ(lbc, i)* &
                                             integrate_grid(cpot, orb(:, i), basis%bf(:, ib, lad), basis%grid)
                      END DO
                   END DO
@@ -1375,7 +1375,7 @@ CONTAINS
       TYPE(grid_atom_type), INTENT(IN)                   :: grid
 
       CHARACTER(len=*), PARAMETER :: routineN = 'potential_numeric', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, nc
       REAL(dp)                                           :: int1, int2
@@ -1387,14 +1387,14 @@ CONTAINS
 
       int1 = integrate_grid(density, r**nu, grid)
       int2 = 0._dp
-      cpot(nc:) = int1/r(nc:)**(nu+1)
+      cpot(nc:) = int1/r(nc:)**(nu + 1)
 
       ! test that grid is decreasing
       CPASSERT(r(1) > r(nc))
       DO i = 1, nc
-         cpot(i) = int1/r(i)**(nu+1)+int2*r(i)**nu
-         int1 = int1-r(i)**(nu)*density(i)*wr(i)
-         int2 = int2+density(i)*wr(i)/r(i)**(nu+1)
+         cpot(i) = int1/r(i)**(nu + 1) + int2*r(i)**nu
+         int1 = int1 - r(i)**(nu)*density(i)*wr(i)
+         int2 = int2 + density(i)*wr(i)/r(i)**(nu + 1)
       END DO
 
    END SUBROUTINE potential_numeric
@@ -1412,7 +1412,7 @@ CONTAINS
       TYPE(atom_basis_type), INTENT(IN)                  :: basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'potential_analytic', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, j, k, l, ll, m
       REAL(KIND=dp)                                      :: a, b, oab, sab
@@ -1421,7 +1421,7 @@ CONTAINS
       m = SIZE(cpot, 1)
       ALLOCATE (erfa(1:m), expa(1:m), z(1:m))
 
-      ll = la+lb
+      ll = la + lb
 
       cpot = 0._dp
 
@@ -1433,14 +1433,14 @@ CONTAINS
             DO j = 1, basis%nbas(lb)
                a = basis%am(i, la)
                b = basis%am(j, lb)
-               sab = SQRT(a+b)
-               oab = dfac(ll+nu+1)*rootpi/(sab**(ll+2))/(2._dp**((ll+nu)/2+2))
+               sab = SQRT(a + b)
+               oab = dfac(ll + nu + 1)*rootpi/(sab**(ll + 2))/(2._dp**((ll + nu)/2 + 2))
                z(:) = sab*basis%grid%rad(:)
                DO k = 1, SIZE(erfa)
-                  erfa(k) = oab*erf(z(k))/z(k)**(nu+1)
+                  erfa(k) = oab*erf(z(k))/z(k)**(nu + 1)
                END DO
                cpot(:, i, j) = erfa(:)
-               expa(:) = EXP(-z(:)**2)/(sab**(ll+2))/(2._dp**((ll+nu)/2+2))
+               expa(:) = EXP(-z(:)**2)/(sab**(ll + 2))/(2._dp**((ll + nu)/2 + 2))
                SELECT CASE (ll)
                CASE DEFAULT
                   CPABORT("")
@@ -1448,62 +1448,62 @@ CONTAINS
                   CPASSERT(nu == 0)
                CASE (1)
                   CPASSERT(nu == 1)
-                  cpot(:, i, j) = cpot(:, i, j)-6._dp*expa(:)/z(:)
+                  cpot(:, i, j) = cpot(:, i, j) - 6._dp*expa(:)/z(:)
                CASE (2)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     cpot(:, i, j) = cpot(:, i, j)-2._dp*expa(:)
+                     cpot(:, i, j) = cpot(:, i, j) - 2._dp*expa(:)
                   CASE (2)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(20._dp+30._dp/z(:)**2)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(20._dp + 30._dp/z(:)**2)
                   END SELECT
                CASE (3)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (1)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(12._dp*z(:)+30._dp/z(:))
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(12._dp*z(:) + 30._dp/z(:))
                   CASE (3)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(56._dp*z(:)+140._dp/z(:)+210._dp*z(:)**3)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(56._dp*z(:) + 140._dp/z(:) + 210._dp*z(:)**3)
                   END SELECT
                CASE (4)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(4._dp*z(:)**2+14._dp)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(4._dp*z(:)**2 + 14._dp)
                   CASE (2)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(40._dp*z(:)**2+140._dp+210._dp/z(:)**2)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(40._dp*z(:)**2 + 140._dp + 210._dp/z(:)**2)
                   CASE (4)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(144._dp*z(:)**2+504._dp+1260._dp/z(:)**2+1890._dp/z(:)**4)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(144._dp*z(:)**2 + 504._dp + 1260._dp/z(:)**2 + 1890._dp/z(:)**4)
                   END SELECT
                CASE (5)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (1)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(24._dp*z(:)**3+108._dp*z(:)+210._dp/z(:))
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(24._dp*z(:)**3 + 108._dp*z(:) + 210._dp/z(:))
                   CASE (3)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(112._dp*z(:)**3+504._dp*z(:)+1260._dp/z(:)+1890._dp/z(:)**3)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(112._dp*z(:)**3 + 504._dp*z(:) + 1260._dp/z(:) + 1890._dp/z(:)**3)
                   CASE (5)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(352._dp*z(:)**3+1584._dp*z(:)+5544._dp/z(:)+ &
-                                                            13860._dp/z(:)**3+20790._dp/z(:)**5)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(352._dp*z(:)**3 + 1584._dp*z(:) + 5544._dp/z(:) + &
+                                                              13860._dp/z(:)**3 + 20790._dp/z(:)**5)
                   END SELECT
                CASE (6)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(8._dp*z(:)**4+44._dp*z(:)**2+114._dp)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(8._dp*z(:)**4 + 44._dp*z(:)**2 + 114._dp)
                   CASE (2)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(80._dp*z(:)**4+440._dp*z(:)**2+1260._dp+1896._dp/z(:)**2)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(80._dp*z(:)**4 + 440._dp*z(:)**2 + 1260._dp + 1896._dp/z(:)**2)
                   CASE (4)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(288._dp*z(:)**4+1584._dp*z(:)**2+5544._dp+ &
-                                                            13860._dp/z(:)**2+20790._dp/z(:)**4)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(288._dp*z(:)**4 + 1584._dp*z(:)**2 + 5544._dp + &
+                                                              13860._dp/z(:)**2 + 20790._dp/z(:)**4)
                   CASE (6)
-                     cpot(:, i, j) = cpot(:, i, j)-expa(:)*(832._dp*z(:)**4+4576._dp*z(:)**2+20592._dp+ &
-                                                            72072._dp/z(:)**2+180180._dp/z(:)**4+270270._dp/z(:)**6)
+                     cpot(:, i, j) = cpot(:, i, j) - expa(:)*(832._dp*z(:)**4 + 4576._dp*z(:)**2 + 20592._dp + &
+                                                              72072._dp/z(:)**2 + 180180._dp/z(:)**4 + 270270._dp/z(:)**6)
                   END SELECT
                END SELECT
             END DO
@@ -1513,13 +1513,13 @@ CONTAINS
             DO j = 1, basis%nprim(lb)
                a = basis%am(i, la)
                b = basis%am(j, lb)
-               sab = SQRT(a+b)
-               oab = dfac(ll+nu+1)*rootpi/sab**(ll+2)/2._dp**((ll+nu)/2+2)
+               sab = SQRT(a + b)
+               oab = dfac(ll + nu + 1)*rootpi/sab**(ll + 2)/2._dp**((ll + nu)/2 + 2)
                z(:) = sab*basis%grid%rad(:)
                DO k = 1, SIZE(erfa)
-                  erfa(k) = oab*erf(z(k))/z(k)**(nu+1)
+                  erfa(k) = oab*erf(z(k))/z(k)**(nu + 1)
                END DO
-               expa(:) = EXP(-z(:)**2)/sab**(ll+2)/2._dp**((ll+nu)/2+2)
+               expa(:) = EXP(-z(:)**2)/sab**(ll + 2)/2._dp**((ll + nu)/2 + 2)
                SELECT CASE (ll)
                CASE DEFAULT
                   CPABORT("")
@@ -1527,67 +1527,67 @@ CONTAINS
                   CPASSERT(nu == 0)
                CASE (1)
                   CPASSERT(nu == 1)
-                  erfa(:) = erfa(:)-6._dp*expa(:)/z(:)
+                  erfa(:) = erfa(:) - 6._dp*expa(:)/z(:)
                CASE (2)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     erfa(:) = erfa(:)-2._dp*expa(:)
+                     erfa(:) = erfa(:) - 2._dp*expa(:)
                   CASE (2)
-                     erfa(:) = erfa(:)-expa(:)*(20._dp+30._dp/z(:)**2)
+                     erfa(:) = erfa(:) - expa(:)*(20._dp + 30._dp/z(:)**2)
                   END SELECT
                CASE (3)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (1)
-                     erfa(:) = erfa(:)-expa(:)*(12._dp*z(:)+30._dp/z(:))
+                     erfa(:) = erfa(:) - expa(:)*(12._dp*z(:) + 30._dp/z(:))
                   CASE (3)
-                     erfa(:) = erfa(:)-expa(:)*(56._dp*z(:)+140._dp/z(:)+210._dp*z(:)**3)
+                     erfa(:) = erfa(:) - expa(:)*(56._dp*z(:) + 140._dp/z(:) + 210._dp*z(:)**3)
                   END SELECT
                CASE (4)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     erfa(:) = erfa(:)-expa(:)*(4._dp*z(:)**2+14._dp)
+                     erfa(:) = erfa(:) - expa(:)*(4._dp*z(:)**2 + 14._dp)
                   CASE (2)
-                     erfa(:) = erfa(:)-expa(:)*(40._dp*z(:)**2+140._dp+210._dp/z(:)**2)
+                     erfa(:) = erfa(:) - expa(:)*(40._dp*z(:)**2 + 140._dp + 210._dp/z(:)**2)
                   CASE (4)
-                     erfa(:) = erfa(:)-expa(:)*(144._dp*z(:)**2+504._dp+1260._dp/z(:)**2+1890._dp/z(:)**4)
+                     erfa(:) = erfa(:) - expa(:)*(144._dp*z(:)**2 + 504._dp + 1260._dp/z(:)**2 + 1890._dp/z(:)**4)
                   END SELECT
                CASE (5)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (1)
-                     erfa(:) = erfa(:)-expa(:)*(24._dp*z(:)**3+108._dp*z(:)+210._dp/z(:))
+                     erfa(:) = erfa(:) - expa(:)*(24._dp*z(:)**3 + 108._dp*z(:) + 210._dp/z(:))
                   CASE (3)
-                     erfa(:) = erfa(:)-expa(:)*(112._dp*z(:)**3+504._dp*z(:)+1260._dp/z(:)+1890._dp/z(:)**3)
+                     erfa(:) = erfa(:) - expa(:)*(112._dp*z(:)**3 + 504._dp*z(:) + 1260._dp/z(:) + 1890._dp/z(:)**3)
                   CASE (5)
-                     erfa(:) = erfa(:)-expa(:)*(352._dp*z(:)**3+1584._dp*z(:)+5544._dp/z(:)+ &
-                                                13860._dp/z(:)**3+20790._dp/z(:)**5)
+                     erfa(:) = erfa(:) - expa(:)*(352._dp*z(:)**3 + 1584._dp*z(:) + 5544._dp/z(:) + &
+                                                  13860._dp/z(:)**3 + 20790._dp/z(:)**5)
                   END SELECT
                CASE (6)
                   SELECT CASE (nu)
                   CASE DEFAULT
                      CPABORT("")
                   CASE (0)
-                     erfa(:) = erfa(:)-expa(:)*(8._dp*z(:)**4+44._dp*z(:)**2+114._dp)
+                     erfa(:) = erfa(:) - expa(:)*(8._dp*z(:)**4 + 44._dp*z(:)**2 + 114._dp)
                   CASE (2)
-                     erfa(:) = erfa(:)-expa(:)*(80._dp*z(:)**4+440._dp*z(:)**2+1260._dp+1896._dp/z(:)**2)
+                     erfa(:) = erfa(:) - expa(:)*(80._dp*z(:)**4 + 440._dp*z(:)**2 + 1260._dp + 1896._dp/z(:)**2)
                   CASE (4)
-                     erfa(:) = erfa(:)-expa(:)*(288._dp*z(:)**4+1584._dp*z(:)**2+5544._dp+ &
-                                                13860._dp/z(:)**2+20790._dp/z(:)**4)
+                     erfa(:) = erfa(:) - expa(:)*(288._dp*z(:)**4 + 1584._dp*z(:)**2 + 5544._dp + &
+                                                  13860._dp/z(:)**2 + 20790._dp/z(:)**4)
                   CASE (6)
-                     erfa(:) = erfa(:)-expa(:)*(832._dp*z(:)**4+4576._dp*z(:)**2+20592._dp+ &
-                                                72072._dp/z(:)**2+180180._dp/z(:)**4+270270._dp/z(:)**6)
+                     erfa(:) = erfa(:) - expa(:)*(832._dp*z(:)**4 + 4576._dp*z(:)**2 + 20592._dp + &
+                                                  72072._dp/z(:)**2 + 180180._dp/z(:)**4 + 270270._dp/z(:)**6)
                   END SELECT
                END SELECT
                DO k = 1, basis%nbas(la)
                   DO l = 1, basis%nbas(lb)
-                     cpot(:, k, l) = cpot(:, k, l)+erfa(:)*basis%cm(i, k, la)*basis%cm(j, l, lb)
+                     cpot(:, k, l) = cpot(:, k, l) + erfa(:)*basis%cm(i, k, la)*basis%cm(j, l, lb)
                   END DO
                END DO
             END DO
@@ -1639,7 +1639,7 @@ CONTAINS
             n = basis%nbas(l)
             DO i = 1, n
                DO j = i, n
-                  imat(i, j, l) = imat(i, j, l)+ &
+                  imat(i, j, l) = imat(i, j, l) + &
                                   integrate_grid(cpot, basis%bf(:, i, l), basis%bf(:, j, l), basis%grid)
                   imat(j, i, l) = imat(i, j, l)
                END DO
@@ -1650,9 +1650,9 @@ CONTAINS
             n = basis%nbas(l)
             DO i = 1, n
                DO j = i, n
-                  imat(i, j, l) = imat(i, j, l)+ &
+                  imat(i, j, l) = imat(i, j, l) + &
                                   integrate_grid(cpot, basis%dbf(:, i, l), basis%bf(:, j, l), basis%grid)
-                  imat(i, j, l) = imat(i, j, l)+ &
+                  imat(i, j, l) = imat(i, j, l) + &
                                   integrate_grid(cpot, basis%bf(:, i, l), basis%dbf(:, j, l), basis%grid)
                   imat(j, i, l) = imat(i, j, l)
                END DO
@@ -1663,7 +1663,7 @@ CONTAINS
             n = basis%nbas(l)
             DO i = 1, n
                DO j = i, n
-                  imat(i, j, l) = imat(i, j, l)+ &
+                  imat(i, j, l) = imat(i, j, l) + &
                                   integrate_grid(cpot, basis%dbf(:, i, l), basis%dbf(:, j, l), basis%grid)
                   imat(j, i, l) = imat(i, j, l)
                END DO
@@ -1708,25 +1708,25 @@ CONTAINS
          n1 = nsize(l1)
          DO l2 = 0, l1
             n2 = nsize(l2)
-            ll = ll+1
+            ll = ll + 1
             ij1 = 0
             DO i1 = 1, n1
                DO j1 = i1, n1
-                  ij1 = ij1+1
+                  ij1 = ij1 + 1
                   f1 = 1._dp
                   IF (i1 /= j1) f1 = 2._dp
                   ij2 = 0
                   DO i2 = 1, n2
                      DO j2 = i2, n2
-                        ij2 = ij2+1
+                        ij2 = ij2 + 1
                         f2 = 1._dp
                         IF (i2 /= j2) f2 = 2._dp
                         eint = erint(ll)%int(ij1, ij2)
                         IF (l1 == l2) THEN
-                           jmat(i1, j1, l1) = jmat(i1, j1, l1)+f2*pmat(i2, j2, l2)*eint
+                           jmat(i1, j1, l1) = jmat(i1, j1, l1) + f2*pmat(i2, j2, l2)*eint
                         ELSE
-                           jmat(i1, j1, l1) = jmat(i1, j1, l1)+f2*pmat(i2, j2, l2)*eint
-                           jmat(i2, j2, l2) = jmat(i2, j2, l2)+f1*pmat(i1, j1, l1)*eint
+                           jmat(i1, j1, l1) = jmat(i1, j1, l1) + f2*pmat(i2, j2, l2)*eint
+                           jmat(i2, j2, l2) = jmat(i2, j2, l2) + f1*pmat(i1, j1, l1)*eint
                         END IF
                      END DO
                   END DO
@@ -1734,7 +1734,7 @@ CONTAINS
             END DO
             IF (have_all_nu) THEN
                ! skip integral blocks with nu/=0
-               ll = ll+l2
+               ll = ll + l2
             END IF
          END DO
       END DO
@@ -1780,28 +1780,28 @@ CONTAINS
          n1 = nsize(l1)
          DO l2 = 0, l1
             n2 = nsize(l2)
-            DO nu = ABS(l1-l2), l1+l2, 2
-               almn = arho(-l1+l2+nu)*arho(l1-l2+nu)*arho(l1+l2-nu)/(REAL(l1+l2+nu+1, dp)*arho(l1+l2+nu))
+            DO nu = ABS(l1 - l2), l1 + l2, 2
+               almn = arho(-l1 + l2 + nu)*arho(l1 - l2 + nu)*arho(l1 + l2 - nu)/(REAL(l1 + l2 + nu + 1, dp)*arho(l1 + l2 + nu))
                almn = -0.5_dp*almn
-               ll = ll+1
+               ll = ll + 1
                ij1 = 0
                DO i1 = 1, n1
                   DO j1 = i1, n1
-                     ij1 = ij1+1
+                     ij1 = ij1 + 1
                      f1 = 1._dp
                      IF (i1 /= j1) f1 = 2._dp
                      ij2 = 0
                      DO i2 = 1, n2
                         DO j2 = i2, n2
-                           ij2 = ij2+1
+                           ij2 = ij2 + 1
                            f2 = 1._dp
                            IF (i2 /= j2) f2 = 2._dp
                            eint = erint(ll)%int(ij1, ij2)
                            IF (l1 == l2) THEN
-                              kmat(i1, j1, l1) = kmat(i1, j1, l1)+f2*almn*pmat(i2, j2, l2)*eint
+                              kmat(i1, j1, l1) = kmat(i1, j1, l1) + f2*almn*pmat(i2, j2, l2)*eint
                            ELSE
-                              kmat(i1, j1, l1) = kmat(i1, j1, l1)+f2*almn*pmat(i2, j2, l2)*eint
-                              kmat(i2, j2, l2) = kmat(i2, j2, l2)+f1*almn*pmat(i1, j1, l1)*eint
+                              kmat(i1, j1, l1) = kmat(i1, j1, l1) + f2*almn*pmat(i2, j2, l2)*eint
+                              kmat(i2, j2, l2) = kmat(i2, j2, l2) + f1*almn*pmat(i1, j1, l1)*eint
                            END IF
                         END DO
                      END DO
@@ -1854,7 +1854,7 @@ CONTAINS
             tpmat(1:m, 1:m) = MATMUL(TRANSPOSE(umat(1:n, 1:m, l)), MATMUL(pmat(1:n, 1:n, l), umat(1:n, 1:m, l)))
             tpmat(1:m, 1:m) = MATMUL(upmat(1:m, 1:m, l), MATMUL(tpmat(1:m, 1:m), upmat(1:m, 1:m, l)))
 
-            emat(1:m, 1:m, l) = MATMUL(tkmat(1:m, 1:m), tpmat(1:m, 1:m))-MATMUL(tpmat(1:m, 1:m), tkmat(1:m, 1:m))
+            emat(1:m, 1:m, l) = MATMUL(tkmat(1:m, 1:m), tpmat(1:m, 1:m)) - MATMUL(tpmat(1:m, 1:m), tkmat(1:m, 1:m))
 
             DEALLOCATE (tkmat, tpmat)
          END IF
@@ -1879,7 +1879,7 @@ CONTAINS
       CHARACTER(len=*), PARAMETER :: routineN = 'slater_density', routineP = moduleN//':'//routineN
 
       INTEGER                                            :: counter, i, l, mc, mm(0:lmat), mo, n, ns
-      INTEGER, DIMENSION(lmat+1, 20)                     :: ne
+      INTEGER, DIMENSION(lmat + 1, 20)                     :: ne
       REAL(KIND=dp)                                      :: a, pf
 
       ! fill out a table with the total number of electrons
@@ -1890,20 +1890,20 @@ CONTAINS
       DO l = 0, lmat
          mo = state%maxn_occ(l)
          IF (SUM(state%core(l, :)) == 0) THEN
-            CPASSERT(ns >= l+mo)
+            CPASSERT(ns >= l + mo)
             DO counter = 1, mo
-               ne(l+1, l+counter) = NINT(state%occ(l, counter))
+               ne(l + 1, l + counter) = NINT(state%occ(l, counter))
             ENDDO
          ELSE
             mc = mm(l) ! number of levels in the core
             CPASSERT(SUM(state%occ(l, 1:mc)) == 0)
-            CPASSERT(ns >= l+mc)
+            CPASSERT(ns >= l + mc)
             DO counter = 1, mc
-               ne(l+1, l+counter) = NINT(state%core(l, counter))
+               ne(l + 1, l + counter) = NINT(state%core(l, counter))
             ENDDO
-            CPASSERT(ns >= l+mc+mo)
-            DO counter = mc+1, mc+mo
-               ne(l+1, l+counter) = NINT(state%occ(l, counter))
+            CPASSERT(ns >= l + mc + mo)
+            DO counter = mc + 1, mc + mo
+               ne(l + 1, l + counter) = NINT(state%occ(l, counter))
             ENDDO
          END IF
       END DO
@@ -1913,14 +1913,14 @@ CONTAINS
       DO l = 0, state%maxl_occ
          DO i = 1, SIZE(state%occ, 2)
             IF (state%occ(l, i) > 0._dp) THEN
-               n = i+l
+               n = i + l
                a = srules(zcore, ne, n, l)
-               pf = 1._dp/SQRT(fac(2*n))*(2._dp*a)**(n+0.5_dp)
+               pf = 1._dp/SQRT(fac(2*n))*(2._dp*a)**(n + 0.5_dp)
                IF (state%multiplicity == -1) THEN
-                  density1(:) = density1(:)+state%occ(l, i)/fourpi*(grid%rad(:)**(n-1)*EXP(-a*grid%rad(:))*pf)**2
+                  density1(:) = density1(:) + state%occ(l, i)/fourpi*(grid%rad(:)**(n - 1)*EXP(-a*grid%rad(:))*pf)**2
                ELSE
-                  density1(:) = density1(:)+state%occa(l, i)/fourpi*(grid%rad(:)**(n-1)*EXP(-a*grid%rad(:))*pf)**2
-                  density2(:) = density2(:)+state%occb(l, i)/fourpi*(grid%rad(:)**(n-1)*EXP(-a*grid%rad(:))*pf)**2
+                  density1(:) = density1(:) + state%occa(l, i)/fourpi*(grid%rad(:)**(n - 1)*EXP(-a*grid%rad(:))*pf)**2
+                  density2(:) = density2(:) + state%occb(l, i)/fourpi*(grid%rad(:)**(n - 1)*EXP(-a*grid%rad(:))*pf)**2
                END IF
             END IF
          END DO
@@ -1937,7 +1937,7 @@ CONTAINS
       REAL(KIND=dp), DIMENSION(:), INTENT(OUT)           :: vxc
 
       CHARACTER(len=*), PARAMETER :: routineN = 'wigner_slater_functional', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       REAL(KIND=dp)                                      :: ec, ex, rs, vc, vx
@@ -1948,9 +1948,9 @@ CONTAINS
             ex = -0.7385588_dp*rho(i)**0.333333333_dp
             vx = 1.333333333_dp*ex
             rs = (3._dp/fourpi/rho(i))**0.333333333_dp
-            ec = -0.88_dp/(rs+7.8_dp)
-            vc = ec*(1._dp+rs/(3._dp*(rs+7.8_dp)))
-            vxc(i) = vx+vc
+            ec = -0.88_dp/(rs + 7.8_dp)
+            vc = ec*(1._dp + rs/(3._dp*(rs + 7.8_dp)))
+            vxc(i) = vx + vc
          END IF
       END DO
 
@@ -2024,8 +2024,8 @@ CONTAINS
 
       m0 = MAXVAL(MINLOC(atom%basis%grid%rad))
       IF (m0 == nr) THEN
-         m1 = m0-1
-         m2 = m0-2
+         m1 = m0 - 1
+         m2 = m0 - 2
       ELSE IF (m0 == 1) THEN
          m1 = 2
          m2 = 3
@@ -2035,8 +2035,8 @@ CONTAINS
       r0 = atom%basis%grid%rad(m0)
       r1 = atom%basis%grid%rad(m1)
       r2 = atom%basis%grid%rad(m2)
-      w0 = r1/(r1-r0)
-      w1 = 1-w0
+      w0 = r1/(r1 - r0)
+      w1 = 1 - w0
 
       IF (spinpol) THEN
          ALLOCATE (rho(nr, 2))
@@ -2045,10 +2045,10 @@ CONTAINS
          IF (nlcc) THEN
             xfun = 0.0_dp
             CALL atom_core_density(xfun(:), atom%potential, typ="RHO", rr=atom%basis%grid%rad)
-            rho(:, 1) = rho(:, 1)+0.5_dp*xfun(:)
-            rho(:, 2) = rho(:, 2)+0.5_dp*xfun(:)
+            rho(:, 1) = rho(:, 1) + 0.5_dp*xfun(:)
+            rho(:, 2) = rho(:, 2) + 0.5_dp*xfun(:)
          END IF
-         rho(:, 1) = rho(:, 1)+rho(:, 2)
+         rho(:, 1) = rho(:, 1) + rho(:, 2)
       ELSE
          ALLOCATE (rho(nr, 1))
          CALL atom_density(rho(:, 1), atom%orbitals%pmat, atom%basis, atom%state%maxl_occ, typ="RHO")
@@ -2060,7 +2060,7 @@ CONTAINS
       d1 = rho(m1, 1)
       d2 = rho(m2, 1)
 
-      rho0 = w0*d0+w1*d1
+      rho0 = w0*d0 + w1*d1
       rho0 = MAX(rho0, 0.0_dp)
 
       DEALLOCATE (rho)
@@ -2090,7 +2090,7 @@ CONTAINS
       CALL init_spherical_harmonics(lmat, 0)
       cnum = 0.0_dp
       DO i = 1, 9
-         ci = 2.0_dp*(0.85_dp+i*0.05_dp)
+         ci = 2.0_dp*(0.85_dp + i*0.05_dp)
          rad(i) = crad*ci
          CALL atom_basis_condnum(basis, rad(i), cnum(i))
          WRITE (iw, '(A,F15.3,T50,A,F14.4)') " Lattice constant:", &
@@ -2116,7 +2116,7 @@ CONTAINS
 
       INTEGER                                            :: i, j, l, ll, m, n, nbas, nl, nr
       INTEGER, DIMENSION(0:lmat)                         :: nelem, nlmax, nlmin
-      INTEGER, DIMENSION(lmat+1, 7)                      :: ne
+      INTEGER, DIMENSION(lmat + 1, 7)                      :: ne
       REAL(KIND=dp)                                      :: al, c1, c2, pf
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:)           :: sfun
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :)        :: bmat
@@ -2124,19 +2124,19 @@ CONTAINS
       REAL(KIND=dp), ALLOCATABLE, DIMENSION(:, :, :, :)  :: sint
       REAL(KIND=dp), DIMENSION(0:lmat, 10)               :: snl
       REAL(KIND=dp), DIMENSION(2)                        :: sse
-      REAL(KIND=dp), DIMENSION(lmat+1, 7)                :: sexp
+      REAL(KIND=dp), DIMENSION(lmat + 1, 7)                :: sexp
 
       ne = 0
       nelem = 0
       nelem(0:3) = ptable(zv)%e_conv(0:3)
       DO l = 0, lmat
-         ll = 2*(2*l+1)
+         ll = 2*(2*l + 1)
          DO i = 1, 7
             IF (nelem(l) >= ll) THEN
-               ne(l+1, i) = ll
-               nelem(l) = nelem(l)-ll
+               ne(l + 1, i) = ll
+               nelem(l) = nelem(l) - ll
             ELSE IF (nelem(l) > 0) THEN
-               ne(l+1, i) = nelem(l)
+               ne(l + 1, i) = nelem(l)
                nelem(l) = 0
             ELSE
                EXIT
@@ -2147,13 +2147,13 @@ CONTAINS
       nlmin = 1
       nlmax = 1
       DO l = 0, lmat
-         nlmin(l) = l+1
+         nlmin(l) = l + 1
          DO i = 1, 7
-            IF (ne(l+1, i) > 0) THEN
-               nlmax(l) = i+l
+            IF (ne(l + 1, i) > 0) THEN
+               nlmax(l) = i + l
             END IF
          END DO
-         nlmax(l) = MAX(nlmax(l), nlmin(l)+1)
+         nlmax(l) = MAX(nlmax(l), nlmin(l) + 1)
       END DO
 
       ! Slater exponents
@@ -2161,15 +2161,15 @@ CONTAINS
       DO l = 0, lmat
          sse(1) = 0.05_dp
          sse(2) = 10.0_dp
-         DO i = l+1, 7
-            sexp(l+1, i) = srules(zv, ne, i, l)
-            IF (ne(l+1, i-l) > 0) THEN
-               sse(1) = MAX(sse(1), sexp(l+1, i))
-               sse(2) = MIN(sse(2), sexp(l+1, i))
+         DO i = l + 1, 7
+            sexp(l + 1, i) = srules(zv, ne, i, l)
+            IF (ne(l + 1, i - l) > 0) THEN
+               sse(1) = MAX(sse(1), sexp(l + 1, i))
+               sse(2) = MIN(sse(2), sexp(l + 1, i))
             END IF
          END DO
          DO i = 1, 10
-            snl(l, i) = ABS(2._dp*sse(1)-0.5_dp*sse(2))/9._dp*REAL(i-1, KIND=dp)+0.5_dp*MIN(sse(1), sse(2))
+            snl(l, i) = ABS(2._dp*sse(1) - 0.5_dp*sse(2))/9._dp*REAL(i - 1, KIND=dp) + 0.5_dp*MIN(sse(1), sse(2))
          END DO
       END DO
 
@@ -2185,13 +2185,13 @@ CONTAINS
             al = snl(l, i)
             nl = nlmin(l)
             pf = (2._dp*al)**nl*SQRT(2._dp*al/fac(2*nl))
-            sfun(1:nr) = pf*basis%grid%rad(1:nr)**(nl-1)*EXP(-al*basis%grid%rad(1:nr))
+            sfun(1:nr) = pf*basis%grid%rad(1:nr)**(nl - 1)*EXP(-al*basis%grid%rad(1:nr))
             DO j = 1, basis%nbas(l)
                sint(i, 1, j, l) = SUM(sfun(1:nr)*basis%bf(1:nr, j, l)*basis%grid%wr(1:nr))
             END DO
             nl = nlmax(l)
             pf = (2._dp*al)**nl*SQRT(2._dp*al/fac(2*nl))
-            sfun(1:nr) = pf*basis%grid%rad(1:nr)**(nl-1)*EXP(-al*basis%grid%rad(1:nr))
+            sfun(1:nr) = pf*basis%grid%rad(1:nr)**(nl - 1)*EXP(-al*basis%grid%rad(1:nr))
             DO j = 1, basis%nbas(l)
                sint(i, 2, j, l) = SUM(sfun(1:nr)*basis%bf(1:nr, j, l)*basis%grid%wr(1:nr))
             END DO
@@ -2251,7 +2251,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(OUT)                         :: cnum
 
       CHARACTER(len=*), PARAMETER :: routineN = 'atom_basis_condnum', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ia, ib, imax, info, ix, iy, iz, ja, jb, &
                                                             ka, kb, l, la, lb, lwork, na, nb, &
@@ -2267,7 +2267,7 @@ CONTAINS
       ! total number of basis functions
       nbas = 0
       DO l = 0, lmat
-         nbas = nbas+basis%nbas(l)*(2*l+1)
+         nbas = nbas + basis%nbas(l)*(2*l + 1)
       END DO
 
       ALLOCATE (smat(nbas, nbas), ibptr(nbas, 0:lmat))
@@ -2276,8 +2276,8 @@ CONTAINS
       na = 0
       DO l = 0, lmat
          DO ia = 1, basis%nbas(l)
-            ibptr(ia, l) = na+1
-            na = na+(2*l+1)
+            ibptr(ia, l) = na + 1
+            na = na + (2*l + 1)
          END DO
       END DO
 
@@ -2286,12 +2286,12 @@ CONTAINS
           basis%basis_type == CGTO_BASIS) THEN
          DO la = 0, lmat
             na = basis%nprim(la)
-            nna = 2*la+1
+            nna = 2*la + 1
             IF (na == 0) CYCLE
             zeta => basis%am(:, la)
             DO lb = 0, lmat
                nb = basis%nprim(lb)
-               nnb = 2*lb+1
+               nnb = 2*lb + 1
                IF (nb == 0) CYCLE
                zetb => basis%am(:, lb)
                DO ia = 1, na
@@ -2302,21 +2302,21 @@ CONTAINS
                         r1 = exp_radius(la, zeta(ia), reps, 1.0_dp)
                         r2 = exp_radius(lb, zetb(ib), reps, 1.0_dp)
                         rmax = MAX(2._dp*r1, 2._dp*r2)
-                        imax = INT(rmax/rad)+1
+                        imax = INT(rmax/rad) + 1
                      END IF
                      IF (imax > 1) THEN
                         CALL overlap_ab_sp(la, zeta(ia), lb, zetb(ib), rad, sab)
                         IF (basis%basis_type == GTO_BASIS) THEN
                            ja = ibptr(ia, la)
                            jb = ibptr(ib, lb)
-                           smat(ja:ja+nna-1, jb:jb+nnb-1) = smat(ja:ja+nna-1, jb:jb+nnb-1)+sab(1:nna, 1:nnb)
+                           smat(ja:ja + nna - 1, jb:jb + nnb - 1) = smat(ja:ja + nna - 1, jb:jb + nnb - 1) + sab(1:nna, 1:nnb)
                         ELSEIF (basis%basis_type == CGTO_BASIS) THEN
                            DO ka = 1, basis%nbas(la)
                               DO kb = 1, basis%nbas(lb)
                                  ja = ibptr(ka, la)
                                  jb = ibptr(kb, lb)
-                                 smat(ja:ja+nna-1, jb:jb+nnb-1) = smat(ja:ja+nna-1, jb:jb+nnb-1)+ &
-                                                                  sab(1:nna, 1:nnb)*basis%cm(ia, ka, la)*basis%cm(ib, kb, lb)
+                                 smat(ja:ja + nna - 1, jb:jb + nnb - 1) = smat(ja:ja + nna - 1, jb:jb + nnb - 1) + &
+                                                                         sab(1:nna, 1:nnb)*basis%cm(ia, ka, la)*basis%cm(ib, kb, lb)
                               END DO
                            END DO
                         END IF
@@ -2331,14 +2331,14 @@ CONTAINS
                                  IF (basis%basis_type == GTO_BASIS) THEN
                                     ja = ibptr(ia, la)
                                     jb = ibptr(ib, lb)
-                                    smat(ja:ja+nna-1, jb:jb+nnb-1) = smat(ja:ja+nna-1, jb:jb+nnb-1)+sab(1:nna, 1:nnb)
+                                 smat(ja:ja + nna - 1, jb:jb + nnb - 1) = smat(ja:ja + nna - 1, jb:jb + nnb - 1) + sab(1:nna, 1:nnb)
                                  ELSEIF (basis%basis_type == CGTO_BASIS) THEN
                                     DO ka = 1, basis%nbas(la)
                                        DO kb = 1, basis%nbas(lb)
                                           ja = ibptr(ka, la)
                                           jb = ibptr(kb, lb)
-                                          smat(ja:ja+nna-1, jb:jb+nnb-1) = &
-                                             smat(ja:ja+nna-1, jb:jb+nnb-1)+ &
+                                          smat(ja:ja + nna - 1, jb:jb + nnb - 1) = &
+                                             smat(ja:ja + nna - 1, jb:jb + nnb - 1) + &
                                              sab(1:nna, 1:nnb)*basis%cm(ia, ka, la)*basis%cm(ib, kb, lb)
                                        END DO
                                     END DO
@@ -2414,7 +2414,7 @@ CONTAINS
       n = SIZE(int, 1)
       m = SIZE(omat, 1)
 
-      INT(1:n, 1:n) = INT(1:n, 1:n)+MATMUL(TRANSPOSE(cm(1:m, 1:n)), MATMUL(omat(1:m, 1:m), cm(1:m, 1:n)))
+      INT(1:n, 1:n) = INT(1:n, 1:n) + MATMUL(TRANSPOSE(cm(1:m, 1:n)), MATMUL(omat(1:m, 1:m), cm(1:m, 1:n)))
 
       CALL timestop(handle)
 
@@ -2484,7 +2484,7 @@ CONTAINS
       ij = 0
       DO i = 1, n
          DO j = i, n
-            ij = ij+1
+            ij = ij + 1
             vec(ij) = mat(i, j)
          END DO
       END DO
@@ -2507,7 +2507,7 @@ CONTAINS
       ij = 0
       DO i = 1, n
          DO j = i, n
-            ij = ij+1
+            ij = ij + 1
             mat(i, j) = vec(ij)
             mat(j, i) = vec(ij)
          END DO

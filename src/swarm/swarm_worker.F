@@ -8,23 +8,23 @@
 !> \author Ole Schuett
 ! **************************************************************************************************
 MODULE swarm_worker
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type
-   USE cp_output_handling,              ONLY: cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE glbopt_worker,                   ONLY: glbopt_worker_execute,&
-                                              glbopt_worker_finalize,&
-                                              glbopt_worker_init,&
-                                              glbopt_worker_type
-   USE input_constants,                 ONLY: swarm_do_glbopt
-   USE input_section_types,             ONLY: section_type,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length
-   USE swarm_message,                   ONLY: swarm_message_add,&
-                                              swarm_message_get,&
-                                              swarm_message_haskey,&
-                                              swarm_message_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type
+   USE cp_output_handling, ONLY: cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE glbopt_worker, ONLY: glbopt_worker_execute, &
+                            glbopt_worker_finalize, &
+                            glbopt_worker_init, &
+                            glbopt_worker_type
+   USE input_constants, ONLY: swarm_do_glbopt
+   USE input_section_types, ONLY: section_type, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length
+   USE swarm_message, ONLY: swarm_message_add, &
+                            swarm_message_get, &
+                            swarm_message_haskey, &
+                            swarm_message_type
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -67,7 +67,7 @@ CONTAINS
       INTEGER, INTENT(in)                                :: worker_id
 
       CHARACTER(len=*), PARAMETER :: routineN = 'swarm_worker_init', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_logger_type), POINTER                      :: logger
 
@@ -106,7 +106,7 @@ CONTAINS
       LOGICAL, INTENT(INOUT)                             :: should_stop
 
       CHARACTER(len=*), PARAMETER :: routineN = 'swarm_worker_execute', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: command
 
@@ -141,7 +141,7 @@ CONTAINS
       TYPE(swarm_worker_type), INTENT(INOUT)             :: worker
 
       CHARACTER(len=*), PARAMETER :: routineN = 'swarm_worker_finalize', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       SELECT CASE (worker%behavior)
       CASE (swarm_do_glbopt)

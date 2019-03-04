@@ -18,13 +18,13 @@
 ! **************************************************************************************************
 MODULE global_types
 
-   USE cp_blacs_env,                    ONLY: BLACS_GRID_SQUARE
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE machine,                         ONLY: m_walltime
-   USE parallel_rng_types,              ONLY: delete_rng_stream,&
-                                              rng_stream_type
+   USE cp_blacs_env, ONLY: BLACS_GRID_SQUARE
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE machine, ONLY: m_walltime
+   USE parallel_rng_types, ONLY: delete_rng_stream, &
+                                 rng_stream_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -126,7 +126,7 @@ CONTAINS
 
       CPASSERT(ASSOCIATED(globenv))
       CPASSERT(globenv%ref_count > 0)
-      globenv%ref_count = globenv%ref_count+1
+      globenv%ref_count = globenv%ref_count + 1
    END SUBROUTINE globenv_retain
 
 ! **************************************************************************************************
@@ -138,11 +138,11 @@ CONTAINS
       TYPE(global_environment_type), POINTER             :: globenv
 
       CHARACTER(len=*), PARAMETER :: routineN = 'globenv_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(globenv)) THEN
          CPASSERT(globenv%ref_count > 0)
-         globenv%ref_count = globenv%ref_count-1
+         globenv%ref_count = globenv%ref_count - 1
          IF (globenv%ref_count == 0) THEN
             IF (ASSOCIATED(globenv%gaussian_rng_stream)) THEN
                CALL delete_rng_stream(globenv%gaussian_rng_stream)

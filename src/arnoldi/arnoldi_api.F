@@ -11,35 +11,35 @@
 ! **************************************************************************************************
 
 MODULE arnoldi_api
-   USE arnoldi_data_methods,            ONLY: arnoldi_is_converged,&
-                                              deallocate_arnoldi_data,&
-                                              get_nrestart,&
-                                              get_selected_ritz_val,&
-                                              get_selected_ritz_vector,&
-                                              select_evals,&
-                                              set_arnoldi_initial_vector,&
-                                              setup_arnoldi_data
-   USE arnoldi_methods,                 ONLY: arnoldi_init,&
-                                              arnoldi_iram,&
-                                              build_subspace,&
-                                              compute_evals,&
-                                              gev_arnoldi_init,&
-                                              gev_build_subspace,&
-                                              gev_update_data
-   USE arnoldi_types,                   ONLY: arnoldi_control_type,&
-                                              arnoldi_data_type,&
-                                              get_control,&
-                                              m_x_v_vectors_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
-        dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
-        dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_type
-   USE dbcsr_vector,                    ONLY: create_col_vec_from_matrix,&
-                                              create_replicated_col_vec_from_matrix,&
-                                              create_replicated_row_vec_from_matrix,&
-                                              dbcsr_matrix_colvec_multiply
-   USE kinds,                           ONLY: dp
-   USE message_passing,                 ONLY: mp_sum
+   USE arnoldi_data_methods, ONLY: arnoldi_is_converged, &
+                                   deallocate_arnoldi_data, &
+                                   get_nrestart, &
+                                   get_selected_ritz_val, &
+                                   get_selected_ritz_vector, &
+                                   select_evals, &
+                                   set_arnoldi_initial_vector, &
+                                   setup_arnoldi_data
+   USE arnoldi_methods, ONLY: arnoldi_init, &
+                              arnoldi_iram, &
+                              build_subspace, &
+                              compute_evals, &
+                              gev_arnoldi_init, &
+                              gev_build_subspace, &
+                              gev_update_data
+   USE arnoldi_types, ONLY: arnoldi_control_type, &
+                            arnoldi_data_type, &
+                            get_control, &
+                            m_x_v_vectors_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_get_block_p, dbcsr_get_info, dbcsr_iterator_blocks_left, &
+      dbcsr_iterator_next_block, dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, &
+      dbcsr_p_type, dbcsr_release, dbcsr_set, dbcsr_type
+   USE dbcsr_vector, ONLY: create_col_vec_from_matrix, &
+                           create_replicated_col_vec_from_matrix, &
+                           create_replicated_row_vec_from_matrix, &
+                           dbcsr_matrix_colvec_multiply
+   USE kinds, ONLY: dp
+   USE message_passing, ONLY: mp_sum
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -101,7 +101,7 @@ CONTAINS
       TYPE(arnoldi_data_type)                            :: arnoldi_data
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'arnoldi_normal_ev', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_loop, ncol_local, nrow_local
       TYPE(arnoldi_control_type), POINTER                :: control
@@ -182,7 +182,7 @@ CONTAINS
       TYPE(arnoldi_data_type)                            :: arnoldi_data
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'arnoldi_generalized_ev', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i_loop, ncol_local, nrow_local
       TYPE(arnoldi_control_type), POINTER                :: control
@@ -260,7 +260,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: max_iter
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'arnoldi_extremal', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, max_iter_internal, nrestarts
       TYPE(arnoldi_data_type)                            :: my_arnoldi
@@ -311,7 +311,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: max_iter
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'arnoldi_conjugate_gradient', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, i, j, mpgrp, nb, nloc, no
       INTEGER, DIMENSION(:), POINTER                     :: rb_offset, rb_size
@@ -341,7 +341,7 @@ CONTAINS
          CALL dbcsr_iterator_next_block(dbcsr_iter, i, j, xvec)
          nb = rb_size(i)
          no = rb_offset(i)
-         xvec(1:nb, 1) = vec_x(no:no+nb-1)
+         xvec(1:nb, 1) = vec_x(no:no + nb - 1)
       END DO
       CALL dbcsr_iterator_stop(dbcsr_iter)
 
@@ -368,7 +368,7 @@ CONTAINS
          CALL dbcsr_iterator_next_block(dbcsr_iter, i, j, xvec)
          nb = rb_size(i)
          no = rb_offset(i)
-         vec_x(no:no+nb-1) = xvec(1:nb, 1)
+         vec_x(no:no + nb - 1) = xvec(1:nb, 1)
       END DO
       CALL dbcsr_iterator_stop(dbcsr_iter)
       control => get_control(my_arnoldi)
@@ -400,7 +400,7 @@ CONTAINS
       TYPE(m_x_v_vectors_type)                           :: vectors
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'conjugate_gradient', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iter, mpgrp, pcgrp
       REAL(KIND=dp)                                      :: alpha, beta, pap, rsnew, rsold
@@ -528,7 +528,7 @@ CONTAINS
          CALL dbcsr_iterator_next_block(dbcsr_iter, i, j, av)
          CALL dbcsr_get_block_p(bvec, i, j, bv, found)
          IF (found .AND. SIZE(bv) > 0) THEN
-            adotb = adotb+DOT_PRODUCT(av(:, 1), bv(:, 1))
+            adotb = adotb + DOT_PRODUCT(av(:, 1), bv(:, 1))
          END IF
       END DO
       CALL dbcsr_iterator_stop(dbcsr_iter)

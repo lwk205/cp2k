@@ -11,50 +11,50 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE mao_methods
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_container_types,       ONLY: add_basis_set_to_container
-   USE basis_set_types,                 ONLY: create_primitive_basis_set,&
-                                              get_gto_basis_set,&
-                                              gto_basis_set_p_type,&
-                                              gto_basis_set_type,&
-                                              write_gto_basis_set
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              cp_dbcsr_plus_fm_fm_t,&
-                                              dbcsr_allocate_matrix_set
-   USE cp_fm_diag,                      ONLY: cp_fm_geeig
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_type, dbcsr_get_block_p, &
-        dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
-        dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
-        dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_set, dbcsr_trace, &
-        dbcsr_type, dbcsr_type_no_symmetry
-   USE input_constants,                 ONLY: mao_basis_ext,&
-                                              mao_basis_orb,&
-                                              mao_basis_prim
-   USE iterate_matrix,                  ONLY: invert_Hotelling
-   USE kinds,                           ONLY: dp
-   USE kpoint_methods,                  ONLY: rskp_transform
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE lapack,                          ONLY: lapack_ssyev,&
-                                              lapack_ssygv
-   USE message_passing,                 ONLY: mp_sum
-   USE particle_types,                  ONLY: particle_type
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_interactions,                 ONLY: init_interaction_radii_orb_basis
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_container_types, ONLY: add_basis_set_to_container
+   USE basis_set_types, ONLY: create_primitive_basis_set, &
+                              get_gto_basis_set, &
+                              gto_basis_set_p_type, &
+                              gto_basis_set_type, &
+                              write_gto_basis_set
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  cp_dbcsr_plus_fm_fm_t, &
+                                  dbcsr_allocate_matrix_set
+   USE cp_fm_diag, ONLY: cp_fm_geeig
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_type, dbcsr_get_block_p, &
+      dbcsr_get_info, dbcsr_iterator_blocks_left, dbcsr_iterator_next_block, &
+      dbcsr_iterator_start, dbcsr_iterator_stop, dbcsr_iterator_type, dbcsr_multiply, &
+      dbcsr_p_type, dbcsr_release, dbcsr_reserve_diag_blocks, dbcsr_set, dbcsr_trace, &
+      dbcsr_type, dbcsr_type_no_symmetry
+   USE input_constants, ONLY: mao_basis_ext, &
+                              mao_basis_orb, &
+                              mao_basis_prim
+   USE iterate_matrix, ONLY: invert_Hotelling
+   USE kinds, ONLY: dp
+   USE kpoint_methods, ONLY: rskp_transform
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE lapack, ONLY: lapack_ssyev, &
+                     lapack_ssygv
+   USE message_passing, ONLY: mp_sum
+   USE particle_types, ONLY: particle_type
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_interactions, ONLY: init_interaction_radii_orb_basis
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -88,7 +88,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: eps1
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_initialization', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, i, iatom, info, jatom, lwork, m, &
                                                             n, nblk
@@ -129,10 +129,10 @@ CONTAINS
          mbl(iatom)%n = n
          mbl(iatom)%ma = m
          DO i = 1, n
-            mbl(iatom)%eig(i) = w(n-i+1)
-            mbl(iatom)%mat(1:n, i) = amat(1:n, n-i+1)
+            mbl(iatom)%eig(i) = w(n - i + 1)
+            mbl(iatom)%mat(1:n, i) = amat(1:n, n - i + 1)
          END DO
-         cblock(1:n, 1:m) = amat(1:n, n:n-m+1:-1)
+         cblock(1:n, 1:m) = amat(1:n, n:n - m + 1:-1)
          DEALLOCATE (amat, bmat, w, work)
       END DO
       CALL dbcsr_iterator_stop(dbcsr_iter)
@@ -252,7 +252,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: reuse
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_function_gradient', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       REAL(KIND=dp)                                      :: convergence, threshold
       TYPE(dbcsr_type)                                   :: bmat, scmat, t2mat, tmat
@@ -302,7 +302,7 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: mao_coef, smat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_orthogonalization', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i, iatom, info, jatom, lwork, m, n
       LOGICAL                                            :: found
@@ -350,7 +350,7 @@ CONTAINS
       TYPE(dbcsr_type)                                   :: mao_coef, mao_grad, smat
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_project_gradient', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: iatom, jatom, m, n
       LOGICAL                                            :: found
@@ -372,7 +372,7 @@ CONTAINS
          CPASSERT(found)
          ALLOCATE (amat(m, m))
          amat(1:m, 1:m) = MATMUL(TRANSPOSE(cblock(1:n, 1:m)), MATMUL(sblock(1:n, 1:n), gblock(1:n, 1:m)))
-         gblock(1:n, 1:m) = gblock(1:n, 1:m)-MATMUL(cblock(1:n, 1:m), amat(1:m, 1:m))
+         gblock(1:n, 1:m) = gblock(1:n, 1:m) - MATMUL(cblock(1:n, 1:m), amat(1:m, 1:m))
          DEALLOCATE (amat)
       END DO
       CALL dbcsr_iterator_stop(dbcsr_iter)
@@ -390,7 +390,7 @@ CONTAINS
       REAL(KIND=dp)                                      :: spro
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_scalar_product', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: group, iatom, jatom, m, n
       LOGICAL                                            :: found
@@ -407,7 +407,7 @@ CONTAINS
          n = SIZE(ablock, 1)
          CALL dbcsr_get_block_p(matrix=fmat2, row=iatom, col=jatom, block=bblock, found=found)
          CPASSERT(found)
-         spro = spro+SUM(ablock(1:n, 1:m)*bblock(1:n, 1:m))
+         spro = spro + SUM(ablock(1:n, 1:m)*bblock(1:n, 1:m))
       END DO
       CALL dbcsr_iterator_stop(dbcsr_iter)
 
@@ -435,7 +435,7 @@ CONTAINS
       REAL(KIND=dp), INTENT(IN)                          :: occ
 
       CHARACTER(len=*), PARAMETER :: routineN = 'calculate_p_gamma', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: norb
       REAL(KIND=dp)                                      :: de
@@ -466,7 +466,7 @@ CONTAINS
 
       ! diagonalize
       CALL cp_fm_geeig(fmksmat, fmsmat, fmvec, eigenvalues, fmwork)
-      de = eigenvalues(nmos+1)-eigenvalues(nmos)
+      de = eigenvalues(nmos + 1) - eigenvalues(nmos)
       IF (de < 0.001_dp) THEN
          CALL cp_warn(__LOCATION__, "MAO: No band gap at "// &
                       "Gamma point. MAO analysis not reliable.")
@@ -505,7 +505,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: print_basis
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_reference_basis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: ikind, nbas, nkind, unit_nr
       REAL(KIND=dp)                                      :: eps_pgf_orb
@@ -620,7 +620,7 @@ CONTAINS
       TYPE(cp_para_env_type), POINTER                    :: para_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'mao_basis_analysis', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(len=2)                                   :: element_symbol
       INTEGER                                            :: ia, iab, iatom, ikind, iset, ishell, &
@@ -662,7 +662,7 @@ CONTAINS
                      DO ishell = 1, basis_set%nshell(iset)
                         lshell = basis_set%l(ishell, iset)
                         DO m = -lshell, lshell
-                           iab = iab+1
+                           iab = iab + 1
                            IF (l == lshell) cmask(iab) = 1.0_dp
                         END DO
                      END DO
@@ -745,7 +745,7 @@ CONTAINS
          electra(ispin) = 0.0_dp
          DO im = 1, nim
             CALL dbcsr_trace(matrix_p(ispin, im)%matrix, matrix_s(1, im)%matrix, elex)
-            electra(ispin) = electra(ispin)+elex
+            electra(ispin) = electra(ispin) + elex
          END DO
       END DO
 
@@ -786,7 +786,7 @@ CONTAINS
             CALL rskp_transform(rmatrix=smat, rsmat=matrix_s, ispin=1, &
                                 xkp=xkp, cell_to_index=cell_to_index, sab_nl=sab_orb)
             norb = NINT(electra(ispin))
-            nocc = MOD(2, nspin)+1
+            nocc = MOD(2, nspin) + 1
             CALL calculate_p_gamma(pmat, ksmat, smat, kpoints, norb, REAL(nocc, KIND=dp))
             CALL dbcsr_multiply("N", "N", 1.0_dp, matrix_smo(1)%matrix, pmat, &
                                 0.0_dp, tmat, filter_eps=eps_filter)

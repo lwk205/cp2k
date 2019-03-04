@@ -10,20 +10,20 @@
 !> \author Fawzi Mohamed
 ! **************************************************************************************************
 MODULE cp_fm_pool_types
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_release,&
-                                              cp_fm_struct_retain,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_p_type,&
-                                              cp_fm_release,&
-                                              cp_fm_type
-   USE cp_linked_list_fm,               ONLY: cp_sll_fm_dealloc,&
-                                              cp_sll_fm_get_first_el,&
-                                              cp_sll_fm_insert_el,&
-                                              cp_sll_fm_next,&
-                                              cp_sll_fm_rm_first_el,&
-                                              cp_sll_fm_type
-   USE cp_log_handling,                 ONLY: cp_to_string
+   USE cp_fm_struct, ONLY: cp_fm_struct_release, &
+                           cp_fm_struct_retain, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_p_type, &
+                          cp_fm_release, &
+                          cp_fm_type
+   USE cp_linked_list_fm, ONLY: cp_sll_fm_dealloc, &
+                                cp_sll_fm_get_first_el, &
+                                cp_sll_fm_insert_el, &
+                                cp_sll_fm_next, &
+                                cp_sll_fm_rm_first_el, &
+                                cp_sll_fm_type
+   USE cp_log_handling, ONLY: cp_to_string
 #include "../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -91,7 +91,7 @@ CONTAINS
       ALLOCATE (pool)
       pool%el_struct => el_struct
       CALL cp_fm_struct_retain(pool%el_struct)
-      last_fm_pool_id_nr = last_fm_pool_id_nr+1
+      last_fm_pool_id_nr = last_fm_pool_id_nr + 1
       pool%id_nr = last_fm_pool_id_nr
       pool%ref_count = 1
       NULLIFY (pool%cache)
@@ -113,7 +113,7 @@ CONTAINS
       CPASSERT(ASSOCIATED(pool))
       CPASSERT(pool%ref_count > 0)
 
-      pool%ref_count = pool%ref_count+1
+      pool%ref_count = pool%ref_count + 1
    END SUBROUTINE fm_pool_retain
 
 ! **************************************************************************************************
@@ -127,7 +127,7 @@ CONTAINS
       TYPE(cp_fm_pool_type), POINTER                     :: pool
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pool_flush_cache', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       TYPE(cp_fm_type), POINTER                          :: el_att
       TYPE(cp_sll_fm_type), POINTER                      :: iterator
@@ -153,11 +153,11 @@ CONTAINS
       TYPE(cp_fm_pool_type), POINTER                     :: pool
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pool_release', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ASSOCIATED(pool)) THEN
          CPASSERT(pool%ref_count > 0)
-         pool%ref_count = pool%ref_count-1
+         pool%ref_count = pool%ref_count - 1
          IF (pool%ref_count == 0) THEN
             pool%ref_count = 1
             CALL fm_pool_flush_cache(pool)
@@ -187,7 +187,7 @@ CONTAINS
       CHARACTER(len=*), INTENT(in), OPTIONAL             :: name
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pool_create_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(pool))
       CPASSERT(pool%ref_count > 0)
@@ -230,7 +230,7 @@ CONTAINS
       TYPE(cp_fm_type), POINTER                          :: element
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pool_give_back_fm', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(pool))
       CPASSERT(pool%ref_count > 0)
@@ -256,7 +256,7 @@ CONTAINS
       TYPE(cp_fm_struct_type), POINTER                   :: res
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pool_get_el_struct', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CPASSERT(ASSOCIATED(pool))
       CPASSERT(pool%ref_count > 0)
@@ -299,7 +299,7 @@ CONTAINS
       TYPE(cp_fm_pool_p_type), DIMENSION(:), POINTER     :: pools
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pools_dealloc', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 
@@ -327,7 +327,7 @@ CONTAINS
       CHARACTER(len=*), INTENT(in), OPTIONAL             :: name
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pools_create_fm_vect', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
       TYPE(cp_fm_pool_type), POINTER                     :: pool
@@ -366,7 +366,7 @@ CONTAINS
       TYPE(cp_fm_p_type), DIMENSION(:), POINTER          :: elements
 
       CHARACTER(len=*), PARAMETER :: routineN = 'fm_pools_give_back_fm_vect', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: i
 

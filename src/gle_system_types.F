@@ -9,21 +9,21 @@
 !> \author  MI 07.2009
 ! **************************************************************************************************
 MODULE gle_system_types
-   USE bibliography,                    ONLY: Ceriotti2009,&
-                                              Ceriotti2009b,&
-                                              cite_reference
-   USE extended_system_types,           ONLY: create_map_info_type,&
-                                              map_info_type,&
-                                              release_map_info_type
-   USE input_section_types,             ONLY: section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: dp
-   USE parallel_rng_types,              ONLY: GAUSSIAN,&
-                                              create_rng_stream,&
-                                              delete_rng_stream,&
-                                              next_rng_seed,&
-                                              rng_stream_type
-   USE string_utilities,                ONLY: compress
+   USE bibliography, ONLY: Ceriotti2009, &
+                           Ceriotti2009b, &
+                           cite_reference
+   USE extended_system_types, ONLY: create_map_info_type, &
+                                    map_info_type, &
+                                    release_map_info_type
+   USE input_section_types, ONLY: section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: dp
+   USE parallel_rng_types, ONLY: GAUSSIAN, &
+                                 create_rng_stream, &
+                                 delete_rng_stream, &
+                                 next_rng_seed, &
+                                 rng_stream_type
+   USE string_utilities, ONLY: compress
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -110,15 +110,15 @@ CONTAINS
                   CPABORT("GLE: Too many elements in A_LIST")
                END IF
                gle%a_mat(j, k) = list(i)
-               k = k+1
+               k = k + 1
                IF (k > gle%ndim) THEN
                   k = 1
-                  j = j+1
+                  j = j + 1
                END IF
             END DO
          END IF
       END DO ! ir
-      IF (j < gle%ndim+1) THEN
+      IF (j < gle%ndim + 1) THEN
          CPABORT("GLE: Too few elements in A_LIST")
       END IF
       gle%a_mat = gle%a_mat*a_scale
@@ -138,15 +138,15 @@ CONTAINS
                      CPABORT("GLE: Too many elements in C_LIST")
                   END IF
                   gle%c_mat(j, k) = list(i)
-                  k = k+1
+                  k = k + 1
                   IF (k > gle%ndim) THEN
                      k = 1
-                     j = j+1
+                     j = j + 1
                   END IF
                END DO
             END IF
          END DO ! ir
-         IF (j < gle%ndim+1) THEN
+         IF (j < gle%ndim + 1) THEN
             CPABORT("GLE: Too few elements in C_LIST")
          END IF
       ELSE
@@ -169,7 +169,7 @@ CONTAINS
       INTEGER, INTENT(IN)                                :: mal_size
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'gle_thermo_create', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=40)                                  :: name
       INTEGER                                            :: i, ithermo, my_index
@@ -196,7 +196,7 @@ CONTAINS
 
       seed(:, :, 1) = initial_seed
       DO ithermo = 2, gle%glob_num_gle
-         seed(:, :, ithermo) = next_rng_seed(seed(:, :, ithermo-1))
+         seed(:, :, ithermo) = next_rng_seed(seed(:, :, ithermo - 1))
       END DO
 
       ! Update initial seed

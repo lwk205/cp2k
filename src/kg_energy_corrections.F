@@ -11,98 +11,98 @@
 !> \author JGH
 ! **************************************************************************************************
 MODULE kg_energy_corrections
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cell_types,                      ONLY: cell_type
-   USE core_ppl,                        ONLY: build_core_ppl
-   USE core_ppnl,                       ONLY: build_core_ppnl
-   USE cp_blacs_env,                    ONLY: cp_blacs_env_type
-   USE cp_control_types,                ONLY: dft_control_type
-   USE cp_dbcsr_cp2k_link,              ONLY: cp_dbcsr_alloc_block_from_nbl
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr,&
-                                              dbcsr_allocate_matrix_set,&
-                                              dbcsr_deallocate_matrix_set
-   USE cp_fm_basic_linalg,              ONLY: cp_fm_triangular_invert
-   USE cp_fm_cholesky,                  ONLY: cp_fm_cholesky_decompose
-   USE cp_fm_diag,                      ONLY: choose_eigv_solver
-   USE cp_fm_struct,                    ONLY: cp_fm_struct_create,&
-                                              cp_fm_struct_release,&
-                                              cp_fm_struct_type
-   USE cp_fm_types,                     ONLY: cp_fm_create,&
-                                              cp_fm_release,&
-                                              cp_fm_set_all,&
-                                              cp_fm_to_fm_triangular,&
-                                              cp_fm_type
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_get_default_unit_nr,&
-                                              cp_logger_type
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: &
-        dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_type, &
-        dbcsr_filter, dbcsr_get_info, dbcsr_init_p, dbcsr_multiply, dbcsr_p_type, dbcsr_release, &
-        dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric
-   USE distribution_1d_types,           ONLY: distribution_1d_type
-   USE distribution_2d_types,           ONLY: distribution_2d_type
-   USE external_potential_types,        ONLY: get_potential,&
-                                              gth_potential_type,&
-                                              sgp_potential_type
-   USE input_constants,                 ONLY: kg_ec_diagonalization,&
-                                              kg_ec_functional_harris
-   USE input_section_types,             ONLY: section_vals_val_get
-   USE kg_environment_types,            ONLY: energy_correction_type,&
-                                              kg_environment_type
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE mao_basis,                       ONLY: mao_generate_basis
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_types,                  ONLY: particle_type
-   USE pw_env_types,                    ONLY: pw_env_get,&
-                                              pw_env_type
-   USE pw_methods,                      ONLY: pw_axpy,&
-                                              pw_integral_ab,&
-                                              pw_scale,&
-                                              pw_transfer
-   USE pw_poisson_methods,              ONLY: pw_poisson_solve
-   USE pw_poisson_types,                ONLY: pw_poisson_type
-   USE pw_pool_types,                   ONLY: pw_pool_create_pw,&
-                                              pw_pool_give_back_pw,&
-                                              pw_pool_p_type,&
-                                              pw_pool_type
-   USE pw_types,                        ONLY: COMPLEXDATA1D,&
-                                              REALDATA3D,&
-                                              REALSPACE,&
-                                              RECIPROCALSPACE,&
-                                              pw_p_type
-   USE qs_core_energies,                ONLY: calculate_ecore_overlap,&
-                                              calculate_ecore_self
-   USE qs_dispersion_pairpot,           ONLY: calculate_dispersion_pairpot
-   USE qs_environment_types,            ONLY: get_qs_env,&
-                                              qs_environment_type
-   USE qs_force_types,                  ONLY: qs_force_type
-   USE qs_integrate_potential,          ONLY: integrate_v_rspace
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              get_qs_kind_set,&
-                                              qs_kind_type
-   USE qs_kinetic,                      ONLY: build_kinetic_matrix
-   USE qs_ks_methods,                   ONLY: calc_rho_tot_gspace
-   USE qs_ks_types,                     ONLY: qs_ks_env_type
-   USE qs_neighbor_list_types,          ONLY: neighbor_list_set_p_type
-   USE qs_neighbor_lists,               ONLY: atom2d_build,&
-                                              atom2d_cleanup,&
-                                              build_neighbor_lists,&
-                                              local_atoms_type,&
-                                              pair_radius_setup
-   USE qs_overlap,                      ONLY: build_overlap_matrix
-   USE qs_rho_types,                    ONLY: qs_rho_get,&
-                                              qs_rho_type
-   USE qs_vxc,                          ONLY: qs_vxc_create
-   USE task_list_methods,               ONLY: generate_qs_task_list
-   USE task_list_types,                 ONLY: allocate_task_list,&
-                                              deallocate_task_list
-   USE virial_types,                    ONLY: virial_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cell_types, ONLY: cell_type
+   USE core_ppl, ONLY: build_core_ppl
+   USE core_ppnl, ONLY: build_core_ppnl
+   USE cp_blacs_env, ONLY: cp_blacs_env_type
+   USE cp_control_types, ONLY: dft_control_type
+   USE cp_dbcsr_cp2k_link, ONLY: cp_dbcsr_alloc_block_from_nbl
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr, &
+                                  dbcsr_allocate_matrix_set, &
+                                  dbcsr_deallocate_matrix_set
+   USE cp_fm_basic_linalg, ONLY: cp_fm_triangular_invert
+   USE cp_fm_cholesky, ONLY: cp_fm_cholesky_decompose
+   USE cp_fm_diag, ONLY: choose_eigv_solver
+   USE cp_fm_struct, ONLY: cp_fm_struct_create, &
+                           cp_fm_struct_release, &
+                           cp_fm_struct_type
+   USE cp_fm_types, ONLY: cp_fm_create, &
+                          cp_fm_release, &
+                          cp_fm_set_all, &
+                          cp_fm_to_fm_triangular, &
+                          cp_fm_type
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_get_default_unit_nr, &
+                              cp_logger_type
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: &
+      dbcsr_add, dbcsr_copy, dbcsr_create, dbcsr_desymmetrize, dbcsr_distribution_type, &
+      dbcsr_filter, dbcsr_get_info, dbcsr_init_p, dbcsr_multiply, dbcsr_p_type, dbcsr_release, &
+      dbcsr_set, dbcsr_trace, dbcsr_type, dbcsr_type_no_symmetry, dbcsr_type_symmetric
+   USE distribution_1d_types, ONLY: distribution_1d_type
+   USE distribution_2d_types, ONLY: distribution_2d_type
+   USE external_potential_types, ONLY: get_potential, &
+                                       gth_potential_type, &
+                                       sgp_potential_type
+   USE input_constants, ONLY: kg_ec_diagonalization, &
+                              kg_ec_functional_harris
+   USE input_section_types, ONLY: section_vals_val_get
+   USE kg_environment_types, ONLY: energy_correction_type, &
+                                   kg_environment_type
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE mao_basis, ONLY: mao_generate_basis
+   USE molecule_types, ONLY: molecule_type
+   USE particle_types, ONLY: particle_type
+   USE pw_env_types, ONLY: pw_env_get, &
+                           pw_env_type
+   USE pw_methods, ONLY: pw_axpy, &
+                         pw_integral_ab, &
+                         pw_scale, &
+                         pw_transfer
+   USE pw_poisson_methods, ONLY: pw_poisson_solve
+   USE pw_poisson_types, ONLY: pw_poisson_type
+   USE pw_pool_types, ONLY: pw_pool_create_pw, &
+                            pw_pool_give_back_pw, &
+                            pw_pool_p_type, &
+                            pw_pool_type
+   USE pw_types, ONLY: COMPLEXDATA1D, &
+                       REALDATA3D, &
+                       REALSPACE, &
+                       RECIPROCALSPACE, &
+                       pw_p_type
+   USE qs_core_energies, ONLY: calculate_ecore_overlap, &
+                               calculate_ecore_self
+   USE qs_dispersion_pairpot, ONLY: calculate_dispersion_pairpot
+   USE qs_environment_types, ONLY: get_qs_env, &
+                                   qs_environment_type
+   USE qs_force_types, ONLY: qs_force_type
+   USE qs_integrate_potential, ONLY: integrate_v_rspace
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            get_qs_kind_set, &
+                            qs_kind_type
+   USE qs_kinetic, ONLY: build_kinetic_matrix
+   USE qs_ks_methods, ONLY: calc_rho_tot_gspace
+   USE qs_ks_types, ONLY: qs_ks_env_type
+   USE qs_neighbor_list_types, ONLY: neighbor_list_set_p_type
+   USE qs_neighbor_lists, ONLY: atom2d_build, &
+                                atom2d_cleanup, &
+                                build_neighbor_lists, &
+                                local_atoms_type, &
+                                pair_radius_setup
+   USE qs_overlap, ONLY: build_overlap_matrix
+   USE qs_rho_types, ONLY: qs_rho_get, &
+                           qs_rho_type
+   USE qs_vxc, ONLY: qs_vxc_create
+   USE task_list_methods, ONLY: generate_qs_task_list
+   USE task_list_types, ONLY: allocate_task_list, &
+                              deallocate_task_list
+   USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -131,7 +131,7 @@ CONTAINS
       LOGICAL, INTENT(IN), OPTIONAL                      :: calculate_forces
 
       CHARACTER(len=*), PARAMETER :: routineN = 'kg_energy_correction', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, unit_nr
       LOGICAL                                            :: my_calc_forces
@@ -210,7 +210,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: calculate_forces
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ec_build_core_hamiltonian', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, nder, nimages
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
@@ -314,7 +314,7 @@ CONTAINS
       TYPE(energy_correction_type), POINTER              :: ec_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ec_build_ks_matrix', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_string_length)               :: headline
       INTEGER                                            :: handle, ispin, nspins
@@ -424,9 +424,9 @@ CONTAINS
          END IF
 
          ! calclulate Int(vhxc*rho)dr and Int(vtau*tau)dr
-         evhxc = evhxc+pw_integral_ab(rho_r(ispin)%pw, v_rspace(ispin)%pw)/v_rspace(1)%pw%pw_grid%dvol
+         evhxc = evhxc + pw_integral_ab(rho_r(ispin)%pw, v_rspace(ispin)%pw)/v_rspace(1)%pw%pw_grid%dvol
          IF (ASSOCIATED(v_tau_rspace)) THEN
-            evhxc = evhxc+pw_integral_ab(tau_r(ispin)%pw, v_tau_rspace(ispin)%pw)/v_tau_rspace(ispin)%pw%pw_grid%dvol
+            evhxc = evhxc + pw_integral_ab(tau_r(ispin)%pw, v_tau_rspace(ispin)%pw)/v_tau_rspace(ispin)%pw%pw_grid%dvol
          END IF
 
       END DO
@@ -444,7 +444,7 @@ CONTAINS
       CALL calculate_ecore_self(qs_env, E_self_core=eself)
       CALL calculate_ecore_overlap(qs_env, para_env, calculate_forces=.FALSE., E_overlap_core=eovrl)
       ec_env%exc = eexc
-      ec_env%ehartree = ehartree+eovrl+eself
+      ec_env%ehartree = ehartree + eovrl + eself
       ec_env%vhxc = evhxc
 
       ! add the core matrix
@@ -543,7 +543,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:, :), POINTER       :: ksmat, smat, pmat
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mao_create_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
       INTEGER, DIMENSION(:), POINTER                     :: col_blk_sizes
@@ -610,7 +610,7 @@ CONTAINS
       TYPE(dbcsr_p_type), DIMENSION(:, :), POINTER       :: ksmat, smat, pmat
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mao_release_matrices', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ispin, nspins
       TYPE(dbcsr_p_type), DIMENSION(:), POINTER          :: mao_coef
@@ -775,7 +775,7 @@ CONTAINS
 
       ! dispersion through pairpotentials
       CALL calculate_dispersion_pairpot(qs_env, ec_env%dispersion_env, energy, .FALSE.)
-      ec_env%edispersion = ec_env%edispersion+energy
+      ec_env%edispersion = ec_env%edispersion + energy
 
       SELECT CASE (ec_env%energy_functional)
       CASE (kg_ec_functional_harris)
@@ -789,10 +789,10 @@ CONTAINS
             IF (unit_nr > 0) WRITE (unit_nr, '(T2,A,T16,F16.10)') 'Tr[PS] ', trace
 !dbg
             CALL dbcsr_trace(ec_env%matrix_ks(ispin, 1)%matrix, ec_env%matrix_p(ispin, 1)%matrix, trace)
-            eband = eband+trace
+            eband = eband + trace
          END DO
          ec_env%eband = eband
-         ec_env%etotal = ec_env%eband+ec_env%ehartree+ec_env%exc-ec_env%vhxc+ec_env%edispersion
+         ec_env%etotal = ec_env%eband + ec_env%ehartree + ec_env%exc - ec_env%vhxc + ec_env%edispersion
          IF (unit_nr > 0) THEN
             WRITE (unit_nr, '(T2,A,T16,F16.10)') "HF Etotal   ", ec_env%etotal
             WRITE (unit_nr, '(T2,A,T16,F16.10)') "Eband    ", ec_env%eband
@@ -827,7 +827,7 @@ CONTAINS
       TYPE(energy_correction_type), POINTER              :: ec_env
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'ec_build_neighborlist', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, ikind, nkind
       LOGICAL                                            :: gth_potential_present, &

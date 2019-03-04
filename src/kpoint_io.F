@@ -10,40 +10,40 @@
 ! **************************************************************************************************
 MODULE kpoint_io
 
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE basis_set_types,                 ONLY: get_gto_basis_set,&
-                                              gto_basis_set_type
-   USE cp_dbcsr_operations,             ONLY: copy_dbcsr_to_fm,&
-                                              copy_fm_to_dbcsr
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_fm_types,                     ONLY: cp_fm_p_type,&
-                                              cp_fm_read_unformatted,&
-                                              cp_fm_type,&
-                                              cp_fm_write_unformatted
-   USE cp_log_handling,                 ONLY: cp_get_default_logger,&
-                                              cp_logger_type,&
-                                              cp_to_string
-   USE cp_output_handling,              ONLY: cp_p_file,&
-                                              cp_print_key_finished_output,&
-                                              cp_print_key_should_output,&
-                                              cp_print_key_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE dbcsr_api,                       ONLY: dbcsr_get_info,&
-                                              dbcsr_p_type
-   USE input_section_types,             ONLY: section_vals_type
-   USE kinds,                           ONLY: default_path_length
-   USE kpoint_types,                    ONLY: get_kpoint_info,&
-                                              kpoint_type
-   USE message_passing,                 ONLY: mp_bcast
-   USE orbital_pointers,                ONLY: nso
-   USE particle_types,                  ONLY: particle_type
-   USE qs_dftb_types,                   ONLY: qs_dftb_atom_type
-   USE qs_dftb_utils,                   ONLY: get_dftb_atom_param
-   USE qs_kind_types,                   ONLY: get_qs_kind,&
-                                              qs_kind_type
-   USE qs_mo_io,                        ONLY: wfn_restart_file_name
-   USE qs_scf_types,                    ONLY: qs_scf_env_type
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE basis_set_types, ONLY: get_gto_basis_set, &
+                              gto_basis_set_type
+   USE cp_dbcsr_operations, ONLY: copy_dbcsr_to_fm, &
+                                  copy_fm_to_dbcsr
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_fm_types, ONLY: cp_fm_p_type, &
+                          cp_fm_read_unformatted, &
+                          cp_fm_type, &
+                          cp_fm_write_unformatted
+   USE cp_log_handling, ONLY: cp_get_default_logger, &
+                              cp_logger_type, &
+                              cp_to_string
+   USE cp_output_handling, ONLY: cp_p_file, &
+                                 cp_print_key_finished_output, &
+                                 cp_print_key_should_output, &
+                                 cp_print_key_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE dbcsr_api, ONLY: dbcsr_get_info, &
+                        dbcsr_p_type
+   USE input_section_types, ONLY: section_vals_type
+   USE kinds, ONLY: default_path_length
+   USE kpoint_types, ONLY: get_kpoint_info, &
+                           kpoint_type
+   USE message_passing, ONLY: mp_bcast
+   USE orbital_pointers, ONLY: nso
+   USE particle_types, ONLY: particle_type
+   USE qs_dftb_types, ONLY: qs_dftb_atom_type
+   USE qs_dftb_utils, ONLY: get_dftb_atom_param
+   USE qs_kind_types, ONLY: get_qs_kind, &
+                            qs_kind_type
+   USE qs_mo_io, ONLY: wfn_restart_file_name
+   USE qs_scf_types, ONLY: qs_scf_env_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -81,7 +81,7 @@ CONTAINS
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_kpoints_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
       CHARACTER(LEN=30), DIMENSION(2), PARAMETER :: &
          keys = (/"SCF%PRINT%RESTART_HISTORY", "SCF%PRINT%RESTART        "/)
 
@@ -188,7 +188,7 @@ CONTAINS
       INTEGER                                            :: ires
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'write_kpoints_file_header', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, iatom, ikind, iset, ishell, &
                                                             lmax, lshell, nao, natom, nset, &
@@ -224,7 +224,7 @@ CONTAINS
             ELSEIF (ASSOCIATED(dftb_parameter)) THEN
                CALL get_dftb_atom_param(dftb_parameter, lmax=lmax)
                nset_max = MAX(nset_max, 1)
-               nshell_max = MAX(nshell_max, lmax+1)
+               nshell_max = MAX(nshell_max, lmax + 1)
             ELSE
                CPABORT("Unknown basis type.")
             END IF
@@ -247,7 +247,7 @@ CONTAINS
                              basis_set=orb_basis_set, dftb_parameter=dftb_parameter)
             IF (ASSOCIATED(orb_basis_set)) THEN
                CALL get_gto_basis_set(gto_basis_set=orb_basis_set, nsgf=nsgf, nset=nset, nshell=nshell, l=l)
-               nao = nao+nsgf
+               nao = nao + nsgf
                nset_info(iatom) = nset
                DO iset = 1, nset
                   nshell_info(iset, iatom) = nshell(iset)
@@ -259,12 +259,12 @@ CONTAINS
             ELSEIF (ASSOCIATED(dftb_parameter)) THEN
                CALL get_dftb_atom_param(dftb_parameter, lmax=lmax)
                nset_info(iatom) = 1
-               nshell_info(1, iatom) = lmax+1
-               DO ishell = 1, lmax+1
-                  lshell = ishell-1
+               nshell_info(1, iatom) = lmax + 1
+               DO ishell = 1, lmax + 1
+                  lshell = ishell - 1
                   nso_info(ishell, 1, iatom) = nso(lshell)
                END DO
-               nao = nao+(lmax+1)**2
+               nao = nao + (lmax + 1)**2
             ELSE
                CPABORT("Unknown basis set type.")
             END IF
@@ -307,7 +307,7 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: natom_mismatch
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_kpoints_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=default_path_length)                 :: file_name
       INTEGER                                            :: group, handle, restart_unit, source
@@ -378,10 +378,10 @@ CONTAINS
       LOGICAL, INTENT(OUT)                               :: natom_mismatch
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'read_kpoints_restart_low', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER :: group, ic, image, ispin, nao, nao_read, natom_read, ni, nimages, nset_max, &
-         nshell_max, nspin, nspin_read, source, version_read
+                 nshell_max, nspin, nspin_read, source, version_read
       INTEGER, DIMENSION(3)                              :: cell
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
       LOGICAL                                            :: natom_match

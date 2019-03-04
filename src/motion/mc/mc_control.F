@@ -11,44 +11,44 @@
 !> \author MJM
 ! **************************************************************************************************
 MODULE mc_control
-   USE atomic_kind_types,               ONLY: get_atomic_kind
-   USE cell_types,                      ONLY: cell_type,&
-                                              get_cell
-   USE cp_files,                        ONLY: close_file,&
-                                              open_file
-   USE cp_log_handling,                 ONLY: cp_logger_get_default_unit_nr
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_types,                 ONLY: cp_subsys_get,&
-                                              cp_subsys_type
-   USE f77_interface,                   ONLY: create_force_env,&
-                                              destroy_force_env,&
-                                              f_env_add_defaults,&
-                                              f_env_rm_defaults,&
-                                              f_env_type
-   USE force_env_types,                 ONLY: force_env_get,&
-                                              force_env_retain,&
-                                              force_env_type
-   USE global_types,                    ONLY: global_environment_type
-   USE input_section_types,             ONLY: section_type
-   USE kinds,                           ONLY: default_path_length,&
-                                              default_string_length,&
-                                              dp
-   USE mc_misc,                         ONLY: mc_make_dat_file_new
-   USE mc_types,                        ONLY: get_mc_molecule_info,&
-                                              get_mc_par,&
-                                              mc_input_file_type,&
-                                              mc_molecule_info_type,&
-                                              mc_simpar_type,&
-                                              set_mc_par
-   USE message_passing,                 ONLY: mp_bcast
-   USE molecule_kind_list_types,        ONLY: molecule_kind_list_type
-   USE molecule_kind_types,             ONLY: atom_type,&
-                                              get_molecule_kind,&
-                                              molecule_kind_type
-   USE parallel_rng_types,              ONLY: next_random_number,&
-                                              rng_stream_type
-   USE particle_list_types,             ONLY: particle_list_type
-   USE physcon,                         ONLY: angstrom
+   USE atomic_kind_types, ONLY: get_atomic_kind
+   USE cell_types, ONLY: cell_type, &
+                         get_cell
+   USE cp_files, ONLY: close_file, &
+                       open_file
+   USE cp_log_handling, ONLY: cp_logger_get_default_unit_nr
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_types, ONLY: cp_subsys_get, &
+                              cp_subsys_type
+   USE f77_interface, ONLY: create_force_env, &
+                            destroy_force_env, &
+                            f_env_add_defaults, &
+                            f_env_rm_defaults, &
+                            f_env_type
+   USE force_env_types, ONLY: force_env_get, &
+                              force_env_retain, &
+                              force_env_type
+   USE global_types, ONLY: global_environment_type
+   USE input_section_types, ONLY: section_type
+   USE kinds, ONLY: default_path_length, &
+                    default_string_length, &
+                    dp
+   USE mc_misc, ONLY: mc_make_dat_file_new
+   USE mc_types, ONLY: get_mc_molecule_info, &
+                       get_mc_par, &
+                       mc_input_file_type, &
+                       mc_molecule_info_type, &
+                       mc_simpar_type, &
+                       set_mc_par
+   USE message_passing, ONLY: mp_bcast
+   USE molecule_kind_list_types, ONLY: molecule_kind_list_type
+   USE molecule_kind_types, ONLY: atom_type, &
+                                  get_molecule_kind, &
+                                  molecule_kind_type
+   USE parallel_rng_types, ONLY: next_random_number, &
+                                 rng_stream_type
+   USE particle_list_types, ONLY: particle_list_type
+   USE physcon, ONLY: angstrom
 #include "../../base/base_uses.f90"
 
    IMPLICIT NONE
@@ -82,7 +82,7 @@ CONTAINS
       TYPE(force_env_type), POINTER                      :: force_env
 
       CHARACTER(len=*), PARAMETER :: routineN = 'write_mc_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(LEN=20)                                  :: ensemble
       CHARACTER(LEN=default_path_length)                 :: restart_file_name
@@ -141,7 +141,7 @@ CONTAINS
                   WRITE (unit, '(1X,A,1X,3(F15.10,3X))') &
                      TRIM(ADJUSTL(name)), &
                      particles%els(iparticle)%r(1:3)*angstrom
-                  iparticle = iparticle+1
+                  iparticle = iparticle + 1
                ENDDO
             ENDDO
          ENDDO
@@ -175,7 +175,7 @@ CONTAINS
       TYPE(rng_stream_type), POINTER                     :: rng_stream
 
       CHARACTER(len=*), PARAMETER :: routineN = 'read_mc_restart', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       CHARACTER(5), ALLOCATABLE, DIMENSION(:)            :: atom_symbols
       CHARACTER(default_string_length), &
@@ -228,7 +228,7 @@ CONTAINS
       CALL mp_bcast(nchains, source, group)
 
       ! do some checking
-      IF (ABS(temperature-mc_temp) .GT. 0.01E0_dp) THEN
+      IF (ABS(temperature - mc_temp) .GT. 0.01E0_dp) THEN
          IF (ionode) THEN
             WRITE (iw, *) 'The temperature in the restart file is ', &
                'not the same as the input file.'
@@ -268,9 +268,9 @@ CONTAINS
          box_length(1:3) = box_length(1:3)/angstrom ! convert to a.u.
       ENDIF
       CALL mp_bcast(box_length, source, group)
-      IF (ABS(box_length(1)-abc(1)) .GT. 0.0001E0_dp .OR. &
-          ABS(box_length(2)-abc(2)) .GT. 0.0001E0_dp .OR. &
-          ABS(box_length(3)-abc(3)) .GT. 0.0001E0_dp) THEN
+      IF (ABS(box_length(1) - abc(1)) .GT. 0.0001E0_dp .OR. &
+          ABS(box_length(2) - abc(2)) .GT. 0.0001E0_dp .OR. &
+          ABS(box_length(3) - abc(3)) .GT. 0.0001E0_dp) THEN
          IF (ionode) THEN
             WRITE (iw, *) 'The cell length in the restart file is ', &
                'not the same as the input file.'
@@ -317,7 +317,7 @@ CONTAINS
 
       ! advance the random number sequence based on the restart step
       IF (ionode) THEN
-         DO i = 1, nstart+1
+         DO i = 1, nstart + 1
             rand = next_random_number(rng_stream)
          ENDDO
       ENDIF
@@ -353,7 +353,7 @@ CONTAINS
       TYPE(global_environment_type), OPTIONAL, POINTER   :: globenv_new
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mc_create_force_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: f_env_id, ierr, output_unit
       TYPE(f_env_type), POINTER                          :: f_env
@@ -409,7 +409,7 @@ CONTAINS
       LOGICAL, INTENT(IN)                                :: ionode
 
       CHARACTER(LEN=*), PARAMETER :: routineN = 'mc_create_bias_force_env', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       IF (ionode) &
          CALL mc_make_dat_file_new(r(:, :), atom_symbols, nunits_tot, &

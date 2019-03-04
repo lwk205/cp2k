@@ -10,35 +10,35 @@
 !> \author Thomas D. Kuehne (tkuehne@phys.chem.ethz.ch)
 ! **************************************************************************************************
 MODULE eip_environment
-   USE atomic_kind_types,               ONLY: atomic_kind_type,&
-                                              get_atomic_kind
-   USE cell_methods,                    ONLY: read_cell,&
-                                              write_cell
-   USE cell_types,                      ONLY: cell_release,&
-                                              cell_type,&
-                                              get_cell
-   USE cp_para_types,                   ONLY: cp_para_env_type
-   USE cp_subsys_methods,               ONLY: cp_subsys_create
-   USE cp_subsys_types,                 ONLY: cp_subsys_release,&
-                                              cp_subsys_set,&
-                                              cp_subsys_type
-   USE distribution_1d_types,           ONLY: distribution_1d_release,&
-                                              distribution_1d_type
-   USE distribution_methods,            ONLY: distribute_molecules_1d
-   USE eip_environment_types,           ONLY: eip_env_set,&
-                                              eip_environment_type
-   USE input_section_types,             ONLY: section_vals_get_subs_vals,&
-                                              section_vals_type,&
-                                              section_vals_val_get
-   USE kinds,                           ONLY: default_string_length,&
-                                              dp
-   USE molecule_kind_types,             ONLY: molecule_kind_type,&
-                                              write_molecule_kind_set
-   USE molecule_types,                  ONLY: molecule_type
-   USE particle_methods,                ONLY: write_fist_particle_coordinates,&
-                                              write_particle_distances,&
-                                              write_structure_data
-   USE particle_types,                  ONLY: particle_type
+   USE atomic_kind_types, ONLY: atomic_kind_type, &
+                                get_atomic_kind
+   USE cell_methods, ONLY: read_cell, &
+                           write_cell
+   USE cell_types, ONLY: cell_release, &
+                         cell_type, &
+                         get_cell
+   USE cp_para_types, ONLY: cp_para_env_type
+   USE cp_subsys_methods, ONLY: cp_subsys_create
+   USE cp_subsys_types, ONLY: cp_subsys_release, &
+                              cp_subsys_set, &
+                              cp_subsys_type
+   USE distribution_1d_types, ONLY: distribution_1d_release, &
+                                    distribution_1d_type
+   USE distribution_methods, ONLY: distribute_molecules_1d
+   USE eip_environment_types, ONLY: eip_env_set, &
+                                    eip_environment_type
+   USE input_section_types, ONLY: section_vals_get_subs_vals, &
+                                  section_vals_type, &
+                                  section_vals_val_get
+   USE kinds, ONLY: default_string_length, &
+                    dp
+   USE molecule_kind_types, ONLY: molecule_kind_type, &
+                                  write_molecule_kind_set
+   USE molecule_types, ONLY: molecule_type
+   USE particle_methods, ONLY: write_fist_particle_coordinates, &
+                               write_particle_distances, &
+                               write_structure_data
+   USE particle_types, ONLY: particle_type
 #include "./base/base_uses.f90"
 
    IMPLICIT NONE
@@ -139,7 +139,7 @@ CONTAINS
       TYPE(section_vals_type), POINTER                   :: subsys_section
 
       CHARACTER(len=*), PARAMETER :: routineN = 'eip_init_subsys', &
-         routineP = moduleN//':'//routineN
+                                     routineP = moduleN//':'//routineN
 
       INTEGER                                            :: handle, natom
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
