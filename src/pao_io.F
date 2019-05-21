@@ -478,7 +478,7 @@ CONTAINS
       ENDDO
 
       ! flush
-      IF (unit_nr > 0) FLUSH(unit_nr)
+      IF (unit_nr > 0) FLUSH (unit_nr)
 
    END SUBROUTINE pao_write_diagonal_blocks
 

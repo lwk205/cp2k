@@ -455,7 +455,7 @@ CONTAINS
       CPASSERT(file_io .GT. 0)
       CPASSERT(ASSOCIATED(tmc_params%move_types))
 
-      FLUSH(file_io)
+      FLUSH (file_io)
 
       IF (.NOT. init .AND. &
           tmc_params%move_types%mv_weight(mv_type_NMC_moves) .GT. 0 .AND. &

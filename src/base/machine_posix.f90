@@ -21,7 +21,7 @@
 
   INTEGER(KIND=int_8), PUBLIC, SAVE :: m_memory_max = 0
 
-CONTAINS
+  CONTAINS
 
 ! *****************************************************************************
 !> \brief Can be used to get a nice core
@@ -52,7 +52,7 @@ CONTAINS
   SUBROUTINE m_flush(lunit)
      INTEGER, INTENT(IN)                      :: lunit
 
-     FLUSH(lunit)
+     FLUSH (lunit)
   END SUBROUTINE m_flush
 
 ! *****************************************************************************

@@ -993,67 +993,67 @@ CONTAINS
       ELSEIF (plan%fsign == -1 .AND. plan%trans) THEN
          io = plan%m
          DO = 1
-         END IF
+      END IF
 
-         IF (plan%fsign == +1) THEN
-            CALL dfftw_plan_many_dft(plan%fftw_plan, 1, plan%n, num_rows, zin, 0, ii, di, &
-                                     zout, 0, io, DO, FFTW_FORWARD, fftw_plan_type)
-         ELSE
-            CALL dfftw_plan_many_dft(plan%fftw_plan, 1, plan%n, num_rows, zin, 0, ii, di, &
-                                     zout, 0, io, DO, FFTW_BACKWARD, fftw_plan_type)
-         END IF
+      IF (plan%fsign == +1) THEN
+         CALL dfftw_plan_many_dft(plan%fftw_plan, 1, plan%n, num_rows, zin, 0, ii, di, &
+                                  zout, 0, io, DO, FFTW_FORWARD, fftw_plan_type)
+      ELSE
+         CALL dfftw_plan_many_dft(plan%fftw_plan, 1, plan%n, num_rows, zin, 0, ii, di, &
+                                  zout, 0, io, DO, FFTW_BACKWARD, fftw_plan_type)
+      END IF
 
-!$       IF (plan%need_alt_plan) THEN
-!$          plan%alt_num_rows = plan%m - (plan%num_threads_needed - 1)*num_rows
-!$          IF (plan%fsign == +1) THEN
-!$             CALL dfftw_plan_many_dft(plan%alt_fftw_plan, 1, plan%n, plan%alt_num_rows, zin, 0, ii, di, &
-!$                                      zout, 0, io, DO, FFTW_FORWARD, fftw_plan_type)
-!$          ELSE
-!$             CALL dfftw_plan_many_dft(plan%alt_fftw_plan, 1, plan%n, plan%alt_num_rows, zin, 0, ii, di, &
-!$                                      zout, 0, io, DO, FFTW_BACKWARD, fftw_plan_type)
-!$          END IF
+!$    IF (plan%need_alt_plan) THEN
+!$       plan%alt_num_rows = plan%m - (plan%num_threads_needed - 1)*num_rows
+!$       IF (plan%fsign == +1) THEN
+!$          CALL dfftw_plan_many_dft(plan%alt_fftw_plan, 1, plan%n, plan%alt_num_rows, zin, 0, ii, di, &
+!$                                   zout, 0, io, DO, FFTW_FORWARD, fftw_plan_type)
+!$       ELSE
+!$          CALL dfftw_plan_many_dft(plan%alt_fftw_plan, 1, plan%n, plan%alt_num_rows, zin, 0, ii, di, &
+!$                                   zout, 0, io, DO, FFTW_BACKWARD, fftw_plan_type)
 !$       END IF
+!$    END IF
 
 #else
-         MARK_USED(plan)
-         MARK_USED(plan_style)
-         !MARK_USED does not work with assumed size arguments
-         IF (.FALSE.) THEN; DO; IF (ABS(zin(1)) > ABS(zout(1))) EXIT; ENDDO; ENDIF
+      MARK_USED(plan)
+      MARK_USED(plan_style)
+      !MARK_USED does not work with assumed size arguments
+      IF (.FALSE.) THEN; DO; IF (ABS(zin(1)) > ABS(zout(1))) EXIT; ENDDO; ENDIF
 #endif
 
-      END SUBROUTINE fftw3_create_plan_1dm
+   END SUBROUTINE fftw3_create_plan_1dm
 
 ! **************************************************************************************************
 !> \brief ...
 !> \param plan ...
 ! **************************************************************************************************
-      SUBROUTINE fftw3_destroy_plan(plan)
+   SUBROUTINE fftw3_destroy_plan(plan)
 
-         TYPE(fft_plan_type), INTENT(INOUT)   :: plan
+      TYPE(fft_plan_type), INTENT(INOUT)   :: plan
 
 #if defined ( __FFTW3 )
-!$       IF (plan%need_alt_plan) THEN
-!$          CALL XFFTW_DESTROY_PLAN(plan%alt_fftw_plan)
-!$       END IF
+!$    IF (plan%need_alt_plan) THEN
+!$       CALL XFFTW_DESTROY_PLAN(plan%alt_fftw_plan)
+!$    END IF
 
-         IF (.NOT. plan%separated_plans) THEN
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan)
-         ELSE
-            ! If it is a separated plan then we have to destroy
-            ! each dim plan individually
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nx)
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_ny)
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nz)
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nx_r)
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_ny_r)
-            CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nz_r)
-         ENDIF
+      IF (.NOT. plan%separated_plans) THEN
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan)
+      ELSE
+         ! If it is a separated plan then we have to destroy
+         ! each dim plan individually
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nx)
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_ny)
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nz)
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nx_r)
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_ny_r)
+         CALL XFFTW_DESTROY_PLAN(plan%fftw_plan_nz_r)
+      ENDIF
 
 #else
-         MARK_USED(plan)
+      MARK_USED(plan)
 #endif
 
-      END SUBROUTINE fftw3_destroy_plan
+   END SUBROUTINE fftw3_destroy_plan
 
 ! **************************************************************************************************
 !> \brief ...
@@ -1063,75 +1063,75 @@ CONTAINS
 !> \param scale ...
 !> \param stat ...
 ! **************************************************************************************************
-      SUBROUTINE fftw31dm(plan, zin, zout, scale, stat)
-         TYPE(fft_plan_type), INTENT(IN)                    :: plan
-         COMPLEX(KIND=dp), DIMENSION(*), INTENT(IN), TARGET :: zin
-         COMPLEX(KIND=dp), DIMENSION(*), INTENT(INOUT), &
-            TARGET                                          :: zout
-         REAL(KIND=dp), INTENT(IN)                          :: scale
-         INTEGER, INTENT(OUT)                               :: stat
+   SUBROUTINE fftw31dm(plan, zin, zout, scale, stat)
+      TYPE(fft_plan_type), INTENT(IN)                    :: plan
+      COMPLEX(KIND=dp), DIMENSION(*), INTENT(IN), TARGET :: zin
+      COMPLEX(KIND=dp), DIMENSION(*), INTENT(INOUT), &
+         TARGET                                          :: zout
+      REAL(KIND=dp), INTENT(IN)                          :: scale
+      INTEGER, INTENT(OUT)                               :: stat
 
-         COMPLEX(KIND=dp), POINTER                          :: zin_ptr, zout_ptr, zscal_ptr
-         INTEGER                                            :: in_offset, my_id, num_rows, out_offset, &
-                                                               scal_offset
-         INTEGER(KIND=C_INTPTR_T)                           :: fftw_plan
+      COMPLEX(KIND=dp), POINTER                          :: zin_ptr, zout_ptr, zscal_ptr
+      INTEGER                                            :: in_offset, my_id, num_rows, out_offset, &
+                                                            scal_offset
+      INTEGER(KIND=C_INTPTR_T)                           :: fftw_plan
 
 !------------------------------------------------------------------------------
 
-         my_id = 0
-         num_rows = plan%m
+      my_id = 0
+      num_rows = plan%m
 
 !$OMP PARALLEL DEFAULT(NONE), &
 !$OMP          PRIVATE(my_id,num_rows,zin_ptr,zout_ptr,zscal_ptr,in_offset,out_offset,scal_offset,fftw_plan), &
 !$OMP          SHARED(zin,zout), &
 !$OMP          SHARED(plan,scale,stat)
-!$       my_id = omp_get_thread_num()
+!$    my_id = omp_get_thread_num()
 
-!$       if (my_id < plan%num_threads_needed) then
+!$    if (my_id < plan%num_threads_needed) then
 
-            fftw_plan = plan%fftw_plan
+         fftw_plan = plan%fftw_plan
 
-            in_offset = 1
-            out_offset = 1
-            scal_offset = 1
+         in_offset = 1
+         out_offset = 1
+         scal_offset = 1
 
-!$          in_offset = 1 + plan%num_rows*my_id*plan%n
-!$          out_offset = 1 + plan%num_rows*my_id*plan%n
-!$          IF (plan%fsign == +1 .AND. plan%trans) THEN
-!$             in_offset = 1 + plan%num_rows*my_id
-!$          ELSEIF (plan%fsign == -1 .AND. plan%trans) THEN
-!$             out_offset = 1 + plan%num_rows*my_id
-!$          ENDIF
-!$          scal_offset = 1 + plan%n*plan%num_rows*my_id
-!$          IF (plan%need_alt_plan .AND. my_id .EQ. plan%num_threads_needed - 1) THEN
-!$             num_rows = plan%alt_num_rows
-!$             fftw_plan = plan%alt_fftw_plan
-!$          ELSE
-!$             num_rows = plan%num_rows
-!$          ENDIF
+!$       in_offset = 1 + plan%num_rows*my_id*plan%n
+!$       out_offset = 1 + plan%num_rows*my_id*plan%n
+!$       IF (plan%fsign == +1 .AND. plan%trans) THEN
+!$          in_offset = 1 + plan%num_rows*my_id
+!$       ELSEIF (plan%fsign == -1 .AND. plan%trans) THEN
+!$          out_offset = 1 + plan%num_rows*my_id
+!$       ENDIF
+!$       scal_offset = 1 + plan%n*plan%num_rows*my_id
+!$       IF (plan%need_alt_plan .AND. my_id .EQ. plan%num_threads_needed - 1) THEN
+!$          num_rows = plan%alt_num_rows
+!$          fftw_plan = plan%alt_fftw_plan
+!$       ELSE
+!$          num_rows = plan%num_rows
+!$       ENDIF
 
-            zin_ptr => zin(in_offset)
-            zout_ptr => zout(out_offset)
-            zscal_ptr => zout(scal_offset)
+         zin_ptr => zin(in_offset)
+         zout_ptr => zout(out_offset)
+         zscal_ptr => zout(scal_offset)
 
 #if defined ( __FFTW3 )
 !$OMP MASTER
-            stat = 1
+         stat = 1
 !$OMP END MASTER
-            CALL dfftw_execute_dft(fftw_plan, zin_ptr, zout_ptr)
-!$       endif
+         CALL dfftw_execute_dft(fftw_plan, zin_ptr, zout_ptr)
+!$    endif
 ! all theads need to meet at this barrier
 !$OMP BARRIER
-!$       if (my_id < plan%num_threads_needed) then
-            IF (scale /= 1.0_dp) CALL zdscal(plan%n*num_rows, scale, zscal_ptr, 1)
-!$       endif
+!$    if (my_id < plan%num_threads_needed) then
+         IF (scale /= 1.0_dp) CALL zdscal(plan%n*num_rows, scale, zscal_ptr, 1)
+!$    endif
 
 #else
-         MARK_USED(plan)
-         MARK_USED(scale)
-         !MARK_USED does not work with assumed size arguments
-         IF (.FALSE.) THEN; DO; IF (ABS(zin(1)) > ABS(zout(1))) EXIT; ENDDO; ENDIF
-         stat = 0
+      MARK_USED(plan)
+      MARK_USED(scale)
+      !MARK_USED does not work with assumed size arguments
+      IF (.FALSE.) THEN; DO; IF (ABS(zin(1)) > ABS(zout(1))) EXIT; ENDDO; ENDIF
+      stat = 0
 
 !$    else
 !$    end if
