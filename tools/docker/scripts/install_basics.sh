@@ -3,21 +3,28 @@
 # author: Ole Schuett
 
 # install Ubuntu packages
-apt-get update
-apt-get install -y --no-install-recommends \
+apt-get update -qq
+apt-get install -qq --no-install-recommends \
+    autoconf                               \
+    autogen                                \
+    automake                               \
+    autotools-dev                          \
     ca-certificates                        \
-    python                                 \
-    git                                    \
-    nano                                   \
-    wget                                   \
-    unzip                                  \
-    less                                   \
-    make                                   \
     cmake                                  \
-    rsync
+    git                                    \
+    less                                   \
+    libtool                                \
+    make                                   \
+    nano                                   \
+    pkg-config                             \
+    python                                 \
+    rsync                                  \
+    unzip                                  \
+    wget
+
 rm -rf /var/lib/apt/lists/*
 
 # clone cp2k repository
-git clone --recursive --depth=1 --single-branch -b master https://github.com/cp2k/cp2k.git /workspace/cp2k
+git clone --quiet --recursive --depth=1 --single-branch -b master https://github.com/cp2k/cp2k.git /workspace/cp2k
 
 #EOF

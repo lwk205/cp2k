@@ -31,6 +31,7 @@ The basic steps are:
 ```
 
 - Once the script has completed successfully, follow the instructions given at the end of its output.
+Note that the pre-built arch files provided by the toolchain are for the GNU compiler, users have to adapt them for other compilers. It is possible to use the provided [arch files](./arch) as guidance.
 
 Sub-points here discuss prerequisites needed to build CP2K. Copies of the recommended versions of 3rd party software can be downloaded from https://www.cp2k.org/static/downloads/.
 
@@ -39,10 +40,10 @@ Sub-points here discuss prerequisites needed to build CP2K. Copies of the recomm
 GNU make should be on your system (gmake or make on linux) and used for the build, go to https://www.gnu.org/software/make/make.html download from https://ftp.gnu.org/pub/gnu/make/ also Python (2.x) is required for building.
 
 ### 2b. Python (required, build system)
-Python 2.x is needed to run the dependency generator. On most system Python is already installed. For more information visit: https://www.python.org/
+Python 2.7 or 3.5+ is needed to run the dependency generator. On most system Python is already installed. For more information visit: https://www.python.org/
 
 ### 2c. Fortran and C Compiler (required, build system)
-A Fortran 2003 compiler and matching C compiler should be installed on your system. We have good experience with gcc/gfortran (gcc >=4.6 works, later version recommended). Be aware that some compilers have bugs that might cause them to fail (internal compiler errors, segfaults) or, worse, yield a mis-compiled CP2K. Report bugs to compiler vendors; they (and we) have an interest in fixing them. Always run a `make -j test` (See point 5.) after compilation to identify these problems.
+A Fortran 2008 compiler and matching C compiler should be installed on your system. We have good experience with gcc/gfortran (gcc >=4.6 works, later version recommended). Be aware that some compilers have bugs that might cause them to fail (internal compiler errors, segfaults) or, worse, yield a mis-compiled CP2K. Report bugs to compiler vendors; they (and we) have an interest in fixing them. A list of tested compiler can be found [here](https://www.cp2k.org/dev:compiler_support). Always run a `make -j test` (See point 5.) after compilation to identify these problems.
 
 ### 2d. BLAS and LAPACK (required, base functionality)
 BLAS and LAPACK should be installed.  Using vendor-provided libraries can make a very significant difference (up to 100%, e.g., ACML, MKL, ESSL), not all optimized libraries are bug free. Use the latest versions available, use the interfaces matching your compiler, and download all patches!
@@ -125,7 +126,7 @@ Library ELPA for the solution of the eigenvalue problem
   * A version of ELPA can to be downloaded from http://elpa.rzg.mpg.de/software.
   * During the installation the libelpa.a (or libelpa_mt.a if omp active) is created.
   * Add `-D__ELPA=YYYYMM` to DFLAGS, where `YYYYMM` denotes the release date of the library.
-  * Currently supported versions are: `201112`, `201308`, `201311`, `201406`, `201502`, `201505`, `201511`, `201605`, and `201611`.
+  * Currently supported versions are: `201611`, `201705` and `201711`.
   * Add `-I$(ELPA_INCLUDE_DIR)/modules` to FCFLAGS
   * Add `-I$(ELPA_INCLUDE_DIR)/elpa` to FCFLAGS
   * Add `-L$(ELPA_DIR)` to `LDFLAGS`

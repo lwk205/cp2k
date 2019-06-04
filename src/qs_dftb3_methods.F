@@ -11,8 +11,7 @@ MODULE qs_dftb3_methods
    USE atomic_kind_types, ONLY: atomic_kind_type, &
                                 get_atomic_kind_set
    USE atprop_types, ONLY: atprop_type
-   USE cell_types, ONLY: cell_type, &
-                         pbc
+   USE cell_types, ONLY: cell_type
    USE cp_para_types, ONLY: cp_para_env_type
    USE dbcsr_api, ONLY: dbcsr_add, &
                         dbcsr_get_block_p, &
@@ -28,14 +27,11 @@ MODULE qs_dftb3_methods
                            kpoint_type
    USE message_passing, ONLY: mp_sum
    USE particle_types, ONLY: particle_type
-   USE qs_dftb_types, ONLY: qs_dftb_atom_type
-   USE qs_dftb_utils, ONLY: get_dftb_atom_param
    USE qs_energy_types, ONLY: qs_energy_type
    USE qs_environment_types, ONLY: get_qs_env, &
                                    qs_environment_type
    USE qs_force_types, ONLY: qs_force_type
-   USE qs_kind_types, ONLY: get_qs_kind, &
-                            qs_kind_type
+   USE qs_kind_types, ONLY: qs_kind_type
    USE qs_neighbor_list_types, ONLY: get_iterator_info, &
                                      neighbor_list_iterate, &
                                      neighbor_list_iterator_create, &
@@ -44,6 +40,7 @@ MODULE qs_dftb3_methods
                                      neighbor_list_set_p_type
    USE qs_rho_types, ONLY: qs_rho_get, &
                            qs_rho_type
+   USE sap_kind_types, ONLY: sap_int_type
    USE virial_methods, ONLY: virial_pair_force
    USE virial_types, ONLY: virial_type
 #include "./base/base_uses.f90"
@@ -65,32 +62,38 @@ CONTAINS
 !> \param rho ...
 !> \param mcharge ...
 !> \param energy ...
+!> \param xgamma ...
+!> \param zeff ...
+!> \param sap_int ...
 !> \param calculate_forces ...
 !> \param just_energy ...
 ! **************************************************************************************************
-   SUBROUTINE build_dftb3_diagonal(qs_env, ks_matrix, rho, mcharge, energy, &
-                                   calculate_forces, just_energy)
+   SUBROUTINE build_dftb3_diagonal(qs_env, ks_matrix, rho, mcharge, energy, xgamma, zeff, &
+                                   sap_int, calculate_forces, just_energy)
 
       TYPE(qs_environment_type), POINTER                 :: qs_env
       TYPE(dbcsr_p_type), DIMENSION(:, :), POINTER       :: ks_matrix
       TYPE(qs_rho_type), POINTER                         :: rho
       REAL(dp), DIMENSION(:)                             :: mcharge
       TYPE(qs_energy_type), POINTER                      :: energy
+      REAL(dp), DIMENSION(:)                             :: xgamma, zeff
+      TYPE(sap_int_type), DIMENSION(:), POINTER          :: sap_int
       LOGICAL, INTENT(in)                                :: calculate_forces, just_energy
 
       CHARACTER(len=*), PARAMETER :: routineN = 'build_dftb3_diagonal', &
                                      routineP = moduleN//':'//routineN
 
-      INTEGER                                            :: atom_i, atom_j, blk, handle, i, ia, &
+      INTEGER                                            :: atom_i, atom_j, blk, handle, i, ia, iac, &
                                                             iatom, ic, icol, ikind, irow, is, &
-                                                            jatom, jkind, natom, nimg
+                                                            jatom, jkind, natom, nimg, nkind
       INTEGER, DIMENSION(3)                              :: cellind
       INTEGER, DIMENSION(:), POINTER                     :: atom_of_kind, kind_of
       INTEGER, DIMENSION(:, :, :), POINTER               :: cell_to_index
       LOGICAL                                            :: found, use_virial
-      REAL(KIND=dp)                                      :: dr, eb3, eloc, fi, gmij, ua, ui, uj, zeff
+      REAL(KIND=dp)                                      :: dr, eb3, eloc, fi, gmij, ua, ui, uj
       REAL(KIND=dp), DIMENSION(3)                        :: fij, rij
       REAL(KIND=dp), DIMENSION(:, :), POINTER            :: dsblock, ksblock, pblock, sblock
+      REAL(KIND=dp), DIMENSION(:, :, :), POINTER         :: dsint
       TYPE(atomic_kind_type), DIMENSION(:), POINTER      :: atomic_kind_set
       TYPE(atprop_type), POINTER                         :: atprop
       TYPE(cell_type), POINTER                           :: cell
@@ -104,7 +107,6 @@ CONTAINS
       TYPE(neighbor_list_set_p_type), DIMENSION(:), &
          POINTER                                         :: n_list
       TYPE(particle_type), DIMENSION(:), POINTER         :: particle_set
-      TYPE(qs_dftb_atom_type), POINTER                   :: dftb_kind
       TYPE(qs_force_type), DIMENSION(:), POINTER         :: force
       TYPE(qs_kind_type), DIMENSION(:), POINTER          :: qs_kind_set
       TYPE(virial_type), POINTER                         :: virial
@@ -119,15 +121,14 @@ CONTAINS
       eb3 = 0.0_dp
       CALL get_qs_env(qs_env=qs_env, local_particles=local_particles)
       DO ikind = 1, SIZE(local_particles%n_el)
-         CALL get_qs_kind(qs_kind_set(ikind), dftb_parameter=dftb_kind)
-         CALL get_dftb_atom_param(dftb_kind, dudq=ua, zeff=zeff)
+         ua = xgamma(ikind)
          DO ia = 1, local_particles%n_el(ikind)
             iatom = local_particles%list(ikind)%array(ia)
             eloc = -1.0_dp/6.0_dp*ua*mcharge(iatom)**3
             eb3 = eb3 + eloc
             IF (atprop%energy) THEN
                ! we have to add the part not covered by 0.5*Tr(FP)
-               eloc = -0.5_dp*eloc - 0.25_dp*ua*zeff*mcharge(iatom)**2
+               eloc = -0.5_dp*eloc - 0.25_dp*ua*zeff(ikind)*mcharge(iatom)**2
                atprop%atecoul(iatom) = atprop%atecoul(iatom) + eloc
             END IF
          END DO
@@ -168,12 +169,10 @@ CONTAINS
                CALL dbcsr_iterator_next_block(iter, irow, icol, sblock, blk)
                ikind = kind_of(irow)
                atom_i = atom_of_kind(irow)
-               CALL get_qs_kind(qs_kind_set(ikind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=ui)
+               ui = xgamma(ikind)
                jkind = kind_of(icol)
                atom_j = atom_of_kind(icol)
-               CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=uj)
+               uj = xgamma(jkind)
                !
                gmij = -0.5_dp*(ui*mcharge(irow)**2 + uj*mcharge(icol)**2)
                !
@@ -191,18 +190,54 @@ CONTAINS
                   force(jkind)%rho_elec(i, atom_j) = force(jkind)%rho_elec(i, atom_j) - fi
                   fij(i) = fi
                END DO
-               ! probably only correct for MIC cases (large enough unit cells)
-               IF (use_virial) THEN
-                  rij = particle_set(irow)%r - particle_set(icol)%r
-                  rij = pbc(rij, cell)
-                  CALL virial_pair_force(virial%pv_virial, -1._dp, fij, rij)
-                  IF (atprop%stress) THEN
-                     CALL virial_pair_force(atprop%atstress(:, :, irow), -0.5_dp, fij, rij)
-                     CALL virial_pair_force(atprop%atstress(:, :, icol), -0.5_dp, fij, rij)
-                  END IF
-               END IF
             ENDDO
             CALL dbcsr_iterator_stop(iter)
+            ! use dsint list
+            IF (use_virial) THEN
+               CPASSERT(ASSOCIATED(sap_int))
+               CALL get_qs_env(qs_env, nkind=nkind)
+               DO ikind = 1, nkind
+                  DO jkind = 1, nkind
+                     iac = ikind + nkind*(jkind - 1)
+                     IF (.NOT. ASSOCIATED(sap_int(iac)%alist)) CYCLE
+                     ui = xgamma(ikind)
+                     uj = xgamma(jkind)
+                     DO ia = 1, sap_int(iac)%nalist
+                        IF (.NOT. ASSOCIATED(sap_int(iac)%alist(ia)%clist)) CYCLE
+                        iatom = sap_int(iac)%alist(ia)%aatom
+                        DO ic = 1, sap_int(iac)%alist(ia)%nclist
+                           jatom = sap_int(iac)%alist(ia)%clist(ic)%catom
+                           rij = sap_int(iac)%alist(ia)%clist(ic)%rac
+                           dr = SQRT(SUM(rij(:)**2))
+                           IF (dr > 1.e-6_dp) THEN
+                              dsint => sap_int(iac)%alist(ia)%clist(ic)%acint
+                              gmij = -0.5_dp*(ui*mcharge(iatom)**2 + uj*mcharge(jatom)**2)
+                              icol = MAX(iatom, jatom)
+                              irow = MIN(iatom, jatom)
+                              NULLIFY (pblock)
+                              CALL dbcsr_get_block_p(matrix=matrix_p(1, 1)%matrix, &
+                                                     row=irow, col=icol, block=pblock, found=found)
+                              CPASSERT(found)
+                              DO i = 1, 3
+                                 IF (irow == iatom) THEN
+                                    fij(i) = -gmij*SUM(pblock*dsint(:, :, i))
+                                 ELSE
+                                    fij(i) = -gmij*SUM(TRANSPOSE(pblock)*dsint(:, :, i))
+                                 END IF
+                              END DO
+                              fi = 1.0_dp
+                              IF (iatom == jatom) fi = 0.5_dp
+                              CALL virial_pair_force(virial%pv_virial, fi, fij, rij)
+                              IF (atprop%stress) THEN
+                                 CALL virial_pair_force(atprop%atstress(:, :, irow), fi*0.5_dp, fij, rij)
+                                 CALL virial_pair_force(atprop%atstress(:, :, icol), fi*0.5_dp, fij, rij)
+                              END IF
+                           END IF
+                        END DO
+                     END DO
+                  END DO
+               END DO
+            END IF
          ELSE
             NULLIFY (n_list)
             CALL get_qs_env(qs_env=qs_env, sab_orb=n_list)
@@ -222,12 +257,10 @@ CONTAINS
 
                ikind = kind_of(iatom)
                atom_i = atom_of_kind(iatom)
-               CALL get_qs_kind(qs_kind_set(ikind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=ui)
+               ui = xgamma(ikind)
                jkind = kind_of(jatom)
                atom_j = atom_of_kind(jatom)
-               CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=uj)
+               uj = xgamma(jkind)
                !
                gmij = -0.5_dp*(ui*mcharge(iatom)**2 + uj*mcharge(jatom)**2)
                !
@@ -250,10 +283,12 @@ CONTAINS
                   fij(i) = fi
                END DO
                IF (use_virial) THEN
-                  CALL virial_pair_force(virial%pv_virial, 1._dp, fij, rij)
+                  fi = 1.0_dp
+                  IF (iatom == jatom) fi = 0.5_dp
+                  CALL virial_pair_force(virial%pv_virial, fi, fij, rij)
                   IF (atprop%stress) THEN
-                     CALL virial_pair_force(atprop%atstress(:, :, iatom), 0.5_dp, fij, rij)
-                     CALL virial_pair_force(atprop%atstress(:, :, jatom), 0.5_dp, fij, rij)
+                     CALL virial_pair_force(atprop%atstress(:, :, iatom), fi*0.5_dp, fij, rij)
+                     CALL virial_pair_force(atprop%atstress(:, :, jatom), fi*0.5_dp, fij, rij)
                   END IF
                END IF
 
@@ -291,11 +326,9 @@ CONTAINS
             DO WHILE (dbcsr_iterator_blocks_left(iter))
                CALL dbcsr_iterator_next_block(iter, irow, icol, sblock, blk)
                ikind = kind_of(irow)
-               CALL get_qs_kind(qs_kind_set(ikind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=ui)
+               ui = xgamma(ikind)
                jkind = kind_of(icol)
-               CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=uj)
+               uj = xgamma(jkind)
                gmij = -0.5_dp*(ui*mcharge(irow)**2 + uj*mcharge(icol)**2)
                DO is = 1, SIZE(ks_matrix, 1)
                   NULLIFY (ksblock)
@@ -321,11 +354,9 @@ CONTAINS
                CPASSERT(ic > 0)
 
                ikind = kind_of(iatom)
-               CALL get_qs_kind(qs_kind_set(ikind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=ui)
+               ui = xgamma(ikind)
                jkind = kind_of(jatom)
-               CALL get_qs_kind(qs_kind_set(jkind), dftb_parameter=dftb_kind)
-               CALL get_dftb_atom_param(dftb_kind, dudq=uj)
+               uj = xgamma(jkind)
                gmij = -0.5_dp*(ui*mcharge(iatom)**2 + uj*mcharge(jatom)**2)
                !
                NULLIFY (sblock)

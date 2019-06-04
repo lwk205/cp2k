@@ -41,7 +41,7 @@ MODULE bibliography
    PUBLIC :: add_all_references ! f77_interface only
 
    ! all reference keys
-   INTEGER, PUBLIC, SAVE ::  VandeVondele2005a, VandeVondele2003, &
+   INTEGER, PUBLIC, SAVE :: Richters2018, VandeVondele2005a, VandeVondele2003, &
                             Laino2005, Laino2006, Goedecker1996, Hartwigsen1998, Krack2005, &
                             Lippert1997, Lippert1999, Krack2000, Krack2002, Iannuzzi2005, &
                             Iannuzzi2006, Iannuzzi2007, Toukmaji1996, Martyna1999, &
@@ -83,7 +83,7 @@ MODULE bibliography
                             Becke1988b, Migliore2009, Mavros2015, Holmberg2017, Marek2014, &
                             Stoychev2016, Futera2017, Bailey2006, Papior2017, Lehtola2018, &
                             Brieuc2016, Barca2018, Scheiber2018, Huang2011, Heaton_Burgess2007, &
-                            Schuett2018, Holmberg2018, Togo2018, Staub2019
+                            Schuett2018, Holmberg2018, Togo2018, Staub2019, Grimme2017
 
 CONTAINS
 
@@ -1805,6 +1805,25 @@ CONTAINS
                          "DI 10.1002/jcc.21759", &
                          "ER"), &
                          DOI="10.1002/jcc.21759")
+
+      CALL add_reference(key=Grimme2017, ISI_record=s2a( &
+                         "PT J", &
+                         "AU Grimme, S", &
+                         "   Bannwarth, C", &
+                         "   Shushkov, P", &
+                         "AF Grimme, Stefan", &
+                         "   Bannwarth, Christoph", &
+                         "   Shushkov, Philip", &
+                         "TI A Robust and Accurate Tight-Binding Quantum Chemical Method for", &
+                         "   Structures, Vibrational Frequencies, and Noncovalent Interactions of", &
+                         "   Large Molecular Systems Parametrized for All spd-Block Elements (Z = 1-86) ", &
+                         "SO Journal of Chemical Theory and Computation", &
+                         "PY 2017", &
+                         "VL 13", &
+                         "BP 1989", &
+                         "DI 10.1021/acs.jctc.7b00118", &
+                         "ER"), &
+                         DOI="10.1021/acs.jctc.7b00118")
 
       CALL add_reference(key=Branduardi2007, ISI_record=s2a( &
                          "PT J", &
@@ -3942,6 +3961,27 @@ CONTAINS
                          "DI 10.1021/acs.jctc.8b00957", &
                          "ER"), &
                          DOI="10.1021/acs.jctc.8b00957")
+
+      CALL add_reference(key=Richters2018, ISI_record=s2a( &
+                         "AU Richters, D", &
+                         "   Lass, M", &
+                         "   Walther, A", &
+                         "   Plessl, C", &
+                         "   Kuehne, T D", &
+                         "TI A General Algorithm to Calculate the Inverse Principal p-th Root of ", &
+                         "   Symmetric Positive Definite Matrices", &
+                         "SO Communications in Computational Physics", &
+                         "SN 1991-7120", &
+                         "J9 J COMPUT CHEM", &
+                         "JI Commun. Comput. Phys.", &
+                         "PD OCT", &
+                         "PY 2018", &
+                         "VL 25", &
+                         "IS 2", &
+                         "BP 564", &
+                         "EP 585", &
+                         "ER"), &
+                         DOI="10.4208/cicp.OA-2018-0053")
 
    END SUBROUTINE add_all_references
 

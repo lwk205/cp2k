@@ -10,12 +10,11 @@ fi
 GCC_VERSION=$1
 
 # install Ubuntu packages
-apt-get update
-apt-get install -y --no-install-recommends  \
+apt-get update -qq
+apt-get install -qq --no-install-recommends  \
     gcc-${GCC_VERSION}                      \
     g++-${GCC_VERSION}                      \
     gfortran-${GCC_VERSION}                 \
-    pkg-config                              \
     fftw3-dev                               \
     libopenblas-dev                         \
     liblapack-dev                           \
@@ -40,8 +39,6 @@ cd /opt/cp2k-toolchain/
 ./install_cp2k_toolchain.sh  \
     --mpi-mode=no            \
     --with-gcc=system        \
-    --with-binutils=system   \
-    --with-make=system       \
     --with-cmake=system      \
     --with-fftw=system       \
     --with-openblas=system   \

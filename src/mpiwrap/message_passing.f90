@@ -164,7 +164,7 @@
      MARK_USED(group)
      MARK_USED(scount)
      MARK_USED(sdispl)
-!$OMP     PARALLEL DO DEFAULT(NONE) PRIVATE(i) SHARED(rcount,rdispl,sdispl,rb,sb)
+     !$OMP PARALLEL DO DEFAULT(NONE) PRIVATE(i) SHARED(rcount,rdispl,sdispl,rb,sb)
      DO i = 1, rcount(1)
         rb(rdispl(1) + i) = sb(sdispl(1) + i)
      ENDDO
@@ -583,7 +583,7 @@
 
 ! *****************************************************************************
 !> \brief Send one datum to another process
-!> \param[in] msg             Dum to send
+!> \param[in] msg             Scalar to send
 !> \param[in] dest            Destination process
 !> \param[in] tag             Transfer identifier
 !> \param[in] gid             Message passing environment identifier
@@ -657,7 +657,7 @@
 ! *****************************************************************************
 !> \brief Receive one datum from another process
 !> \param[in,out] msg         Place received data into this variable
-!> \param[in,out] source      Process to receieve from
+!> \param[in,out] source      Process to receive from
 !> \param[in,out] tag         Transfer identifier
 !> \param[in] gid             Message passing environment identifier
 !> \par MPI mapping
@@ -701,7 +701,7 @@
 
 ! *****************************************************************************
 !> \brief Receive rank-1 data from another process
-!> \param[in,out] msg         Place receieved data into this rank-1 array
+!> \param[in,out] msg         Place received data into this rank-1 array
 !> \param source ...
 !> \param tag ...
 !> \param gid ...
@@ -1114,7 +1114,7 @@
 !> \note see mp_sum_${nametype1}$
 ! *****************************************************************************
   SUBROUTINE mp_sum_${nametype1}$m3(msg, gid)
-     ${type1}$, INTENT(INOUT)                   :: msg(:, :, :)
+     ${type1}$, INTENT(INOUT), CONTIGUOUS     :: msg(:, :, :)
      INTEGER, INTENT(IN)                      :: gid
 
      CHARACTER(len=*), PARAMETER :: routineN = 'mp_sum_${nametype1}$m3', &
@@ -1274,9 +1274,9 @@
 !> \param[in] gid          Message passing environment identifier
 ! *****************************************************************************
   SUBROUTINE mp_sum_partial_${nametype1}$m(msg, res, gid)
-     ${type1}$, INTENT(IN)         :: msg(:, :)
-     ${type1}$, INTENT(OUT)        :: res(:, :)
-     INTEGER, INTENT(IN)         :: gid
+     ${type1}$, CONTIGUOUS, INTENT(IN)   :: msg(:, :)
+     ${type1}$, CONTIGUOUS, INTENT(OUT)  :: res(:, :)
+     INTEGER, INTENT(IN)                 :: gid
 
      CHARACTER(len=*), PARAMETER :: routineN = 'mp_sum_partial_${nametype1}$m' &
                                     , routineP = moduleN//':'//routineN
@@ -1412,7 +1412,7 @@
 !> \note see mp_min_${nametype1}$
 ! *****************************************************************************
   SUBROUTINE mp_min_${nametype1}$v(msg, gid)
-     ${type1}$, INTENT(INOUT)                   :: msg(:)
+     ${type1}$, INTENT(INOUT), CONTIGUOUS     :: msg(:)
      INTEGER, INTENT(IN)                      :: gid
 
      CHARACTER(len=*), PARAMETER :: routineN = 'mp_min_${nametype1}$v', &
@@ -1438,7 +1438,7 @@
 !> \brief Multiplies a set of numbers scattered across a number of processes,
 !>        then replicates the result.
 !> \param[in,out] msg         a number to multiply (input) and result (output)
-!> \param[in] gid             mssage passing environment identifier
+!> \param[in] gid             message passing environment identifier
 !> \par MPI mapping
 !>      mpi_allreduce
 ! *****************************************************************************
@@ -2823,7 +2823,7 @@
   END SUBROUTINE mp_sendrecv_${nametype1}$m4
 
 ! *****************************************************************************
-!> \brief Non-blocking send and receieve of a scalar
+!> \brief Non-blocking send and receive of a scalar
 !> \param[in] msgin           Scalar data to send
 !> \param[in] dest            Which process to send to
 !> \param[out] msgout         Receive data into this pointer
@@ -2883,7 +2883,7 @@
   END SUBROUTINE mp_isendrecv_${nametype1}$
 
 ! *****************************************************************************
-!> \brief Non-blocking send and receieve of a vector
+!> \brief Non-blocking send and receive of a vector
 !> \param[in] msgin           Vector data to send
 !> \param[in] dest            Which process to send to
 !> \param[out] msgout         Receive data into this pointer
@@ -3546,9 +3546,9 @@
            IF (myproc .EQ. source) do_local_copy = .TRUE.
         ENDIF
         IF (do_local_copy) THEN
-!$OMP           PARALLEL WORKSHARE DEFAULT(none) SHARED(base,win_data,disp_aint,len)
+           !$OMP PARALLEL WORKSHARE DEFAULT(none) SHARED(base,win_data,disp_aint,len)
            base(:) = win_data(disp_aint + 1:disp_aint + len)
-!$OMP           END PARALLEL WORKSHARE
+           !$OMP END PARALLEL WORKSHARE
            request = mp_request_null
            ierr = 0
         ELSE
@@ -3710,7 +3710,7 @@
 !>        (serial) Unformatted stream write
 !> \param[in] fh     file handle (file storage unit)
 !> \param[in] offset file offset (position)
-!> \param[in] msg    data to be writen to the file
+!> \param[in] msg    data to be written to the file
 !> \param msglen ...
 !> \par MPI-I/O mapping   mpi_file_write_at
 !> \par STREAM-I/O mapping   WRITE

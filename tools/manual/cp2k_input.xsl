@@ -296,8 +296,7 @@
         </xsl:if>
        </em>
        <xsl:call-template name="link_edit_text">
-        <xsl:with-param name="txt_id" select="$local_path"/>
-        <xsl:with-param name="root" select="$root"/>
+        <xsl:with-param name="location" select="string(LOCATION)"/>
        </xsl:call-template>
       </li>
      </ul>
@@ -496,7 +495,7 @@
          <big class="tt">&#160;{<xsl:value-of select="$vartype"/>}&#160;...</big>
          <xsl:if test="contains(upper-case(NAME[@type='default']),'LIST')">
           <big class="tt">&#160;or&#160;a&#160;range&#160;{<xsl:value-of select="$vartype"/>}..{<xsl:value-of select="$vartype"/>}</big>
-         </xsl:if>      
+         </xsl:if>
         </xsl:if>
        </xsl:otherwise>
       </xsl:choose>
@@ -515,8 +514,7 @@
        </xsl:if>
       </em>
       <xsl:call-template name="link_edit_text">
-       <xsl:with-param name="txt_id" select="$keyword_path"/>
-       <xsl:with-param name="root" select="$root"/>
+       <xsl:with-param name="location" select="string(LOCATION)"/>
       </xsl:call-template>
      </td>
     </tr>
@@ -615,10 +613,6 @@
               Without description, yet.
              </xsl:if>
             </em>
-            <xsl:call-template name="link_edit_text">
-             <xsl:with-param name="txt_id" select="concat($keyword_path,'/',string(NAME))"/>
-             <xsl:with-param name="root" select="$root"/>
-            </xsl:call-template>
            </dd>
           </dl>
          </li>
@@ -702,42 +696,27 @@
     <h2 align="center">How to generate the CP2K input reference manual</h2>
     <ul class="disc">
      <li>
-      Prepare a CP2K executable. It does not matter which type of CP2K executable (e.g. sopt) you are using.
+      Prepare a CP2K executable. It does not matter which type of CP2K executable (e.g. psmp) you are using,
+      since running a CP2K executable with the flag <big class="tt">--xml</big> like:
+      <ul class="none">
+       <li><big class="tt">cp2k.psmp --xml</big></li>
+      </ul>
+      will generate a file named <big class="tt">cp2k_input.xml</big> with an XML dump of the entire CP2K input structure
+      in the same directory describing all features of the actual CP2K executable.<br/>
+      That XML output in <big class="tt">cp2k_input.xml</big> has to be transformed to HTML using an XML 2.0 compliant
+      translator like SAXON. Preferentially, you may want to employ the platform independent Java version of SAXON, which
+      can be downloaded from <a href="https://sourceforge.net/projects/saxon">https://sourceforge.net/projects/saxon</a>.<br/>
      </li>
      <li>
-      Run the CP2K executable with the flag <big class="tt">--xml</big> like:
+      Alternatively, you can also run the script
       <ul class="none">
-       <li><big class="tt">cp2k.sopt --xml</big></li>
+       <li><big class="tt">update_manual local psmp</big></li>
       </ul>
-      which will generate a file named <big class="tt">cp2k_input.xml</big> with a XML dump of the CP2K input
-      structure in the same directory.
+      in the folder cp2k/tools/manual/ which will perform all steps using the CP2K executable cp2k/exe/local/cp2k.psmp.
      </li>
      <li>
-      Copy the XSLT file <big class="tt">cp2k_input.xsl</big> from <big class="tt">cp2k/tools/manual/</big> to
-      your working directory, if needed.
-     </li>
-     <li>
-      Transform the XML output in <big class="tt">cp2k_input.xml</big> to HTML using a XML 2.0 compliant
-      translator like SAXON.<br/>
-      If you have the SAXON package already installed, then just run:
-      <ul class="none">
-       <li><big class="tt">saxon -o index.html cp2k_input.xml cp2k_input.xsl</big></li>
-      </ul>
-      Alternatively, you may employ the platform independent Java version of SAXON
-      <ul class="none">
-       <li><big class="tt">java -jar saxon8.jar -o index.html cp2k_input.xml cp2k_input.xsl</big></li>
-      </ul>
-      which can be downloaded from
-      <a href="https://sourceforge.net/projects/saxon">https://sourceforge.net/projects/saxon</a>.<br/>
-      The latter choice might be more convenient, if you have the Java Runtime Environment 1.5 or higher installed anyway.<br/>
-      You may check your installed Java version with:
-      <ul class="none">
-       <li><big class="tt">java -version</big></li>
-      </ul>
-     </li>
-     <li>
-      Launch your favorite web browser and load the <big class="tt">index.html</big> file generated in the
-      previous step.
+      Launch your favorite web browser and load the generated <big class="tt">index.html</big> file, e.g. in cp2k/tools/manual/local/psmp
+      from the previous step.
      </li>
      <li>
       Happy browsing!
@@ -752,16 +731,12 @@
 </xsl:template>
 
 <xsl:template name="link_edit_text">
- <xsl:param name="txt_id"/>
- <xsl:param name="root"/>
+ <xsl:param name="location"/>
  <xsl:if test="$add_edit_links = 'yes'">
-  <!-- <span style="position:relative;">
-  <a title="Edit this text" href="{concat('https://manual.cp2k.org/edit.php?txt_id=',$txt_id)}">
-  <img src="{concat($root,'edit.png')}" style="height:25px; position:absolute; top:-22px; left:5px;"/>
-  </a>
-  </span> -->
+ <xsl:variable name="link_path" select="concat(substring-before($location, ':'), '#L', substring-after($location, ':'))"/>
+ <xsl:variable name="link_url" select="concat('https://github.com/cp2k/cp2k/blob/master/src/', $link_path)"/>
   <span style="font-size: small;">
-   &#160;[<a title="Edit this text" href="{concat('https://manual.cp2k.org/edit.php?txt_id=',$txt_id)}">Edit</a>]
+   &#160;[<a title="See corresponding source code location." href="{$link_url}">Edit on GitHub</a>]
   </span>
  </xsl:if>
 </xsl:template>
