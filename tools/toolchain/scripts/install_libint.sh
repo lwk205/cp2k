@@ -69,7 +69,8 @@ case "$with_libint" in
                     -DENABLE_FORTRAN=ON \
                     -DCXXFLAGS="$LIBINT_CXXFLAGS" > configure.log 2>&1
 
-            make -j $NPROCS > make.log 2>&1
+            # restrict number of jobs to 8 since parallel build may consume too much memory
+            make -j $(( NPROCS < 8 ? NPROCS : 8 )) > make.log 2>&1
             make install > install.log 2>&1
 
             cd ..
